@@ -718,38 +718,28 @@
     function openTrustLine() {
       const statusEl = document.getElementById('trustline-status');
 
-      // Build the Xaman (Xumm) deep link for TrustSet
-      // This opens Xaman directly with a pre-filled TrustSet transaction
-      const xamanDeepLink = 'https://xumm.app/detect/xapp:xumm.tangem-card?issuer=' 
-        + NUT_ISSUER + '&currency=' + NUT_CURRENCY;
+      // Use xrpl.services — it has native Xaman (Xumm) sign-in integration
+      // and a proper TrustSet form. This is the standard approach for XRPL projects.
+      const trustLineURL = 'https://xrpl.services/tokens/' 
+        + NUT_ISSUER + '/' + NUT_CURRENCY;
 
-      // Alternative: direct sign request URL format
-      // This creates a TrustSet payload that Xaman can sign
-      const trustSetPayload = {
-        TransactionType: 'TrustSet',
-        LimitAmount: {
-          currency: NUT_CURRENCY,
-          issuer: NUT_ISSUER,
-          value: '321000000000'
-        }
-      };
-
-      // Encode as a xumm sign URL
-      const payloadJSON = encodeURIComponent(JSON.stringify(trustSetPayload));
-      const signURL = 'https://xumm.app/sign/' + payloadJSON;
+      // Fallback: XPMarket token page also allows setting trust lines via Xaman
+      const xpmarketURL = 'https://xpmarket.com/token/' 
+        + NUT_CURRENCY + '-' + NUT_ISSUER;
 
       if (statusEl) {
-        statusEl.textContent = '⏳ Opening Xaman wallet...';
+        statusEl.textContent = '⏳ Opening trust line page...';
         statusEl.className = 'trustline-status';
       }
 
-      // Try the sign URL first (works on both mobile and desktop)
-      window.open(signURL, '_blank');
+      // Open XPMarket token page — has a clean "Set Trust Line" button with Xaman
+      window.open(xpmarketURL, '_blank');
 
-      // Update status after a moment
+      // Update status with instructions
       setTimeout(function() {
         if (statusEl) {
-          statusEl.innerHTML = '✅ Xaman should be open! Sign the TrustSet transaction in your wallet.<br><small style="opacity:0.7">Didn\'t work? Open Xaman → tap + → search "NUT" → add trust line manually.</small>';
+          statusEl.innerHTML = '✅ XPMarket opened! Click "Set Trust Line" on that page and sign in Xaman.'
+            + '<br><small style="opacity:0.7">Didn\'t work? Open Xaman app → tap + → search "NUT" → add trust line manually.</small>';
           statusEl.className = 'trustline-status success';
         }
       }, 2000);
