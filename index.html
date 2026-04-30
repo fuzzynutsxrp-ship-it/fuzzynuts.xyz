@@ -10,7 +10,7 @@
   <meta property="og:image" content="https://fuzzynuts.xyz/logo.png">
   <meta property="og:url" content="https://fuzzynuts.xyz">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:site" content="@fuzznutsxrp">
+  <meta name="twitter:site" content="@fuzzynutsxrp">
   <link rel="icon" type="image/png" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
@@ -180,6 +180,97 @@
       background: rgba(245,166,35,0.2);
       transform: translateY(-2px);
     }
+    .btn-trustline {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(45,106,79,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-trustline::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+      animation: trustlineShine 3s ease-in-out infinite;
+    }
+    @keyframes trustlineShine {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
+    }
+    .btn-trustline:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(45,106,79,0.6);
+    }
+
+    /* ═══ AIRDROP BANNER ═══ */
+    .airdrop-banner {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, rgba(45,106,79,0.15), rgba(245,166,35,0.08));
+      border: 1.5px solid rgba(45,106,79,0.3);
+      border-radius: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .airdrop-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--gold), var(--green));
+    }
+    .airdrop-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.75rem;
+      padding: 0.35rem 1rem;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(45,106,79,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(45,106,79,0); }
+    }
+    .airdrop-title {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .airdrop-desc {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .airdrop-cta-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .trustline-status {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      min-height: 1.4rem;
+    }
+    .trustline-status.success { color: #2ecc71; font-weight: 700; }
+    .trustline-status.error { color: #e74c3c; }
 
     /* ═══ STATS BAR ═══ */
     .stats-bar {
@@ -458,6 +549,7 @@
     <p class="tagline">The nuttiest meme coin on the XRP Ledger. 321 billion tokens. Supply locked forever. No rugs, just nuts. 🐿️</p>
     <div class="cta-group">
       <a href="https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP" class="btn btn-primary" target="_blank">🥜 Buy $NUT</a>
+      <a id="hero-trustline-btn" href="#" class="btn btn-trustline" onclick="openTrustLine(); return false;">🔗 Set Trust Line</a>
       <a href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7" class="btn btn-secondary" target="_blank">🔍 Verify On-Chain</a>
     </div>
   </section>
@@ -536,8 +628,22 @@
     </div>
   </section>
 
+  <!-- ═══ AIRDROP BANNER ═══ -->
+  <section class="section fade-up" style="padding-bottom: 0;">
+    <div class="airdrop-banner" id="airdrop-section">
+      <div class="airdrop-badge">🥜 Nut Drop Incoming</div>
+      <div class="airdrop-title">Set Your Trust Line for Airdrops</div>
+      <p class="airdrop-desc">The first Nut Drop is coming soon. You <strong>must</strong> have a $NUT trust line set before the snapshot to be eligible. One tap — that's all it takes.</p>
+      <div class="airdrop-cta-row">
+        <a id="airdrop-trustline-btn" href="#" class="btn btn-trustline" onclick="openTrustLine(); return false;">🔗 Set Trust Line in Xaman</a>
+        <a href="#how-to-manual" class="btn btn-secondary" onclick="document.getElementById('how-to-buy').scrollIntoView({behavior:'smooth'}); return false;">📖 Manual Instructions</a>
+      </div>
+      <div class="trustline-status" id="trustline-status"></div>
+    </div>
+  </section>
+
   <!-- ═══ HOW TO BUY ═══ -->
-  <section class="section fade-up">
+  <section class="section fade-up" id="how-to-buy">
     <h2 class="section-title">How to Get $NUT</h2>
     <p class="section-sub">4 simple steps to join the nuttiest community on XRPL.</p>
     <div class="steps">
@@ -547,11 +653,11 @@
       </div>
       <div class="step">
         <h3>Fund with XRP</h3>
-        <p>Buy XRP on any exchange and send it to your Xaman wallet.</p>
+        <p>Buy XRP on any exchange and send it to your Xaman wallet. You need ~12 XRP minimum.</p>
       </div>
       <div class="step">
         <h3>Set Trustline</h3>
-        <p>Add the NUT trustline from issuer <code style="font-size:0.7rem;color:var(--gold)">rpL6Hfo...xMP7</code></p>
+        <p><a href="#" onclick="openTrustLine(); return false;" style="color:var(--gold);text-decoration:underline;font-weight:700;">Tap here to set it instantly</a>, or add manually:<br><code style="font-size:0.7rem;color:var(--gold)">rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7</code></p>
       </div>
       <div class="step">
         <h3>Swap on DEX</h3>
@@ -595,7 +701,8 @@
   <!-- ═══ FOOTER ═══ -->
   <footer>
     <div class="social-links">
-      <a href="https://x.com/fuzznutsxrp" target="_blank">𝕏 Twitter</a>
+      <a href="https://x.com/fuzzynutsxrp" target="_blank">𝕏 Twitter</a>
+      <a href="https://t.me/FuzzynutsXRP" target="_blank">💬 Telegram</a>
       <a href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7" target="_blank">XRPScan</a>
       <a href="https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP" target="_blank">XPMarket</a>
     </div>
@@ -604,7 +711,51 @@
   </footer>
 
   <script>
-    // Intersection Observer for fade-in animations
+    // ═══ TRUST LINE DEEP LINK ═══
+    const NUT_ISSUER = 'rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7';
+    const NUT_CURRENCY = 'NUT';
+
+    function openTrustLine() {
+      const statusEl = document.getElementById('trustline-status');
+
+      // Build the Xaman (Xumm) deep link for TrustSet
+      // This opens Xaman directly with a pre-filled TrustSet transaction
+      const xamanDeepLink = 'https://xumm.app/detect/xapp:xumm.tangem-card?issuer=' 
+        + NUT_ISSUER + '&currency=' + NUT_CURRENCY;
+
+      // Alternative: direct sign request URL format
+      // This creates a TrustSet payload that Xaman can sign
+      const trustSetPayload = {
+        TransactionType: 'TrustSet',
+        LimitAmount: {
+          currency: NUT_CURRENCY,
+          issuer: NUT_ISSUER,
+          value: '321000000000'
+        }
+      };
+
+      // Encode as a xumm sign URL
+      const payloadJSON = encodeURIComponent(JSON.stringify(trustSetPayload));
+      const signURL = 'https://xumm.app/sign/' + payloadJSON;
+
+      if (statusEl) {
+        statusEl.textContent = '⏳ Opening Xaman wallet...';
+        statusEl.className = 'trustline-status';
+      }
+
+      // Try the sign URL first (works on both mobile and desktop)
+      window.open(signURL, '_blank');
+
+      // Update status after a moment
+      setTimeout(function() {
+        if (statusEl) {
+          statusEl.innerHTML = '✅ Xaman should be open! Sign the TrustSet transaction in your wallet.<br><small style="opacity:0.7">Didn\'t work? Open Xaman → tap + → search "NUT" → add trust line manually.</small>';
+          statusEl.className = 'trustline-status success';
+        }
+      }, 2000);
+    }
+
+    // ═══ INTERSECTION OBSERVER ═══
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -615,7 +766,7 @@
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // Floating nut particles
+    // ═══ FLOATING NUT PARTICLES ═══
     function createNut() {
       const nut = document.createElement('div');
       nut.className = 'nut-float';
