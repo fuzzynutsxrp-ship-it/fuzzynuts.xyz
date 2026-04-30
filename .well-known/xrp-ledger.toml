@@ -2,8 +2,14 @@
 # https://fuzzynuts.xyz/.well-known/xrp-ledger.toml
 
 [METADATA]
-modified = 2026-04-30T09:48:00Z
+modified = 2026-04-30T13:47:00Z
 
+# ═══ ISSUER INFO ═══
+[[ISSUERS]]
+address = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
+name = "Fuzzynuts"
+
+# ═══ ACCOUNTS ═══
 [[ACCOUNTS]]
 address = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
 desc = "NUT Issuer (blackholed — supply permanently locked)"
@@ -11,15 +17,41 @@ desc = "NUT Issuer (blackholed — supply permanently locked)"
 [[ACCOUNTS]]
 address = "rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh"
 desc = "NUT Distributor & LP Provider"
+domain = "fuzzynuts.xyz"
 
 [[ACCOUNTS]]
 address = "rH2ekyXyhdU5nMscw1PvcetBKeRe2en5xn"
 desc = "321 Nut Fund (Community Nut Jar)"
 
+# ═══ TOKEN METADATA (XRPL Meta format — [[TOKENS]] + icon) ═══
+[[TOKENS]]
+issuer = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
+currency = "NUT"
+name = "Fuzzynuts"
+desc = "The nuttiest meme on XRPL. 321 billion $NUT. Supply permanently locked. Community-driven. Built in Canada."
+icon = "https://fuzzynuts.xyz/logo.png"
+image = "https://fuzzynuts.xyz/logo.png"
+
+[[TOKENS.WEBLINKS]]
+url = "https://fuzzynuts.xyz"
+type = "website"
+title = "Official Website"
+
+[[TOKENS.WEBLINKS]]
+url = "https://x.com/fuzzynutsxrp"
+type = "socialmedia"
+title = "Twitter/X"
+
+[[TOKENS.WEBLINKS]]
+url = "https://t.me/FuzzynutsXRP"
+type = "socialmedia"
+title = "Telegram"
+
+# ═══ TOKEN METADATA (xrpl.org format — [[CURRENCIES]] + image) ═══
 [[CURRENCIES]]
 issuer = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
 currency = "NUT"
 name = "Fuzzynuts"
-desc = "The nuttiest meme on XRPL. 321 billion $NUT. Supply permanently locked. Community-driven."
+desc = "The nuttiest meme on XRPL. 321 billion $NUT. Supply permanently locked. Community-driven. Built in Canada."
 image = "https://fuzzynuts.xyz/logo.png"
-
+icon = "https://fuzzynuts.xyz/logo.png"
