@@ -1,0 +1,20 @@
+# Fuzzynuts ($NUT) — xrp-ledger.toml
+# https://fuzzynuts.xyz/.well-known/xrp-ledger.toml
+
+[METADATA]
+modified = 2026-04-30T00:00:00Z
+
+[[ACCOUNTS]]
+address = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
+desc = "NUT Issuer (blackholed — supply permanently locked)"
+
+[[ACCOUNTS]]
+address = "rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh"
+desc = "NUT Distributor & LP Provider"
+
+[[TOKENS]]
+issuer = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
+currency = "NUT"
+name = "Fuzzynuts"
+desc = "The nuttiest meme on XRPL. 321 billion $NUT. Supply permanently locked. Community-driven."
+icon = "https://fuzzynuts.xyz/logo.png"
