@@ -551,6 +551,7 @@
       <a href="https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP" class="btn btn-primary" target="_blank">🥜 Buy $NUT</a>
       <a id="hero-trustline-btn" href="#" class="btn btn-trustline" onclick="openTrustLine(); return false;">🔗 Set Trust Line</a>
       <a href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7" class="btn btn-secondary" target="_blank">🔍 Verify On-Chain</a>
+      <a href="game.html" class="btn btn-game" id="play-game-btn">🎮 Play Flappy Fuzzynuts</a>
     </div>
   </section>
 
@@ -769,6 +770,94 @@
     }
     setInterval(createNut, 3000);
     for (let i = 0; i < 5; i++) setTimeout(createNut, i * 600);
+
+    // ═══ 🐿️ RANDOM SQUIRREL CHASE EASTER EGG ═══
+    // A squirrel chases a rolling nut across the bottom of the screen at random intervals
+    function launchSquirrelChase() {
+      // Don't run if another is active
+      if (document.querySelector('.squirrel-chase')) return;
+
+      const chase = document.createElement('div');
+      chase.className = 'squirrel-chase';
+
+      // Random: left-to-right or right-to-left
+      const goRight = Math.random() > 0.5;
+      const bottomPos = 20 + Math.random() * 60; // px from bottom
+      const duration = 4 + Math.random() * 3; // seconds
+
+      chase.innerHTML = goRight
+        ? '<span class="chase-nut">🌰</span><span class="chase-squirrel">🐿️</span>'
+        : '<span class="chase-squirrel" style="transform:scaleX(-1)">🐿️</span><span class="chase-nut">🌰</span>';
+
+      chase.style.cssText = `
+        position: fixed;
+        bottom: ${bottomPos}px;
+        ${goRight ? 'left: -120px' : 'right: -120px'};
+        z-index: 9999;
+        pointer-events: none;
+        font-size: 2.2rem;
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        animation: squirrelRun${goRight ? 'Right' : 'Left'} ${duration}s linear forwards;
+      `;
+
+      document.body.appendChild(chase);
+      setTimeout(() => chase.remove(), duration * 1000 + 500);
+    }
+
+    // Inject squirrel chase CSS animations
+    const squirrelStyle = document.createElement('style');
+    squirrelStyle.textContent = `
+      @keyframes squirrelRunRight {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(calc(100vw + 240px)); }
+      }
+      @keyframes squirrelRunLeft {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(calc(-100vw - 240px)); }
+      }
+      .squirrel-chase .chase-nut {
+        animation: nutRoll 0.4s linear infinite;
+        display: inline-block;
+      }
+      .squirrel-chase .chase-squirrel {
+        animation: squirrelBounce 0.25s ease-in-out infinite;
+        display: inline-block;
+      }
+      @keyframes nutRoll {
+        0%   { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes squirrelBounce {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-8px); }
+      }
+      .btn-game {
+        background: linear-gradient(135deg, #2D6A4F, #3D8B6A) !important;
+        color: #F0EDE6 !important;
+        border: 2px solid #3D8B6A !important;
+      }
+      .btn-game:hover {
+        background: linear-gradient(135deg, #3D8B6A, #4ADE80) !important;
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.3) !important;
+      }
+    `;
+    document.head.appendChild(squirrelStyle);
+
+    // Launch squirrel chase at random intervals (every 15-45 seconds)
+    function scheduleSquirrel() {
+      const delay = (15 + Math.random() * 30) * 1000;
+      setTimeout(() => {
+        launchSquirrelChase();
+        scheduleSquirrel();
+      }, delay);
+    }
+    // First one after 8-15 seconds
+    setTimeout(() => {
+      launchSquirrelChase();
+      scheduleSquirrel();
+    }, (8 + Math.random() * 7) * 1000);
   </script>
 </body>
 </html>
