@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuzzynuts Arcade — Play & Win $NUT Prizes</title>
+  <meta name="description" content="Play games, top the leaderboard, and win weekly $NUT prizes. Connect your XRPL wallet and start competing!">
+  <meta property="og:title" content="Fuzzynuts Arcade">
+  <meta property="og:description" content="Play retro games and win $NUT tokens weekly. The nuttiest arcade on XRPL.">
+  <meta property="og:image" content="https://fuzzynuts.xyz/logo.png">
+  <meta property="og:url" content="https://fuzzynuts.xyz/arcade/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@fuzzynutsxrp">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arcade.css">
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="bg-particles"></div>
+
+  <!-- ═══ STICKY HEADER ═══ -->
+  <header class="arcade-topbar" id="topbar">
+    <div style="display:flex;align-items:center;gap:1.2rem;">
+      <a href="../" class="topbar-back" id="back-link">← Back</a>
+      <a href="../" class="topbar-brand">
+        <img src="../logo_512.png" alt="Fuzzynuts" class="topbar-logo">
+        <span class="topbar-title">FUZZYNUTS ARCADE</span>
+      </a>
+    </div>
+    <div class="wallet-area">
+      <div id="wallet-status-badge"></div>
+      <button class="wallet-btn" id="wallet-btn" onclick="handleWalletClick()">
+        <span class="wallet-dot"></span>
+        <span id="wallet-btn-text">Connect Wallet</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ WALLET CONNECT MODAL ═══ -->
+  <div class="wallet-modal-overlay" id="wallet-modal">
+    <div class="wallet-modal">
+      <button class="wallet-modal-close" onclick="closeWalletModal()">&times;</button>
+      <h2>🔗 CONNECT WALLET</h2>
+      <p>Choose your XRPL wallet to sign in, track scores, and win prizes.</p>
+
+      <div class="wallet-option" onclick="connectWallet('xaman')" id="opt-xaman">
+        <div class="wallet-option-icon" style="background:linear-gradient(135deg,#3052FF,#1a35b3);color:#fff;">X</div>
+        <div class="wallet-option-info">
+          <h3>Xaman (Xumm)</h3>
+          <p>Mobile wallet — scan QR code to connect</p>
+        </div>
+      </div>
+
+      <div class="wallet-option" onclick="connectWallet('gemwallet')" id="opt-gemwallet">
+        <div class="wallet-option-icon" style="background:linear-gradient(135deg,#00D4AA,#009977);color:#fff;">💎</div>
+        <div class="wallet-option-info">
+          <h3>GemWallet</h3>
+          <p>Browser extension — Chrome, Brave, Firefox</p>
+        </div>
+      </div>
+
+      <div class="wallet-option" onclick="connectWallet('crossmark')" id="opt-crossmark">
+        <div class="wallet-option-icon" style="background:linear-gradient(135deg,#6366F1,#4338CA);color:#fff;">✕</div>
+        <div class="wallet-option-info">
+          <h3>Crossmark</h3>
+          <p>Browser extension — Chrome, Brave, Edge</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="arcade-main">
+
+    <!-- Trustline CTA (hidden by default, shown when connected without trustline) -->
+    <div class="trustline-cta" id="trustline-cta">
+      <p>⚠️ You're connected but don't have a <strong>$NUT trustline</strong> yet. Set one to be eligible for weekly prizes!</p>
+      <button class="btn-trustline" onclick="FuzzyWallet.requestTrustline()">
+        🥜 Set $NUT Trustline (Free)
+      </button>
+    </div>
+
+    <!-- ═══ PRIZE BANNER ═══ -->
+    <div class="prize-banner fade-up">
+      <div class="prize-badge">🏆 WEEKLY PRIZES</div>
+      <h2 class="prize-title">Win 500K $NUT Every Week!</h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.4rem;">
+        Top 3 combined scores across all games share the weekly prize pool
+      </p>
+      <div class="prize-tiers">
+        <div class="prize-tier"><span class="medal">🥇</span><span class="amount">250,000 NUT</span></div>
+        <div class="prize-tier"><span class="medal">🥈</span><span class="amount">150,000 NUT</span></div>
+        <div class="prize-tier"><span class="medal">🥉</span><span class="amount">100,000 NUT</span></div>
+      </div>
+      <div class="prize-countdown" id="prize-countdown">
+        Week ends: Sunday 23:59 UTC — <span id="countdown-timer"></span>
+      </div>
+    </div>
+
+    <!-- ═══ GAMES SECTION ═══ -->
+    <section class="games-section">
+      <div class="section-header">
+        <h2>🎮 GAMES</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="game-grid" id="game-grid">
+
+        <!-- Game 1: Super Fuzzynuts -->
+        <a href="../games/mario/" class="game-card" id="card-mario">
+          <div class="game-thumb">
+            <span class="game-icon">🍄</span>
+          </div>
+          <div class="game-info">
+            <div class="game-name">SUPER FUZZYNUTS</div>
+            <div class="game-desc">Classic platformer action! Run, jump, and collect coins through the Mushroom Kingdom.</div>
+            <div class="game-stats">
+              <div class="game-stat">🏆 Your Best: <span class="stat-val" id="best-mario">—</span></div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Game 2: Fuzzy Survivors -->
+        <a href="../games/survivors/" class="game-card" id="card-survivors">
+          <div class="game-thumb">
+            <span class="game-icon">⚔️</span>
+          </div>
+          <div class="game-info">
+            <div class="game-name">FUZZY SURVIVORS</div>
+            <div class="game-desc">Survive waves of enemies! Level up, grab upgrades, and see how long you last.</div>
+            <div class="game-stats">
+              <div class="game-stat">🏆 Your Best: <span class="stat-val" id="best-survivors">—</span></div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Coming Soon Placeholder -->
+        <div class="game-card coming-soon">
+          <div class="game-thumb">
+            <span class="game-icon">🐿️</span>
+          </div>
+          <div class="game-info">
+            <div class="game-name">MORE COMING SOON</div>
+            <div class="game-desc">New games are being added to the arcade. Stay tuned for more nutty fun!</div>
+            <div class="game-stats">
+              <div class="game-stat" style="color:var(--gold-light)">🔜 Check back soon</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ WEEKLY LEADERBOARD ═══ -->
+    <section class="leaderboard-section fade-up">
+      <div class="section-header">
+        <h2>📋 WEEKLY LEADERBOARD</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="leaderboard-panel">
+        <div class="lb-tabs">
+          <button class="lb-tab active" onclick="switchTab('combined')" id="tab-combined">Combined</button>
+          <button class="lb-tab" onclick="switchTab('mario')" id="tab-mario">Super Fuzzynuts</button>
+          <button class="lb-tab" onclick="switchTab('survivors')" id="tab-survivors">Fuzzy Survivors</button>
+        </div>
+
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Player</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="lb-body">
+            <tr><td colspan="3" class="lb-empty">No scores yet this week. Be the first to play! 🎮</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ HOW TO PLAY & WIN ═══ -->
+    <section class="howto-section fade-up">
+      <div class="section-header">
+        <h2>❓ HOW TO PLAY & WIN</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="howto-steps">
+        <div class="howto-step">
+          <div class="howto-num">1</div>
+          <h3>Connect Wallet</h3>
+          <p>Use Xaman, GemWallet, or Crossmark to link your XRPL wallet.</p>
+        </div>
+        <div class="howto-step">
+          <div class="howto-num">2</div>
+          <h3>Set $NUT Trustline</h3>
+          <p>One-click setup. Free and instant. Required to receive prizes.</p>
+        </div>
+        <div class="howto-step">
+          <div class="howto-num">3</div>
+          <h3>Play Games</h3>
+          <p>Your best score per game is recorded. Play as much as you want!</p>
+        </div>
+        <div class="howto-step">
+          <div class="howto-num">4</div>
+          <h3>Win $NUT Weekly</h3>
+          <p>Top 3 combined scores win prizes every Monday. Sent straight to your wallet!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="arcade-footer">
+    <div class="footer-links">
+      <a href="https://x.com/fuzzynutsxrp" target="_blank">𝕏 Twitter</a>
+      <a href="https://t.me/FuzzynutsXRP" target="_blank">Telegram</a>
+      <a href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7" target="_blank">XRPScan</a>
+      <a href="https://xpmarket.com/token/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7" target="_blank">XPMarket</a>
+      <a href="../">fuzzynuts.xyz</a>
+    </div>
+    <p>Prizes funded by the Community Nut Jar (18% of supply). Play fair, win $NUT. 🐿️</p>
+  </footer>
+
+  <!-- ═══ SCRIPTS ═══ -->
+  <!-- Xaman SDK (CDN) -->
+  <script src="https://xumm.app/assets/cdn/xumm.min.js"></script>
+  <!-- GemWallet SDK (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@gemwallet/api@latest/dist/gemwallet-api.min.js"></script>
+  <!-- Crossmark: auto-injected by extension via window.xrpl — no CDN needed -->
+
+  <!-- Arcade Modules -->
+  <script src="wallet.js"></script>
+  <script src="leaderboard.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════
+    // APP INIT
+    // ═══════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', () => {
+      // Init leaderboard
+      FuzzyLeaderboard.init();
+
+      // Try to reconnect wallet
+      FuzzyWallet.tryReconnect();
+
+      // Listen for wallet state changes
+      FuzzyWallet.onChange(updateWalletUI);
+
+      // Listen for leaderboard changes
+      FuzzyLeaderboard.onChange(updateLeaderboardUI);
+
+      // Initial UI render
+      updateWalletUI(FuzzyWallet.state);
+      renderLeaderboard('combined');
+      updatePersonalBests();
+      updateCountdown();
+
+      // Countdown timer
+      setInterval(updateCountdown, 60000);
+
+      // Fade-in animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) e.target.classList.add('visible');
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    });
+
+    // ═══════════════════════════════════════════
+    // WALLET UI
+    // ═══════════════════════════════════════════
+    function handleWalletClick() {
+      if (FuzzyWallet.isConnected) {
+        // Show disconnect option
+        if (confirm(`Disconnect wallet ${FuzzyWallet.state.displayName}?`)) {
+          FuzzyWallet.disconnect();
+        }
+      } else {
+        openWalletModal();
+      }
+    }
+
+    function openWalletModal() {
+      document.getElementById('wallet-modal').classList.add('active');
+    }
+
+    function closeWalletModal() {
+      document.getElementById('wallet-modal').classList.remove('active');
+    }
+
+    async function connectWallet(type) {
+      closeWalletModal();
+      const btn = document.getElementById('wallet-btn');
+      btn.querySelector('#wallet-btn-text').textContent = 'Connecting...';
+
+      let success = false;
+      switch (type) {
+        case 'xaman': success = await FuzzyWallet.connect.xaman(); break;
+        case 'gemwallet': success = await FuzzyWallet.connect.gemwallet(); break;
+        case 'crossmark': success = await FuzzyWallet.connect.crossmark(); break;
+      }
+
+      if (!success) {
+        btn.querySelector('#wallet-btn-text').textContent = 'Connect Wallet';
+      }
+    }
+
+    function updateWalletUI(state) {
+      const btn = document.getElementById('wallet-btn');
+      const btnText = document.getElementById('wallet-btn-text');
+      const badge = document.getElementById('wallet-status-badge');
+      const trustlineCta = document.getElementById('trustline-cta');
+
+      if (state.connected) {
+        btn.classList.add('connected');
+        btnText.textContent = state.displayName;
+
+        if (state.hasTrustline) {
+          badge.innerHTML = '<span class="wallet-badge trustline">✅ NUT Trustline</span>';
+          trustlineCta.classList.remove('visible');
+        } else {
+          badge.innerHTML = '<span class="wallet-badge no-trustline">⚠️ No Trustline</span>';
+          trustlineCta.classList.add('visible');
+        }
+      } else {
+        btn.classList.remove('connected');
+        btnText.textContent = 'Connect Wallet';
+        badge.innerHTML = '';
+        trustlineCta.classList.remove('visible');
+      }
+    }
+
+    // Close modal on outside click
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('wallet-modal');
+      if (e.target === modal) closeWalletModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeWalletModal();
+    });
+
+    // ═══════════════════════════════════════════
+    // LEADERBOARD UI
+    // ═══════════════════════════════════════════
+    let currentTab = 'combined';
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      renderLeaderboard(tab);
+    }
+
+    function renderLeaderboard(tab) {
+      const tbody = document.getElementById('lb-body');
+
+      let entries;
+      if (tab === 'combined') {
+        entries = FuzzyLeaderboard.getLeaderboard().map(p => ({
+          address: p.address,
+          name: p.name,
+          score: p.total,
+          eligible: p.eligible
+        }));
+      } else {
+        entries = FuzzyLeaderboard.getGameScores(tab);
+      }
+
+      if (!entries || entries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="lb-empty">No scores yet this week. Be the first to play! 🎮</td></tr>';
+        return;
+      }
+
+      const currentAddress = FuzzyWallet.isConnected ? FuzzyWallet.address : null;
+
+      tbody.innerHTML = entries.slice(0, 20).map((entry, i) => {
+        const rank = i + 1;
+        const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+        const isYou = currentAddress && entry.address === currentAddress;
+        const youTag = isYou ? '<span class="you-tag">YOU</span>' : '';
+        const eligibleIcon = entry.eligible ? ' ✅' : '';
+        const displayName = entry.name || 'Guest';
+        const scoreStr = entry.score.toLocaleString();
+
+        return `<tr>
+          <td class="lb-rank ${rankClass}">${medal}</td>
+          <td class="lb-player">${displayName}${eligibleIcon}${youTag}</td>
+          <td class="lb-score">${scoreStr}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function updateLeaderboardUI() {
+      renderLeaderboard(currentTab);
+      updatePersonalBests();
+    }
+
+    function updatePersonalBests() {
+      const bestMario = FuzzyLeaderboard.getPersonalBest('mario');
+      const bestSurvivors = FuzzyLeaderboard.getPersonalBest('survivors');
+
+      document.getElementById('best-mario').textContent =
+        bestMario > 0 ? bestMario.toLocaleString() : '—';
+      document.getElementById('best-survivors').textContent =
+        bestSurvivors > 0 ? bestSurvivors.toLocaleString() : '—';
+    }
+
+    function updateCountdown() {
+      const el = document.getElementById('countdown-timer');
+      if (el) el.textContent = FuzzyLeaderboard.getTimeUntilReset();
+    }
+  </script>
+
+</body>
+</html>
