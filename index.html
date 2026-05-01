@@ -142,6 +142,60 @@
       margin-bottom: 2.5rem;
     }
 
+    /* CA (Contract/Issuer Address) Display */
+    .ca-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 1rem auto 1.5rem;
+      padding: 0.6rem 1.2rem;
+      background: rgba(218, 165, 32, 0.08);
+      border: 1px solid rgba(218, 165, 32, 0.25);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      max-width: 100%;
+    }
+    .ca-display:hover {
+      background: rgba(218, 165, 32, 0.15);
+      border-color: rgba(218, 165, 32, 0.5);
+      box-shadow: 0 0 15px rgba(218, 165, 32, 0.15);
+    }
+    .ca-display.copied {
+      border-color: #4ADE80;
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .ca-display.copied .ca-label {
+      background: #4ADE80;
+      color: #0A0A0F;
+    }
+    .ca-label {
+      background: var(--gold);
+      color: #0A0A0F;
+      font-weight: 800;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .ca-address {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: rgba(240, 237, 230, 0.85);
+      letter-spacing: 0.02em;
+      word-break: break-all;
+    }
+    .ca-copy {
+      font-size: 0.9rem;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .ca-display:hover .ca-copy {
+      opacity: 1;
+    }
+
     .cta-group {
       display: flex;
       gap: 1rem;
@@ -850,6 +904,11 @@
     <h1>Fuzzynuts</h1>
     <p class="ticker">$NUT on XRPL</p>
     <p class="tagline">The nuttiest meme coin on the XRP Ledger. 321 billion tokens. Supply locked forever. No rugs, just nuts. 🐿️</p>
+    <div class="ca-display" onclick="navigator.clipboard.writeText('rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7').then(()=>{this.classList.add('copied');this.querySelector('.ca-label').textContent='Copied! ✓';setTimeout(()=>{this.classList.remove('copied');this.querySelector('.ca-label').textContent='CA';},2000);})" title="Click to copy issuer address">
+      <span class="ca-label">CA</span>
+      <span class="ca-address">rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7</span>
+      <span class="ca-copy">📋</span>
+    </div>
     <div class="cta-group">
       <a href="https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP" class="btn btn-primary" target="_blank">🥜 Buy $NUT</a>
       <a id="hero-trustline-btn" href="#" class="btn btn-trustline" onclick="openTrustLine(); return false;">🔗 Set Trust Line</a>
