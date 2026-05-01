@@ -43,7 +43,8 @@ Mario.TitleState.prototype.Enter = function() {
 	Mario.GlobalMapState = new Mario.MapState();
 	//set up the global main character variable
 	Mario.MarioCharacter = new Mario.Character();
-	Mario.MarioCharacter.Image = Enjine.Resources.Images["smallMario"];
+	Mario.MarioCharacter.Large = true;
+	Mario.MarioCharacter.Image = Enjine.Resources.Images["racoonMario"];
 
 	Mario.PlayTitleMusic();
 };
