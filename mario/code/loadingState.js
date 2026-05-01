@@ -16,7 +16,7 @@ Mario.LoadingState.prototype = new Enjine.GameState();
 
 Mario.LoadingState.prototype.Enter = function() {
     var i = 0;
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < 14; i++) {
         this.Images[i] = {};
     }
     
@@ -29,12 +29,11 @@ Mario.LoadingState.prototype.Enter = function() {
     this.Images[6].name = "items";
     this.Images[7].name = "logo";
     this.Images[8].name = "map";
-    this.Images[9].name = "mario";
-    this.Images[10].name = "particles";
-    this.Images[11].name = "racoonMario";
-    this.Images[12].name = "smallMario";
-    this.Images[13].name = "title";
-    this.Images[14].name = "worldMap";
+    this.Images[9].name = "particles";
+    this.Images[10].name = "racoonMario";
+    this.Images[11].name = "smallMario";
+    this.Images[12].name = "title";
+    this.Images[13].name = "worldMap";
 
     this.Images[0].src = "images/bgsheet.png";
     this.Images[1].src = "images/endscene.gif";
@@ -45,53 +44,30 @@ Mario.LoadingState.prototype.Enter = function() {
     this.Images[6].src = "images/itemsheet.png";
     this.Images[7].src = "images/logo.gif";
     this.Images[8].src = "images/mapsheet.png";
-    this.Images[9].src = "images/mariosheet.png";
-    this.Images[10].src = "images/particlesheet.png";
-    this.Images[11].src = "images/racoonmariosheet.png";
-    this.Images[12].src = "images/smallmariosheet.png";
-    this.Images[13].src = "images/title.gif";
-    this.Images[14].src = "images/worldmap.png";
+    this.Images[9].src = "images/particlesheet.png";
+    this.Images[10].src = "images/racoonmariosheet.png";
+    this.Images[11].src = "images/smallmariosheet.png";
+    this.Images[12].src = "images/title.gif";
+    this.Images[13].src = "images/worldmap.png";
     
     Enjine.Resources.AddImages(this.Images);
     
-    var testAudio = new Audio();
-	
-    if (testAudio.canPlayType("audio/mp3")) {
-    	Enjine.Resources.AddSound("1up", "sounds/1-up.mp3", 1)
-		    .AddSound("breakblock", "sounds/breakblock.mp3")
-		    .AddSound("bump", "sounds/bump.mp3", 4)
-		    .AddSound("cannon", "sounds/cannon.mp3")
-		    .AddSound("coin", "sounds/coin.mp3", 5)
-		    .AddSound("death", "sounds/death.mp3", 1)
-		    .AddSound("exit", "sounds/exit.mp3", 1)
-		    .AddSound("fireball", "sounds/fireball.mp3", 1)
-		    .AddSound("jump", "sounds/jump.mp3")
-		    .AddSound("kick", "sounds/kick.mp3")
-		    .AddSound("pipe", "sounds/pipe.mp3", 1)
-		    .AddSound("powerdown", "sounds/powerdown.mp3", 1)
-		    .AddSound("powerup", "sounds/powerup.mp3", 1)
-		    .AddSound("sprout", "sounds/sprout.mp3", 1)
-		    .AddSound("stagestart", "sounds/stagestart.mp3", 1)
-		    .AddSound("stomp", "sounds/stomp.mp3", 2);
-    } else {
-	    Enjine.Resources.AddSound("1up", "sounds/1-up.wav", 1)
-		    .AddSound("breakblock", "sounds/breakblock.wav")
-		    .AddSound("bump", "sounds/bump.wav", 2)
-		    .AddSound("cannon", "sounds/cannon.wav")
-		    .AddSound("coin", "sounds/coin.wav", 5)
-		    .AddSound("death", "sounds/death.wav", 1)
-		    .AddSound("exit", "sounds/exit.wav", 1)
-		    .AddSound("fireball", "sounds/fireball.wav", 1)
-		    .AddSound("jump", "sounds/jump.wav", 1)
-		    .AddSound("kick", "sounds/kick.wav", 1)
-		    .AddSound("message", "sounds/message.wav", 1)
-		    .AddSound("pipe", "sounds/pipe.wav", 1)
-		    .AddSound("powerdown", "sounds/powerdown.wav", 1)
-		    .AddSound("powerup", "sounds/powerup.wav", 1)
-		    .AddSound("sprout", "sounds/sprout.wav", 1)
-		    .AddSound("stagestart", "sounds/stagestart.wav", 1)
-		    .AddSound("stomp", "sounds/stomp.wav", 1);
-    }
+    Enjine.Resources.AddSound("1up", "sounds/1-up.mp3", 1)
+        .AddSound("breakblock", "sounds/breakblock.mp3")
+        .AddSound("bump", "sounds/bump.mp3", 4)
+        .AddSound("cannon", "sounds/cannon.mp3")
+        .AddSound("coin", "sounds/coin.mp3", 5)
+        .AddSound("death", "sounds/death.mp3", 1)
+        .AddSound("exit", "sounds/exit.mp3", 1)
+        .AddSound("fireball", "sounds/fireball.mp3", 1)
+        .AddSound("jump", "sounds/jump.mp3")
+        .AddSound("kick", "sounds/kick.mp3")
+        .AddSound("pipe", "sounds/pipe.mp3", 1)
+        .AddSound("powerdown", "sounds/powerdown.mp3", 1)
+        .AddSound("powerup", "sounds/powerup.mp3", 1)
+        .AddSound("sprout", "sounds/sprout.mp3", 1)
+        .AddSound("stagestart", "sounds/stagestart.mp3", 1)
+        .AddSound("stomp", "sounds/stomp.mp3", 2);
     
     //load the array of tile behaviors
     Mario.Tile.LoadBehaviors();
