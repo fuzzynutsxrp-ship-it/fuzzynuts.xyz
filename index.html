@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@fuzzynutsxrp">
   <link rel="icon" type="image/png" href="logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -581,83 +581,80 @@
 
     /* ═══ ARCADE SECTION ═══ */
     .arcade-section {
-      padding: 4rem 2rem 5rem;
+      padding: 5rem 2rem 6rem;
       max-width: 1200px;
       margin: 0 auto;
       position: relative;
     }
-    .arcade-title {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 900;
+    .arcade-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 80%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+    }
+    .arcade-header {
       text-align: center;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--gold-light), var(--gold), #FF6B35);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      margin-bottom: 3rem;
+    }
+    .arcade-badge {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      color: var(--gold);
+      background: rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.2);
+      border-radius: 20px;
+      padding: 6px 16px;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .arcade-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(1rem, 3vw, 1.6rem);
+      text-align: center;
+      margin-bottom: 0.8rem;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(245,166,35,0.3), 0 2px 0 var(--gold-dark);
+      line-height: 1.8;
     }
     .arcade-subtitle {
       text-align: center;
       color: var(--text-muted);
-      margin-bottom: 2.5rem;
+      margin-bottom: 0;
       font-size: 1rem;
+      max-width: 500px;
+      margin-left: auto; margin-right: auto;
     }
     .arcade-layout {
       display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 2rem;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
       align-items: start;
     }
 
     /* CRT Screen */
     .crt-frame {
       position: relative;
-      background: #0c0c0c;
+      background: linear-gradient(180deg, #0e0e0e 0%, #080808 100%);
       border-radius: 18px;
-      padding: 16px;
+      padding: 3px;
       box-shadow:
-        0 0 0 3px #2a2017,
-        0 0 0 6px #1a1209,
-        0 0 60px rgba(245,166,35,0.15),
-        inset 0 0 30px rgba(0,0,0,0.8);
+        0 0 0 1px rgba(245,166,35,0.15),
+        0 0 60px rgba(245,166,35,0.1),
+        0 20px 60px rgba(0,0,0,0.6);
       overflow: hidden;
+      animation: frameGlow 5s ease-in-out infinite;
     }
-    .crt-frame::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.08) 2px,
-        rgba(0,0,0,0.08) 4px
-      );
-      pointer-events: none;
-      z-index: 2;
-      border-radius: 18px;
+    @keyframes frameGlow {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(245,166,35,0.15), 0 0 60px rgba(245,166,35,0.1), 0 20px 60px rgba(0,0,0,0.6); }
+      50% { box-shadow: 0 0 0 1px rgba(245,166,35,0.25), 0 0 90px rgba(245,166,35,0.15), 0 20px 60px rgba(0,0,0,0.6); }
     }
-    .crt-frame::after {
-      content: '';
-      position: absolute;
-      top: -2px; left: -2px; right: -2px; bottom: -2px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(245,166,35,0.2), transparent 30%, transparent 70%, rgba(245,166,35,0.15));
-      pointer-events: none;
-      z-index: 3;
-    }
-    .crt-glow {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 120%; height: 120%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(ellipse, rgba(245,166,35,0.06) 0%, transparent 70%);
-      pointer-events: none;
-      animation: crtGlow 4s ease-in-out infinite;
-    }
-    @keyframes crtGlow {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+    .crt-inner {
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
     }
     .game-canvas-wrapper {
       position: relative;
@@ -918,23 +915,28 @@
 
   <!-- ═══ SUPER FUZZYNUTS ARCADE ═══ -->
   <section class="arcade-section fade-up" id="arcade">
-    <h2 class="arcade-title">🕹️ Super Fuzzynuts Arcade</h2>
-    <p class="arcade-subtitle">Play the flying squirrel platformer right here. Stomp enemies, collect nuts, climb the leaderboard!</p>
+    <div class="arcade-header">
+      <div class="arcade-badge">🕹️ Now Playable</div>
+      <h2 class="arcade-title">SUPER FUZZYNUTS</h2>
+      <p class="arcade-subtitle">Stomp enemies, collect coins, and conquer World 1-1 right in your browser.</p>
+    </div>
 
     <div class="arcade-layout">
       <!-- CRT Game Screen -->
       <div class="crt-frame">
-        <div class="crt-glow"></div>
-        <div class="game-canvas-wrapper" id="game-wrapper">
-          <div class="game-play-overlay" id="game-overlay" onclick="startGame()">
-            <div class="play-icon">🐿️</div>
-            <div class="play-text">Click to Play</div>
+        <div class="crt-inner">
+          <div class="game-canvas-wrapper" id="game-wrapper">
+            <div class="game-play-overlay" id="game-overlay" onclick="startGame()">
+              <div class="play-icon">🐿️</div>
+              <div class="play-text">Click to Play</div>
+            </div>
           </div>
         </div>
         <div class="controls-bar">
-          <div class="control-hint"><span class="key-badge">←→</span> Move</div>
-          <div class="control-hint"><span class="key-badge">S</span> Jump / Start</div>
-          <div class="control-hint"><span class="key-badge">A</span> Run / Fire</div>
+          <div class="control-hint"><span class="key-badge">← →</span> Move</div>
+          <div class="control-hint"><span class="key-badge">X</span> Jump</div>
+          <div class="control-hint"><span class="key-badge">Z</span> Run</div>
+          <div class="control-hint"><span class="key-badge">↓</span> Duck</div>
         </div>
         <div class="standalone-link">
           <a href="mario/index.html" target="_blank">Open in full window ↗</a>
