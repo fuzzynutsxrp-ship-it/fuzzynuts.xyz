@@ -42,12 +42,12 @@ Mario.LoadingState.prototype.Enter = function() {
     this.Images[4].src = "images/font.gif";
     this.Images[5].src = "images/gameovergost.gif";
     this.Images[6].src = "images/itemsheet.png";
-    this.Images[7].src = "images/logo.png";
+    this.Images[7].src = "images/logo.gif";
     this.Images[8].src = "images/mapsheet.png";
     this.Images[9].src = "images/particlesheet.png";
     this.Images[10].src = "images/racoonmariosheet.png";
     this.Images[11].src = "images/smallmariosheet.png";
-    this.Images[12].src = "images/title.png";
+    this.Images[12].src = "images/title.gif";
     this.Images[13].src = "images/worldmap.png";
     
     Enjine.Resources.AddImages(this.Images);
