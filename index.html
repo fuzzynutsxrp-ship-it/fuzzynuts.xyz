@@ -525,12 +525,315 @@
       transform: translateY(0);
     }
 
+    /* ═══ ARCADE SECTION ═══ */
+    .arcade-section {
+      padding: 4rem 2rem 5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .arcade-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold), #FF6B35);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .arcade-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+    }
+    .arcade-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* CRT Screen */
+    .crt-frame {
+      position: relative;
+      background: #0c0c0c;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow:
+        0 0 0 3px #2a2017,
+        0 0 0 6px #1a1209,
+        0 0 60px rgba(245,166,35,0.15),
+        inset 0 0 30px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+    .crt-frame::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 18px;
+    }
+    .crt-frame::after {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(245,166,35,0.2), transparent 30%, transparent 70%, rgba(245,166,35,0.15));
+      pointer-events: none;
+      z-index: 3;
+    }
+    .crt-glow {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 120%; height: 120%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, rgba(245,166,35,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      animation: crtGlow 4s ease-in-out infinite;
+    }
+    @keyframes crtGlow {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .game-canvas-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 75%; /* 4:3 aspect ratio */
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .game-canvas-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .game-play-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: opacity 0.4s;
+    }
+    .game-play-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .play-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 20px rgba(245,166,35,0.6));
+      animation: playPulse 2s ease-in-out infinite;
+    }
+    @keyframes playPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .play-text {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .controls-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .control-hint {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .key-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 24px;
+      padding: 0 6px;
+      background: rgba(245,166,35,0.12);
+      border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 5px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--gold);
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Leaderboard */
+    .leaderboard-panel {
+      background: rgba(19,19,26,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(245,166,35,0.15);
+      border-radius: 18px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .leaderboard-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), #FF6B35, var(--gold));
+    }
+    .lb-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+    .lb-crown { font-size: 1.4rem; }
+    .lb-title {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      letter-spacing: 0.5px;
+    }
+    .lb-scores {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .lb-entry {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.7rem;
+      background: rgba(245,166,35,0.04);
+      border-radius: 10px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .lb-entry:hover {
+      background: rgba(245,166,35,0.08);
+      border-color: rgba(245,166,35,0.15);
+    }
+    .lb-entry.gold { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.2); }
+    .lb-entry.silver { background: rgba(192,192,192,0.06); }
+    .lb-entry.bronze { background: rgba(205,127,50,0.06); }
+    .lb-rank {
+      font-weight: 900;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .lb-entry.gold .lb-rank { color: #FFD700; }
+    .lb-entry.silver .lb-rank { color: #C0C0C0; }
+    .lb-entry.bronze .lb-rank { color: #CD7F32; }
+    .lb-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lb-score {
+      font-weight: 900;
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-family: 'Courier New', monospace;
+    }
+    .lb-empty {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 2rem 0;
+      opacity: 0.7;
+    }
+    .lb-your-score {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      background: rgba(245,166,35,0.08);
+      border-radius: 10px;
+      border: 1px solid rgba(245,166,35,0.2);
+      text-align: center;
+    }
+    .lb-your-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+    .lb-your-value {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      font-family: 'Courier New', monospace;
+    }
+    .lb-clear {
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+    .lb-clear-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+    .lb-clear-btn:hover { opacity: 1; color: #e74c3c; }
+
+    /* Standalone link */
+    .standalone-link {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .standalone-link a {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .standalone-link a:hover { color: var(--gold); }
+
     /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 900px) {
+      .arcade-layout {
+        grid-template-columns: 1fr;
+      }
+      .leaderboard-panel {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+    }
     @media (max-width: 600px) {
       .stats-bar { grid-template-columns: repeat(2, 1fr); }
       .cta-group { flex-direction: column; align-items: center; }
       .btn { width: 100%; max-width: 280px; justify-content: center; }
       .address-item { flex-wrap: wrap; }
+      .controls-bar { gap: 0.8rem; }
     }
   </style>
 </head>
@@ -552,7 +855,52 @@
       <a id="hero-trustline-btn" href="#" class="btn btn-trustline" onclick="openTrustLine(); return false;">🔗 Set Trust Line</a>
       <a href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7" class="btn btn-secondary" target="_blank">🔍 Verify On-Chain</a>
       <a href="game.html" class="btn btn-game" id="play-game-btn">🎮 Play Flappy Fuzzynuts</a>
-      <a href="mario/index.html" class="btn btn-game" id="play-mario-btn" style="background:linear-gradient(135deg,#5C2E0A,#8B4513);border-color:#CD853F;">🐿️ Play Super Fuzzynuts</a>
+      <a href="#arcade" class="btn btn-game" id="play-mario-btn" style="background:linear-gradient(135deg,#5C2E0A,#8B4513);border-color:#CD853F;" onclick="document.getElementById('arcade').scrollIntoView({behavior:'smooth'}); return false;">🐿️ Play Super Fuzzynuts ↓</a>
+    </div>
+  </section>
+
+  <!-- ═══ SUPER FUZZYNUTS ARCADE ═══ -->
+  <section class="arcade-section fade-up" id="arcade">
+    <h2 class="arcade-title">🕹️ Super Fuzzynuts Arcade</h2>
+    <p class="arcade-subtitle">Play the flying squirrel platformer right here. Stomp enemies, collect nuts, climb the leaderboard!</p>
+
+    <div class="arcade-layout">
+      <!-- CRT Game Screen -->
+      <div class="crt-frame">
+        <div class="crt-glow"></div>
+        <div class="game-canvas-wrapper" id="game-wrapper">
+          <div class="game-play-overlay" id="game-overlay" onclick="startGame()">
+            <div class="play-icon">🐿️</div>
+            <div class="play-text">Click to Play</div>
+          </div>
+        </div>
+        <div class="controls-bar">
+          <div class="control-hint"><span class="key-badge">←→</span> Move</div>
+          <div class="control-hint"><span class="key-badge">S</span> Jump / Start</div>
+          <div class="control-hint"><span class="key-badge">A</span> Run / Fire</div>
+        </div>
+        <div class="standalone-link">
+          <a href="mario/index.html" target="_blank">Open in full window ↗</a>
+        </div>
+      </div>
+
+      <!-- Leaderboard Panel -->
+      <div class="leaderboard-panel">
+        <div class="lb-header">
+          <span class="lb-crown">👑</span>
+          <span class="lb-title">LEADERBOARD</span>
+        </div>
+        <div class="lb-scores" id="lb-scores">
+          <div class="lb-empty">🥜 No scores yet.<br>Be the first!</div>
+        </div>
+        <div class="lb-your-score">
+          <div class="lb-your-label">Your Best</div>
+          <div class="lb-your-value" id="lb-your-best">---</div>
+        </div>
+        <div class="lb-clear">
+          <button class="lb-clear-btn" onclick="clearLeaderboard()">Reset Leaderboard</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -859,6 +1207,124 @@
       launchSquirrelChase();
       scheduleSquirrel();
     }, (8 + Math.random() * 7) * 1000);
+
+    // ═══ SUPER FUZZYNUTS ARCADE ═══
+    let gameStarted = false;
+
+    function startGame() {
+      if (gameStarted) return;
+      gameStarted = true;
+      const wrapper = document.getElementById('game-wrapper');
+      const overlay = document.getElementById('game-overlay');
+      
+      // Create iframe
+      const iframe = document.createElement('iframe');
+      iframe.src = 'mario/index.html';
+      iframe.id = 'game-iframe';
+      iframe.allow = 'autoplay';
+      iframe.setAttribute('loading', 'lazy');
+      wrapper.appendChild(iframe);
+      
+      // Hide overlay with animation
+      overlay.classList.add('hidden');
+      
+      // Focus the iframe after a short delay
+      setTimeout(() => {
+        iframe.focus();
+        iframe.contentWindow && iframe.contentWindow.focus();
+      }, 500);
+    }
+
+    // ═══ LEADERBOARD SYSTEM ═══
+    const LB_KEY = 'fuzzynuts_leaderboard';
+    const LB_MAX = 10;
+
+    function getLeaderboard() {
+      try {
+        return JSON.parse(localStorage.getItem(LB_KEY) || '[]');
+      } catch { return []; }
+    }
+
+    function saveLeaderboard(lb) {
+      localStorage.setItem(LB_KEY, JSON.stringify(lb.slice(0, LB_MAX)));
+    }
+
+    function addScore(score, event) {
+      const lb = getLeaderboard();
+      const name = getPlayerName();
+      lb.push({ name, score: score, event: event, date: Date.now() });
+      lb.sort((a, b) => b.score - a.score);
+      saveLeaderboard(lb.slice(0, LB_MAX));
+      renderLeaderboard();
+    }
+
+    function getPlayerName() {
+      let name = localStorage.getItem('fuzzynuts_player_name');
+      if (!name) {
+        const adjectives = ['Nutty', 'Golden', 'Fuzzy', 'Swift', 'Lucky', 'Wild', 'Brave', 'Mighty'];
+        const nouns = ['Squirrel', 'Acorn', 'Chipmunk', 'Walnut', 'Hazel', 'Forager', 'Climber', 'Tail'];
+        name = adjectives[Math.floor(Math.random() * adjectives.length)] + nouns[Math.floor(Math.random() * nouns.length)];
+        localStorage.setItem('fuzzynuts_player_name', name);
+      }
+      return name;
+    }
+
+    function renderLeaderboard() {
+      const lb = getLeaderboard();
+      const container = document.getElementById('lb-scores');
+      const bestEl = document.getElementById('lb-your-best');
+      const playerName = getPlayerName();
+
+      if (lb.length === 0) {
+        container.innerHTML = '<div class="lb-empty">🥜 No scores yet.<br>Be the first!</div>';
+        bestEl.textContent = '---';
+        return;
+      }
+
+      const medals = ['gold', 'silver', 'bronze'];
+      container.innerHTML = lb.map((entry, i) => {
+        const cls = i < 3 ? medals[i] : '';
+        const rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        return `<div class="lb-entry ${cls}">
+          <span class="lb-rank">${rankIcon}</span>
+          <span class="lb-name">${escapeHtml(entry.name)}</span>
+          <span class="lb-score">${formatScore(entry.score)}</span>
+        </div>`;
+      }).join('');
+
+      // Find player's best
+      const playerBest = lb.filter(e => e.name === playerName).sort((a, b) => b.score - a.score)[0];
+      bestEl.textContent = playerBest ? formatScore(playerBest.score) : '---';
+    }
+
+    function formatScore(n) {
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function clearLeaderboard() {
+      if (confirm('Reset all leaderboard scores?')) {
+        localStorage.removeItem(LB_KEY);
+        renderLeaderboard();
+      }
+    }
+
+    // Listen for scores from the game iframe
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'fuzzynuts_score') {
+        if (e.data.score > 0) {
+          addScore(e.data.score, e.data.event);
+        }
+      }
+    });
+
+    // Initial render
+    renderLeaderboard();
   </script>
 </body>
 </html>

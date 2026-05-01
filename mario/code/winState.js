@@ -19,7 +19,13 @@ Mario.WinState.prototype.Enter = function() {
     this.camera = new Enjine.Camera();
     
     this.font = Mario.SpriteCuts.CreateBlackFont();
-    this.font.Strings[0] = { String: "Thank you for saving me, Mario!", X: 36, Y: 160 };
+    this.font.Strings[0] = { String: "You saved the Fuzzynut Forest!", X: 30, Y: 160 };
+    this.font.Strings[1] = { String: "Final Score: " + Mario.Score, X: 80, Y: 180 };
+    
+    // Game completion bonus
+    Mario.AddScore(50000);
+    Mario.SaveHighScore();
+    Mario.PostScoreToParent('game_win');
     
     this.kissing = new Enjine.AnimatedSprite();
     this.kissing.Image = Enjine.Resources.Images["endScene"];
@@ -62,6 +68,7 @@ Mario.WinState.prototype.Draw = function(context) {
 Mario.WinState.prototype.CheckForChange = function(context) {
     if (this.waitTime <= 0) {
         if (this.wasKeyDown && !Enjine.KeyboardInput.IsKeyDown(Enjine.Keys.S)) {
+            Mario.ResetScore();
             context.ChangeState(new Mario.TitleState());
         }
     }

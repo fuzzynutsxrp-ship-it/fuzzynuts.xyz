@@ -77,6 +77,9 @@ Mario.LevelState.prototype.Enter = function() {
 
 	this.GotoMapState = false;
 	this.GotoLoseState = false;
+
+    // Track coins at level start for scoring delta
+    this.StartCoins = Mario.MarioCharacter.Coins;
 };
 
 Mario.LevelState.prototype.Exit = function() {
@@ -288,8 +291,10 @@ Mario.LevelState.prototype.Draw = function(context) {
 
     this.Layer.DrawExit1(context, this.Camera);
 
+    // Score display - pad to 8 digits
+    var scoreStr = ("00000000" + Mario.Score).slice(-8);
     this.DrawStringShadow(context, "NUTTY " + Mario.MarioCharacter.Lives, 0, 0);
-    this.DrawStringShadow(context, "00000000", 0, 1);
+    this.DrawStringShadow(context, scoreStr, 0, 1);
     this.DrawStringShadow(context, "NUTS", 14, 0);
     this.DrawStringShadow(context, " " + Mario.MarioCharacter.Coins, 14, 1);
     this.DrawStringShadow(context, "FOREST", 24, 0);
@@ -313,7 +318,11 @@ Mario.LevelState.prototype.Draw = function(context) {
         t = t * t * 0.2;
 
         if (t > 900) {
-            //TODO: goto map state with level won
+            // Award time bonus and coin bonus
+            var timeBonus = Math.max(0, this.TimeLeft | 0) * 50;
+            var coinBonus = (Mario.MarioCharacter.Coins - this.StartCoins) * 100;
+            Mario.AddScore(timeBonus + coinBonus + 1000);
+            Mario.PostScoreToParent('level_win');
 			Mario.GlobalMapState.LevelWon();
 			this.GotoMapState = true;
         }
@@ -327,10 +336,10 @@ Mario.LevelState.prototype.Draw = function(context) {
         t = t * t * 0.1;
 
         if (t > 900) {
-            //TODO: goto map with level lost
 			Mario.MarioCharacter.Lives--;
 			this.GotoMapState = true;
 			if (Mario.MarioCharacter.Lives <= 0) {
+				Mario.PostScoreToParent('game_over');
 				this.GotoLoseState = true;
 			}
         }

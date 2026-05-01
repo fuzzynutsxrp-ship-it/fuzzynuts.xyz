@@ -58,6 +58,7 @@ Mario.Enemy.prototype.CollideCheck = function() {
         if (yMarioD > -this.Height && yMarioD < Mario.MarioCharacter.Height) {
             if (this.Type !== Mario.Enemy.Spiky && Mario.MarioCharacter.Ya > 0 && yMarioD <= 0 && (!Mario.MarioCharacter.OnGround || !Mario.MarioCharacter.WasOnGround)) {
                 Mario.MarioCharacter.Stomp(this);
+                Mario.AddScore(200);
                 if (this.Winged) {
                     this.Winged = false;
                     this.Ya = 0;

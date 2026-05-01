@@ -112,7 +112,7 @@ Mario.Character.prototype.Blink = function(on) {
         if (this.Fire) {
             this.Image = Enjine.Resources.Images["fireMario"];
         } else {
-            this.Image = Enjine.Resources.Images["mario"];
+            this.Image = Enjine.Resources.Images["racoonMario"];
         }
         
         this.XPicO = 16;
@@ -652,10 +652,12 @@ Mario.Character.prototype.Get1Up = function() {
     if (this.Lives === 99) {
         this.Lives = 99;
     }
+    Mario.AddScore(5000);
 };
 
 Mario.Character.prototype.GetCoin = function() {
     this.Coins++;
+    Mario.AddScore(100);
     if (this.Coins === 100) {
         this.Coins = 0;
         this.Get1Up();
