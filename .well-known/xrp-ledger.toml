@@ -2,7 +2,7 @@
 # https://fuzzynuts.xyz/.well-known/xrp-ledger.toml
 
 [METADATA]
-modified = 2026-04-30T13:47:00Z
+modified = 2026-05-01T02:30:00Z
 
 # ═══ ISSUER INFO ═══
 [[ISSUERS]]
@@ -28,9 +28,9 @@ desc = "321 Nut Fund (Community Nut Jar)"
 issuer = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
 currency = "NUT"
 name = "Fuzzynuts"
-desc = "The nuttiest meme on XRPL. 321 billion $NUT. Supply permanently locked. Community-driven. Built in Canada."
-icon = "https://fuzzynuts.xyz/logo.png"
-image = "https://fuzzynuts.xyz/logo.png"
+desc = "The squirrel that feeds the Fuzzybear! Community-driven meme coin on XRPL. 321B supply, blackholed issuer, 0% tax. Treasury buys $FUZZY and airdrops it to $NUT holders as Fuzzy Rewards."
+icon = "https://fuzzynuts.xyz/logo_512.png"
+image = "https://fuzzynuts.xyz/logo_512.png"
 
 [[TOKENS.WEBLINKS]]
 url = "https://fuzzynuts.xyz"
@@ -47,11 +47,16 @@ url = "https://t.me/FuzzynutsXRP"
 type = "socialmedia"
 title = "Telegram"
 
+[[TOKENS.WEBLINKS]]
+url = "https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP"
+type = "exchange"
+title = "Trade on XPMarket"
+
 # ═══ TOKEN METADATA (xrpl.org format — [[CURRENCIES]] + image) ═══
 [[CURRENCIES]]
 issuer = "rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
 currency = "NUT"
 name = "Fuzzynuts"
-desc = "The nuttiest meme on XRPL. 321 billion $NUT. Supply permanently locked. Community-driven. Built in Canada."
-image = "https://fuzzynuts.xyz/logo.png"
-icon = "https://fuzzynuts.xyz/logo.png"
+desc = "The squirrel that feeds the Fuzzybear! Community-driven meme coin on XRPL. 321B supply, blackholed issuer, 0% tax. Treasury buys $FUZZY and airdrops it to $NUT holders as Fuzzy Rewards."
+image = "https://fuzzynuts.xyz/logo_512.png"
+icon = "https://fuzzynuts.xyz/logo_512.png"
