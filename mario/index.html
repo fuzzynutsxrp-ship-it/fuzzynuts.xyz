@@ -39,6 +39,23 @@
             min-height: 100vh;
         }
 
+        /* ═══ IFRAME EMBED MODE ═══ */
+        body.embedded { overflow: hidden; background: #000; min-height: 0; }
+        body.embedded .bg-field,
+        body.embedded .bg-gradient,
+        body.embedded .page,
+        body.embedded .loading-overlay { display: none !important; }
+        body.embedded #game-container {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: #000;
+        }
+        body.embedded #game-container canvas {
+            width: 100% !important; height: 100% !important;
+            object-fit: contain;
+        }
+
         /* ═══ ANIMATED BACKGROUND ═══ */
         .bg-field {
             position: fixed; top: 0; left: 0;
@@ -418,6 +435,9 @@
             </div>
         </main>
     </div>
+
+    <!-- Detect iframe embed mode -->
+    <script>if (window.self !== window.top) document.body.classList.add('embedded');</script>
 
     <!-- Game Engine Scripts -->
     <script type="text/javascript" src="js/util.js"></script>
