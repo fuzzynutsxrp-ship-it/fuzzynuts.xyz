@@ -4,185 +4,500 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Fuzzynuts — The Nuttiest Platformer on XRPL</title>
-    <meta name="description" content="Play Super Fuzzynuts! Guide your squirrel through tree-filled levels, collect nuts, and dodge predator birds in this Fuzzynuts-themed platformer.">
+    <meta name="description" content="Play Super Fuzzynuts! Guide your squirrel through forest levels, collect nuts, and dodge enemies in this retro platformer.">
+    <meta property="og:title" content="Super Fuzzynuts — Play Now">
+    <meta property="og:description" content="The nuttiest platformer on the XRP Ledger. Play free in your browser!">
+    <meta property="og:image" content="https://fuzzynuts.xyz/logo.png">
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #F5A623;
+            --gold-light: #FFD777;
+            --gold-dark: #C78415;
+            --gold-glow: rgba(245, 166, 35, 0.4);
+            --brown: #8B5E34;
+            --brown-dark: #5C3D1F;
+            --bg: #08080E;
+            --bg-panel: rgba(15, 15, 25, 0.85);
+            --bg-glass: rgba(245, 166, 35, 0.06);
+            --border: rgba(245, 166, 35, 0.15);
+            --border-bright: rgba(245, 166, 35, 0.35);
+            --text: #F0EDE6;
+            --text-muted: #7A756A;
+            --pixel-font: 'Press Start 2P', monospace;
+            --ui-font: 'Outfit', sans-serif;
+        }
 
         body {
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a0f0a 50%, #0a1a0f 100%);
+            font-family: var(--ui-font);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Outfit', sans-serif;
-            color: #d4a843;
+        }
+
+        /* ═══ ANIMATED BACKGROUND ═══ */
+        .bg-field {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
             overflow: hidden;
         }
-
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 900;
-            text-align: center;
-            margin-bottom: 4px;
-            text-shadow: 0 0 20px rgba(212,168,67,0.5);
+        .bg-field .nut {
+            position: absolute;
+            font-size: 14px;
+            opacity: 0;
+            animation: nutFloat linear infinite;
         }
-        h1 .emoji { font-size: 1.8rem; }
-
-        .subtitle {
-            font-size: 0.85rem;
-            color: #8b7355;
-            text-align: center;
-            margin-bottom: 12px;
+        @keyframes nutFloat {
+            0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10%  { opacity: 0.15; }
+            90%  { opacity: 0.15; }
+            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
         }
 
-        .game-wrapper {
+        /* Gradient overlays */
+        .bg-gradient {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 0%, rgba(245,166,35,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(139,94,52,0.05) 0%, transparent 60%);
+            pointer-events: none; z-index: 0;
+        }
+
+        /* ═══ LAYOUT ═══ */
+        .page { position: relative; z-index: 1; }
+
+        /* ═══ TOP NAV ═══ */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .topbar a { 
+            color: var(--gold); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .topbar a:hover { color: var(--gold-light); text-shadow: 0 0 12px var(--gold-glow); }
+        .topbar .brand {
+            font-family: var(--pixel-font);
+            font-size: 0.7rem;
+            color: var(--gold);
+            text-shadow: 0 0 20px var(--gold-glow);
+            letter-spacing: 2px;
+        }
+        .topbar .social { display: flex; gap: 16px; }
+
+        /* ═══ GAME STAGE ═══ */
+        .stage {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 24px 16px 16px;
+            min-height: calc(100vh - 49px);
+        }
+
+        .title-block {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .title-block h1 {
+            font-family: var(--pixel-font);
+            font-size: 1.1rem;
+            color: var(--gold);
+            text-shadow: 
+                0 0 30px var(--gold-glow),
+                0 2px 0 var(--gold-dark);
+            letter-spacing: 3px;
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 30px var(--gold-glow), 0 2px 0 var(--gold-dark); }
+            50% { text-shadow: 0 0 50px var(--gold-glow), 0 0 80px rgba(245,166,35,0.15), 0 2px 0 var(--gold-dark); }
+        }
+        .title-block .tagline {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* ═══ ARCADE CABINET ═══ */
+        .cabinet {
             position: relative;
-            border: 3px solid #d4a843;
+            border-radius: 16px;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--brown-dark), var(--gold-dark));
+            box-shadow: 
+                0 0 40px rgba(245,166,35,0.15),
+                0 0 80px rgba(245,166,35,0.08),
+                0 20px 60px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            animation: cabinetGlow 4s ease-in-out infinite;
+        }
+        @keyframes cabinetGlow {
+            0%, 100% { box-shadow: 0 0 40px rgba(245,166,35,0.15), 0 0 80px rgba(245,166,35,0.08), 0 20px 60px rgba(0,0,0,0.5); }
+            50% { box-shadow: 0 0 60px rgba(245,166,35,0.25), 0 0 120px rgba(245,166,35,0.12), 0 20px 60px rgba(0,0,0,0.5); }
+        }
+
+        .screen {
+            position: relative;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(212,168,67,0.2), 0 0 80px rgba(212,168,67,0.1);
-        }
-
-        #canvas {
-            display: block;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
             background: #000;
         }
 
-        .controls {
+        /* CRT Scanline Effect */
+        .screen::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.03) 0px,
+                rgba(0,0,0,0.03) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* CRT vignette */
+        .screen::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        #game-container {
             display: flex;
-            gap: 20px;
-            margin-top: 16px;
             justify-content: center;
+            align-items: center;
+        }
+
+        #game-container canvas {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            width: 100%;
+            height: auto;
+        }
+
+        /* ═══ HUD BAR ═══ */
+        .hud {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 16px;
+            width: 100%;
+            max-width: 770px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
-        .control-group {
-            text-align: center;
-            background: rgba(212,168,67,0.08);
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid rgba(212,168,67,0.2);
+        .controls-row {
+            display: flex; gap: 8px; flex-wrap: wrap;
         }
 
-        .control-group .label {
-            font-size: 0.65rem;
-            color: #6b5b3a;
+        .key-hint {
+            display: flex; flex-direction: column; align-items: center;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+        .key-hint:hover {
+            border-color: var(--border-bright);
+            background: rgba(245,166,35,0.1);
+            transform: translateY(-1px);
+        }
+        .key-hint .action {
+            font-size: 0.55rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            margin-bottom: 3px;
+        }
+        .key-hint .binding {
+            font-family: var(--pixel-font);
+            font-size: 0.6rem;
+            color: var(--gold);
         }
 
-        .control-group .keys {
-            font-size: 0.9rem;
-            color: #d4a843;
+        .hud-actions {
+            display: flex; gap: 8px;
+        }
+
+        .btn {
+            font-family: var(--pixel-font);
+            font-size: 0.5rem;
+            padding: 10px 16px;
+            border: 1px solid var(--border-bright);
+            border-radius: 10px;
+            background: var(--bg-glass);
+            color: var(--gold);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn:hover {
+            background: rgba(245,166,35,0.15);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(245,166,35,0.2);
+        }
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #0A0A0F;
+            border-color: var(--gold);
             font-weight: 700;
         }
-
-        .back-link {
-            margin-top: 16px;
-            color: #d4a843;
-            text-decoration: none;
-            font-size: 0.9rem;
-            opacity: 0.7;
-            transition: opacity 0.2s;
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            box-shadow: 0 4px 30px rgba(245,166,35,0.35);
         }
-        .back-link:hover { opacity: 1; }
 
-        .footer-note {
-            margin-top: 8px;
+        /* ═══ FOOTER ═══ */
+        .game-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-bottom: 24px;
+        }
+        .game-footer p {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+        .game-footer a { color: var(--gold); text-decoration: none; }
+        .game-footer a:hover { text-decoration: underline; }
+
+        /* ═══ LOADING OVERLAY ═══ */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(8,8,14,0.95);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 20;
+            transition: opacity 0.5s;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-text {
+            font-family: var(--pixel-font);
             font-size: 0.7rem;
-            color: #4a3a2a;
+            color: var(--gold);
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .loading-squirrel {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            animation: bounce 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
         }
 
-        @media (max-width: 680px) {
-            h1 { font-size: 1.5rem; }
-            .controls { gap: 10px; }
-            .control-group { padding: 6px 10px; }
+        /* ═══ FULLSCREEN ═══ */
+        .cabinet.fullscreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            border-radius: 0;
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cabinet.fullscreen .screen {
+            border-radius: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 800px) {
+            .cabinet { max-width: 100%; }
+            .topbar .brand { font-size: 0.55rem; letter-spacing: 1px; }
+            .title-block h1 { font-size: 0.8rem; }
+            .hud { flex-direction: column; align-items: center; }
+            .controls-row { justify-content: center; }
+        }
+        @media (max-width: 500px) {
+            .topbar { padding: 8px 12px; }
+            .topbar .social { gap: 10px; }
+            .key-hint { padding: 6px 10px; }
+            .key-hint .action { font-size: 0.45rem; }
+            .key-hint .binding { font-size: 0.5rem; }
+            .stage { padding: 12px 8px 8px; }
         }
     </style>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 </head>
 <body>
-    <h1><span class="emoji">🐿️</span> Super Fuzzynuts</h1>
-    <p class="subtitle">Navigate the forest, collect $NUT, dodge the raptors!</p>
+    <!-- Animated background -->
+    <div class="bg-field" id="bg-field"></div>
+    <div class="bg-gradient"></div>
 
-    <div class="game-wrapper">
-        <canvas id="canvas" width="640" height="480"></canvas>
+    <div class="page">
+        <!-- Top Navigation -->
+        <nav class="topbar">
+            <a href="../index.html">← Fuzzynuts.xyz</a>
+            <span class="brand">🐿️ SUPER FUZZYNUTS</span>
+            <div class="social">
+                <a href="https://x.com/fuzzynutsxrp" target="_blank" title="Follow on X">𝕏</a>
+                <a href="https://t.me/fuzzynutsxrp" target="_blank" title="Telegram">✈️</a>
+            </div>
+        </nav>
+
+        <!-- Game Stage -->
+        <main class="stage">
+            <div class="title-block">
+                <h1>SUPER FUZZYNUTS</h1>
+                <p class="tagline">Navigate the forest · Collect $NUT · Dodge the enemies!</p>
+            </div>
+
+            <!-- Arcade Cabinet -->
+            <div class="cabinet" id="cabinet">
+                <div class="screen">
+                    <div id="game-container"></div>
+                    <div class="loading-overlay" id="loading-overlay">
+                        <div class="loading-squirrel">🐿️</div>
+                        <div class="loading-text">LOADING...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HUD Bar -->
+            <div class="hud">
+                <div class="controls-row">
+                    <div class="key-hint">
+                        <span class="action">Move</span>
+                        <span class="binding">← →</span>
+                    </div>
+                    <div class="key-hint">
+                        <span class="action">Jump</span>
+                        <span class="binding">X</span>
+                    </div>
+                    <div class="key-hint">
+                        <span class="action">Run</span>
+                        <span class="binding">Z</span>
+                    </div>
+                    <div class="key-hint">
+                        <span class="action">Duck</span>
+                        <span class="binding">↓</span>
+                    </div>
+                </div>
+                <div class="hud-actions">
+                    <button class="btn" id="fullscreen-btn" title="Fullscreen">⛶ FULL</button>
+                    <button class="btn" id="sound-btn" title="Toggle Sound">🔊 SOUND</button>
+                    <a class="btn btn-primary" href="https://x.com/intent/tweet?text=🐿️%20Playing%20Super%20Fuzzynuts%20—%20the%20nuttiest%20platformer%20on%20XRPL!%20%24NUT%20🥜&url=https://fuzzynuts.xyz/mario/" target="_blank">📤 SHARE</a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="game-footer">
+                <p>Game engine by <a href="https://github.com/reruns/mario" target="_blank">Garrett Johnson</a> · MIT License · Fuzzynuts Edition</p>
+                <p style="margin-top:4px">$NUT on XRPL · <a href="https://fuzzynuts.xyz">fuzzynuts.xyz</a></p>
+            </div>
+        </main>
     </div>
 
-    <div class="controls">
-        <div class="control-group">
-            <div class="label">Move</div>
-            <div class="keys">← → Arrow Keys</div>
-        </div>
-        <div class="control-group">
-            <div class="label">Jump</div>
-            <div class="keys">S</div>
-        </div>
-        <div class="control-group">
-            <div class="label">Run / Throw Acorn</div>
-            <div class="keys">A</div>
-        </div>
-        <div class="control-group">
-            <div class="label">Duck</div>
-            <div class="keys">↓</div>
-        </div>
-    </div>
+    <!-- Game Engine Scripts -->
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/input.js"></script>
+    <script type="text/javascript" src="js/resources.js"></script>
+    <script type="text/javascript" src="js/sprite.js"></script>
+    <script type="text/javascript" src="js/entity.js"></script>
+    <script type="text/javascript" src="js/pipe.js"></script>
+    <script type="text/javascript" src="js/mushroom.js"></script>
+    <script type="text/javascript" src="js/fireflower.js"></script>
+    <script type="text/javascript" src="js/star.js"></script>
+    <script type="text/javascript" src="js/fireball.js"></script>
+    <script type="text/javascript" src="js/coin.js"></script>
+    <script type="text/javascript" src="js/bcoin.js"></script>
+    <script type="text/javascript" src="js/goomba.js"></script>
+    <script type="text/javascript" src="js/koopa.js"></script>
+    <script type="text/javascript" src="js/floor.js"></script>
+    <script type="text/javascript" src="js/block.js"></script>
+    <script type="text/javascript" src="js/rubble.js"></script>
+    <script type="text/javascript" src="js/prop.js"></script>
+    <script type="text/javascript" src="js/player.js"></script>
+    <script type="text/javascript" src="js/flag.js"></script>
+    <script type="text/javascript" src="js/levels/level.js"></script>
+    <script type="text/javascript" src="js/levels/11.js"></script>
+    <script type="text/javascript" src="js/levels/11tunnel.js"></script>
+    <script type="text/javascript" src="js/game.js"></script>
 
-    <a href="../index.html" class="back-link">← Back to Fuzzynuts.xyz</a>
-    <p class="footer-note">Based on Infinite Mario by Notch • Ported by Rob Kleffner • Fuzzynuts Edition</p>
+    <script>
+        // ═══ FLOATING NUT PARTICLES ═══
+        (function() {
+            const field = document.getElementById('bg-field');
+            const nuts = ['🥜', '🌰', '🐿️', '🍂', '🍁'];
+            for (let i = 0; i < 20; i++) {
+                const el = document.createElement('div');
+                el.className = 'nut';
+                el.textContent = nuts[i % nuts.length];
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (15 + Math.random() * 25) + 's';
+                el.style.animationDelay = (Math.random() * 20) + 's';
+                el.style.fontSize = (10 + Math.random() * 12) + 'px';
+                field.appendChild(el);
+            }
+        })();
 
-    <!-- Enjine Includes -->
-    <script src="Enjine/core.js"></script>
-    <script src="Enjine/gameCanvas.js"></script>
-    <script src="Enjine/keyboardInput.js"></script>
-    <script src="Enjine/resources.js"></script>
-    <script src="Enjine/drawable.js"></script>
-    <script src="Enjine/state.js"></script>
-    <script src="Enjine/gameTimer.js"></script>
-    <script src="Enjine/camera.js"></script>
-    <script src="Enjine/drawableManager.js"></script>
-    <script src="Enjine/sprite.js"></script>
-    <script src="Enjine/spriteFont.js"></script>
-    <script src="Enjine/frameSprite.js"></script>
-    <script src="Enjine/animatedSprite.js"></script>
-    <script src="Enjine/collideable.js"></script>
-    <script src="Enjine/application.js"></script>
+        // ═══ LOADING OVERLAY ═══
+        (function() {
+            const overlay = document.getElementById('loading-overlay');
+            // Hide once game canvas is rendered
+            const check = setInterval(function() {
+                const cv = document.querySelector('#game-container canvas');
+                if (cv) {
+                    setTimeout(function() {
+                        overlay.classList.add('hidden');
+                    }, 800);
+                    clearInterval(check);
+                }
+            }, 200);
+        })();
 
-    <!-- Game code -->
-    <script src="code/setup.js"></script>
-    <script src="code/spriteCuts.js"></script>
-    <script src="code/level.js"></script>
-    <script src="code/backgroundGenerator.js"></script>
-    <script src="code/backgroundRenderer.js"></script>
-    <script src="code/improvedNoise.js"></script>
-    <script src="code/notchSprite.js"></script>
-    <script src="code/character.js"></script>
-    <script src="code/levelRenderer.js"></script>
-    <script src="code/levelGenerator.js"></script>
-    <script src="code/spriteTemplate.js"></script>
-    <script src="code/enemy.js"></script>
-    <script src="code/fireball.js"></script>
-    <script src="code/sparkle.js"></script>
-    <script src="code/coinAnim.js"></script>
-    <script src="code/mushroom.js"></script>
-    <script src="code/particle.js"></script>
-    <script src="code/fireFlower.js"></script>
-    <script src="code/bulletBill.js"></script>
-    <script src="code/flowerEnemy.js"></script>
-    <script src="code/shell.js"></script>
-    <script src="code/titleState.js"></script>
-    <script src="code/loadingState.js"></script>
-    <script src="code/loseState.js"></script>
-    <script src="code/winState.js"></script>
-    <script src="code/mapState.js"></script>
-    <script src="code/levelState.js"></script>
-    <script src="code/music.js"></script>
+        // ═══ FULLSCREEN TOGGLE ═══
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            const cabinet = document.getElementById('cabinet');
+            if (!document.fullscreenElement) {
+                cabinet.requestFullscreen().catch(function(){});
+            } else {
+                document.exitFullscreen();
+            }
+        });
 
-    <script>$(document).ready(function() { new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240) });</script>
+        // ═══ SOUND TOGGLE ═══
+        (function() {
+            let muted = false;
+            const btn = document.getElementById('sound-btn');
+            btn.addEventListener('click', function() {
+                muted = !muted;
+                // Mute/unmute all audio elements
+                document.querySelectorAll('audio').forEach(function(a) { a.muted = muted; });
+                btn.textContent = muted ? '🔇 MUTED' : '🔊 SOUND';
+            });
+        })();
+    </script>
 </body>
 </html>
