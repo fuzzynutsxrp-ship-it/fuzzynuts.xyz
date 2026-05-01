@@ -1367,9 +1367,53 @@
       if (e.data && e.data.type === 'fuzzynuts_score') {
         if (e.data.score > 0) {
           addScore(e.data.score, e.data.event);
+          showShareButton(e.data.score, e.data.event);
         }
       }
     });
+
+    function showShareButton(score, event) {
+      var existing = document.getElementById('share-x-btn');
+      if (existing) existing.remove();
+
+      var emoji = event === 'game_win' ? '🏆' : '🕹️';
+      var action = event === 'game_win' ? 'beat' : 'scored ' + score.toLocaleString() + ' on';
+      var text = emoji + ' I just ' + action + ' Super Fuzzynuts!\n\n' +
+          'The only playable arcade game in XRPL meme coin history.\n' +
+          'Can you beat me? → fuzzynuts.xyz\n\n' +
+          '$NUT #XRPL 🐿️🥜';
+
+      var btn = document.createElement('a');
+      btn.id = 'share-x-btn';
+      btn.href = 'https://x.com/intent/tweet?text=' + encodeURIComponent(text);
+      btn.target = '_blank';
+      btn.rel = 'noopener';
+      btn.textContent = '🐦 Share Score on X';
+      btn.style.cssText = 'display:inline-block;margin:12px auto;padding:12px 28px;background:linear-gradient(135deg,#1a1a2e,#16213e);' +
+          'color:#d4a843;border:2px solid #d4a843;border-radius:10px;font-family:Outfit,sans-serif;font-size:15px;' +
+          'font-weight:700;text-decoration:none;cursor:pointer;transition:all 0.3s;box-shadow:0 0 20px rgba(212,168,67,0.3);' +
+          'animation:sharePulse 2s ease-in-out infinite;';
+
+      // Add pulse animation
+      if (!document.getElementById('share-pulse-style')) {
+        var style = document.createElement('style');
+        style.id = 'share-pulse-style';
+        style.textContent = '@keyframes sharePulse{0%,100%{box-shadow:0 0 20px rgba(212,168,67,0.3)}50%{box-shadow:0 0 35px rgba(212,168,67,0.6)}}';
+        document.head.appendChild(style);
+      }
+
+      btn.onmouseover = function() { btn.style.background = '#d4a843'; btn.style.color = '#0a0a1a'; };
+      btn.onmouseout = function() { btn.style.background = 'linear-gradient(135deg,#1a1a2e,#16213e)'; btn.style.color = '#d4a843'; };
+
+      // Insert right after the leaderboard
+      var lb = document.getElementById('leaderboard');
+      if (lb && lb.parentNode) {
+        lb.parentNode.insertBefore(btn, lb.nextSibling);
+      }
+
+      // Auto-dismiss after 30 seconds
+      setTimeout(function() { if (btn.parentNode) btn.remove(); }, 30000);
+    }
 
     // Initial render
     renderLeaderboard();

@@ -26,6 +26,7 @@ Mario.WinState.prototype.Enter = function() {
     Mario.AddScore(50000);
     Mario.SaveHighScore();
     Mario.PostScoreToParent('game_win');
+    Mario.ShowShareOverlay('game_win');
     
     this.kissing = new Enjine.AnimatedSprite();
     this.kissing.Image = Enjine.Resources.Images["endScene"];

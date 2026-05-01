@@ -34,6 +34,7 @@ Mario.LoseState.prototype.Enter = function() {
     // Save and post score
     Mario.SaveHighScore();
     Mario.PostScoreToParent('game_over');
+    Mario.ShowShareOverlay('game_over');
     
     this.drawManager.Add(this.font);
     this.drawManager.Add(this.gameOver);
