@@ -35,21 +35,32 @@ export const useWalletStore = create<WalletState>((set) => ({
 
       switch (provider) {
         case "xaman": {
-          // Xaman SDK integration
+          // Xaman SDK integration (loaded via CDN — no npm dependency needed)
           const apiKey = process.env.NEXT_PUBLIC_XAMAN_API_KEY;
           if (!apiKey) {
             throw new Error("Xaman API key not configured");
           }
 
-          // Dynamic import for client-side only
           if (typeof window !== "undefined") {
             try {
-              // Dynamic import with variable to avoid webpack static analysis
-              const xummModule = "xumm";
-              const { Xumm } = await import(/* webpackIgnore: true */ xummModule) as { Xumm: new (key: string) => { authorize: () => Promise<void>; user?: { account?: string } } };
-              const xumm = new Xumm(apiKey);
+              // Load Xumm SDK from CDN if not already loaded
+              const win = window as unknown as Record<string, unknown>;
+              if (!win.Xumm) {
+                await new Promise<void>((resolve, reject) => {
+                  const script = document.createElement("script");
+                  script.src = "https://xumm.app/assets/cdn/xumm.min.js";
+                  script.onload = () => resolve();
+                  script.onerror = () => reject(new Error("Failed to load Xaman SDK"));
+                  document.head.appendChild(script);
+                });
+              }
+
+              const XummClass = win.Xumm as { new(key: string): { authorize: () => Promise<void>; user?: { account?: string } } };
+              if (!XummClass) throw new Error("Xaman SDK failed to initialize");
+
+              const xumm = new XummClass(apiKey);
               await xumm.authorize();
-              
+
               const account = xumm.user?.account;
               address = account || null;
             } catch {
