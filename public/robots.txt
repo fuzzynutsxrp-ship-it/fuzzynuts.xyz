@@ -1,0 +1,12 @@
+# Fuzzynuts — https://fuzzynuts.xyz
+# Optimized for search engine crawling
+
+User-agent: *
+Allow: /
+
+# Static sitemap
+Sitemap: https://fuzzynuts.xyz/sitemap.xml
+
+# Block internal/dev paths
+Disallow: /_next/
+Disallow: /api/
