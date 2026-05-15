@@ -7,9 +7,9 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
-    "serve:static": "next build --turbopack && npx -y serve out",
+    "serve:static": "next build && npx -y serve out",
     "lint": "eslint"
   },
   "dependencies": {
