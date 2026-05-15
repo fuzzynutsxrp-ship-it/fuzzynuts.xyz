@@ -122,7 +122,7 @@ function ErrorFallback({ error, gameTitle, onRetry }: ErrorFallbackProps) {
           </motion.button>
 
           <motion.a
-            href="/arcade/"
+            href="/#games"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             className="btn-secondary px-6 py-2.5 text-sm inline-flex items-center justify-center"

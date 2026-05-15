@@ -195,7 +195,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
           {/* Left: Back + Title */}
           <div className="flex items-center gap-3 min-w-0">
             <motion.a
-              href="/arcade/"
+              href="/#games"
               whileHover={{ scale: 1.08, x: -2 }}
               whileTap={{ scale: 0.94 }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors shrink-0"
@@ -376,7 +376,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
                         🔄 Retry
                       </motion.button>
                       <motion.a
-                        href="/arcade/"
+                        href="/#games"
                         whileHover={{ scale: 1.04 }}
                         whileTap={{ scale: 0.96 }}
                         className="btn-secondary px-5 py-2 text-sm"

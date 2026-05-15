@@ -17,7 +17,8 @@
       ]
     }
   ],
-  "rewrites": [
-    { "source": "/arcade/", "destination": "/#games" }
+  "redirects": [
+    { "source": "/arcade", "destination": "/#games", "permanent": false },
+    { "source": "/arcade/", "destination": "/#games", "permanent": false }
   ]
 }
