@@ -22,6 +22,15 @@ interface GameRegistryEntry {
 }
 
 const GAME_REGISTRY: Record<string, GameRegistryEntry> = {
+  "mirage-realms": {
+    title: "MirageRealms",
+    type: "Adventure",
+    color: "#10B981",
+    description:
+      "Explore the endless desert realms — uncover hidden oases, battle mirages, and claim legendary artifacts.",
+    iframeSrc: "/games/mirage-realms/index.html",
+    sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
+  },
   kaetram: {
     title: "Fuzzynuts World",
     type: "MMORPG",

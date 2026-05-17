@@ -117,39 +117,32 @@ vercel
    - **CNAME**: `cname.vercel-dns.com` (for `www`)
 4. Vercel auto-provisions HTTPS via Let's Encrypt
 
-## 📂 Project Structure
+## 📂 Project Organization
 
 ```
 fuzzynuts-optimized/
-├── public/
-│   ├── og-image.png         # Social preview image (1200×630)
-│   ├── robots.txt           # Search engine directives
-│   ├── sitemap.xml          # Static sitemap
-│   └── favicon.ico          # Browser icon
 ├── src/
-│   ├── app/
-│   │   ├── layout.tsx       # Root layout, metadata, JSON-LD
-│   │   ├── page.tsx         # Homepage composition
-│   │   └── globals.css      # Design system, tokens, animations
+│   ├── app/                 # Next.js App Router (pages, layout, CSS)
 │   ├── components/
-│   │   ├── Navbar.tsx       # Wallet connect, NUT balance, claim modal
-│   │   ├── Hero.tsx         # Floating squirrel, CTAs, stats
-│   │   ├── GamesShowcase.tsx # 3D tilt cards, nut explosions
-│   │   ├── Features.tsx     # Why Fuzzynuts grid
-│   │   ├── Tokenomics.tsx   # Animated donut chart, bars
-│   │   ├── OnChainVerification.tsx # Copyable XRPL addresses
-│   │   ├── HowToGet.tsx     # 4-step onboarding
-│   │   ├── FallingNuts.tsx  # Canvas particle system
-│   │   └── Footer.tsx       # Links, socials, credits
-│   ├── store/
-│   │   └── wallet.ts        # Zustand wallet state
-│   └── lib/
-│       └── utils.ts         # Constants, helpers, XRPL config
-├── vercel.json              # Vercel config, headers, caching
-├── next.config.ts           # Next.js static export config
-├── tailwind.config.ts       # Theme tokens, animations
-└── package.json
+│   │   ├── layout/          # Navbar, Footer
+│   │   ├── sections/        # Hero, GamesShowcase, Tokenomics, etc.
+│   │   ├── game/            # GameWrapper, LoadingOverlay, ErrorBoundary
+│   │   └── ui/              # CyberCard, reusable primitives
+│   ├── lib/                 # Utilities, config, constants
+│   ├── store/               # Zustand state management
+│   ├── hooks/               # Custom React hooks
+│   └── types/               # Shared TypeScript types
+├── public/
+│   ├── images/              # Organized by: hero/, sections/, branding/, features/, og/
+│   ├── icons/               # Game icons (pop-art WebP)
+│   ├── videos/              # Hero background video
+│   └── games/               # Static game bundles (mario, survivors, minigolf, etc.)
+├── docs/                    # Deployment guides, handoff docs, archived files
+├── scripts/                 # Build & optimization utilities
+└── [configs]                # next.config.ts, tailwind.config.ts, vercel.json, etc.
 ```
+
+> 📖 **Full structure docs with conventions and rules:** [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md)
 
 ## 🔐 XRPL Wallet Setup
 

@@ -24,6 +24,17 @@ export const TOKENOMICS = [
 
 export const GAMES = [
   {
+    id: "mirage-realms",
+    title: "MirageRealms",
+    type: "Adventure",
+    description: "Explore the endless desert realms — uncover hidden oases, battle mirages, and claim legendary artifacts.",
+    href: "/games/mirage-realms/",
+    icon: "/icons/icon-mirage-realms-pop.webp",
+    image: "🏜️",
+    color: "#10B981",
+    tags: ["New", "Featured", "🔥 Live"],
+  },
+  {
     id: "kaetram",
     title: "Fuzzynuts World",
     type: "MMORPG",
