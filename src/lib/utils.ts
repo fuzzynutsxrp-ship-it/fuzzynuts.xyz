@@ -25,14 +25,14 @@ export const TOKENOMICS = [
 export const GAMES = [
   {
     id: "mirage-realms",
-    title: "MirageRealms",
-    type: "Adventure",
-    description: "Explore the endless desert realms — uncover hidden oases, battle mirages, and claim legendary artifacts.",
+    title: "Top Secret",
+    type: "??? Classified",
+    description: "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
     href: "/games/mirage-realms/",
     icon: "/icons/icon-mirage-realms-pop.webp",
-    image: "🏜️",
-    color: "#10B981",
-    tags: ["New", "Featured", "🔥 Live"],
+    image: "🕵️",
+    color: "#8B5CF6",
+    tags: ["Coming Soon", "🔒 Classified"],
   },
   {
     id: "kaetram",

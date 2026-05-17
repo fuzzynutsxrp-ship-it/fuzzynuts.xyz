@@ -42,7 +42,7 @@ interface ProfileState {
 const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
 
 const GAME_EMOJIS: Record<string, string> = {
-  "mirage-realms": "🏜️",
+  "mirage-realms": "🕵️",
   kaetram: "🌍",
   mario: "🍄",
   survivors: "⚔️",
@@ -66,9 +66,9 @@ interface Achievement {
 const ACHIEVEMENTS: Achievement[] = [
   {
     id: "desert-explorer",
-    title: "Desert Explorer",
-    description: "Played MirageRealms for the first time",
-    icon: "🏜️",
+    title: "Classified Agent",
+    description: "Played the Top Secret game before anyone else",
+    icon: "🕵️",
     game: "mirage-realms",
     storageKey: "fuzzy_achievement_desert_explorer",
   },

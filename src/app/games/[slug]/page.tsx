@@ -23,11 +23,11 @@ interface GameRegistryEntry {
 
 const GAME_REGISTRY: Record<string, GameRegistryEntry> = {
   "mirage-realms": {
-    title: "MirageRealms",
-    type: "Adventure",
-    color: "#10B981",
+    title: "Top Secret",
+    type: "??? Classified",
+    color: "#8B5CF6",
     description:
-      "Explore the endless desert realms — uncover hidden oases, battle mirages, and claim legendary artifacts.",
+      "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
     iframeSrc: "/games/mirage-realms/index.html",
     sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
   },
