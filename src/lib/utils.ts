@@ -102,7 +102,7 @@ export const FEATURES = [
     icon: "Gamepad2",
     featIcon: "/images/features/feat-arcade.webp",
     title: "Play-to-Earn Arcade",
-    description: "5 hand-tuned games with real $NUT prizes. Compete on the weekly leaderboard for 500K NUT.",
+    description: "6 hand-tuned games with real $NUT prizes. Compete on the weekly leaderboard for 500K NUT.",
   },
   {
     icon: "Lock",
