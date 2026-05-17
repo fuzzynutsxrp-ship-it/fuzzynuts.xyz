@@ -37,7 +37,7 @@ The Fuzzynuts Arcade is a **3-tier system** designed for maximum separation of c
 ├────────────────────┼──────────────┼──────────────┼───────────────┤
 │  TIER 2: BUSINESS LOGIC (Railway — Node.js)                    │
 │                                                                 │
-│  world.fuzzynuts.xyz — Kaetram Server (uws + Express)          │
+│  world.fuzzynuts.xyz — Fuzzynuts World Server (uws + Express)          │
 │  ┌──────────────────┬─────────────────┬──────────────────┐     │
 │  │ WebSocket :9001  │ REST API :9002  │ XRPL Dispatch    │     │
 │  │ (game world)     │ (scores/rewards)│ (xrpl.js)        │     │
@@ -75,7 +75,7 @@ All 5 games are standalone HTML/JS/CSS apps served from `public/games/` as stati
 
 | # | Slug | Title | Type | Engine | Size | Score Cap |
 |---|------|-------|------|--------|------|-----------|
-| 1 | `kaetram` | Fuzzynuts World | MMORPG | Kaetram/uws | 8 KB (redirect stub) | 9,999,999 |
+| 1 | `fuzzynuts-world` | Fuzzynuts World | MMORPG | Fuzzynuts World/uws | 8 KB (redirect stub) | 9,999,999 |
 | 2 | `mario` | Super Fuzzynuts | Platformer | FullScreenMario | 11 MB | 99,999 |
 | 3 | `fuzzy-survivors` | Fuzzy Survivors | Horde Survival | Canvas + JS modules | 464 KB | 999,999 |
 | 4 | `minigolf` | Fuzzy Putt | Mini Golf | Emscripten WASM | 18 MB | 10,500 |
@@ -145,7 +145,7 @@ FuzzyNuts Optimized/
 | 3002 | Fuzzy Survivors |
 | 3003 | Minigolf |
 | 3004 | Nut Racer |
-| 3005 | Kaetram |
+| 3005 | Fuzzynuts World |
 | 3099 | postMessage test harness |
 
 ### Docker (Optional)
@@ -174,7 +174,7 @@ docker compose run --service-ports app npm run dev:mario   # Single game
 ### Backend (Railway)
 
 ```bash
-cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/kaetram"
+cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/fuzzynuts-world"
 git add -A
 git commit -m "feat: description"
 git push origin develop
@@ -234,7 +234,7 @@ git push origin main
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `COMMUNITY_NUT_JAR_SEED` | **⚠️ CRITICAL** | XRPL family seed for prize payouts |
-| `ACCEPT_LICENSE` | ✅ | Kaetram license (`true`) |
+| `ACCEPT_LICENSE` | ✅ | Fuzzynuts World license (`true`) |
 | `NAME` | ✅ | Server display name (`Fuzzynuts World`) |
 | `HOST` | ✅ | Bind address (`0.0.0.0`) |
 | `PORT` | ✅ | WebSocket port (`9001`) |
@@ -312,7 +312,7 @@ Route (app)                                 Size  First Load JS
 ┌ ○ /                                    27.1 kB         180 kB
 ├ ○ /_not-found                             1 kB         104 kB
 ├ ● /games/[slug]                        6.94 kB         151 kB
-├   ├ /games/kaetram
+├   ├ /games/fuzzynuts-world
 ├   ├ /games/mario
 ├   ├ /games/fuzzy-survivors
 ├   └ [+2 more paths]
@@ -346,14 +346,14 @@ Prioritized by impact and dependency order:
 | Score sharing (X/Twitter cards) | 🔴 High | 3 hours | OG images with dynamic score data |
 | Referral system | 🟡 Medium | 1 day | Invite link → bonus NUT on first score |
 | Telegram bot notifications | 🟡 Medium | 4 hours | Weekly leaderboard announcement |
-| Discord bot integration | 🟢 Low | 1 day | Kaetram `DISCORD_ENABLED=true` |
+| Discord bot integration | 🟢 Low | 1 day | Fuzzynuts World `DISCORD_ENABLED=true` |
 
 ### Phase 3: Achievements & Rewards
 
 | Item | Priority | Effort | Notes |
 |------|----------|--------|-------|
 | Automated weekly prize distribution | 🔴 High | 4 hours | Cron job or Railway scheduled task |
-| Achievement system (Kaetram server) | 🟡 Medium | 1 week | `queueNutReward()` hooks for quests/skills |
+| Achievement system (Fuzzynuts World server) | 🟡 Medium | 1 week | `queueNutReward()` hooks for quests/skills |
 | Achievement badges UI | 🟡 Medium | 2 days | Profile page achievement cards |
 | Wallet signature on score POST | 🟡 Medium | 1 day | Xaman sign-in-to-submit flow |
 

@@ -4,14 +4,14 @@
  * ═══════════════════════════════════════════════════════════════
  * FUZZYNUTS ARCADE — Rewards API Routes
  *
- * Drop-in Express router for the Railway backend (Kaetram server).
+ * Drop-in Express router for the Railway backend (Fuzzynuts World server).
  * Provides two endpoints for the frontend /profile Prize Claiming UI:
  *
  *   GET  /api/rewards/eligibility?wallet=<address>&week=<YYYY-WNN>
  *   POST /api/rewards/claim       { wallet, week }
  *
  * INSTALLATION:
- *   1. Copy this file into the Kaetram server's routes/ directory
+ *   1. Copy this file into the Fuzzynuts World server's routes/ directory
  *   2. In the main Express app (or API entrypoint), add:
  *        const rewardsRouter = require('./routes/rewards-api');
  *        app.use('/api/rewards', rewardsRouter);

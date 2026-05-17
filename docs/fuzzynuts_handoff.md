@@ -16,7 +16,7 @@ There are **2 GitHub repos** and **1 local-only** directory:
 | Repo | GitHub URL / Location | Branch | Deploy Target |
 |------|-----------|--------|---------------|
 | **Website + Arcade** | `fuzzynutsxrp-ship-it/fuzzynuts.xyz` | `main` | GitHub Pages → `fuzzynuts.xyz` |
-| **Fuzzynuts World (Kaetram)** | `fuzzynutsxrp-ship-it/fuzzynuts-world` | `develop` | Railway → `world.fuzzynuts.xyz` |
+| **Fuzzynuts World (Fuzzynuts World)** | `fuzzynutsxrp-ship-it/fuzzynuts-world` | `develop` | Railway → `world.fuzzynuts.xyz` |
 | **Website Optimized (Next.js 15)** | Local (`FuzzyNuts Optimized/fuzzynuts-optimized/`) | — | Ready for Vercel deploy |
 
 ### Local Folder Structure
@@ -31,7 +31,7 @@ There are **2 GitHub repos** and **1 local-only** directory:
 │   ├── legacy/           ← Old static HTML site files + litepaper.html
 │   └── scripts/          ← Build/optimization scripts
 ├── website-v2/           ← IN-PROGRESS redesign (not live)
-├── kaetram/              ← Fuzzynuts World MMORPG (Railway deployment)
+├── fuzzynuts-world/              ← Fuzzynuts World MMORPG (Railway deployment)
 │   ├── packages/         ← Monorepo: client, server, common, hub, admin, tools, e2e
 │   ├── railway.json      ← Railway build/deploy config
 │   └── .env              ← Local dev config (Railway vars override in prod)
@@ -52,7 +52,7 @@ There are **2 GitHub repos** and **1 local-only** directory:
 │   ├── public/
 │   │   ├── games/         ← ALL 5 game subdirectories (copied from website/dist/games/)
 │   │   │   ├── mario/     ← Super Fuzzynuts (11MB, 32-level platformer)
-│   │   │   ├── kaetram/   ← Fuzzynuts World launcher (links to world.fuzzynuts.xyz)
+│   │   │   ├── fuzzynuts-world/   ← Fuzzynuts World launcher (links to world.fuzzynuts.xyz)
 │   │   │   ├── fuzzy-survivors/  ← Roguelite survival (2.1MB)
 │   │   │   ├── minigolf/  ← Nut Golf WASM game (18MB)
 │   │   │   ├── nut-racer/ ← Nut Racer arcade (288KB)
@@ -134,7 +134,7 @@ npx next build && npx serve out
 | **Hosting** | Static files on GitHub Pages |
 | **Status** | Added in Phase 2C with full leaderboard integration |
 
-### 5. Fuzzynuts World (Kaetram MMORPG) ⭐ Flagship
+### 5. Fuzzynuts World (Fuzzynuts World MMORPG) ⭐ Flagship
 
 | Property | Value |
 |----------|-------|
@@ -200,9 +200,9 @@ Push to `develop` branch on GitHub
 }
 ```
 
-### Environment Variables (Railway → Kaetram Service)
+### Environment Variables (Railway → Fuzzynuts World Service)
 
-These are set in the Railway dashboard under the Kaetram service → Variables tab:
+These are set in the Railway dashboard under the Fuzzynuts World service → Variables tab:
 
 ```env
 ACCEPT_LICENSE=true
@@ -306,7 +306,7 @@ git push origin main
 ### Deploying Fuzzynuts World (Railway)
 
 ```bash
-cd /home/jeetmachine/Documents/AI\ Tools/Fuzzynuts/kaetram
+cd /home/jeetmachine/Documents/AI\ Tools/Fuzzynuts/fuzzynuts-world
 
 # Make changes, then:
 git add -A
@@ -314,7 +314,7 @@ git commit -m "feat: description of changes"
 git push origin develop
 
 # Railway auto-detects push → rebuilds in ~4 min
-# Monitor: Railway dashboard → Kaetram service → Deployments
+# Monitor: Railway dashboard → Fuzzynuts World service → Deployments
 ```
 
 > [!TIP]
@@ -473,8 +473,8 @@ After any deployment, run through:
 |------|----------|
 | `fuzzynuts.xyz` loads | Landing page with hero, tokenomics, games |
 | `fuzzynuts.xyz/#games` | Game cards visible |
-| `world.fuzzynuts.xyz` | Kaetram login screen |
-| Create test account in Kaetram | Game world loads, character persists |
+| `world.fuzzynuts.xyz` | Fuzzynuts World login screen |
+| Create test account in Fuzzynuts World | Game world loads, character persists |
 | Railway dashboard → Deployments | Latest shows "Success" ✅ |
 | Railway dashboard → MongoDB → Metrics | Shows read/write activity |
 

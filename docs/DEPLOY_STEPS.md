@@ -2,14 +2,14 @@
 
 > **Last Updated:** May 14, 2026
 > **Frontend:** Next.js 15 Static Export → Vercel
-> **Backend:** Kaetram Server (Node.js + µWebSockets + MongoDB) → Railway
+> **Backend:** Fuzzynuts World Server (Node.js + µWebSockets + MongoDB) → Railway
 
 ---
 
 ## Pre-Flight Checklist
 
 - [ ] Frontend build passes: `npm run build` → 0 errors, `out/` generated
-- [ ] Backend `rewards-api.ts` is committed to the Kaetram repo
+- [ ] Backend `rewards-api.ts` is committed to the Fuzzynuts World repo
 - [ ] `COMMUNITY_NUT_JAR_SEED` is set on Railway (see `PRODUCTION_ENV.md`)
 - [ ] `xrpl` package is in the backend's dependencies
 - [ ] CORS headers allow `fuzzynuts.xyz` origins
@@ -21,13 +21,13 @@
 ### Step 1: Copy the Rewards API to the Backend Repo
 
 The rewards route file (`scripts/rewards-api.js`) was built against the Express pattern.
-**However**, the Kaetram backend uses **µWebSockets (uws)**, not Express.
+**However**, the Fuzzynuts World backend uses **µWebSockets (uws)**, not Express.
 
 The file must be adapted to the uws handler pattern used by `scores.ts`:
 
 ```bash
 # The backend repo is at:
-cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/kaetram"
+cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/fuzzynuts-world"
 
 # The rewards API should be created at:
 # packages/server/src/api/rewards.ts
@@ -78,7 +78,7 @@ app.options('/api/rewards/*', (res) => {
 ### Step 3: Install xrpl Dependency
 
 ```bash
-cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/kaetram"
+cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/fuzzynuts-world"
 
 # Add xrpl to the server package
 yarn workspace @kaetram/server add xrpl
@@ -87,7 +87,7 @@ yarn workspace @kaetram/server add xrpl
 ### Step 4: Set Environment Variable on Railway
 
 ```
-Railway Dashboard → "efficient-tenderness" → Kaetram service → Variables
+Railway Dashboard → "efficient-tenderness" → Fuzzynuts World service → Variables
 
 Add:  COMMUNITY_NUT_JAR_SEED = <your distributor wallet seed>
 ```
@@ -98,14 +98,14 @@ Add:  COMMUNITY_NUT_JAR_SEED = <your distributor wallet seed>
 ### Step 5: Push to Railway
 
 ```bash
-cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/kaetram"
+cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/fuzzynuts-world"
 
 git add -A
 git commit -m "feat: add rewards eligibility and claim API endpoints"
 git push origin develop
 
 # Railway auto-detects push → rebuilds in ~4 minutes
-# Monitor: Railway dashboard → Kaetram service → Deployments
+# Monitor: Railway dashboard → Fuzzynuts World service → Deployments
 ```
 
 ---
@@ -129,7 +129,7 @@ Route (app)                         Size  First Load JS
 ┌ ○ /                            37.1 kB         193 kB
 ├ ○ /_not-found                      0 B         115 kB
 ├ ● /games/[slug]                7.45 kB         163 kB
-├   ├ /games/kaetram
+├   ├ /games/fuzzynuts-world
 ├   ├ /games/mario
 ├   ├ /games/fuzzy-survivors
 ├   └ [+2 more paths]
@@ -230,7 +230,7 @@ Vercel Dashboard → Deployments → Click previous deployment → "Promote to P
 
 ```bash
 # Option A: Revert commit and push
-cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/kaetram"
+cd "/home/jeetmachine/Documents/AI Tools/Fuzzynuts/fuzzynuts-world"
 git revert HEAD
 git push origin develop
 
@@ -260,7 +260,7 @@ git push origin develop
 │          world.fuzzynuts.xyz (Railway)               │
 │                                                     │
 │  ┌──────────────────────────────────────────────┐  │
-│  │         Kaetram Server (Node.js + uws)       │  │
+│  │         Fuzzynuts World Server (Node.js + uws)       │  │
 │  │                                              │  │
 │  │  Port 9001: Game WebSocket (WSS)            │  │
 │  │  Port 9002: REST API (Express)              │  │
@@ -284,7 +284,7 @@ git push origin develop
 | What | Where |
 |------|-------|
 | Frontend errors | Vercel → Analytics / Functions |
-| Backend logs | Railway → Kaetram → Logs |
+| Backend logs | Railway → Fuzzynuts World → Logs |
 | MongoDB metrics | Railway → MongoDB → Metrics |
 | XRPL transactions | https://xrpscan.com/account/rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh |
 | Uptime | Railway Dashboard → Service health |

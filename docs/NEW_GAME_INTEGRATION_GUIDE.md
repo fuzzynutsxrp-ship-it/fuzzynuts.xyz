@@ -138,7 +138,7 @@ var SCORE_CAPS = {
   mario: 99999,
   survivors: 999999,
   minigolf: 10500,
-  kaetram: 9999999,
+  fuzzynuts-world: 9999999,
   nutracer: 99999,
   'your-slug': XXXXX     // ← ADD THIS LINE
 };
@@ -226,7 +226,7 @@ export const GAMES = [
 ];
 ```
 
-> **To make it the #1 featured game:** Place the entry at `index 0` of the array (before `kaetram`). The GamesShowcase renders in array order.
+> **To make it the #1 featured game:** Place the entry at `index 0` of the array (before `fuzzynuts-world`). The GamesShowcase renders in array order.
 
 ### C. Create the game icon
 
@@ -268,7 +268,7 @@ npm run build
 ```
 Route (app)                                 Size  First Load JS
 ├ ● /games/[slug]                        6.94 kB         151 kB
-├   ├ /games/kaetram
+├   ├ /games/fuzzynuts-world
 ├   ├ /games/mario
 ├   ├ /games/fuzzy-survivors
 ├   ├ /games/your-slug              ← NEW! Must appear here

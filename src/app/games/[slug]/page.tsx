@@ -31,13 +31,13 @@ const GAME_REGISTRY: Record<string, GameRegistryEntry> = {
     iframeSrc: "/games/top-secret/index.html",
     sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
   },
-  kaetram: {
+  "fuzzynuts-world": {
     title: "Fuzzynuts World",
     type: "MMORPG",
     color: "#4ade80",
     description:
       "Explore a massive open world, complete quests, craft items, and compete with players worldwide.",
-    iframeSrc: "/games/kaetram/index.html",
+    iframeSrc: "/games/fuzzynuts-world/index.html",
     sandbox: "allow-scripts allow-same-origin allow-popups allow-forms",
   },
   mario: {

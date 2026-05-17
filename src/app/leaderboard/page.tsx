@@ -5,11 +5,11 @@ import { LeaderboardClient } from "./client";
 export const metadata: Metadata = {
   title: "Arcade Leaderboard | Fuzzynuts.xyz",
   description:
-    "See who tops the charts and earns $NUT prizes. Play Kaetram, Super Fuzzynuts, Fuzzy Survivors, Nut Golf, and Nut Racer on the XRP Ledger.",
+    "See who tops the charts and earns $NUT prizes. Play Fuzzynuts World, Super Fuzzynuts, Fuzzy Survivors, Nut Golf, and Nut Racer on the XRP Ledger.",
   openGraph: {
     title: "Arcade Leaderboard | Fuzzynuts.xyz",
     description:
-      "See who tops the charts and earns $NUT prizes. Play Kaetram, Super Fuzzynuts, Fuzzy Survivors, Nut Golf, and Nut Racer on the XRP Ledger.",
+      "See who tops the charts and earns $NUT prizes. Play Fuzzynuts World, Super Fuzzynuts, Fuzzy Survivors, Nut Golf, and Nut Racer on the XRP Ledger.",
     url: "https://fuzzynuts.xyz/leaderboard",
     siteName: "Fuzzynuts.xyz",
     type: "website",

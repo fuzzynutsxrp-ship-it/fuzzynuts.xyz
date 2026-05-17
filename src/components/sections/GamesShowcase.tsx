@@ -9,7 +9,7 @@ import { CyberCard } from "@/components/ui/CyberCard";
 
 /** Map game colors to CyberCard accent names */
 const ACCENT_MAP: Record<string, "green" | "red" | "purple" | "cyan" | "orange"> = {
-  kaetram: "green",
+  "fuzzynuts-world": "green",
   mario: "red",
   survivors: "purple",
   minigolf: "cyan",

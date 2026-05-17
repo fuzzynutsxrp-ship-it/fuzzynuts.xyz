@@ -22,6 +22,9 @@
     { "source": "/arcade/", "destination": "/#games", "permanent": false },
     { "source": "/games/mirage-realms", "destination": "/games/top-secret", "permanent": false },
     { "source": "/games/mirage-realms/", "destination": "/games/top-secret/", "permanent": false },
-    { "source": "/games/mirage-realms/:path*", "destination": "/games/top-secret/:path*", "permanent": false }
+    { "source": "/games/mirage-realms/:path*", "destination": "/games/top-secret/:path*", "permanent": false },
+    { "source": "/games/kaetram", "destination": "/games/fuzzynuts-world", "permanent": false },
+    { "source": "/games/kaetram/", "destination": "/games/fuzzynuts-world/", "permanent": false },
+    { "source": "/games/kaetram/:path*", "destination": "/games/fuzzynuts-world/:path*", "permanent": false }
   ]
 }

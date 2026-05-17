@@ -35,11 +35,11 @@ export const GAMES = [
     tags: ["Coming Soon", "🔒 Classified"],
   },
   {
-    id: "kaetram",
+    id: "fuzzynuts-world",
     title: "Fuzzynuts World",
     type: "MMORPG",
     description: "Explore a massive open world, complete quests, craft items, and compete with players worldwide. The flagship Fuzzynuts experience.",
-    href: "/games/kaetram/",
+    href: "/games/fuzzynuts-world/",
     icon: "/icons/icon-world-pop.webp",
     image: "🌍",
     color: "#4ade80",

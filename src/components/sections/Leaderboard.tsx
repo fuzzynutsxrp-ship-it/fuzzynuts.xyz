@@ -42,7 +42,7 @@ const MAX_ENTRIES = 50;
 /** Map game IDs to accent colors for the CyberCard system */
 const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange" | "gold"> = {
   "top-secret": "purple",
-  kaetram: "green",
+  "fuzzynuts-world": "green",
   mario: "red",
   survivors: "purple",
   minigolf: "cyan",
@@ -52,7 +52,7 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
 /** Map game IDs to emojis for the tab selector */
 const GAME_EMOJIS: Record<string, string> = {
   "top-secret": "🕵️",
-  kaetram: "🌍",
+  "fuzzynuts-world": "🌍",
   mario: "🍄",
   survivors: "⚔️",
   minigolf: "⛳",
@@ -167,7 +167,7 @@ function RankBadge({ rank }: { rank: number }) {
    ═══════════════════════════════════════════════════════════════ */
 
 export function Leaderboard() {
-  const [selectedGame, setSelectedGame] = useState("kaetram");
+  const [selectedGame, setSelectedGame] = useState("fuzzynuts-world");
   const [state, setState] = useState<LeaderboardState>({
     scores: [],
     loading: true,

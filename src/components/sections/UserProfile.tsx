@@ -43,7 +43,7 @@ const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
 
 const GAME_EMOJIS: Record<string, string> = {
   "top-secret": "🕵️",
-  kaetram: "🌍",
+  "fuzzynuts-world": "🌍",
   mario: "🍄",
   survivors: "⚔️",
   minigolf: "⛳",
@@ -77,7 +77,7 @@ const ACHIEVEMENTS: Achievement[] = [
     title: "World Traveler",
     description: "Explored Fuzzynuts World",
     icon: "🌍",
-    game: "kaetram",
+    game: "fuzzynuts-world",
     storageKey: "fuzzy_achievement_world_traveler",
   },
   {

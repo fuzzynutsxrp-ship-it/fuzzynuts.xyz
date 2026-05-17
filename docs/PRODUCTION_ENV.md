@@ -28,15 +28,15 @@ The frontend is a **static export** (`output: "export"`). It has **no server-sid
 
 ---
 
-## Backend — Railway (Kaetram Server)
+## Backend — Railway (Fuzzynuts World Server)
 
-These are set in the Railway dashboard under **Kaetram service → Variables tab**.
+These are set in the Railway dashboard under **Fuzzynuts World service → Variables tab**.
 
 ### Existing Variables (already configured)
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
-| `ACCEPT_LICENSE` | `true` | Kaetram license acceptance |
+| `ACCEPT_LICENSE` | `true` | Fuzzynuts World license acceptance |
 | `NAME` | `Fuzzynuts World` | Server display name |
 | `HOST` | `0.0.0.0` | Bind address |
 | `PORT` | `9001` | Game WebSocket port |
@@ -75,7 +75,7 @@ These are set in the Railway dashboard under **Kaetram service → Variables tab
 ```
 1. Go to https://railway.app
 2. Open project "efficient-tenderness"
-3. Click the "Kaetram" service
+3. Click the "Fuzzynuts World" service
 4. Go to "Variables" tab
 5. Click "+ New Variable"
 6. Name:  COMMUNITY_NUT_JAR_SEED

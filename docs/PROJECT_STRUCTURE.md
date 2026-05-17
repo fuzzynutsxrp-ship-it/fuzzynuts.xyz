@@ -92,7 +92,7 @@ fuzzynuts-optimized/
 │   ├── videos/
 │   │   └── herobackgroundvideo.mp4 # Hero background loop (1.8M)
 │   ├── games/                      # ⚠️ STATIC GAME BUNDLES — careful here
-│   │   ├── kaetram/                # MMORPG (redirect stub → world.fuzzynuts.xyz)
+│   │   ├── fuzzynuts-world/                # MMORPG (redirect stub → world.fuzzynuts.xyz)
 │   │   ├── mario/                  # Super Fuzzynuts (11M, FullScreenMario fork)
 │   │   ├── fuzzy-survivors/        # Vampire Survivors clone (runtime only)
 │   │   ├── minigolf/               # Nut Golf WebAssembly (18M)
