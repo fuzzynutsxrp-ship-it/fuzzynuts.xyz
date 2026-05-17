@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Wallet, LogOut, ChevronDown, ExternalLink, Gift, Coins, Trophy, User, Bell } from "lucide-react";
+import { Menu, X, Wallet, LogOut, ChevronDown, ExternalLink, Gift, Coins, Trophy, User, Bell, AlertCircle } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { truncateAddress } from "@/lib/utils";
 import Image from "next/image";
@@ -122,7 +122,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const [claimOpen, setClaimOpen] = useState(false);
-  const { address, isConnected, isConnecting, connect, disconnect, provider, nutBalance } = useWalletStore();
+  const { address, isConnected, isConnecting, connect, disconnect, provider, nutBalance, error, setError } = useWalletStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [hasClaimable, setHasClaimable] = useState(false);
 
@@ -176,10 +176,18 @@ export function Navbar() {
     }
   }, [walletMenuOpen]);
 
+  // Auto-dismiss wallet errors after 8s
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => setError(null), 8000);
+    return () => clearTimeout(timer);
+  }, [error, setError]);
+
   const handleConnect = useCallback(async (prov: "xaman" | "gemwallet" | "crossmark") => {
     setWalletMenuOpen(false);
+    setError(null); // Clear any previous error
     await connect(prov);
-  }, [connect]);
+  }, [connect, setError]);
 
   return (
     <>
@@ -349,6 +357,30 @@ export function Navbar() {
                     ) : (
                       <div className="space-y-1">
                         <p className="text-xs text-[var(--color-cream-dim)] px-2 pb-2 font-medium">Choose wallet</p>
+
+                        {/* Inline error in dropdown */}
+                        {error && (
+                          <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 mb-1">
+                            <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                            <div className="text-xs text-red-400 leading-relaxed">
+                              {error}
+                              {error.includes("installed") || error.includes("not found") ? (
+                                <>
+                                  {" "}
+                                  <a
+                                    href="https://xaman.app"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline text-brand-gold hover:text-[var(--color-gold)] font-semibold"
+                                  >
+                                    Get Xaman →
+                                  </a>
+                                </>
+                              ) : null}
+                            </div>
+                          </div>
+                        )}
+
                         {[
                           { id: "xaman" as const, name: "Xaman (Xumm)", icon: "📱", desc: "Mobile / Desktop" },
                           { id: "gemwallet" as const, name: "GemWallet", icon: "💎", desc: "Browser Extension" },
@@ -357,8 +389,9 @@ export function Navbar() {
                           <motion.button
                             key={w.id}
                             onClick={() => handleConnect(w.id)}
+                            disabled={isConnecting}
                             whileHover={{ x: 4 }}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-[var(--color-cream)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.08)] rounded-lg transition-all cursor-pointer"
+                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-[var(--color-cream)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.08)] rounded-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <span className="text-xl w-8 text-center">{w.icon}</span>
                             <div className="text-left">
