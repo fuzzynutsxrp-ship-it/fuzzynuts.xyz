@@ -182,95 +182,183 @@ body {
 }
 
 /* ──────────────────────────────────────────
-   Arcade Cabinet — Cyber-Nature Game Cards
+   Game Card — Cyber-Nature Premium Cards
+   Clean gradient border, ambient glow, tight layout
    ────────────────────────────────────────── */
-.arcade-cabinet {
-  --cab-color: #10B981;
+.game-card {
+  --gc-accent: #10B981;
   position: relative;
-  background: var(--color-forest-dark);
-  background-image: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(16,185,129,0.03), transparent);
-  border: 3px solid transparent;
-  border-radius: 12px;
-  overflow: visible;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s;
-  /* Gradient border via background-clip trick */
-  border-image: linear-gradient(180deg, #10B981 0%, #FBBF24 100%) 1;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.arcade-cabinet:hover {
-  transform: translateY(-6px);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.7),
-    0 0 30px var(--cab-color, rgba(16,185,129,0.15)),
-    0 0 60px rgba(16,185,129,0.06),
-    inset 0 1px 0 rgba(255,255,255,0.05);
-}
-
-.arcade-cabinet:focus-within {
-  outline: 2px solid var(--color-neon-green);
-  outline-offset: 3px;
-}
-
-/* ── Marquee zone ── */
-.arcade-marquee {
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-/* ── Screen zone ── */
-.arcade-screen {
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-/* ── CRT Scanlines ── */
-.arcade-scanlines {
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.15) 2px,
-    rgba(0, 0, 0, 0.15) 4px
+  background: linear-gradient(
+    168deg,
+    rgba(10, 15, 10, 0.95) 0%,
+    rgba(1, 5, 8, 0.98) 40%,
+    rgba(1, 5, 8, 0.92) 100%
   );
-  mix-blend-mode: multiply;
+  border-radius: 14px;
+  overflow: visible;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* Screen flicker on hover */
-.arcade-cabinet:hover .arcade-scanlines {
-  animation: screen-flicker 4s ease-in-out infinite;
+/* ── Gradient border: accent → transparent at bottom ── */
+.game-card__border {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1px;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    var(--gc-accent) 0%,
+    color-mix(in srgb, var(--gc-accent) 30%, transparent) 50%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.35;
+  transition: opacity 0.3s;
 }
 
-@keyframes screen-flicker {
-  0%, 95%, 100% { opacity: 1; }
-  96% { opacity: 0.96; }
-  97% { opacity: 1; }
-  98% { opacity: 0.97; }
+/* ── Inner highlight: subtle top edge ── */
+.game-card__highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 2;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.08) 70%,
+    transparent 95%
+  );
 }
 
-/* ── Play button glow pulse on cabinet hover ── */
-.arcade-cabinet:hover .arcade-play-btn {
-  animation: btn-glow-pulse 2s ease-in-out infinite;
+/* ── Ambient glow behind icon ── */
+.game-card__ambient {
+  opacity: 0.35;
+  transition: opacity 0.4s ease;
+  animation: ambientPulse 4s ease-in-out infinite;
 }
 
-@keyframes btn-glow-pulse {
+@keyframes ambientPulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Title gradient text ── */
+.game-card__title {
+  background: linear-gradient(135deg, #FBBF24 0%, #10B981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: var(--gc-title-glow, none);
+  transition: filter 0.3s;
+}
+
+/* ── Tag slide-up on hover ── */
+.game-card__tag {
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.3s,
+              border-color 0.3s;
+}
+
+/* ── Hover state ── */
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.65),
+    0 0 30px color-mix(in srgb, var(--gc-accent) 15%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.game-card:hover .game-card__border {
+  opacity: 0.7;
+}
+
+.game-card:hover .game-card__ambient {
+  opacity: 0.55;
+  animation-play-state: running;
+}
+
+.game-card:hover .game-card__tag {
+  transform: translateY(-6px);
+}
+
+.game-card:hover .game-card__play-btn {
+  animation: btnGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes btnGlowPulse {
   0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.12); }
+  50% { filter: brightness(1.1); }
+}
+
+/* ── Featured card: extra glow ── */
+.game-card--featured {
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.55),
+    0 0 20px color-mix(in srgb, var(--gc-accent) 8%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.game-card--featured .game-card__border {
+  opacity: 0.5;
+}
+
+.game-card--featured:hover {
+  box-shadow:
+    0 16px 50px rgba(0, 0, 0, 0.7),
+    0 0 40px color-mix(in srgb, var(--gc-accent) 20%, transparent),
+    0 0 80px color-mix(in srgb, var(--gc-accent) 6%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ── Focus states ── */
+.game-card:focus-within {
+  outline: none;
+}
+
+.game-card:focus-within .game-card__border {
+  opacity: 0.9;
+}
+
+.game-card .game-card__play-btn:focus-visible {
+  outline: 2px solid var(--gc-accent);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 4px rgba(10, 15, 10, 0.9),
+    0 0 20px color-mix(in srgb, var(--gc-accent) 40%, transparent);
 }
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .arcade-cabinet,
-  .arcade-cabinet:hover {
+  .game-card,
+  .game-card:hover {
     transform: none !important;
     transition: none !important;
   }
-  .arcade-cabinet:hover .arcade-scanlines {
+  .game-card__ambient {
     animation: none !important;
+    opacity: 0.3;
   }
-  .arcade-cabinet:hover .arcade-play-btn {
+  .game-card__tag {
+    transform: none !important;
+    transition: none !important;
+  }
+  .game-card:hover .game-card__play-btn {
     animation: none !important;
   }
 }
