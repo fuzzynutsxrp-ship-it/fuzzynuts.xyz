@@ -303,6 +303,18 @@
         //   4. postMessage → parent GameWrapper (toast notification)
         var result = FuzzyScoreSubmit(GAME_SLUG, score, durationSeconds);
         console.log('[' + GAME_TITLE + '] Score submitted:', result);
+
+        // 🔌 ACHIEVEMENT: Unlock "Desert Explorer" on first play
+        try {
+          if (!localStorage.getItem('fuzzy_achievement_desert_explorer')) {
+            localStorage.setItem('fuzzy_achievement_desert_explorer', 'true');
+            console.log('[' + GAME_TITLE + '] 🏜️ Achievement unlocked: Desert Explorer');
+            window.parent.postMessage({
+              type: 'FUZZY_ACHIEVEMENT_UNLOCKED',
+              achievement: 'desert-explorer'
+            }, '*');
+          }
+        } catch(e) {}
       }
 
       // ──────────────────────────────────────────────────

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wallet,
   Trophy,
   Gamepad2,
+  Award,
   RefreshCw,
   WifiOff,
   TrendingUp,
@@ -41,12 +42,84 @@ interface ProfileState {
 const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
 
 const GAME_EMOJIS: Record<string, string> = {
+  "mirage-realms": "🏜️",
   kaetram: "🌍",
   mario: "🍄",
   survivors: "⚔️",
   minigolf: "⛳",
   racer: "🏎️",
 };
+
+/* ═══════════════════════════════════════════════════════════════
+   Achievement Definitions
+   ═══════════════════════════════════════════════════════════════ */
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  game: string;
+  storageKey: string;
+}
+
+const ACHIEVEMENTS: Achievement[] = [
+  {
+    id: "desert-explorer",
+    title: "Desert Explorer",
+    description: "Played MirageRealms for the first time",
+    icon: "🏜️",
+    game: "mirage-realms",
+    storageKey: "fuzzy_achievement_desert_explorer",
+  },
+  {
+    id: "world-traveler",
+    title: "World Traveler",
+    description: "Explored Fuzzynuts World",
+    icon: "🌍",
+    game: "kaetram",
+    storageKey: "fuzzy_achievement_world_traveler",
+  },
+  {
+    id: "mushroom-stomper",
+    title: "Mushroom Stomper",
+    description: "Completed a run in Super Fuzzynuts",
+    icon: "🍄",
+    game: "mario",
+    storageKey: "fuzzy_achievement_mushroom_stomper",
+  },
+  {
+    id: "survivor",
+    title: "Survivor",
+    description: "Survived a wave in Fuzzy Survivors",
+    icon: "⚔️",
+    game: "survivors",
+    storageKey: "fuzzy_achievement_survivor",
+  },
+  {
+    id: "hole-in-one",
+    title: "Hole in One",
+    description: "Played a round of Fuzzy Putt",
+    icon: "⛳",
+    game: "minigolf",
+    storageKey: "fuzzy_achievement_hole_in_one",
+  },
+];
+
+function getUnlockedAchievements(): Set<string> {
+  const unlocked = new Set<string>();
+  if (typeof window === "undefined") return unlocked;
+  for (const a of ACHIEVEMENTS) {
+    try {
+      if (localStorage.getItem(a.storageKey) === "true") {
+        unlocked.add(a.id);
+      }
+    } catch {
+      // localStorage unavailable
+    }
+  }
+  return unlocked;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    Utilities
@@ -157,6 +230,7 @@ export function UserProfile() {
     error: null,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const unlockedAchievements = useMemo(() => getUnlockedAchievements(), []);
 
   /* ── Fetch user scores ── */
   const fetchUserScores = useCallback(
@@ -400,6 +474,57 @@ export function UserProfile() {
             </div>
           </motion.div>
         )}
+
+        {/* ── Achievements ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+        >
+          <h3 className="font-display text-lg font-bold text-cream mb-3 flex items-center gap-2">
+            <Award size={16} className="text-brand-gold" />
+            Achievements
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {ACHIEVEMENTS.map((achievement) => {
+              const isUnlocked = unlockedAchievements.has(achievement.id);
+              return (
+                <CyberCard
+                  key={achievement.id}
+                  accentColor={isUnlocked ? "gold" : "green"}
+                >
+                  <div
+                    className={`p-4 flex items-center gap-3 transition-opacity ${
+                      isUnlocked ? "opacity-100" : "opacity-40"
+                    }`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 ${
+                        isUnlocked
+                          ? "bg-brand-gold/15 border border-brand-gold/30"
+                          : "bg-white/[0.04] border border-white/[0.08]"
+                      }`}
+                    >
+                      {isUnlocked ? achievement.icon : "🔒"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm font-bold truncate ${
+                          isUnlocked ? "text-brand-gold" : "text-cream-dim"
+                        }`}
+                      >
+                        {achievement.title}
+                      </p>
+                      <p className="text-[11px] text-cream-dim">
+                        {achievement.description}
+                      </p>
+                    </div>
+                  </div>
+                </CyberCard>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* ── Score History Table ── */}
         <motion.div
