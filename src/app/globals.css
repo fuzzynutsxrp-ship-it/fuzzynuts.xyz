@@ -182,6 +182,100 @@ body {
 }
 
 /* ──────────────────────────────────────────
+   Arcade Cabinet — Cyber-Nature Game Cards
+   ────────────────────────────────────────── */
+.arcade-cabinet {
+  --cab-color: #10B981;
+  position: relative;
+  background: var(--color-forest-dark);
+  background-image: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(16,185,129,0.03), transparent);
+  border: 3px solid transparent;
+  border-radius: 12px;
+  overflow: visible;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s;
+  /* Gradient border via background-clip trick */
+  border-image: linear-gradient(180deg, #10B981 0%, #FBBF24 100%) 1;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.arcade-cabinet:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    0 0 30px var(--cab-color, rgba(16,185,129,0.15)),
+    0 0 60px rgba(16,185,129,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.arcade-cabinet:focus-within {
+  outline: 2px solid var(--color-neon-green);
+  outline-offset: 3px;
+}
+
+/* ── Marquee zone ── */
+.arcade-marquee {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ── Screen zone ── */
+.arcade-screen {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ── CRT Scanlines ── */
+.arcade-scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Screen flicker on hover */
+.arcade-cabinet:hover .arcade-scanlines {
+  animation: screen-flicker 4s ease-in-out infinite;
+}
+
+@keyframes screen-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.96; }
+  97% { opacity: 1; }
+  98% { opacity: 0.97; }
+}
+
+/* ── Play button glow pulse on cabinet hover ── */
+.arcade-cabinet:hover .arcade-play-btn {
+  animation: btn-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes btn-glow-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .arcade-cabinet,
+  .arcade-cabinet:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+  .arcade-cabinet:hover .arcade-scanlines {
+    animation: none !important;
+  }
+  .arcade-cabinet:hover .arcade-play-btn {
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────
    Legacy glass-card (kept for backward compat)
    ────────────────────────────────────────── */
 .glass-card {
