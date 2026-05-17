@@ -24,12 +24,12 @@ export const TOKENOMICS = [
 
 export const GAMES = [
   {
-    id: "mirage-realms",
+    id: "top-secret",
     title: "Top Secret",
     type: "??? Classified",
     description: "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
-    href: "/games/mirage-realms/",
-    icon: "/icons/icon-mirage-realms-pop.webp",
+    href: "/games/top-secret/",
+    icon: "/icons/icon-top-secret-pop.webp",
     image: "🕵️",
     color: "#8B5CF6",
     tags: ["Coming Soon", "🔒 Classified"],

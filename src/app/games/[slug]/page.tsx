@@ -22,13 +22,13 @@ interface GameRegistryEntry {
 }
 
 const GAME_REGISTRY: Record<string, GameRegistryEntry> = {
-  "mirage-realms": {
+  "top-secret": {
     title: "Top Secret",
     type: "??? Classified",
     color: "#8B5CF6",
     description:
       "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
-    iframeSrc: "/games/mirage-realms/index.html",
+    iframeSrc: "/games/top-secret/index.html",
     sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
   },
   kaetram: {

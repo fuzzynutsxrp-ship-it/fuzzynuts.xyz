@@ -15,7 +15,7 @@ var FuzzyScoreSubmit = (function() {
   var STORAGE_KEY = 'fuzzy_arcade_scores';
   var WALLET_KEY  = 'fuzzy_wallet';
   var API_BASE    = 'https://world.fuzzynuts.xyz/api/scores';
-  var SCORE_CAPS  = { 'mirage-realms': 999999, mario: 99999, survivors: 999999, minigolf: 10500, kaetram: 9999999, nutracer: 99999 };
+  var SCORE_CAPS  = { 'top-secret': 999999, mario: 99999, survivors: 999999, minigolf: 10500, kaetram: 9999999, nutracer: 99999 };
   var MIN_DURATION = 15; // seconds
 
   function getCurrentWeekKey() {
