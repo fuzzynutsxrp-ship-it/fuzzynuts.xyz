@@ -1,0 +1,28 @@
+/* ═══════════════════════════════════════════════════════════════
+   FUZZYNUTS ARCADE — Game Wrapper Base Styles (Standalone)
+   
+   Provides the flex-based body layout and reset for standalone
+   HTML game launchers outside Next.js.
+   
+   Referenced by:
+     - public/games/fuzzynuts-world/index.html
+   ═══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-base, #0a0f0a);
+  color: var(--text-secondary, #ddd);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; }
