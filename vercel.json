@@ -19,6 +19,9 @@
   ],
   "redirects": [
     { "source": "/arcade", "destination": "/#games", "permanent": false },
-    { "source": "/arcade/", "destination": "/#games", "permanent": false }
+    { "source": "/arcade/", "destination": "/#games", "permanent": false },
+    { "source": "/games/mirage-realms", "destination": "/games/top-secret", "permanent": false },
+    { "source": "/games/mirage-realms/", "destination": "/games/top-secret/", "permanent": false },
+    { "source": "/games/mirage-realms/:path*", "destination": "/games/top-secret/:path*", "permanent": false }
   ]
 }
