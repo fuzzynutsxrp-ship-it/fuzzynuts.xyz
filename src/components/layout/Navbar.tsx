@@ -16,112 +16,11 @@ const NAV_LINKS = [
   { href: "#how-to-get", label: "Get $NUT" },
 ];
 
-function ClaimModal({ onClose }: { onClose: () => void }) {
-  const [claimed, setClaimed] = useState(false);
-  const [claiming, setClaiming] = useState(false);
-
-  const handleClaim = () => {
-    setClaiming(true);
-    setTimeout(() => {
-      setClaiming(false);
-      setClaimed(true);
-    }, 1500);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative glass-card p-8 max-w-sm w-full text-center"
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] cursor-pointer"
-          aria-label="Close modal"
-        >
-          <X size={18} />
-        </button>
-
-        {claimed ? (
-          <>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", damping: 12 }}
-              className="text-6xl mb-4"
-            >
-              🎉
-            </motion.div>
-            <h3 className="font-display text-2xl font-bold gradient-text-gold mb-2">
-              Test Rewards Claimed!
-            </h3>
-            <p className="text-sm text-[var(--color-cream-dim)] mb-4">
-              +1,000 $NUT (demo) has been added to your test balance.
-              In the real arcade, you earn by playing games!
-            </p>
-            <button
-              onClick={onClose}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-sm cursor-pointer"
-            >
-              Awesome! 🐿️
-            </button>
-          </>
-        ) : (
-          <>
-            <div className="text-5xl mb-4">🌰</div>
-            <h3 className="font-display text-2xl font-bold gradient-text-gold mb-2">
-              Claim Test Rewards
-            </h3>
-            <p className="text-sm text-[var(--color-cream-dim)] mb-6">
-              Welcome to Fuzzynuts! Claim 1,000 test $NUT to explore the arcade.
-              No real tokens are transferred.
-            </p>
-            <button
-              onClick={handleClaim}
-              disabled={claiming}
-              className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-base hover:shadow-[0_0_30px_rgba(245,196,66,0.5)] transition-all disabled:opacity-60 cursor-pointer"
-            >
-              {claiming ? (
-                <span className="flex items-center justify-center gap-2">
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    className="inline-block"
-                  >
-                    🌰
-                  </motion.span>
-                  Claiming…
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <Gift size={18} />
-                  Claim 1,000 $NUT
-                </span>
-              )}
-            </button>
-          </>
-        )}
-      </motion.div>
-    </motion.div>
-  );
-}
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
-  const [claimOpen, setClaimOpen] = useState(false);
   const { address, isConnected, isConnecting, connect, disconnect, provider, nutBalance, error, setError } = useWalletStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [hasClaimable, setHasClaimable] = useState(false);
@@ -329,13 +228,14 @@ export function Navbar() {
                         </div>
 
                         {/* Actions */}
-                        <button
-                          onClick={() => { setClaimOpen(true); setWalletMenuOpen(false); }}
+                        <Link
+                          href="/profile/"
+                          onClick={() => setWalletMenuOpen(false)}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--color-accent-green)] hover:bg-[rgba(74,222,128,0.08)] rounded-lg transition-colors cursor-pointer"
                         >
                           <Gift size={14} />
-                          Claim Test Rewards
-                        </button>
+                          {hasClaimable ? "Claim Rewards 🔔" : "Claim Rewards"}
+                        </Link>
                         <a
                           href={`https://xrpscan.com/account/${address}`}
                           target="_blank"
@@ -507,10 +407,6 @@ export function Navbar() {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Claim Modal */}
-      <AnimatePresence>
-        {claimOpen && <ClaimModal onClose={() => setClaimOpen(false)} />}
-      </AnimatePresence>
     </>
   );
 }
