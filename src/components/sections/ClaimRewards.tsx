@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy,
@@ -10,115 +10,226 @@ import {
   CheckCircle,
   AlertTriangle,
   Gift,
+  X,
+  ShieldCheck,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { CyberCard } from "@/components/ui/CyberCard";
+import {
+  usePayoutEligibility,
+  getCurrentWeekKey,
+  type ClaimStatus,
+} from "@/hooks/useArcadeState";
 
 /* ═══════════════════════════════════════════════════════════════
-   Types & Constants
+   Prize Tier Config
    ═══════════════════════════════════════════════════════════════ */
 
-interface EligibilityData {
-  eligible: boolean;
-  rank: number | null;
-  game: string | null;
-  prize: number | null;
-  claimed: boolean;
-  txHash: string | null;
-}
-
-type ClaimStatus = "idle" | "checking" | "claiming" | "success" | "error";
-
-const API_BASE = "https://world.fuzzynuts.xyz/api/rewards";
-
-const PRIZE_TIERS: Record<number, { label: string; amount: string; emoji: string }> = {
-  1: { label: "1st Place", amount: "250,000 $NUT", emoji: "🥇" },
-  2: { label: "2nd Place", amount: "150,000 $NUT", emoji: "🥈" },
-  3: { label: "3rd Place", amount: "100,000 $NUT", emoji: "🥉" },
+const PRIZE_TIERS: Record<number, { label: string; amount: string; nutAmount: number; emoji: string }> = {
+  1: { label: "1st Place", amount: "250,000 $NUT", nutAmount: 250_000, emoji: "🥇" },
+  2: { label: "2nd Place", amount: "150,000 $NUT", nutAmount: 150_000, emoji: "🥈" },
+  3: { label: "3rd Place", amount: "100,000 $NUT", nutAmount: 100_000, emoji: "🥉" },
 };
 
-function getCurrentWeekKey(): string {
-  const now = new Date();
-  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNum = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
+/* ═══════════════════════════════════════════════════════════════
+   Confetti Burst — Lightweight CSS-only confetti animation
+   ═══════════════════════════════════════════════════════════════ */
+
+function ConfettiBurst() {
+  const particles = Array.from({ length: 24 }, (_, i) => ({
+    id: i,
+    angle: (i / 24) * 360,
+    distance: 60 + Math.random() * 80,
+    size: 4 + Math.random() * 6,
+    color: ["#FBBF24", "#10B981", "#f59e0b", "#4ade80", "#22d3ee", "#a855f7"][
+      i % 6
+    ],
+    delay: Math.random() * 0.3,
+  }));
+
+  return (
+    <div className="confetti-container absolute inset-0 pointer-events-none z-50 overflow-hidden" aria-hidden="true">
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="confetti-particle"
+          style={{
+            left: "50%",
+            top: "50%",
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            backgroundColor: p.color,
+            borderRadius: p.id % 3 === 0 ? "50%" : "2px",
+            animationDelay: `${p.delay}s`,
+            // Use CSS custom properties for the animation
+            "--confetti-x": `${Math.cos((p.angle * Math.PI) / 180) * p.distance}px`,
+            "--confetti-y": `${Math.sin((p.angle * Math.PI) / 180) * p.distance - 40}px`,
+          } as React.CSSProperties}
+        />
+      ))}
+    </div>
+  );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Component
+   Confirmation Modal
+   ═══════════════════════════════════════════════════════════════ */
+
+function ClaimConfirmModal({
+  tier,
+  game,
+  onConfirm,
+  onCancel,
+  claiming,
+}: {
+  tier: { label: string; amount: string; emoji: string };
+  game: string | null;
+  onConfirm: () => void;
+  onCancel: () => void;
+  claiming: boolean;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !claiming) onCancel();
+      }}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        className="relative w-full max-w-md rounded-2xl border border-brand-gold/20
+                   bg-[rgba(1,5,8,0.95)] backdrop-blur-2xl shadow-2xl overflow-hidden"
+      >
+        {/* Close button */}
+        {!claiming && (
+          <button
+            onClick={onCancel}
+            className="absolute top-4 right-4 p-2 rounded-lg text-cream-dim hover:text-cream
+                       hover:bg-white/[0.06] transition-colors min-h-[44px] min-w-[44px]
+                       flex items-center justify-center"
+            aria-label="Cancel"
+          >
+            <X size={18} />
+          </button>
+        )}
+
+        <div className="p-8 text-center">
+          {/* Shield icon */}
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand-gold/10 border border-brand-gold/20
+                          flex items-center justify-center mb-5">
+            <ShieldCheck size={32} className="text-brand-gold" />
+          </div>
+
+          <h3 className="font-display text-xl font-bold text-cream mb-2">
+            Confirm Prize Claim
+          </h3>
+
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+              <span className="text-cream-dim">Prize</span>
+              <span className="font-bold text-brand-gold">{tier.emoji} {tier.label} — {tier.amount}</span>
+            </div>
+            {game && (
+              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+                <span className="text-cream-dim">Game</span>
+                <span className="text-cream font-medium">{game}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+              <span className="text-cream-dim">Network</span>
+              <span className="text-cream font-medium">XRPL Mainnet</span>
+            </div>
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+              <span className="text-cream-dim">Est. Gas</span>
+              <span className="text-cream font-medium">~0.000012 XRP</span>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={onCancel}
+              disabled={claiming}
+              className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold
+                         text-cream-dim border border-white/[0.1] hover:border-white/[0.2]
+                         hover:bg-white/[0.04] transition-all min-h-[44px]
+                         disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+            <motion.button
+              onClick={onConfirm}
+              disabled={claiming}
+              whileHover={claiming ? {} : { scale: 1.02 }}
+              whileTap={claiming ? {} : { scale: 0.98 }}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
+                         text-sm font-bold bg-gradient-to-r from-brand-gold to-yellow-500
+                         text-forest-dark hover:shadow-[0_0_30px_rgba(245,196,66,0.5)]
+                         transition-all min-h-[44px] disabled:opacity-60 cursor-pointer"
+            >
+              {claiming ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Processing…
+                </>
+              ) : (
+                <>
+                  <Gift size={16} />
+                  Claim Prize
+                </>
+              )}
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ClaimRewards — Main Component
    ═══════════════════════════════════════════════════════════════ */
 
 export function ClaimRewards() {
   const { address, isConnected, connect, isConnecting } = useWalletStore();
-  const [eligibility, setEligibility] = useState<EligibilityData | null>(null);
-  const [status, setStatus] = useState<ClaimStatus>("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
 
-  /* ── Check eligibility ── */
-  const checkEligibility = useCallback(async () => {
-    if (!address) return;
-    setStatus("checking");
-    setError(null);
-
-    try {
-      const week = getCurrentWeekKey();
-      const url = `${API_BASE}/eligibility?wallet=${encodeURIComponent(address)}&week=${week}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
-
-      const data: EligibilityData = await res.json();
-      setEligibility(data);
-      if (data.claimed && data.txHash) setClaimTxHash(data.txHash);
-      setStatus("idle");
-    } catch {
-      // If endpoint doesn't exist yet, show graceful fallback
-      setEligibility({ eligible: false, rank: null, game: null, prize: null, claimed: false, txHash: null });
-      setStatus("idle");
-    }
-  }, [address]);
-
-  useEffect(() => {
-    if (isConnected && address) checkEligibility();
-  }, [isConnected, address, checkEligibility]);
-
-  /* ── Claim reward ── */
-  const handleClaim = async () => {
-    if (!address || !eligibility?.eligible) return;
-    setStatus("claiming");
-    setError(null);
-
-    try {
-      const res = await fetch(`${API_BASE}/claim`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          wallet: address,
-          week: getCurrentWeekKey(),
-        }),
-        signal: AbortSignal.timeout(15000),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || `Server returned ${res.status}`);
-      }
-
-      const result = await res.json();
-      setClaimTxHash(result.txHash || null);
-      setEligibility((prev) => prev ? { ...prev, claimed: true, txHash: result.txHash } : prev);
-      setStatus("success");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Claim failed — please try again");
-      setStatus("error");
-    }
-  };
+  const {
+    eligibility,
+    status,
+    error,
+    txHash,
+    checkEligibility,
+    startClaim,
+    cancelClaim,
+    confirmClaim,
+  } = usePayoutEligibility(address);
 
   const weekKey = getCurrentWeekKey();
   const tier = eligibility?.rank ? PRIZE_TIERS[eligibility.rank] : null;
+
+  /** Status-to-string for claim button */
+  const getButtonLabel = useCallback(
+    (claimStatus: ClaimStatus): string => {
+      switch (claimStatus) {
+        case "checking":
+          return "Checking eligibility…";
+        case "claiming":
+          return "Processing on XRPL…";
+        case "polling":
+          return "Confirming transaction…";
+        default:
+          return tier ? `Claim ${tier.amount}` : "Claim Prize";
+      }
+    },
+    [tier]
+  );
 
   /* ═══════════════════════════════════════════════════════
      Not Connected
@@ -175,12 +286,15 @@ export function ClaimRewards() {
   }
 
   /* ═══════════════════════════════════════════════════════
-     Already Claimed
+     Already Claimed / Success with Confetti
      ═══════════════════════════════════════════════════════ */
-  if (eligibility?.claimed || status === "success") {
+  if (status === "already-claimed" || status === "success") {
     return (
       <CyberCard accentColor="green">
-        <div className="p-6 sm:p-8">
+        <div className="p-6 sm:p-8 relative">
+          {/* Confetti on fresh success */}
+          {status === "success" && <ConfettiBurst />}
+
           <div className="flex flex-col sm:flex-row items-center gap-5">
             <motion.div
               initial={{ scale: 0 }}
@@ -192,16 +306,16 @@ export function ClaimRewards() {
             </motion.div>
             <div className="flex-1 text-center sm:text-left">
               <h3 className="font-display text-lg font-bold text-neon-green mb-1">
-                Rewards Claimed! ✅
+                {status === "success" ? "Prize sent to wallet! 🌰" : "Rewards Claimed! ✅"}
               </h3>
               <p className="text-sm text-cream-dim">
                 {tier
                   ? `${tier.emoji} ${tier.label} — ${tier.amount} sent to your wallet.`
                   : "Your $NUT prize has been sent to your wallet."}
               </p>
-              {(claimTxHash || eligibility?.txHash) && (
+              {txHash && (
                 <a
-                  href={`https://xrpscan.com/tx/${claimTxHash || eligibility?.txHash}`}
+                  href={`https://xrpscan.com/tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 mt-2 text-xs text-brand-gold hover:underline font-mono"
@@ -220,7 +334,7 @@ export function ClaimRewards() {
   /* ═══════════════════════════════════════════════════════
      Not Eligible
      ═══════════════════════════════════════════════════════ */
-  if (!eligibility?.eligible || !tier) {
+  if (status === "not-eligible" || (!eligibility?.eligible && status !== "eligible")) {
     return (
       <CyberCard accentColor="gold">
         <div className="p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-5">
@@ -239,86 +353,113 @@ export function ClaimRewards() {
               and win next week!
             </p>
           </div>
+          <button
+            onClick={checkEligibility}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold
+                       text-cream-dim hover:text-cream bg-white/[0.04] hover:bg-white/[0.08]
+                       border border-white/[0.06] transition-all min-h-[44px] shrink-0"
+          >
+            Re-check
+          </button>
         </div>
       </CyberCard>
     );
   }
 
   /* ═══════════════════════════════════════════════════════
-     Eligible — Claim CTA
+     Eligible — Claim CTA + Confirmation Modal
      ═══════════════════════════════════════════════════════ */
   return (
-    <CyberCard accentColor="gold">
-      <div className="p-6 sm:p-8">
-        <div className="flex flex-col items-center text-center">
-          {/* Trophy */}
-          <motion.div
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", damping: 10, stiffness: 200 }}
-            className="text-5xl mb-4"
-          >
-            {tier.emoji}
-          </motion.div>
+    <>
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {(status === "confirming" || status === "claiming" || status === "polling") && tier && (
+          <ClaimConfirmModal
+            tier={tier}
+            game={eligibility?.game || null}
+            onConfirm={confirmClaim}
+            onCancel={cancelClaim}
+            claiming={status === "claiming" || status === "polling"}
+          />
+        )}
+      </AnimatePresence>
 
-          <h3 className="font-display text-2xl font-bold gradient-text-gold mb-1">
-            {tier.label} — {eligibility.game ? eligibility.game : "Arcade"}
-          </h3>
-          <p className="text-cream-dim text-sm mb-1">
-            Week {weekKey}
-          </p>
-          <p className="font-display text-3xl font-black text-brand-gold mb-6">
-            {tier.amount}
-          </p>
-
-          {/* Error banner */}
-          <AnimatePresence>
-            {status === "error" && error && (
+      <CyberCard accentColor="gold">
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col items-center text-center">
+            {/* Trophy */}
+            {tier && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="w-full mb-4"
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", damping: 10, stiffness: 200 }}
+                className="text-5xl mb-4"
               >
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-                  <AlertTriangle size={16} className="shrink-0" />
-                  {error}
-                </div>
+                {tier.emoji}
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {/* Claim button */}
-          <motion.button
-            onClick={handleClaim}
-            disabled={status === "claiming"}
-            whileHover={{ scale: 1.04, boxShadow: "0 0 35px rgba(245,196,66,0.5)" }}
-            whileTap={{ scale: 0.96 }}
-            className="w-full max-w-xs px-8 py-4 rounded-xl
-                       bg-gradient-to-r from-brand-gold to-yellow-500
-                       text-forest-dark font-bold text-base
-                       hover:shadow-[0_0_30px_rgba(245,196,66,0.5)]
-                       transition-all disabled:opacity-60 cursor-pointer"
-            style={{ animation: status !== "claiming" ? "pulse-gold 3s ease-in-out infinite" : "none" }}
-          >
-            {status === "claiming" ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 size={18} className="animate-spin" />
-                Processing on XRPL…
-              </span>
-            ) : (
-              <span className="flex items-center justify-center gap-2">
-                <Gift size={18} />
-                Claim {tier.amount}
-              </span>
-            )}
-          </motion.button>
+            <h3 className="font-display text-2xl font-bold gradient-text-gold mb-1">
+              {tier?.label ?? "Prize"} — {eligibility?.game ?? "Arcade"}
+            </h3>
+            <p className="text-cream-dim text-sm mb-1">
+              Week {weekKey}
+            </p>
+            <p className="font-display text-3xl font-black text-brand-gold mb-6">
+              {tier?.amount ?? "—"}
+            </p>
 
-          <p className="text-[11px] text-cream-dim/50 mt-3">
-            Prize is sent directly to your connected wallet via XRPL.
-          </p>
+            {/* Error banner */}
+            <AnimatePresence>
+              {status === "error" && error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="w-full mb-4"
+                >
+                  <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                    <AlertTriangle size={16} className="shrink-0" />
+                    {error}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Claim button */}
+            <motion.button
+              onClick={startClaim}
+              disabled={status !== "eligible" && status !== "idle" && status !== "error"}
+              whileHover={{ scale: 1.04, boxShadow: "0 0 35px rgba(245,196,66,0.5)" }}
+              whileTap={{ scale: 0.96 }}
+              className="w-full max-w-xs px-8 py-4 rounded-xl
+                         bg-gradient-to-r from-brand-gold to-yellow-500
+                         text-forest-dark font-bold text-base
+                         hover:shadow-[0_0_30px_rgba(245,196,66,0.5)]
+                         transition-all disabled:opacity-60 cursor-pointer
+                         payout-claim-pulse"
+            >
+              <span className="flex items-center justify-center gap-2">
+                {status === "claiming" || status === "polling" ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    {getButtonLabel(status)}
+                  </>
+                ) : (
+                  <>
+                    <Gift size={18} />
+                    {getButtonLabel(status)}
+                  </>
+                )}
+              </span>
+            </motion.button>
+
+            <p className="text-[11px] text-cream-dim/50 mt-3">
+              Prize is sent directly to your connected wallet via XRPL.
+            </p>
+          </div>
         </div>
-      </div>
-    </CyberCard>
+      </CyberCard>
+    </>
   );
 }

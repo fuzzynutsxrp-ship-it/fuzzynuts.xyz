@@ -676,6 +676,77 @@ body {
 }
 
 /* ──────────────────────────────────────────
+   Confetti Burst — CSS-only particle explosion
+   ────────────────────────────────────────── */
+.confetti-container {
+  pointer-events: none;
+}
+
+.confetti-particle {
+  position: absolute;
+  animation: confetti-burst 1s ease-out forwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--confetti-x), var(--confetti-y)) scale(0.3) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+/* ──────────────────────────────────────────
+   Live Pulse Dot — Leaderboard polling indicator
+   ────────────────────────────────────────── */
+.live-pulse-dot {
+  position: relative;
+}
+
+.live-pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  animation: live-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes live-dot-pulse {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 0.4; transform: scale(1.5); }
+}
+
+/* ──────────────────────────────────────────
+   Payout Claim Button Pulse
+   ────────────────────────────────────────── */
+.payout-claim-pulse {
+  animation: payout-pulse 3s ease-in-out infinite;
+}
+
+.payout-claim-pulse:disabled {
+  animation: none;
+}
+
+@keyframes payout-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(245, 196, 66, 0.2); }
+  50% { box-shadow: 0 0 45px rgba(245, 196, 66, 0.55), 0 0 80px rgba(245, 196, 66, 0.15); }
+}
+
+/* ──────────────────────────────────────────
+   Text Glow — Gold
+   ────────────────────────────────────────── */
+.text-glow-gold {
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4), 0 0 20px rgba(251, 191, 36, 0.15);
+}
+
+/* ──────────────────────────────────────────
    Reduce motion for users who prefer it
    ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -684,7 +755,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .hero-bg-animate {
+  .hero-bg-animate,
+  .payout-claim-pulse,
+  .confetti-particle,
+  .live-pulse-dot::after {
     animation: none;
   }
 }

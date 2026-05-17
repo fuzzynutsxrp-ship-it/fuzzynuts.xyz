@@ -11,9 +11,12 @@ import {
   VolumeX,
   CheckCircle,
   XCircle,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { LoadingOverlay } from "@/components/game/LoadingOverlay";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
+import { useScoreSubmission } from "@/hooks/useArcadeState";
 
 /** Canonical game metadata for the wrapper */
 export interface GameConfig {
@@ -36,6 +39,12 @@ interface GameWrapperProps {
  * fullscreen toggle, loading overlay, error boundary, and mobile-responsive
  * aspect ratio scaling.
  *
+ * Enhanced with:
+ * - Anti-cheat score validation (caps, duration, debounce)
+ * - Duplicate session prevention via localStorage
+ * - Explicit SCORE_ERROR postMessage channel
+ * - Detailed toast error messages for 429/400/500 codes
+ *
  * Features:
  * - Fullscreen API integration (with graceful fallback)
  * - Loading overlay that listens for `postMessage({ type: 'gameReady' })`
@@ -57,10 +66,10 @@ export function GameWrapper({ game }: GameWrapperProps) {
   const [iframeError, setIframeError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [submissionStatus, setSubmissionStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
-  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Use the shared score submission hook with anti-cheat validation
+  const { status: submissionStatus, errorMessage, markGameStart, dismiss } =
+    useScoreSubmission(game.slug);
 
   // Track fullscreen state changes from external triggers (Esc key, etc.)
   useEffect(() => {
@@ -71,34 +80,6 @@ export function GameWrapper({ game }: GameWrapperProps) {
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
-  // ── Score Submission Listener ──
-  // Listens for postMessage from fuzzy-score.js inside the game iframe.
-  // Message contract: { type: 'FUZZY_SCORE_SUBMITTED', success: boolean }
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Only handle objects with our expected message type
-      if (!event.data || typeof event.data !== "object") return;
-      if (event.data.type !== "FUZZY_SCORE_SUBMITTED") return;
-
-      // Clear any existing dismiss timer
-      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
-
-      const status = event.data.success ? "success" : "error";
-      setSubmissionStatus(status);
-
-      // Auto-dismiss after 4 seconds
-      dismissTimerRef.current = setTimeout(() => {
-        setSubmissionStatus("idle");
-      }, 4000);
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
-    };
-  }, []);
-
   const handleLoadComplete = useCallback(() => {
     setIsLoading(false);
   }, []);
@@ -107,7 +88,9 @@ export function GameWrapper({ game }: GameWrapperProps) {
     setIframeError(false);
     setIsLoading(true);
     setIframeKey((k) => k + 1);
-  }, []);
+    // Mark new game start for anti-cheat duration tracking
+    markGameStart();
+  }, [markGameStart]);
 
   const handleIframeLoad = useCallback(() => {
     // Give the game a moment to initialize before dismissing overlay.
@@ -115,8 +98,10 @@ export function GameWrapper({ game }: GameWrapperProps) {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2500);
+    // Mark game start when iframe loads (for anti-cheat duration validation)
+    markGameStart();
     return () => clearTimeout(timer);
-  }, []);
+  }, [markGameStart]);
 
   const handleIframeError = useCallback(() => {
     setIframeError(true);
@@ -178,6 +163,34 @@ export function GameWrapper({ game }: GameWrapperProps) {
     "allow-popups",
     "allow-forms",
   ].join(" ");
+
+  /** Derive toast icon + text + style from submission status */
+  const toastConfig = (() => {
+    switch (submissionStatus) {
+      case "submitting":
+        return {
+          icon: <Loader2 size={18} className="shrink-0 animate-spin" />,
+          text: "Saving score...",
+          style: "bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.4)] text-blue-400",
+        };
+      case "success":
+        return {
+          icon: <CheckCircle size={18} className="shrink-0" />,
+          text: "Score Saved to Leaderboard! 🏆",
+          style: "bg-[rgba(16,185,129,0.15)] border-[rgba(16,185,129,0.4)] text-emerald-400",
+        };
+      case "error":
+        return {
+          icon: errorMessage?.includes("Rate") || errorMessage?.includes("fast")
+            ? <AlertTriangle size={18} className="shrink-0" />
+            : <XCircle size={18} className="shrink-0" />,
+          text: errorMessage || "Submission Failed — Try Again!",
+          style: "bg-[rgba(239,68,68,0.15)] border-[rgba(239,68,68,0.4)] text-red-400",
+        };
+      default:
+        return null;
+    }
+  })();
 
   return (
     <GameErrorBoundary gameTitle={game.title} onRetry={handleRetry}>
@@ -279,7 +292,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
 
         {/* ── Score Submission Toast ── */}
         <AnimatePresence>
-          {submissionStatus !== "idle" && (
+          {toastConfig && (
             <motion.div
               initial={{ opacity: 0, y: -40, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -288,24 +301,14 @@ export function GameWrapper({ game }: GameWrapperProps) {
               className="absolute top-[60px] left-1/2 -translate-x-1/2 z-50 pointer-events-auto"
             >
               <div
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-xl backdrop-blur-xl border shadow-lg ${
-                  submissionStatus === "success"
-                    ? "bg-[rgba(16,185,129,0.15)] border-[rgba(16,185,129,0.4)] text-emerald-400"
-                    : "bg-[rgba(239,68,68,0.15)] border-[rgba(239,68,68,0.4)] text-red-400"
-                }`}
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-xl backdrop-blur-xl border shadow-lg ${toastConfig.style}`}
               >
-                {submissionStatus === "success" ? (
-                  <CheckCircle size={18} className="shrink-0" />
-                ) : (
-                  <XCircle size={18} className="shrink-0" />
-                )}
+                {toastConfig.icon}
                 <span className="text-sm font-semibold whitespace-nowrap">
-                  {submissionStatus === "success"
-                    ? "Score Saved to Leaderboard! 🏆"
-                    : "Submission Failed — Try Again!"}
+                  {toastConfig.text}
                 </span>
                 <button
-                  onClick={() => setSubmissionStatus("idle")}
+                  onClick={dismiss}
                   className="ml-1 opacity-60 hover:opacity-100 transition-opacity text-xs"
                   aria-label="Dismiss notification"
                 >
