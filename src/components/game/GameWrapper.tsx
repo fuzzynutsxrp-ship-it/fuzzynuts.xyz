@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { LoadingOverlay } from "@/components/game/LoadingOverlay";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
-import { useScoreSubmission } from "@/hooks/useArcadeState";
+import { useScoreSubmission } from "@/features/arcade";
 
 /** Canonical game metadata for the wrapper */
 export interface GameConfig {

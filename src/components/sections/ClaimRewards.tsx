@@ -19,7 +19,7 @@ import {
   usePayoutEligibility,
   getCurrentWeekKey,
   type ClaimStatus,
-} from "@/hooks/useArcadeState";
+} from "@/features/arcade";
 
 /* ═══════════════════════════════════════════════════════════════
    Prize Tier Config
@@ -36,15 +36,15 @@ const PRIZE_TIERS: Record<number, { label: string; amount: string; nutAmount: nu
    ═══════════════════════════════════════════════════════════════ */
 
 function ConfettiBurst() {
-  const particles = Array.from({ length: 24 }, (_, i) => ({
+  const particles = Array.from({ length: 36 }, (_, i) => ({
     id: i,
-    angle: (i / 24) * 360,
-    distance: 60 + Math.random() * 80,
-    size: 4 + Math.random() * 6,
-    color: ["#FBBF24", "#10B981", "#f59e0b", "#4ade80", "#22d3ee", "#a855f7"][
-      i % 6
+    angle: (i / 36) * 360,
+    distance: 50 + Math.random() * 120,
+    size: 3 + Math.random() * 8,
+    color: ["#FBBF24", "#10B981", "#f59e0b", "#4ade80", "#22d3ee", "#a855f7", "#ffe066", "#ef4444"][
+      i % 8
     ],
-    delay: Math.random() * 0.3,
+    delay: Math.random() * 0.4,
   }));
 
   return (
@@ -291,40 +291,61 @@ export function ClaimRewards() {
   if (status === "already-claimed" || status === "success") {
     return (
       <CyberCard accentColor="green">
-        <div className="p-6 sm:p-8 relative">
+        <div className="p-6 sm:p-10 relative">
           {/* Confetti on fresh success */}
           {status === "success" && <ConfettiBurst />}
 
-          <div className="flex flex-col sm:flex-row items-center gap-5">
+          <div className="flex flex-col items-center text-center gap-4">
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", damping: 12 }}
-              className="w-14 h-14 rounded-xl bg-neon-green/15 border border-neon-green/30 flex items-center justify-center shrink-0"
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", damping: 10, stiffness: 150 }}
+              className="text-6xl sm:text-7xl"
             >
-              <CheckCircle size={28} className="text-neon-green" />
+              {status === "success" ? "🎉" : "✅"}
             </motion.div>
-            <div className="flex-1 text-center sm:text-left">
-              <h3 className="font-display text-lg font-bold text-neon-green mb-1">
-                {status === "success" ? "Prize sent to wallet! 🌰" : "Rewards Claimed! ✅"}
-              </h3>
+
+            <div>
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="font-display text-2xl sm:text-3xl font-black gradient-text-neon mb-2"
+              >
+                {status === "success" ? "Prize Sent! 🌰" : "Rewards Claimed!"}
+              </motion.h3>
               <p className="text-sm text-cream-dim">
                 {tier
                   ? `${tier.emoji} ${tier.label} — ${tier.amount} sent to your wallet.`
                   : "Your $NUT prize has been sent to your wallet."}
               </p>
-              {txHash && (
-                <a
-                  href={`https://xrpscan.com/tx/${txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-2 text-xs text-brand-gold hover:underline font-mono"
-                >
-                  <ExternalLink size={12} />
-                  View on XRPScan
-                </a>
-              )}
             </div>
+
+            {tier && status === "success" && (
+              <motion.p
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, type: "spring" }}
+                className="font-display text-4xl font-black text-brand-gold text-glow-gold"
+              >
+                +{tier.amount}
+              </motion.p>
+            )}
+
+            {txHash && (
+              <a
+                href={`https://xrpscan.com/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-1 px-4 py-2 rounded-lg
+                           bg-white/[0.04] border border-white/[0.08]
+                           text-xs text-brand-gold hover:text-cream hover:bg-white/[0.08]
+                           font-mono transition-all"
+              >
+                <ExternalLink size={12} />
+                View on XRPScan
+              </a>
+            )}
           </div>
         </div>
       </CyberCard>
@@ -399,15 +420,20 @@ export function ClaimRewards() {
               </motion.div>
             )}
 
-            <h3 className="font-display text-2xl font-bold gradient-text-gold mb-1">
+            <h3 className="font-display text-2xl sm:text-3xl font-bold gradient-text-gold mb-1">
               {tier?.label ?? "Prize"} — {eligibility?.game ?? "Arcade"}
             </h3>
             <p className="text-cream-dim text-sm mb-1">
               Week {weekKey}
             </p>
-            <p className="font-display text-3xl font-black text-brand-gold mb-6">
+            <motion.p
+              initial={{ scale: 0.8 }}
+              animate={{ scale: [0.8, 1.05, 1] }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="font-display text-4xl sm:text-5xl font-black text-brand-gold text-glow-gold mb-6"
+            >
               {tier?.amount ?? "—"}
-            </p>
+            </motion.p>
 
             {/* Error banner */}
             <AnimatePresence>

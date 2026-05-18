@@ -30,6 +30,11 @@ const Leaderboard = dynamic(
   }
 );
 
+const ClaimRewards = dynamic(
+  () => import("@/components/sections/ClaimRewards").then((mod) => mod.ClaimRewards),
+  { ssr: false }
+);
+
 export function LeaderboardClient() {
   return (
     <div className="relative min-h-screen">
@@ -128,6 +133,16 @@ export function LeaderboardClient() {
                        overflow-hidden"
           >
             <Leaderboard />
+          </motion.div>
+
+          {/* ── Claim Rewards Section ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+            className="mt-6"
+          >
+            <ClaimRewards />
           </motion.div>
         </div>
       </div>

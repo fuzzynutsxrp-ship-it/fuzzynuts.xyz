@@ -1,16 +1,17 @@
 "use client";
 
-import { GameWrapper, type GameConfig } from "@/components/game/GameWrapper";
+import { GamePage } from "@/components/game/GamePage";
+import type { GameMetadata } from "@/lib/gameRegistry";
 
 interface GamePageClientProps {
-  game: GameConfig;
+  game: GameMetadata;
 }
 
 /**
  * Client-side wrapper for the game page.
  * Separates the server component (page.tsx) from
- * the client-side interactive logic (GameWrapper).
+ * the client-side interactive logic (GamePage).
  */
 export function GamePageClient({ game }: GamePageClientProps) {
-  return <GameWrapper game={game} />;
+  return <GamePage game={game} />;
 }

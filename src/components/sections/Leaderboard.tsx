@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Trophy, Clock, Wifi, WifiOff, ChevronDown, Radio } from "lucide-react";
+import { RefreshCw, Trophy, Clock, Wifi, WifiOff, ChevronDown, Radio, Gift, Star, Zap } from "lucide-react";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { useWalletStore } from "@/store/wallet";
 import {
   useLeaderboard,
+  usePayoutEligibility,
   getCurrentWeekKey,
   getWeekKeyOffset,
   timeAgo,
-} from "@/hooks/useArcadeState";
+} from "@/features/arcade";
 
 /* ═══════════════════════════════════════════════════════════════
    Constants
@@ -19,6 +20,13 @@ import {
 
 const STORAGE_KEY = "fuzzy_arcade_scores";
 const MAX_ENTRIES = 50;
+
+/** Prize amounts shown inline next to top-3 scores */
+const PRIZE_LABELS: Record<number, { amount: string; color: string; glow: string }> = {
+  1: { amount: "250K $NUT", color: "text-brand-gold", glow: "winner-row-glow" },
+  2: { amount: "150K $NUT", color: "text-[#C0C0C0]", glow: "silver-row-glow" },
+  3: { amount: "100K $NUT", color: "text-[#CD7F32]", glow: "bronze-row-glow" },
+};
 
 /** Map game IDs to accent colors for the CyberCard system */
 const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange" | "gold"> = {
@@ -47,6 +55,21 @@ const WEEK_OPTIONS = [
   { label: "2 Weeks Ago", offset: 2 },
   { label: "3 Weeks Ago", offset: 3 },
 ];
+
+/** Compute time until next Monday 00:00 UTC */
+function getTimeUntilReset(): string {
+  const now = new Date();
+  const dayOfWeek = now.getUTCDay(); // 0=Sun, 1=Mon
+  const daysUntilMon = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+  const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + daysUntilMon));
+  const diff = next.getTime() - now.getTime();
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(hours / 24);
+  const h = hours % 24;
+  if (days > 0) return `${days}d ${h}h`;
+  const mins = Math.floor((diff % 3600000) / 60000);
+  return `${h}h ${mins}m`;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    Utilities
@@ -93,21 +116,21 @@ function SkeletonRow({ index }: { index: number }) {
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) {
     return (
-      <span className="text-base font-bold" title="1st Place">
+      <span className="text-lg font-bold trophy-float" title="1st Place — 250,000 $NUT">
         🥇
       </span>
     );
   }
   if (rank === 2) {
     return (
-      <span className="text-base font-bold" title="2nd Place">
+      <span className="text-lg font-bold" title="2nd Place — 150,000 $NUT">
         🥈
       </span>
     );
   }
   if (rank === 3) {
     return (
-      <span className="text-base font-bold" title="3rd Place">
+      <span className="text-lg font-bold" title="3rd Place — 100,000 $NUT">
         🥉
       </span>
     );
@@ -155,6 +178,19 @@ export function Leaderboard() {
       ) + 1
     : 0;
 
+  // Prize eligibility for connected wallet
+  const { eligibility, status: claimStatus } = usePayoutEligibility(walletAddress ?? null);
+  const isWinner = isCurrentWeek && userRank > 0 && userRank <= 3;
+  const prizeInfo = isWinner ? PRIZE_LABELS[userRank] : null;
+
+  // Live countdown to next reset
+  const [countdown, setCountdown] = useState(getTimeUntilReset);
+  useEffect(() => {
+    if (!isCurrentWeek) return;
+    const timer = setInterval(() => setCountdown(getTimeUntilReset()), 60_000);
+    return () => clearInterval(timer);
+  }, [isCurrentWeek]);
+
   return (
     <section id="leaderboard" className="py-24 relative">
       <div className="container-main">
@@ -177,7 +213,75 @@ export function Leaderboard() {
           <p className="text-[var(--color-cream-dim)] text-lg max-w-xl mx-auto">
             Top scores reset every Monday. Climb the ranks, earn $NUT.
           </p>
+          {isCurrentWeek && (
+            <p className="text-xs text-cream-dim/60 font-mono mt-2 countdown-pulse">
+              ⏱ Resets in <span className="text-neon-green font-semibold">{countdown}</span> · Monday 00:00 UTC
+            </p>
+          )}
         </motion.div>
+
+        {/* ═══ PRIZE WINNER BANNER ═══ */}
+        <AnimatePresence>
+          {isWinner && prizeInfo && isCurrentWeek && claimStatus !== "success" && claimStatus !== "already-claimed" && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", damping: 15, stiffness: 200 }}
+              className="mb-8"
+            >
+              <div className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/40 prize-shimmer"
+                style={{
+                  background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(1,5,8,0.95) 40%, rgba(16,185,129,0.05) 100%)",
+                  boxShadow: "0 0 40px rgba(251,191,36,0.15), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)"
+                }}
+              >
+                <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5 p-6 sm:p-8">
+                  {/* Trophy */}
+                  <div className="trophy-float text-6xl sm:text-7xl shrink-0">
+                    {userRank === 1 ? "🏆" : userRank === 2 ? "🥈" : "🥉"}
+                  </div>
+
+                  {/* Message */}
+                  <div className="flex-1 text-center sm:text-left">
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                      <Star size={16} className="text-brand-gold" />
+                      <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+                        You&apos;re a Winner!
+                      </span>
+                      <Star size={16} className="text-brand-gold" />
+                    </div>
+                    <h3 className="font-display text-2xl sm:text-3xl font-black text-cream mb-1">
+                      You&apos;re <span className="gradient-text-gold">#{userRank}</span> this week!
+                    </h3>
+                    <p className="text-sm text-cream-dim">
+                      in {currentGameMeta?.title ?? selectedGame}
+                    </p>
+                    <p className="font-display text-3xl sm:text-4xl font-black text-brand-gold text-glow-gold mt-2">
+                      {prizeInfo.amount}
+                    </p>
+                  </div>
+
+                  {/* Claim CTA */}
+                  {eligibility?.eligible && claimStatus !== "claiming" && (
+                    <motion.a
+                      href="/profile/"
+                      whileHover={{ scale: 1.06, boxShadow: "0 0 50px rgba(251,191,36,0.6)" }}
+                      whileTap={{ scale: 0.95 }}
+                      className="claim-fab-pulse flex items-center gap-2.5 px-7 py-4 rounded-xl
+                                 bg-gradient-to-r from-brand-gold to-yellow-500
+                                 text-forest-dark font-black text-base shrink-0
+                                 cursor-pointer min-h-[52px]"
+                    >
+                      <Gift size={20} />
+                      Claim Prize
+                    </motion.a>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Controls Bar ── */}
         <motion.div
@@ -403,6 +507,44 @@ export function Leaderboard() {
           )}
         </AnimatePresence>
 
+        {/* ── Weekly Prize Pool Strip ── */}
+        {isCurrentWeek && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mb-4 grid grid-cols-3 gap-2 sm:gap-3"
+          >
+            {/* 1st Place */}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-brand-gold/20 text-center">
+              <span className="text-lg">🥇</span>
+              <div className="text-left">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-gold/70">1st</p>
+                <p className="text-sm sm:text-base font-black font-mono text-brand-gold">250K</p>
+              </div>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+            </div>
+            {/* 2nd Place */}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-gray-400/20 text-center">
+              <span className="text-lg">🥈</span>
+              <div className="text-left">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400/70">2nd</p>
+                <p className="text-sm sm:text-base font-black font-mono text-gray-300">150K</p>
+              </div>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+            </div>
+            {/* 3rd Place */}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-amber-700/20 text-center">
+              <span className="text-lg">🥉</span>
+              <div className="text-left">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600/70">3rd</p>
+                <p className="text-sm sm:text-base font-black font-mono text-amber-600">100K</p>
+              </div>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+            </div>
+          </motion.div>
+        )}
+
         {/* ── Leaderboard Table ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -487,6 +629,7 @@ export function Leaderboard() {
                     (entry.wallet
                       ? truncateAddress(entry.wallet)
                       : "Anonymous");
+                  const rowPrize = isCurrentWeek ? PRIZE_LABELS[rank] : null;
 
                   return (
                     <motion.div
@@ -500,9 +643,9 @@ export function Leaderboard() {
                         transition-colors duration-150
                         ${
                           isCurrentUser
-                            ? "bg-brand-gold/[0.06] border-l-2 border-l-brand-gold"
+                            ? `bg-brand-gold/[0.08] border-l-2 border-l-brand-gold ${rowPrize?.glow ?? ""}`
                             : rank <= 3
-                            ? "bg-white/[0.01]"
+                            ? `bg-white/[0.015] ${rowPrize?.glow ?? ""}`
                             : "hover:bg-white/[0.02]"
                         }
                       `}
@@ -521,19 +664,35 @@ export function Leaderboard() {
                               isCurrentUser
                                 ? "text-brand-gold font-bold"
                                 : rank <= 3
-                                ? "text-cream"
+                                ? "text-cream font-semibold"
                                 : "text-cream-dim"
                             }
                           `}
                         >
                           {displayName}
                           {isCurrentUser && (
-                            <span className="ml-1.5 text-[10px] font-mono text-brand-gold/70">
-                              (you)
+                            <span className="ml-1.5 text-[10px] font-mono text-brand-gold/80 bg-brand-gold/10 px-1.5 py-0.5 rounded-full">
+                              you
                             </span>
                           )}
                         </span>
                       </div>
+
+                      {/* Prize Badge — current week only for top 3 */}
+                      {rowPrize && isCurrentWeek && (
+                        <div className="hidden sm:flex items-center gap-1 shrink-0">
+                          <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border
+                            ${rank === 1
+                              ? "bg-brand-gold/10 border-brand-gold/30 text-brand-gold"
+                              : rank === 2
+                              ? "bg-[#C0C0C0]/10 border-[#C0C0C0]/30 text-[#C0C0C0]"
+                              : "bg-[#CD7F32]/10 border-[#CD7F32]/30 text-[#CD7F32]"
+                            }`}
+                          >
+                            <Zap size={8} className="inline mr-0.5" />{rowPrize.amount}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Score */}
                       <div className="w-20 text-right shrink-0">

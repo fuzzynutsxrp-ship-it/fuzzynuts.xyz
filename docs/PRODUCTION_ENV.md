@@ -1,6 +1,6 @@
 # 🔐 Production Environment Variables
 
-> **Last Updated:** May 14, 2026
+> **Last Updated:** May 18, 2026
 > **Project:** Fuzzynuts Arcade — Full Stack Deployment
 
 ---
@@ -112,8 +112,37 @@ These collections are used by the rewards system (auto-created on first write):
 ## Security Checklist
 
 - [ ] `COMMUNITY_NUT_JAR_SEED` is set on Railway (never in code)
-- [ ] CORS allows only `fuzzynuts.xyz` and `world.fuzzynuts.xyz`
-- [ ] Rate limiting is active on `/api/scores` POST
-- [ ] Anti-cheat score caps are enforced server-side
+- [x] CORS allows all origins (`*`) for API endpoints
+- [x] Rate limiting is active on `/api/scores` POST (1 req/min per wallet+game)
+- [x] Rate limiting is active on `/api/rewards/claim` POST (30s between attempts)
+- [x] Anti-cheat score caps are enforced server-side
 - [ ] MongoDB is accessible only via Railway's internal network
 - [ ] `MONGO_URL` uses Railway reference syntax (`${{MongoDB.MONGO_URL}}`)
+
+---
+
+## API Endpoint Reference
+
+### Scores API (port 9001 — µWebSockets)
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/scores` | GET | Fetch leaderboard (query: `?week=2026-W20&game=mario`) |
+| `/api/scores` | POST | Submit a score (body: `{ game, score, wallet, timestamp }`) |
+
+### Rewards API (port 9001 — µWebSockets)
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/rewards/eligibility` | GET | Check top-3 eligibility (query: `?wallet=rXXX&week=2026-W20`) |
+| `/api/rewards/claim` | POST | Execute prize claim (body: `{ wallet, week }`) |
+| `/api/rewards/claim/status` | GET | Poll claim transaction status (query: `?wallet=rXXX&week=2026-W20`) |
+| `/api/rewards/health` | GET | Service health check (MongoDB + XRPL connectivity) |
+| `/api/rewards` | GET | Achievement rewards for a wallet (query: `?wallet=rXXX`) |
+
+### Base URLs
+
+| Environment | URL |
+|-------------|-----|
+| Production | `https://world.fuzzynuts.xyz` |
+| Railway Internal | `efficient-tenderness-production.up.railway.app` |

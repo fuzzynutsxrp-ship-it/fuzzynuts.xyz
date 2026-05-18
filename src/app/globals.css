@@ -740,6 +740,89 @@ body {
 }
 
 /* ──────────────────────────────────────────
+   Prize Banner — Trophy Float & Shimmer
+   ────────────────────────────────────────── */
+.trophy-float {
+  animation: trophy-float 3s ease-in-out infinite;
+}
+
+@keyframes trophy-float {
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.prize-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(251, 191, 36, 0.12) 37%,
+    rgba(251, 191, 36, 0.25) 50%,
+    rgba(251, 191, 36, 0.12) 63%,
+    transparent 75%
+  );
+  background-size: 250% 100%;
+  animation: prize-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes prize-shimmer {
+  0% { background-position: 250% center; }
+  100% { background-position: -250% center; }
+}
+
+.winner-row-glow {
+  animation: winner-glow 3s ease-in-out infinite;
+}
+
+@keyframes winner-glow {
+  0%, 100% { box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.05), 0 0 0 rgba(251, 191, 36, 0); }
+  50% { box-shadow: inset 0 0 30px rgba(251, 191, 36, 0.08), 0 0 15px rgba(251, 191, 36, 0.03); }
+}
+
+.silver-row-glow {
+  animation: silver-glow 3s ease-in-out infinite;
+}
+
+@keyframes silver-glow {
+  0%, 100% { box-shadow: inset 0 0 15px rgba(192, 192, 192, 0.04); }
+  50% { box-shadow: inset 0 0 25px rgba(192, 192, 192, 0.07); }
+}
+
+.bronze-row-glow {
+  animation: bronze-glow 3s ease-in-out infinite;
+}
+
+@keyframes bronze-glow {
+  0%, 100% { box-shadow: inset 0 0 15px rgba(205, 127, 50, 0.04); }
+  50% { box-shadow: inset 0 0 25px rgba(205, 127, 50, 0.07); }
+}
+
+/* Prize countdown timer pulse */
+.countdown-pulse {
+  animation: countdown-pulse 2s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Eligible claim floating action button */
+.claim-fab-pulse {
+  animation: claim-fab-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes claim-fab-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 30px rgba(251, 191, 36, 0.5), 0 0 60px rgba(251, 191, 36, 0.2);
+    transform: scale(1.03);
+  }
+}
+
+/* ──────────────────────────────────────────
    Text Glow — Gold
    ────────────────────────────────────────── */
 .text-glow-gold {
@@ -758,7 +841,15 @@ body {
   .hero-bg-animate,
   .payout-claim-pulse,
   .confetti-particle,
-  .live-pulse-dot::after {
+  .live-pulse-dot::after,
+  .trophy-float,
+  .prize-shimmer,
+  .winner-row-glow,
+  .silver-row-glow,
+  .bronze-row-glow,
+  .countdown-pulse,
+  .claim-fab-pulse {
     animation: none;
   }
 }
+

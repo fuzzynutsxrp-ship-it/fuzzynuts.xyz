@@ -1,6 +1,6 @@
 # 🚀 Deployment Steps — Fuzzynuts Arcade
 
-> **Last Updated:** May 14, 2026
+> **Last Updated:** May 18, 2026
 > **Frontend:** Next.js 15 Static Export → Vercel
 > **Backend:** Fuzzynuts World Server (Node.js + µWebSockets + MongoDB) → Railway
 
@@ -9,10 +9,11 @@
 ## Pre-Flight Checklist
 
 - [ ] Frontend build passes: `npm run build` → 0 errors, `out/` generated
-- [ ] Backend `rewards-api.ts` is committed to the Fuzzynuts World repo
+- [x] Backend `rewards.ts` is committed to the Fuzzynuts World repo at `packages/server/src/api/rewards.ts`
+- [x] Routes registered in `packages/server/src/network/sockets/uws.ts`
 - [ ] `COMMUNITY_NUT_JAR_SEED` is set on Railway (see `PRODUCTION_ENV.md`)
-- [ ] `xrpl` package is in the backend's dependencies
-- [ ] CORS headers allow `fuzzynuts.xyz` origins
+- [x] `xrpl` package is in the backend's dependencies (`^4.6.0`)
+- [x] CORS headers allow `*` origins
 
 ---
 
@@ -205,6 +206,8 @@ Run these checks after both deploys complete:
 | Health check | `curl https://world.fuzzynuts.xyz/` | `{"name":"Fuzzynuts World",...}` |
 | Scores GET | `curl "https://world.fuzzynuts.xyz/api/scores"` | JSON array of scores |
 | Rewards eligibility | `curl "https://world.fuzzynuts.xyz/api/rewards/eligibility?wallet=rTestAddress123"` | `{"eligible":false,...}` |
+| Rewards health | `curl "https://world.fuzzynuts.xyz/api/rewards/health"` | `{"ok":true,"mongoConnected":true,...}` |
+| Claim status | `curl "https://world.fuzzynuts.xyz/api/rewards/claim/status?wallet=rTest&week=2026-W20"` | `{"status":"not_found",...}` |
 | CORS preflight | `curl -X OPTIONS https://world.fuzzynuts.xyz/api/rewards/eligibility -I` | `Access-Control-Allow-Origin: *` |
 
 ### Integration Tests
@@ -266,7 +269,9 @@ git push origin develop
 │  │  Port 9002: REST API (Express)              │  │
 │  │    ├── GET/POST /api/scores                 │  │
 │  │    ├── GET /api/rewards/eligibility         │  │
-│  │    └── POST /api/rewards/claim              │  │
+│  │    ├── POST /api/rewards/claim              │  │
+│  │    ├── GET /api/rewards/claim/status        │  │
+│  │    └── GET /api/rewards/health              │  │
 │  │              │                   │          │  │
 │  │              ▼                   ▼          │  │
 │  │    ┌──────────────┐    ┌──────────────┐    │  │
