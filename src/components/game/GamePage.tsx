@@ -153,9 +153,8 @@ export function GamePage({ game }: GamePageProps) {
   }, [markGameStart]);
 
   const handleIframeLoad = useCallback(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2500);
+    setIsLoading(false);
     markGameStart();
-    return () => clearTimeout(timer);
   }, [markGameStart]);
 
   const handleIframeError = useCallback(() => {
@@ -400,7 +399,7 @@ export function GamePage({ game }: GamePageProps) {
                 src={game.iframePath}
                 title={`Play ${game.title}`}
                 sandbox={game.sandbox || defaultSandbox}
-                loading="lazy"
+                loading="eager"
                 allow="autoplay; fullscreen; gamepad"
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}

@@ -36,7 +36,7 @@ export function LoadingOverlay({
   isLoading,
   gameTitle = "Game",
   accentColor = "var(--color-brand-gold)",
-  maxLoadTime = 15000,
+  maxLoadTime = 5000,
   onLoadComplete,
 }: LoadingOverlayProps) {
   const [progress, setProgress] = useState(0);
