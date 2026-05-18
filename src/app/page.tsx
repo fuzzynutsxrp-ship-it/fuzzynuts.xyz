@@ -8,6 +8,9 @@ import { ClientFallingNuts } from "@/components/ClientFallingNuts";
 // These components are dynamically imported so they don't block First Contentful Paint.
 // Each gets its own chunk → smaller initial JS bundle.
 const GamesShowcase = dynamic(() => import("@/components/sections/GamesShowcase").then(m => ({ default: m.GamesShowcase })));
+const WeeklyPrizes = dynamic(() => import("@/components/home/WeeklyPrizes").then(m => ({ default: m.WeeklyPrizes })));
+const WalletCTA = dynamic(() => import("@/components/home/WalletCTA").then(m => ({ default: m.WalletCTA })));
+const SectionTransition = dynamic(() => import("@/components/home/SectionTransition").then(m => ({ default: m.SectionTransition })));
 const Features = dynamic(() => import("@/components/sections/Features").then(m => ({ default: m.Features })));
 const Tokenomics = dynamic(() => import("@/components/sections/Tokenomics").then(m => ({ default: m.Tokenomics })));
 const OnChainVerification = dynamic(() => import("@/components/sections/OnChainVerification").then(m => ({ default: m.OnChainVerification })));
@@ -28,13 +31,40 @@ export default function Home() {
       <ClientFallingNuts />
       <Navbar />
       <main id="main-content" className="relative z-10">
+        {/* ═══ HERO — First impression, tagline, CTAs ═══ */}
         <Hero />
-        <div className="section-divider" role="separator" aria-hidden="true" />
+
+        {/* ── Vine transition: Hero → Games ── */}
+        <SectionTransition variant="vine" />
+
+        {/* ═══ GAMES — The arcade showcase ═══ */}
         <GamesShowcase />
-        <div className="section-divider" role="separator" aria-hidden="true" />
+
+        {/* ── Glow transition: Games → Prizes ── */}
+        <SectionTransition variant="glow" />
+
+        {/* ═══ WEEKLY PRIZES — 500K $NUT prize podium (NEW) ═══ */}
+        <WeeklyPrizes />
+
+        {/* ── Wallet CTA: Convert interested visitors (NEW) ── */}
+        <WalletCTA />
+
+        {/* ── Vine transition: Wallet CTA → Features ── */}
+        <SectionTransition variant="vine" flip />
+
+        {/* ═══ FEATURES — Why Fuzzynuts ═══ */}
         <Features />
-        <div className="section-divider" role="separator" aria-hidden="true" />
+
+        {/* ── Fade transition: Features → Tokenomics ── */}
+        <SectionTransition variant="fade" />
+
+        {/* ═══ TOKENOMICS — Distribution & facts ═══ */}
         <Tokenomics />
+
+        {/* ── Vine transition: Tokenomics → Verification ── */}
+        <SectionTransition variant="vine" />
+
+        {/* ═══ ON-CHAIN VERIFICATION — Addresses & proof ═══ */}
         <OnChainVerification />
       </main>
 

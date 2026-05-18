@@ -76,7 +76,7 @@ export function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-30px" }}
               transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -6, transition: { type: "spring", stiffness: 300 } }}
+              whileHover={{ y: -3, transition: { type: "spring", stiffness: 300 } }}
             >
               <CyberCard accentColor="blue" className="p-6 group cursor-default h-full">
                 <motion.div

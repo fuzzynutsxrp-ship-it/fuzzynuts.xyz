@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Gamepad2, Globe, ArrowDown } from "lucide-react";
 import Image from "next/image";
+import { HeroPrizeTeaser } from "@/components/home/HeroPrizeTeaser";
 
 const FLOAT_ANIMATION = {
   y: [0, -12, 0],
@@ -201,6 +202,9 @@ export function Hero() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Prize teaser — 500K $NUT weekly */}
+        <HeroPrizeTeaser />
 
         {/* Scroll indicator */}
         <motion.div
