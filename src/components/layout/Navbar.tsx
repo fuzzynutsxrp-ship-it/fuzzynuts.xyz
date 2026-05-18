@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Wallet, LogOut, ChevronDown, ExternalLink, Gift, Coins, Trophy, User, Bell, AlertCircle } from "lucide-react";
+import { Menu, X, Wallet, LogOut, ChevronDown, ExternalLink, Gift, Coins, Trophy, User, AlertCircle } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { truncateAddress } from "@/lib/utils";
 import Image from "next/image";
@@ -128,13 +128,20 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
               const isRoute = link.href.startsWith("/");
-              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors rounded-lg hover:bg-[rgba(245,196,66,0.05)] flex items-center gap-1.5`;
+              const isLeaderboard = link.icon === "trophy";
+              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors rounded-lg hover:bg-[rgba(245,196,66,0.05)] flex items-center gap-1.5 relative`;
 
               if (isRoute) {
                 return (
                   <Link key={link.href} href={link.href} className={classes}>
-                    {link.icon === "trophy" && <Trophy size={14} className="text-brand-gold opacity-70" />}
+                    {isLeaderboard && <Trophy size={14} className={hasClaimable ? "text-brand-gold" : "text-brand-gold opacity-70"} />}
                     {link.label}
+                    {/* Prize badge on Leaderboard link */}
+                    {isLeaderboard && hasClaimable && (
+                      <span className="ml-1 text-[9px] font-black uppercase tracking-wider bg-brand-gold/15 text-brand-gold border border-brand-gold/30 px-1.5 py-0.5 rounded-full animate-pulse">
+                        Top 3!
+                      </span>
+                    )}
                   </Link>
                 );
               }
@@ -152,13 +159,15 @@ export function Navbar() {
                 className="relative px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-neon-green)] transition-colors rounded-lg hover:bg-[rgba(16,185,129,0.05)] flex items-center gap-1.5"
               >
                 {hasClaimable ? (
-                  <Bell size={14} className="text-brand-gold animate-pulse" />
+                  <Gift size={14} className="text-brand-gold" />
                 ) : (
                   <User size={14} className="text-neon-green opacity-70" />
                 )}
-                Profile
+                {hasClaimable ? "Claim Rewards" : "Profile"}
                 {hasClaimable && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-brand-gold shadow-[0_0_8px_rgba(245,196,66,0.6)] animate-pulse" />
+                  <span className="text-[9px] font-black bg-brand-gold text-forest-dark px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)] animate-pulse">
+                    $NUT
+                  </span>
                 )}
               </Link>
             )}
@@ -390,13 +399,15 @@ export function Navbar() {
                       className="relative flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-neon-green)] hover:bg-[rgba(16,185,129,0.05)] rounded-lg transition-colors min-h-[44px]"
                     >
                       {hasClaimable ? (
-                        <Bell size={16} className="text-brand-gold animate-pulse" />
+                        <Gift size={16} className="text-brand-gold" />
                       ) : (
                         <User size={16} className="text-neon-green opacity-70" />
                       )}
                       {hasClaimable ? "Claim Rewards!" : "My Profile"}
                       {hasClaimable && (
-                        <span className="w-2.5 h-2.5 rounded-full bg-brand-gold shadow-[0_0_8px_rgba(245,196,66,0.6)] animate-pulse" />
+                        <span className="text-[10px] font-black bg-brand-gold text-forest-dark px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)] animate-pulse">
+                          $NUT
+                        </span>
                       )}
                     </Link>
                   </motion.div>

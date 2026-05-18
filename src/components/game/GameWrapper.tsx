@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -13,10 +13,12 @@ import {
   XCircle,
   AlertTriangle,
   Loader2,
+  Trophy,
 } from "lucide-react";
 import { LoadingOverlay } from "@/components/game/LoadingOverlay";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
-import { useScoreSubmission } from "@/features/arcade";
+import { useScoreSubmission, useLeaderboard, getCurrentWeekKey, PRIZE_TIERS } from "@/features/arcade";
+import { useWalletStore } from "@/store/wallet";
 
 /** Canonical game metadata for the wrapper */
 export interface GameConfig {
@@ -68,8 +70,24 @@ export function GameWrapper({ game }: GameWrapperProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Use the shared score submission hook with anti-cheat validation
-  const { status: submissionStatus, errorMessage, markGameStart, dismiss } =
+  const { status: submissionStatus, errorMessage, lastScore, markGameStart, dismiss } =
     useScoreSubmission(game.slug);
+
+  // Pull current leaderboard to check if score is prize-worthy
+  const currentWeek = useMemo(() => getCurrentWeekKey(), []);
+  const { scores: leaderboardScores } = useLeaderboard(game.slug, currentWeek);
+  const walletAddress = useWalletStore((s) => s.address);
+
+  // Compute what rank this score would get
+  const prizeRank = useMemo(() => {
+    if (submissionStatus !== "success" || lastScore === null || leaderboardScores.length === 0) return null;
+    // Count how many existing scores are strictly higher
+    const higherCount = leaderboardScores.filter((s) => s.score > lastScore).length;
+    const rank = higherCount + 1;
+    return rank <= 3 ? rank : null;
+  }, [submissionStatus, lastScore, leaderboardScores]);
+
+  const prizeInfo = prizeRank ? PRIZE_TIERS[prizeRank] : null;
 
   // Track fullscreen state changes from external triggers (Esc key, etc.)
   useEffect(() => {
@@ -172,13 +190,22 @@ export function GameWrapper({ game }: GameWrapperProps) {
           icon: <Loader2 size={18} className="shrink-0 animate-spin" />,
           text: "Saving score...",
           style: "bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.4)] text-blue-400",
+          isPrize: false,
         };
       case "success":
-        return {
-          icon: <CheckCircle size={18} className="shrink-0" />,
-          text: "Score Saved to Leaderboard! 🏆",
-          style: "bg-[rgba(16,185,129,0.15)] border-[rgba(16,185,129,0.4)] text-emerald-400",
-        };
+        return prizeRank && prizeInfo
+          ? {
+              icon: <Trophy size={18} className="shrink-0 text-brand-gold" />,
+              text: `${prizeInfo.emoji} Top ${prizeRank}! You're eligible for ${prizeInfo.amount}!`,
+              style: "bg-[rgba(251,191,36,0.18)] border-[rgba(251,191,36,0.5)] text-brand-gold",
+              isPrize: true,
+            }
+          : {
+              icon: <CheckCircle size={18} className="shrink-0" />,
+              text: "Score Saved to Leaderboard! 🏆",
+              style: "bg-[rgba(16,185,129,0.15)] border-[rgba(16,185,129,0.4)] text-emerald-400",
+              isPrize: false,
+            };
       case "error":
         return {
           icon: errorMessage?.includes("Rate") || errorMessage?.includes("fast")
@@ -186,6 +213,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
             : <XCircle size={18} className="shrink-0" />,
           text: errorMessage || "Submission Failed — Try Again!",
           style: "bg-[rgba(239,68,68,0.15)] border-[rgba(239,68,68,0.4)] text-red-400",
+          isPrize: false,
         };
       default:
         return null;
@@ -301,12 +329,26 @@ export function GameWrapper({ game }: GameWrapperProps) {
               className="absolute top-[60px] left-1/2 -translate-x-1/2 z-50 pointer-events-auto"
             >
               <div
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-xl backdrop-blur-xl border shadow-lg ${toastConfig.style}`}
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-xl backdrop-blur-xl border shadow-lg ${
+                  toastConfig.isPrize
+                    ? `${toastConfig.style} claim-fab-pulse`
+                    : toastConfig.style
+                }`}
               >
                 {toastConfig.icon}
-                <span className="text-sm font-semibold whitespace-nowrap">
+                <span className={`text-sm font-semibold whitespace-nowrap ${
+                  toastConfig.isPrize ? "text-glow-gold" : ""
+                }`}>
                   {toastConfig.text}
                 </span>
+                {toastConfig.isPrize && (
+                  <a
+                    href="/leaderboard/"
+                    className="ml-1 text-xs font-bold bg-brand-gold/20 text-brand-gold px-2 py-0.5 rounded-full hover:bg-brand-gold/30 transition-colors"
+                  >
+                    Claim →
+                  </a>
+                )}
                 <button
                   onClick={dismiss}
                   className="ml-1 opacity-60 hover:opacity-100 transition-opacity text-xs"

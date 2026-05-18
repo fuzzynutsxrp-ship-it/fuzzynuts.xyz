@@ -29,6 +29,7 @@ import { getCurrentWeekKey } from "../utils/scoreHelpers";
 export function useScoreSubmission(slug: string): ScoreSubmissionReturn {
   const [status, setStatus] = useState<SubmissionStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lastScore, setLastScore] = useState<number | null>(null);
 
   const gameStartRef = useRef<number>(Date.now());
   const lastSubmitRef = useRef<number>(0);
@@ -128,6 +129,7 @@ export function useScoreSubmission(slug: string): ScoreSubmissionReturn {
       if (event.data.success) {
         setStatus("success");
         setErrorMessage(null);
+        setLastScore(typeof score === "number" ? score : null);
       } else {
         setStatus("error");
         const reason = event.data.reason || event.data.message;
@@ -160,5 +162,5 @@ export function useScoreSubmission(slug: string): ScoreSubmissionReturn {
     };
   }, [slug]);
 
-  return { status, errorMessage, markGameStart, dismiss };
+  return { status, errorMessage, lastScore, markGameStart, dismiss };
 }

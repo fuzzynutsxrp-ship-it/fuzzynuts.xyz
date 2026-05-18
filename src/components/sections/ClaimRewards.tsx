@@ -295,7 +295,8 @@ export function ClaimRewards() {
           {/* Confetti on fresh success */}
           {status === "success" && <ConfettiBurst />}
 
-          <div className="flex flex-col items-center text-center gap-4">
+          <div className="flex flex-col items-center text-center gap-5">
+            {/* Animated emoji entrance */}
             <motion.div
               initial={{ scale: 0, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -305,6 +306,7 @@ export function ClaimRewards() {
               {status === "success" ? "🎉" : "✅"}
             </motion.div>
 
+            {/* Headline */}
             <div>
               <motion.h3
                 initial={{ opacity: 0, y: 10 }}
@@ -314,37 +316,64 @@ export function ClaimRewards() {
               >
                 {status === "success" ? "Prize Sent! 🌰" : "Rewards Claimed!"}
               </motion.h3>
-              <p className="text-sm text-cream-dim">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-sm text-cream-dim"
+              >
                 {tier
                   ? `${tier.emoji} ${tier.label} — ${tier.amount} sent to your wallet.`
                   : "Your $NUT prize has been sent to your wallet."}
-              </p>
+              </motion.p>
             </div>
 
+            {/* Animated prize amount */}
             {tier && status === "success" && (
               <motion.p
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.4, type: "spring" }}
-                className="font-display text-4xl font-black text-brand-gold text-glow-gold"
+                className="font-display text-4xl sm:text-5xl font-black text-brand-gold text-glow-gold"
               >
                 +{tier.amount}
               </motion.p>
             )}
 
+            {/* Premium Transaction Verification Card */}
             {txHash && (
-              <a
-                href={`https://xrpscan.com/tx/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-1 px-4 py-2 rounded-lg
-                           bg-white/[0.04] border border-white/[0.08]
-                           text-xs text-brand-gold hover:text-cream hover:bg-white/[0.08]
-                           font-mono transition-all"
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.4 }}
+                className="w-full max-w-sm"
               >
-                <ExternalLink size={12} />
-                View on XRPScan
-              </a>
+                <div className="rounded-xl bg-white/[0.03] border border-neon-green/20 p-4 space-y-3">
+                  <div className="flex items-center justify-center gap-2">
+                    <ShieldCheck size={14} className="text-neon-green" />
+                    <span className="text-[11px] font-bold uppercase tracking-widest text-neon-green">
+                      Verified on XRPL Ledger
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2">
+                    <span className="text-[11px] font-mono text-cream-dim truncate mr-2">
+                      {txHash.slice(0, 12)}…{txHash.slice(-8)}
+                    </span>
+                    <a
+                      href={`https://xrpscan.com/tx/${txHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
+                                 bg-neon-green/10 border border-neon-green/20
+                                 text-[11px] font-bold text-neon-green
+                                 hover:bg-neon-green/20 transition-colors shrink-0"
+                    >
+                      <ExternalLink size={10} />
+                      XRPScan
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
             )}
           </div>
         </div>

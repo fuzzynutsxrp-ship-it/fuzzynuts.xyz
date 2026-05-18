@@ -78,6 +78,8 @@ export interface LeaderboardReturn {
 export interface ScoreSubmissionReturn {
   status: SubmissionStatus;
   errorMessage: string | null;
+  /** The score value from the most recent successful submission */
+  lastScore: number | null;
   /** Register the game start time (call when iframe loads/game begins) */
   markGameStart: () => void;
   /** Dismiss the toast manually */
