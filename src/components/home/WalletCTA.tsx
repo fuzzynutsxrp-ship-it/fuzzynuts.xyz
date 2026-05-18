@@ -30,21 +30,18 @@ const BENEFITS = [
     title: "Check If You're in the Top 3",
     desc: "Your rank may already qualify — you just can't see it yet.",
     color: "#FBBF24",
-    borderColor: "rgba(251,191,36,0.12)",
   },
   {
     icon: Gift,
     title: "Claim 500K $NUT Weekly",
     desc: "Top 3 players split the prize pool every single week.",
     color: "#10B981",
-    borderColor: "rgba(16,185,129,0.12)",
   },
   {
     icon: TrendingUp,
     title: "Track Scores Across All Games",
     desc: "Full history, personal bests, and live rank tracking.",
     color: "#a855f7",
-    borderColor: "rgba(168,85,247,0.12)",
   },
 ];
 
@@ -62,7 +59,6 @@ export function WalletCTA() {
             className="max-w-2xl mx-auto text-center px-6 py-6 rounded-2xl"
             style={{
               background: "rgba(16,185,129,0.04)",
-              border: "1px solid rgba(16,185,129,0.1)",
             }}
           >
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -80,7 +76,7 @@ export function WalletCTA() {
                 href="/leaderboard/"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-[var(--color-gold)] border border-[rgba(251,191,36,0.15)] hover:bg-[rgba(251,191,36,0.06)] transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-[var(--color-gold)] hover:bg-[rgba(251,191,36,0.06)] transition-colors"
               >
                 <Trophy size={14} />
                 Leaderboard
@@ -89,7 +85,7 @@ export function WalletCTA() {
                 href="/profile/"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-[var(--color-neon-green)] border border-[rgba(16,185,129,0.15)] hover:bg-[rgba(16,185,129,0.06)] transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-[var(--color-neon-green)] hover:bg-[rgba(16,185,129,0.06)] transition-colors"
               >
                 <Gift size={14} />
                 Rewards
@@ -140,7 +136,6 @@ export function WalletCTA() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
                   style={{
                     background: "rgba(251,191,36,0.06)",
-                    border: "1px solid rgba(251,191,36,0.15)",
                   }}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
@@ -188,14 +183,13 @@ export function WalletCTA() {
                     whileHover={{ y: -4 }}
                     className="p-4 sm:p-5 rounded-xl transition-transform"
                     style={{
-                      background: "rgba(1, 5, 8, 0.6)",
-                      border: `1px solid ${benefit.borderColor}`,
+                      background: "rgba(1, 5, 8, 0.5)",
                     }}
                   >
                     <div
                       className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
                       style={{
-                        background: `${benefit.borderColor}`,
+                        background: `color-mix(in srgb, ${benefit.color} 12%, transparent)`,
                       }}
                     >
                       <benefit.icon

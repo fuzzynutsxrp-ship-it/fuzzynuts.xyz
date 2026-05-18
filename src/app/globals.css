@@ -105,15 +105,12 @@ body {
 
 /* ──────────────────────────────────────────
    CyberCard — Refined Dark Card
-   Near-opaque dark card with subtle accent line.
-   Blur reduced to avoid generic "AI glass" feel.
+   Near-opaque dark card with vine accent line at top.
+   No border. No backdrop-filter. Background is solid enough.
    ────────────────────────────────────────── */
 .cyber-card {
   position: relative;
   background: rgba(1, 5, 8, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border-radius: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
@@ -144,7 +141,6 @@ body {
 }
 
 .cyber-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
@@ -160,13 +156,6 @@ body {
 .cyber-card[data-accent="cyan"] { --accent-color: #22d3ee; }
 .cyber-card[data-accent="orange"] { --accent-color: #f97316; }
 .cyber-card[data-accent="gold"] { --accent-color: #FBBF24; }
-
-.cyber-card[data-accent="green"]:hover { border-color: rgba(16, 185, 129, 0.2); }
-.cyber-card[data-accent="red"]:hover { border-color: rgba(239, 68, 68, 0.2); }
-.cyber-card[data-accent="purple"]:hover { border-color: rgba(168, 85, 247, 0.2); }
-.cyber-card[data-accent="blue"]:hover { border-color: rgba(59, 130, 246, 0.2); }
-.cyber-card[data-accent="cyan"]:hover { border-color: rgba(34, 211, 238, 0.2); }
-.cyber-card[data-accent="orange"]:hover { border-color: rgba(249, 115, 22, 0.2); }
 
 /* ── Circuit pattern background for verification cards ── */
 .cyber-card-circuit {
@@ -217,7 +206,7 @@ body {
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.35;
+  opacity: 0.15;
   transition: opacity 0.3s;
 }
 
@@ -279,7 +268,7 @@ body {
 }
 
 .game-card:hover .game-card__border {
-  opacity: 0.55;
+  opacity: 0.3;
 }
 
 .game-card:hover .game-card__ambient {
@@ -308,7 +297,7 @@ body {
 }
 
 .game-card--featured .game-card__border {
-  opacity: 0.5;
+  opacity: 0.25;
 }
 
 .game-card--featured:hover {
@@ -358,35 +347,28 @@ body {
 
 /* ──────────────────────────────────────────
    Legacy glass-card (kept for backward compat)
+   No borders. No blur. Opaque dark bg only.
    ────────────────────────────────────────── */
 .glass-card {
   background: rgba(1, 5, 8, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* Elevated variant — slightly stronger presence */
 .glass-card-elevated {
   background: rgba(1, 5, 8, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   border-radius: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card-elevated:hover {
-  border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
 }
 
@@ -501,7 +483,7 @@ body {
   opacity: 0.25;
 }
 
-/* Section badge — consistent pill styling */
+/* Section badge — consistent pill styling, no border */
 .section-badge {
   display: inline-flex;
   align-items: center;
@@ -513,7 +495,6 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   background: rgba(16, 185, 129, 0.06);
-  border: 1px solid rgba(16, 185, 129, 0.15);
   color: var(--color-neon-green);
 }
 
@@ -730,7 +711,7 @@ body {
    WalletCTA v3 — Clean dark card
    ────────────────────────────────────────── */
 
-/* Dark card with minimal glass */
+/* Dark card — no border, uses background for depth */
 .wallet-cta-card-v3 {
   background: linear-gradient(
     168deg,
@@ -738,7 +719,6 @@ body {
     rgba(6, 10, 8, 0.92) 50%,
     rgba(1, 5, 8, 0.95) 100%
   );
-  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
   transition: box-shadow 0.3s ease;
 }
@@ -798,6 +778,98 @@ body {
   );
   background-size: 250% 100%;
   animation: prize-shimmer 6s ease-in-out infinite;
+}
+
+/* ──────────────────────────────────────────
+   Ledger Terminal — On-Chain Verification
+   Terminal/ledger aesthetic. Zero glassmorphism.
+   Opaque dark panels, left accent bars, monospace.
+   ────────────────────────────────────────── */
+
+/* Terminal header bar — solid dark, no border */
+.ledger-terminal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  background: rgba(1, 5, 8, 0.98);
+  border-radius: 10px 10px 0 0;
+}
+
+/* Terminal body — contains all ledger entries */
+.ledger-terminal__body {
+  background: rgba(1, 5, 8, 0.96);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+}
+
+/* Individual ledger entry row */
+.ledger-entry {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  transition: background 0.2s ease;
+}
+
+/* Scanline divider between entries */
+.ledger-entry + .ledger-entry {
+  border-top: 1px solid rgba(255, 255, 255, 0.025);
+}
+
+/* Left accent bar — 3px colored stripe */
+.ledger-entry__bar {
+  width: 3px;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.ledger-entry:hover {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.ledger-entry:hover .ledger-entry__bar {
+  opacity: 1;
+}
+
+/* Address text — monospace, muted until hover */
+.ledger-entry__address {
+  color: var(--color-cream);
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.ledger-entry:hover .ledger-entry__address {
+  opacity: 1;
+}
+
+/* Explorer link */
+.ledger-entry__link {
+  color: var(--color-cream-dim);
+}
+
+.ledger-entry__link:hover {
+  color: var(--color-neon-green);
+}
+
+/* Copy button — subtle until hover */
+.ledger-entry__copy {
+  color: var(--color-cream-dim);
+}
+
+.ledger-entry__copy:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 639px) {
+  .ledger-terminal__header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .ledger-entry__bar {
+    width: 2px;
+  }
 }
 
 /* ──────────────────────────────────────────
