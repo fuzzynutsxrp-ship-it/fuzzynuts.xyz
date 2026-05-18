@@ -8,12 +8,14 @@
 
 ## Pre-Flight Checklist
 
-- [ ] Frontend build passes: `npm run build` → 0 errors, `out/` generated
+- [x] Frontend build passes: `npm run build` → 0 errors, 13 pages generated
 - [x] Backend `rewards.ts` is committed to the Fuzzynuts World repo at `packages/server/src/api/rewards.ts`
-- [x] Routes registered in `packages/server/src/network/sockets/uws.ts`
+- [x] Routes registered in `packages/server/src/network/sockets/uws.ts` (eligibility, claim, claim/status, health)
 - [ ] `COMMUNITY_NUT_JAR_SEED` is set on Railway (see `PRODUCTION_ENV.md`)
 - [x] `xrpl` package is in the backend's dependencies (`^4.6.0`)
 - [x] CORS headers allow `*` origins
+- [x] Health check endpoint: `GET /api/rewards/health`
+- [x] Claim status polling: `GET /api/rewards/claim/status`
 
 ---
 
