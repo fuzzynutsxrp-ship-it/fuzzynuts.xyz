@@ -31,7 +31,7 @@ function AnimatedBar({ item, index }: { item: typeof TOKENOMICS[number]; index: 
       </div>
 
       {/* Animated bar */}
-      <div className="h-3 rounded-full bg-[rgba(245,196,66,0.08)] overflow-hidden">
+      <div className="h-3 rounded-full bg-[rgba(251,191,36,0.08)] overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           whileInView={{ width: `${item.percentage}%` }}
@@ -47,7 +47,7 @@ function AnimatedBar({ item, index }: { item: typeof TOKENOMICS[number]; index: 
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
+              background: "linear-gradient(90deg, transparent, var(--color-glass-border-strong), transparent)",
               backgroundSize: "200% 100%",
               animation: "shimmer 2s linear infinite",
             }}
@@ -125,7 +125,7 @@ function DonutChart() {
           x="100"
           y="96"
           textAnchor="middle"
-          fill="#f5c442"
+          fill="#FBBF24"
           fontSize="16"
           fontWeight="bold"
           fontFamily="Outfit, sans-serif"

@@ -20,6 +20,24 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    files: ["src/**/*.tsx", "src/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "Literal[value=/rgba\\(255,\\s*255,\\s*255/]",
+          message:
+            "Use CSS var tokens (--color-glass-border, --color-glass-border-strong, etc.) instead of hardcoded rgba(255,255,255,...). See globals.css :root.",
+        },
+        {
+          selector: "TemplateLiteral[quasis.0.value.raw=/\\[#[0-9a-fA-F]{3,8}\\]/]",
+          message:
+            "Use Tailwind color tokens instead of arbitrary hex values [#...]. Check tailwind.config.ts for available tokens.",
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

@@ -22,6 +22,7 @@ import {
 } from "@/features/arcade";
 import { useWalletStore } from "@/store/wallet";
 import type { GameMetadata } from "@/lib/gameRegistry";
+import { TOAST_CLASSES } from "@/lib/ui/badges";
 
 /* ═══════════════════════════════════════════════════════════════
    GamePage — Unified game page template
@@ -240,15 +241,13 @@ export function GamePage({ game }: GamePageProps) {
         return {
           icon: <Loader2 size={18} className="shrink-0 animate-spin" />,
           text: "Saving score...",
-          style:
-            "bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.4)] text-blue-400",
+          style: TOAST_CLASSES.info,
         };
       case "success":
         return {
           icon: <CheckCircle size={18} className="shrink-0" />,
           text: "Score Saved to Leaderboard! 🏆",
-          style:
-            "bg-[rgba(16,185,129,0.15)] border-[rgba(16,185,129,0.4)] text-emerald-400",
+          style: TOAST_CLASSES.success,
         };
       case "error":
         return {
@@ -260,8 +259,7 @@ export function GamePage({ game }: GamePageProps) {
               <XCircle size={18} className="shrink-0" />
             ),
           text: errorMessage || "Submission Failed — Try Again!",
-          style:
-            "bg-[rgba(239,68,68,0.15)] border-[rgba(239,68,68,0.4)] text-red-400",
+          style: TOAST_CLASSES.error,
         };
       default:
         return null;

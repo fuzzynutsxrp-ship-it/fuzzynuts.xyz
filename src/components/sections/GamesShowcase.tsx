@@ -167,8 +167,8 @@ function GameCard({
             boxShadow: pressed
               ? "inset 0 2px 8px rgba(0,0,0,0.6)"
               : hovered && !isComingSoon
-                ? `0 4px 24px rgba(251, 191, 36, 0.45), 0 0 40px rgba(251, 191, 36, 0.15), inset 0 1px 0 rgba(255,255,255,0.35)`
-                : `0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)`,
+                ? `0 4px 24px rgba(251, 191, 36, 0.45), 0 0 40px rgba(251, 191, 36, 0.15), inset 0 1px 0 var(--color-glass-border-strong)`
+                : `0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 var(--color-glass-border-strong)`,
             border: isComingSoon ? "1px solid #333" : "1px solid #d97706",
             cursor: isComingSoon ? "not-allowed" : "pointer",
             pointerEvents:

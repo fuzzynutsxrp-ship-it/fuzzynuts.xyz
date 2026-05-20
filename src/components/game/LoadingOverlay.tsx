@@ -160,7 +160,7 @@ export function LoadingOverlay({
           {/* Progress bar */}
           <div
             className="w-48 sm:w-64 h-1.5 rounded-full overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.08)" }}
+            style={{ background: "var(--color-glass-border-strong)" }}
             role="progressbar"
             aria-valuenow={Math.round(progress)}
             aria-valuemin={0}

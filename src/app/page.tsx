@@ -8,7 +8,7 @@ import { ClientFallingNuts } from "@/components/ClientFallingNuts";
 // These components are dynamically imported so they don't block First Contentful Paint.
 // Each gets its own chunk → smaller initial JS bundle.
 const GamesShowcase = dynamic(() => import("@/components/sections/GamesShowcase").then(m => ({ default: m.GamesShowcase })));
-const WeeklyPrizes = dynamic(() => import("@/components/home/WeeklyPrizes").then(m => ({ default: m.WeeklyPrizes })));
+const PrizeTiers = dynamic(() => import("@/components/sections/PrizeTiers").then(m => ({ default: m.PrizeTiers })));
 const WalletCTA = dynamic(() => import("@/components/home/WalletCTA").then(m => ({ default: m.WalletCTA })));
 const SectionTransition = dynamic(() => import("@/components/home/SectionTransition").then(m => ({ default: m.SectionTransition })));
 const Features = dynamic(() => import("@/components/sections/Features").then(m => ({ default: m.Features })));
@@ -43,8 +43,8 @@ export default function Home() {
         {/* ── Glow transition: Games → Prizes ── */}
         <SectionTransition variant="glow" />
 
-        {/* ═══ WEEKLY PRIZES — 500K $NUT prize podium (NEW) ═══ */}
-        <WeeklyPrizes />
+        {/* ═══ PRIZE TIERS — Holographic Vault (500K $NUT) ═══ */}
+        <PrizeTiers />
 
         {/* ── Wallet CTA: Convert interested visitors (NEW) ── */}
         <WalletCTA />

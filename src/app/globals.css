@@ -15,9 +15,10 @@
   --color-card: rgba(1, 5, 8, 0.85);
   --color-card-hover: rgba(2, 8, 12, 0.92);
   --color-brand-gold: #FBBF24;
-  --color-gold: #f5c442;
+  --color-gold: #FBBF24;
   --color-gold-dark: #daa520;
   --color-gold-light: #ffe066;
+  --color-gold-dim-border: rgba(251, 191, 36, 0.1);
   --color-orange: #e8943a;
   --color-brown: #8b6914;
   --color-cream: #f0ede6;
@@ -30,10 +31,16 @@
   --color-neon-green-dim: rgba(16, 185, 129, 0.12);
   --color-neon-blue: #3B82F6;
   --color-neon-blue-dim: rgba(59, 130, 246, 0.12);
+  --color-silver: #C0C0C0;
+  --color-silver-dim: rgba(192, 192, 192, 0.12);
+  --color-bronze: #CD7F32;
+  --color-bronze-dim: rgba(205, 127, 50, 0.12);
   --color-glass: rgba(16, 185, 129, 0.04);
   --color-glass-border: rgba(255, 255, 255, 0.06);
+  --color-glass-border-faint: rgba(255, 255, 255, 0.04);
   --color-glass-border-strong: rgba(255, 255, 255, 0.10);
   --color-glass-border-neon: rgba(16, 185, 129, 0.18);
+  --color-glass-hover: rgba(255, 255, 255, 0.03);
   --font-display: "Outfit", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
@@ -101,6 +108,28 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-brand-gold);
+}
+
+/* ──────────────────────────────────────────
+   Constellation Background Pattern
+   Tiny radial-gradient dots that mimic a star
+   field. Used by PrizeTiers section.
+   ────────────────────────────────────────── */
+.constellation-bg {
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(251,191,36,0.25), transparent),
+    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.12), transparent),
+    radial-gradient(1.5px 1.5px at 40% 70%, rgba(251,191,36,0.18), transparent),
+    radial-gradient(1px 1px at 55% 20%, rgba(192,192,192,0.15), transparent),
+    radial-gradient(1px 1px at 70% 55%, rgba(205,127,50,0.18), transparent),
+    radial-gradient(1.5px 1.5px at 85% 30%, rgba(251,191,36,0.12), transparent),
+    radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.08), transparent),
+    radial-gradient(1px 1px at 60% 90%, rgba(251,191,36,0.15), transparent),
+    radial-gradient(1px 1px at 90% 75%, rgba(192,192,192,0.10), transparent),
+    radial-gradient(1.5px 1.5px at 35% 10%, rgba(16,185,129,0.12), transparent),
+    radial-gradient(1px 1px at 75% 85%, rgba(16,185,129,0.08), transparent),
+    radial-gradient(1px 1px at 48% 48%, rgba(251,191,36,0.20), transparent);
+  background-size: 300px 300px;
 }
 
 /* ──────────────────────────────────────────
@@ -427,8 +456,10 @@ body {
 }
 
 .text-glow-gold {
-  text-shadow: 0 0 20px rgba(251, 191, 36, 0.5),
-               0 0 40px rgba(251, 191, 36, 0.2);
+  text-shadow:
+    0 0 10px rgba(251, 191, 36, 0.8),
+    0 0 20px rgba(251, 191, 36, 0.6),
+    0 0 30px rgba(251, 191, 36, 0.4);
 }
 
 .text-glow-blue {
@@ -496,6 +527,40 @@ body {
   text-transform: uppercase;
   background: rgba(16, 185, 129, 0.06);
   color: var(--color-neon-green);
+}
+
+/* ──────────────────────────────────────────
+   Feature Tile — Borderless holographic card
+   Replaces CyberCard in Features section.
+   ────────────────────────────────────────── */
+.feature-tile {
+  background: rgba(1, 5, 8, 0.5);
+  transition: background 0.3s ease;
+}
+
+.feature-tile:hover {
+  background: rgba(1, 5, 8, 0.7);
+}
+
+/* Scan-line overlay — visible on hover */
+.feature-tile__scanlines {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(59, 130, 246, 0.02) 3px,
+    rgba(59, 130, 246, 0.02) 4px
+  );
+}
+
+.feature-tile:hover .feature-tile__scanlines {
+  opacity: 1;
 }
 
 /* ──────────────────────────────────────────
@@ -1020,10 +1085,68 @@ body {
 }
 
 /* ──────────────────────────────────────────
-   Text Glow — Gold
+   Holographic Effects — Full Utility Set
    ────────────────────────────────────────── */
-.text-glow-gold {
-  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4), 0 0 20px rgba(251, 191, 36, 0.15);
+
+/* Hologram flicker — subtle CRT-style brightness pops */
+.hologram-flicker {
+  animation: hologramFlicker 3s ease-in-out infinite;
+}
+
+@keyframes hologramFlicker {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  41%      { opacity: 1; filter: brightness(1); }
+  42%      { opacity: 0.8; filter: brightness(1.2); }
+  43%      { opacity: 1; filter: brightness(1); }
+  45%      { opacity: 0.9; filter: brightness(1.1); }
+  46%      { opacity: 1; filter: brightness(1); }
+}
+
+/* Energy ring expand — used for circular pulse effects */
+@keyframes energyRing {
+  0%   { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* 3D transform utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Gradient border rotation — for animated gradient borders */
+@keyframes gradientRotate {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientRotate 3s ease infinite;
+}
+
+/* Data stream particles — vertical rain-like data flow */
+.data-particle {
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  background: linear-gradient(to bottom, transparent, rgba(251, 191, 36, 0.8), transparent);
+  animation: dataStream 2s linear infinite;
+}
+@keyframes dataStream {
+  0%   { transform: translateY(-100px); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(100px); opacity: 0; }
+}
+
+/* Shimmer sweep class (pairs with @keyframes shimmer already defined above) */
+.shimmer {
+  animation: shimmer 2s ease-in-out infinite;
 }
 
 /* ──────────────────────────────────────────
@@ -1048,7 +1171,11 @@ body {
   .claim-fab-pulse,
   .hero-prize-shimmer-v3,
   .wallet-cta-button-v3,
-  .prize-card-gold::after {
+  .prize-card-gold::after,
+  .hologram-flicker,
+  .animate-gradient,
+  .data-particle,
+  .shimmer {
     animation: none;
   }
 }

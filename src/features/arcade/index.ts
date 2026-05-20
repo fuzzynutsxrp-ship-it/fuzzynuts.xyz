@@ -45,6 +45,23 @@ export {
 
 // ── Hooks ──
 export { useLeaderboard } from "./hooks/useLeaderboard";
+export { useLeaderboardSSE } from "./hooks/useLeaderboardSSE";
 export { useScoreSubmission } from "./hooks/useScoreSubmission";
 export { usePayoutEligibility } from "./hooks/usePayoutEligibility";
 export { useSyncLocalScores } from "./hooks/useSyncLocalScores";
+export { useWeeklyCountdown } from "./hooks/useWeeklyCountdown";
+export type { CountdownState } from "./hooks/useWeeklyCountdown";
+
+// ── Components ──
+export { LeaderboardSkeleton } from "./components/LeaderboardSkeleton";
+export { WeeklyResetCountdown } from "./components/WeeklyResetCountdown";
+
+// ── Validation ──
+export {
+  ScorePayloadSchema,
+  SecureScorePayloadSchema,
+  generateNonce,
+  computeScoreHash,
+  isTimestampValid,
+} from "./validation/scoreSchema";
+export type { ScorePayload, SecureScorePayload } from "./validation/scoreSchema";

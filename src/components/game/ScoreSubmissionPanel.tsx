@@ -96,7 +96,7 @@ export function ScoreSubmissionPanel({
 
   return (
     <div
-      className="border-t border-[rgba(255,255,255,0.06)]"
+      className="border-t border-glass"
       style={{
         background: "rgba(6, 10, 6, 0.8)",
         backdropFilter: "blur(8px)",
@@ -129,7 +129,7 @@ export function ScoreSubmissionPanel({
 
           {/* Divider */}
           {lastSubmission && bestScore !== null && (
-            <div className="w-px h-8 bg-[rgba(255,255,255,0.06)] hidden sm:block" />
+            <div className="w-px h-8 bg-glass hidden sm:block" />
           )}
 
           {/* Best score */}
@@ -147,7 +147,7 @@ export function ScoreSubmissionPanel({
                       background:
                         rank <= 3
                           ? "rgba(251, 191, 36, 0.12)"
-                          : "rgba(255,255,255,0.04)",
+                          : "var(--color-glass-border-faint)",
                       color:
                         rank <= 3
                           ? "var(--color-brand-gold)"
@@ -188,7 +188,7 @@ export function ScoreSubmissionPanel({
           {history.length > 0 && (
             <button
               onClick={() => setIsExpanded((p) => !p)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.04)] transition-colors min-h-[36px]"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[var(--color-glass-border-faint)] transition-colors min-h-[36px]"
               aria-label={isExpanded ? "Collapse history" : "Expand history"}
               id="score-history-toggle"
             >
@@ -211,7 +211,7 @@ export function ScoreSubmissionPanel({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden border-t border-[rgba(255,255,255,0.04)]"
+            className="overflow-hidden border-t border-glass-faint"
           >
             <div className="px-3 sm:px-5 py-3 space-y-1.5 max-h-[200px] overflow-y-auto">
               {history.slice(0, 10).map((entry, i) => {
@@ -220,7 +220,7 @@ export function ScoreSubmissionPanel({
                 return (
                   <div
                     key={`${entry.timestamp}-${i}`}
-                    className="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                    className="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[var(--color-glass-hover)] transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <Icon size={12} style={{ color: config.color }} />

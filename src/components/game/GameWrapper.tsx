@@ -19,6 +19,7 @@ import { LoadingOverlay } from "@/components/game/LoadingOverlay";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
 import { useScoreSubmission, useLeaderboard, getCurrentWeekKey, PRIZE_TIERS } from "@/features/arcade";
 import { useWalletStore } from "@/store/wallet";
+import { TOAST_CLASSES } from "@/lib/ui/badges";
 
 /** Canonical game metadata for the wrapper */
 export interface GameConfig {
@@ -189,7 +190,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
         return {
           icon: <Loader2 size={18} className="shrink-0 animate-spin" />,
           text: "Saving score...",
-          style: "bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.4)] text-blue-400",
+          style: TOAST_CLASSES.info,
           isPrize: false,
         };
       case "success":
@@ -197,13 +198,13 @@ export function GameWrapper({ game }: GameWrapperProps) {
           ? {
               icon: <Trophy size={18} className="shrink-0 text-brand-gold" />,
               text: `${prizeInfo.emoji} Top ${prizeRank}! You're eligible for ${prizeInfo.amount}!`,
-              style: "bg-[rgba(251,191,36,0.18)] border-[rgba(251,191,36,0.5)] text-brand-gold",
+              style: TOAST_CLASSES.gold,
               isPrize: true,
             }
           : {
               icon: <CheckCircle size={18} className="shrink-0" />,
               text: "Score Saved to Leaderboard! 🏆",
-              style: "bg-[rgba(16,185,129,0.15)] border-[rgba(16,185,129,0.4)] text-emerald-400",
+              style: TOAST_CLASSES.success,
               isPrize: false,
             };
       case "error":
@@ -212,7 +213,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
             ? <AlertTriangle size={18} className="shrink-0" />
             : <XCircle size={18} className="shrink-0" />,
           text: errorMessage || "Submission Failed — Try Again!",
-          style: "bg-[rgba(239,68,68,0.15)] border-[rgba(239,68,68,0.4)] text-red-400",
+          style: TOAST_CLASSES.error,
           isPrize: false,
         };
       default:
@@ -239,7 +240,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
               href="/#games"
               whileHover={{ scale: 1.08, x: -2 }}
               whileTap={{ scale: 0.94 }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors shrink-0"
               aria-label="Back to Arcade"
               id="game-back-button"
             >
@@ -247,7 +248,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
               <span className="hidden sm:inline">Arcade</span>
             </motion.a>
 
-            <div className="w-px h-5 bg-[rgba(255,255,255,0.1)] hidden sm:block" />
+            <div className="w-px h-5 bg-glass-strong hidden sm:block" />
 
             {/* Genre badge */}
             <span
@@ -277,7 +278,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
               onClick={toggleMute}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
               aria-label={isMuted ? "Unmute game audio" : "Mute game audio"}
               title={isMuted ? "Unmute Game Audio (M)" : "Mute Game Audio (M)"}
               id="game-mute-toggle"
@@ -291,7 +292,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
               whileHover={{ scale: 1.1, rotate: -180 }}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 300 }}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
               aria-label="Reload game"
               title="Reload Game"
               id="game-reload-button"
@@ -304,7 +305,7 @@ export function GameWrapper({ game }: GameWrapperProps) {
               onClick={toggleFullscreen}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              className="hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
               aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
               title={isFullscreen ? "Exit Fullscreen (F)" : "Toggle Fullscreen (F)"}
               id="game-fullscreen-toggle"

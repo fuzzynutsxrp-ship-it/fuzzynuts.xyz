@@ -96,7 +96,7 @@ export function Navbar() {
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-[#0a0f0a]/90 backdrop-blur-xl border-b border-[rgba(245,196,66,0.1)] shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+            ? "bg-forest-900/90 backdrop-blur-xl border-b border-gold-dim shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
             : "bg-transparent"
         }`}
         role="navigation"
@@ -345,7 +345,7 @@ export function Navbar() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden bg-[#0a0f0a]/95 backdrop-blur-xl border-b border-[rgba(245,196,66,0.1)]"
+              className="md:hidden overflow-hidden bg-forest-900/95 backdrop-blur-xl border-b border-gold-dim"
             >
               <div className="container-main py-4 space-y-1">
                 {NAV_LINKS.map((link, i) => {

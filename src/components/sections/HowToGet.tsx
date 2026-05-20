@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Wallet, Coins, Link, Zap, Copy, Check } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { HOW_TO_STEPS, XRPL_CONFIG } from "@/lib/utils";
 import { useState, useCallback } from "react";
 
-const ICON_MAP: Record<string, React.ElementType> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   Wallet,
   Coins,
   Link,
@@ -78,7 +79,7 @@ export function HowToGet() {
                 {/* Content */}
                 <div className="flex-1">
                   <h3 className="font-display font-bold text-lg text-[var(--color-cream)] mb-1 flex items-center gap-2 group-hover:text-neon-green transition-colors">
-                    <Icon size={18} className="text-neon-green" />
+                    <Icon size={18} className="text-neon-green" strokeWidth={2} />
                     {step.title}
                   </h3>
                   <p className="text-sm text-[var(--color-cream-dim)] leading-relaxed">

@@ -114,7 +114,7 @@ export function FallingNuts() {
       const s = n.size;
 
       // Golden glow
-      ctx.shadowColor = "#f5c442";
+      ctx.shadowColor = "#FBBF24";
       ctx.shadowBlur = s * 0.6;
 
       // Golden cap
@@ -136,7 +136,7 @@ export function FallingNuts() {
       }
 
       // Golden body
-      ctx.fillStyle = "#f5c442";
+      ctx.fillStyle = "#FBBF24";
       ctx.beginPath();
       ctx.ellipse(0, s * 0.15, s * 0.4, s * 0.45, 0, 0, Math.PI * 2);
       ctx.fill();

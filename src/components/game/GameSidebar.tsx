@@ -99,8 +99,8 @@ export function GameSidebar({
                   key={entry.wallet + i}
                   className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-colors ${
                     isUser
-                      ? "bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.15)]"
-                      : "hover:bg-[rgba(255,255,255,0.03)]"
+                      ? "bg-neon-green-dim border border-glass-neon"
+                      : "hover:bg-[var(--color-glass-hover)]"
                   }`}
                 >
                   {/* Rank */}
@@ -110,7 +110,7 @@ export function GameSidebar({
                       background:
                         i < 3
                           ? `${RANK_COLORS[i]}15`
-                          : "rgba(255,255,255,0.04)",
+                          : "var(--color-glass-border-faint)",
                       color: i < 3 ? RANK_COLORS[i] : "var(--color-cream-dim)",
                     }}
                   >
@@ -142,8 +142,8 @@ export function GameSidebar({
                     ···
                   </span>
                 </div>
-                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.15)]">
-                  <div className="w-5 h-5 flex items-center justify-center rounded-full shrink-0 font-bold text-[10px] text-[var(--color-cream-dim)] bg-[rgba(255,255,255,0.04)]">
+                <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs bg-neon-green-dim border border-glass-neon">
+                  <div className="w-5 h-5 flex items-center justify-center rounded-full shrink-0 font-bold text-[10px] text-[var(--color-cream-dim)] bg-[var(--color-glass-border-faint)]">
                     {userRank}
                   </div>
                   <span className="font-mono truncate flex-1 text-[var(--color-neon-green)] font-semibold">
@@ -159,7 +159,7 @@ export function GameSidebar({
         )}
         <a
           href={`/leaderboard?game=${game.slug}`}
-          className="flex items-center justify-center gap-1 mt-3 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+          className="flex items-center justify-center gap-1 mt-3 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[var(--color-glass-border-faint)] transition-colors"
         >
           View Full Leaderboard <ChevronRight size={10} />
         </a>
@@ -174,7 +174,7 @@ export function GameSidebar({
         accentColor="#FBBF24"
       >
         {/* Prize pool */}
-        <div className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-[rgba(251,191,36,0.05)] border border-[rgba(251,191,36,0.1)]">
+        <div className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-brand-gold/5 border border-gold-dim">
           <span className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)] font-medium">
             Weekly Prize Pool
           </span>
@@ -184,7 +184,7 @@ export function GameSidebar({
         </div>
 
         {/* Eligibility */}
-        <div className="mt-2 px-2.5 py-2.5 rounded-lg border border-[rgba(255,255,255,0.06)]">
+        <div className="mt-2 px-2.5 py-2.5 rounded-lg border border-glass">
           {eligibility?.eligible ? (
             <motion.div
               initial={{ opacity: 0 }}
@@ -245,7 +245,7 @@ export function GameSidebar({
             ))}
           </ul>
 
-          <div className="flex items-center justify-between pt-2 border-t border-[rgba(255,255,255,0.05)]">
+          <div className="flex items-center justify-between pt-2 border-t border-glass-faint">
             <div className="flex items-center gap-1.5">
               <Trophy size={11} className="opacity-40" />
               <span className="text-[10px]">Score Cap</span>
@@ -265,7 +265,7 @@ export function GameSidebar({
             </span>
           </div>
 
-          <p className="text-[10px] opacity-50 pt-2 border-t border-[rgba(255,255,255,0.05)] leading-relaxed">
+          <p className="text-[10px] opacity-50 pt-2 border-t border-glass-faint leading-relaxed">
             {game.description}
           </p>
         </div>
@@ -280,8 +280,8 @@ export function GameSidebar({
         onClick={onToggle}
         className="fixed right-3 top-[76px] z-50 lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] transition-colors"
         style={{
-          background: "rgba(10, 15, 10, 0.9)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--color-forest-900)",
+          border: "1px solid var(--color-glass-border-strong)",
           backdropFilter: "blur(12px)",
         }}
         aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
@@ -292,7 +292,7 @@ export function GameSidebar({
 
       {/* Desktop: always-visible panel */}
       <aside
-        className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-[rgba(255,255,255,0.06)] overflow-y-auto"
+        className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-glass overflow-y-auto"
         style={{
           background: "rgba(6, 10, 6, 0.6)",
           backdropFilter: "blur(8px)",
@@ -320,7 +320,7 @@ export function GameSidebar({
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 z-50 w-[300px] max-w-[85vw] flex flex-col border-l border-[rgba(255,255,255,0.08)] overflow-y-auto lg:hidden"
+              className="fixed right-0 top-0 bottom-0 z-50 w-[300px] max-w-[85vw] flex flex-col border-l border-glass-strong overflow-y-auto lg:hidden"
               style={{
                 background: "rgba(6, 10, 6, 0.95)",
                 backdropFilter: "blur(16px)",
@@ -328,7 +328,7 @@ export function GameSidebar({
               id="game-sidebar-mobile"
             >
               {/* Close button */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-glass">
                 <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-cream-dim)]">
                   Game Panel
                 </span>
@@ -368,10 +368,10 @@ function SidebarSection({
   children,
 }: SidebarSectionProps) {
   return (
-    <div className="border-b border-[rgba(255,255,255,0.04)]">
+    <div className="border-b border-glass-faint">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+        className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[var(--color-glass-hover)]"
         style={{ color: isExpanded ? accentColor : "var(--color-cream-dim)" }}
       >
         <span className="flex items-center gap-2">

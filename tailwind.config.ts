@@ -31,9 +31,23 @@ const config: Config = {
           DEFAULT: "#3B82F6",
           dim: "rgba(59, 130, 246, 0.12)",
         },
+        silver: {
+          DEFAULT: "#C0C0C0",
+          dim: "rgba(192, 192, 192, 0.12)",
+        },
+        bronze: {
+          DEFAULT: "#CD7F32",
+          dim: "rgba(205, 127, 50, 0.12)",
+        },
         "glass-bg": "rgba(1, 5, 8, 0.85)",
+        glass: {
+          DEFAULT: "var(--color-glass-border)",
+          strong: "var(--color-glass-border-strong)",
+          faint: "var(--color-glass-border-faint)",
+          hover: "var(--color-glass-hover)",
+        },
         gold: {
-          DEFAULT: "#f5c442",
+          DEFAULT: "#FBBF24",
           dark: "#daa520",
           light: "#ffe066",
         },
@@ -43,6 +57,14 @@ const config: Config = {
           DEFAULT: "#f0ede6",
           dim: "#b0a890",
         },
+        overlay: "rgba(0, 0, 0, 0.7)",
+      },
+      borderColor: {
+        glass: "var(--color-glass-border)",
+        "glass-strong": "var(--color-glass-border-strong)",
+        "glass-faint": "var(--color-glass-border-faint)",
+        "glass-neon": "var(--color-glass-border-neon)",
+        "gold-dim": "var(--color-gold-dim-border)",
       },
       fontFamily: {
         display: ["Outfit", "sans-serif"],

@@ -1,9 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gamepad2, Globe, ArrowDown } from "lucide-react";
+import { Gamepad2, Globe, ArrowDown, ArrowRight, Check, Wallet } from "lucide-react";
 import Image from "next/image";
-import { HeroPrizeTeaser } from "@/components/home/HeroPrizeTeaser";
+import { useWalletStore } from "@/store/wallet";
+
+/* ─────────────────────────────────────────────────────────────
+   Hero — Holographic Vault Edition
+
+   Top section: Animated logo + badge + title + CTAs + stats
+   Bottom section (new): "Are You in the Top 3?" holographic CTA
+   with expanding energy rings, shimmer button, and trust signals.
+
+   Replaces the old HeroPrizeTeaser badge with a full-width
+   holographic call-to-action that drives wallet connections.
+   ───────────────────────────────────────────────────────────── */
 
 const FLOAT_ANIMATION = {
   y: [0, -12, 0],
@@ -11,6 +22,8 @@ const FLOAT_ANIMATION = {
 };
 
 export function Hero() {
+  const { isConnected, connect, isConnecting } = useWalletStore();
+
   return (
     <section
       id="hero"
@@ -91,7 +104,7 @@ export function Hero() {
         >
           <motion.span
             whileHover={{ scale: 1.05 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase bg-[rgba(245,196,66,0.12)] border border-[rgba(245,196,66,0.25)] text-[var(--color-gold)] backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase bg-[rgba(245,196,66,0.12)] text-[var(--color-gold)]"
           >
             🌰 Live on XRPL Mainnet
           </motion.span>
@@ -165,7 +178,7 @@ export function Hero() {
             href="#games"
             whileHover={{ scale: 1.06, backgroundColor: "rgba(245,196,66,0.15)" }}
             whileTap={{ scale: 0.97 }}
-            className="group flex items-center gap-2 px-8 py-4 rounded-2xl border-2 border-[var(--color-gold)] text-[var(--color-gold)] font-bold text-lg transition-all backdrop-blur-sm"
+            className="group flex items-center gap-2 px-8 py-4 rounded-2xl text-[var(--color-gold)] font-bold text-lg transition-all hover:bg-[rgba(245,196,66,0.1)]"
           >
             <Gamepad2 size={20} />
             Play Arcade
@@ -203,15 +216,128 @@ export function Hero() {
           ))}
         </motion.div>
 
-        {/* Prize teaser — 500K $NUT weekly */}
-        <HeroPrizeTeaser />
+        {/* ═══════════════════════════════════════════════════════
+            HOLOGRAPHIC CTA — "Are You in the Top 3?"
+            Replaces old HeroPrizeTeaser badge.
+            ═══════════════════════════════════════════════════════ */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.7 }}
+          className="relative mt-20 py-16 sm:py-20"
+        >
+          {/* ── Expanding energy rings ── */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            {[...Array(5)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: 300 + i * 130,
+                  height: 300 + i * 130,
+                  border: `1px solid rgba(251,191,36,${0.08 - i * 0.012})`,
+                }}
+                animate={{
+                  scale: [1, 1.08, 1],
+                  opacity: [0.3, 0.1, 0.3],
+                }}
+                transition={{
+                  duration: 3 + i * 0.5,
+                  repeat: Infinity,
+                  delay: i * 0.3,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
+          </div>
+
+          {/* ── Content ── */}
+          <div className="relative z-10">
+            {/* Live badge */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <div className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
+              <span className="text-[var(--color-gold)] text-xs sm:text-sm font-bold tracking-[0.15em] uppercase">
+                This Week&rsquo;s Prizes Are Live
+              </span>
+            </div>
+
+            {/* Heading */}
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-5 leading-tight">
+              <span className="text-[var(--color-cream)]">
+                Are You in the{" "}
+              </span>
+              <span
+                className="gradient-text-gold"
+                style={{
+                  textShadow: "0 0 40px rgba(251,191,36,0.4)",
+                }}
+              >
+                Top 3?
+              </span>
+            </h2>
+
+            {/* Subtitle */}
+            <p className="text-base sm:text-lg md:text-xl text-[var(--color-cream-dim)] max-w-2xl mx-auto mb-10 leading-relaxed">
+              Connect your wallet to see your rank and claim your share of{" "}
+              <span className="text-[var(--color-gold)] font-semibold">
+                500,000 $NUT
+              </span>{" "}
+              in weekly prizes.
+            </p>
+
+            {/* ── Holographic CTA Button ── */}
+            <motion.button
+              onClick={() => {
+                if (isConnected) {
+                  window.location.href = "/leaderboard/";
+                } else {
+                  connect("xaman");
+                }
+              }}
+              disabled={isConnecting}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative group inline-flex items-center gap-3 px-10 sm:px-12 py-5 sm:py-6 rounded-full bg-gradient-to-r from-[var(--color-gold)] to-yellow-500 font-bold text-base sm:text-lg text-[var(--color-forest-900)] overflow-hidden transition-shadow hover:shadow-[0_0_40px_rgba(251,191,36,0.4)]"
+            >
+              {/* Holographic shimmer sweep */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+
+              <span className="relative flex items-center gap-3">
+                {isConnecting ? (
+                  "Connecting…"
+                ) : isConnected ? (
+                  <>
+                    View My Rank
+                    <ArrowRight size={20} />
+                  </>
+                ) : (
+                  <>
+                    <Wallet size={20} />
+                    See If I&rsquo;m in the Top 3
+                    <ArrowRight size={20} />
+                  </>
+                )}
+              </span>
+            </motion.button>
+
+            {/* ── Trust signals ── */}
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-[var(--color-cream-dim)] opacity-50">
+              {["Free", "10 seconds", "Read-only"].map((signal) => (
+                <div key={signal} className="flex items-center gap-1.5">
+                  <Check size={14} className="text-[var(--color-neon-green)]" />
+                  {signal}
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="mt-16"
+          className="mt-10"
         >
           <a
             href="#games"

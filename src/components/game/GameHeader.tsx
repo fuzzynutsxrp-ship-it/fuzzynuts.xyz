@@ -102,7 +102,7 @@ export function GameHeader({
           href="/#games"
           whileHover={{ scale: 1.06, x: -2 }}
           whileTap={{ scale: 0.94 }}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors shrink-0"
           aria-label="Back to Arcade"
           id="game-back-button"
         >
@@ -110,7 +110,7 @@ export function GameHeader({
           <span className="hidden sm:inline">Arcade</span>
         </motion.a>
 
-        <div className="w-px h-5 bg-[rgba(255,255,255,0.08)] hidden sm:block" />
+        <div className="w-px h-5 bg-glass-strong hidden sm:block" />
 
         {/* Genre badge */}
         <span
@@ -155,7 +155,7 @@ export function GameHeader({
               background:
                 rank <= 3
                   ? "rgba(251, 191, 36, 0.15)"
-                  : "rgba(255,255,255,0.06)",
+                  : "var(--color-glass-border-faint)",
               color:
                 rank <= 3
                   ? "var(--color-brand-gold)"
@@ -163,7 +163,7 @@ export function GameHeader({
               border:
                 rank <= 3
                   ? "1px solid rgba(251, 191, 36, 0.3)"
-                  : "1px solid rgba(255,255,255,0.08)",
+                  : "1px solid var(--color-glass-border-strong)",
             }}
           >
             Rank #{rank}
@@ -180,7 +180,7 @@ export function GameHeader({
               e.stopPropagation();
               setWeekOpen((p) => !p);
             }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
             id="game-week-selector"
           >
             <span className="font-mono">{weekLabel}</span>
@@ -190,7 +190,7 @@ export function GameHeader({
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(10,15,10,0.95)] backdrop-blur-xl shadow-xl z-50 overflow-hidden"
+              className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-glass-strong bg-forest-900/95 backdrop-blur-xl shadow-xl z-50 overflow-hidden"
             >
               {[
                 { key: currentWeek, label: "This Week" },
@@ -205,7 +205,7 @@ export function GameHeader({
                   className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors ${
                     selectedWeek === opt.key
                       ? "text-[var(--color-neon-green)] bg-[var(--color-neon-green-dim)]"
-                      : "text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)]"
+                      : "text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass"
                   }`}
                 >
                   <span className="font-mono">{opt.label}</span>
@@ -249,14 +249,14 @@ export function GameHeader({
           </motion.button>
         )}
 
-        <div className="w-px h-4 bg-[rgba(255,255,255,0.06)] hidden sm:block" />
+        <div className="w-px h-4 bg-glass hidden sm:block" />
 
         {/* Mute */}
         <motion.button
           onClick={onToggleMute}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
           aria-label={isMuted ? "Unmute" : "Mute"}
           title={isMuted ? "Unmute (M)" : "Mute (M)"}
           id="game-mute-toggle"
@@ -270,7 +270,7 @@ export function GameHeader({
           whileHover={{ scale: 1.1, rotate: -180 }}
           whileTap={{ scale: 0.9 }}
           transition={{ type: "spring", stiffness: 300 }}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
           aria-label="Reload game"
           title="Reload"
           id="game-reload-button"
@@ -283,7 +283,7 @@ export function GameHeader({
           onClick={onToggleFullscreen}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+          className="hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors"
           aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
           title={isFullscreen ? "Exit Fullscreen (F)" : "Fullscreen (F)"}
           id="game-fullscreen-toggle"

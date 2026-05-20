@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Trophy, Clock, Wifi, WifiOff, ChevronDown, Radio, Gift, Star, Zap } from "lucide-react";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { CyberCard } from "@/components/ui/CyberCard";
+import { LeaderboardSkeleton } from "@/components/ui/LeaderboardSkeleton";
 import { useWalletStore } from "@/store/wallet";
 import {
-  useLeaderboard,
+  useLeaderboardSSE,
+  useWeeklyCountdown,
   usePayoutEligibility,
   getCurrentWeekKey,
   getWeekKeyOffset,
@@ -24,8 +26,8 @@ const MAX_ENTRIES = 50;
 /** Prize amounts shown inline next to top-3 scores */
 const PRIZE_LABELS: Record<number, { amount: string; color: string; glow: string }> = {
   1: { amount: "250K $NUT", color: "text-brand-gold", glow: "winner-row-glow" },
-  2: { amount: "150K $NUT", color: "text-[#C0C0C0]", glow: "silver-row-glow" },
-  3: { amount: "100K $NUT", color: "text-[#CD7F32]", glow: "bronze-row-glow" },
+  2: { amount: "150K $NUT", color: "text-silver", glow: "silver-row-glow" },
+  3: { amount: "100K $NUT", color: "text-bronze", glow: "bronze-row-glow" },
 };
 
 /** Map game IDs to accent colors for the CyberCard system */
@@ -56,20 +58,7 @@ const WEEK_OPTIONS = [
   { label: "3 Weeks Ago", offset: 3 },
 ];
 
-/** Compute time until next Monday 00:00 UTC */
-function getTimeUntilReset(): string {
-  const now = new Date();
-  const dayOfWeek = now.getUTCDay(); // 0=Sun, 1=Mon
-  const daysUntilMon = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
-  const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + daysUntilMon));
-  const diff = next.getTime() - now.getTime();
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(hours / 24);
-  const h = hours % 24;
-  if (days > 0) return `${days}d ${h}h`;
-  const mins = Math.floor((diff % 3600000) / 60000);
-  return `${h}h ${mins}m`;
-}
+/* getTimeUntilReset replaced by useWeeklyCountdown hook — see below */
 
 /* ═══════════════════════════════════════════════════════════════
    Utilities
@@ -85,29 +74,7 @@ function getPersonalBest(gameId: string): number | null {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Skeleton Loader
-   ═══════════════════════════════════════════════════════════════ */
-
-function SkeletonRow({ index }: { index: number }) {
-  return (
-    <div
-      className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.04] last:border-0"
-      style={{ animationDelay: `${index * 60}ms` }}
-    >
-      {/* Rank */}
-      <div className="w-8 h-5 rounded bg-white/[0.06] animate-pulse" />
-      {/* Name */}
-      <div className="flex-1">
-        <div className="w-24 h-4 rounded bg-white/[0.06] animate-pulse" />
-      </div>
-      {/* Score */}
-      <div className="w-16 h-5 rounded bg-white/[0.06] animate-pulse" />
-      {/* Time */}
-      <div className="w-12 h-4 rounded bg-white/[0.06] animate-pulse hidden sm:block" />
-    </div>
-  );
-}
+/* SkeletonRow replaced by <LeaderboardSkeleton /> from @/components/ui */
 
 /* ═══════════════════════════════════════════════════════════════
    Medal Component
@@ -161,9 +128,12 @@ export function Leaderboard() {
     [weekOffset]
   );
 
-  // Use the shared leaderboard hook with polling + visibility refetch
+  // SSE-powered leaderboard with automatic polling fallback
   const { scores, loading, error, lastFetched, isRefreshing, refetch, manualRefresh } =
-    useLeaderboard(selectedGame, selectedWeek);
+    useLeaderboardSSE(selectedGame, selectedWeek);
+
+  // Tick-accurate countdown (1 s visible, 60 s hidden)
+  const countdown = useWeeklyCountdown();
 
   /* ── Derived state ── */
   const currentGameMeta = GAMES.find((g) => g.id === selectedGame);
@@ -183,13 +153,7 @@ export function Leaderboard() {
   const isWinner = isCurrentWeek && userRank > 0 && userRank <= 3;
   const prizeInfo = isWinner ? PRIZE_LABELS[userRank] : null;
 
-  // Live countdown to next reset
-  const [countdown, setCountdown] = useState(getTimeUntilReset);
-  useEffect(() => {
-    if (!isCurrentWeek) return;
-    const timer = setInterval(() => setCountdown(getTimeUntilReset()), 60_000);
-    return () => clearInterval(timer);
-  }, [isCurrentWeek]);
+  /* countdown now driven by useWeeklyCountdown() above — no polling needed */
 
   return (
     <section id="leaderboard" className="py-24 relative">
@@ -214,8 +178,8 @@ export function Leaderboard() {
             Top scores reset every Monday. Climb the ranks, earn $NUT.
           </p>
           {isCurrentWeek && (
-            <p className="text-xs text-cream-dim/60 font-mono mt-2 countdown-pulse">
-              ⏱ Resets in <span className="text-neon-green font-semibold">{countdown}</span> · Monday 00:00 UTC
+            <p className={`text-xs font-mono mt-2 ${countdown.isCritical ? "text-red-400 animate-pulse" : countdown.isUrgent ? "text-orange" : "text-cream-dim/60"} countdown-pulse`}>
+              ⏱ Resets in <span className={`font-semibold ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>{countdown.display}</span> · Monday 00:00 UTC
             </p>
           )}
         </motion.div>
@@ -566,11 +530,7 @@ export function Leaderboard() {
 
             {/* ── Loading State ── */}
             {loading && (
-              <div>
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <SkeletonRow key={i} index={i} />
-                ))}
-              </div>
+              <LeaderboardSkeleton />
             )}
 
             {/* ── Error State (full error, no data) ── */}
@@ -685,8 +645,8 @@ export function Leaderboard() {
                             ${rank === 1
                               ? "bg-brand-gold/10 border-brand-gold/30 text-brand-gold"
                               : rank === 2
-                              ? "bg-[#C0C0C0]/10 border-[#C0C0C0]/30 text-[#C0C0C0]"
-                              : "bg-[#CD7F32]/10 border-[#CD7F32]/30 text-[#CD7F32]"
+                              ? "bg-silver/10 border-silver/30 text-silver"
+                              : "bg-bronze/10 border-bronze/30 text-bronze"
                             }`}
                           >
                             <Zap size={8} className="inline mr-0.5" />{rowPrize.amount}

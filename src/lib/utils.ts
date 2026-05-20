@@ -17,7 +17,7 @@ export const XRPL_CONFIG = {
 };
 
 export const TOKENOMICS = [
-  { label: "AMM Liquidity Pool", percentage: 80, amount: "256.8B NUT", color: "#f5c442" },
+  { label: "AMM Liquidity Pool", percentage: 80, amount: "256.8B NUT", color: "#FBBF24" },
   { label: "Community Nut Jar", percentage: 18, amount: "57.78B NUT", color: "#e8943a" },
   { label: "Squirrel's Pile (Founder)", percentage: 2, amount: "6.42B NUT", color: "#8B6914" },
 ];

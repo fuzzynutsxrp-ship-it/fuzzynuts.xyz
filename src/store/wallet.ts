@@ -1,5 +1,97 @@
 import { create } from "zustand";
 
+/* ═══════════════════════════════════════════════════════════════
+   Encrypted Storage Utilities (AES-GCM via Web Crypto)
+   ═══════════════════════════════════════════════════════════════ */
+
+const STORAGE_KEY = "fuzzy_wallet";
+const ENCRYPTED_KEY = "fuzzy_wallet_enc";
+const FINGERPRINT_SALT = "fuzzynuts-v1";
+
+/** Derive an AES-GCM key from a browser fingerprint (domain-scoped, deterministic) */
+async function deriveStorageKey(): Promise<CryptoKey> {
+  const raw = [
+    typeof navigator !== "undefined" ? navigator.userAgent : "",
+    typeof location !== "undefined" ? location.origin : "",
+    FINGERPRINT_SALT,
+  ].join("|");
+
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(raw),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"],
+  );
+
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: new TextEncoder().encode(FINGERPRINT_SALT),
+      iterations: 100_000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
+/** Encrypt wallet data to localStorage */
+async function encryptAndStore(data: { address: string; provider: string }): Promise<void> {
+  try {
+    const key = await deriveStorageKey();
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(JSON.stringify(data));
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      encoded,
+    );
+    // Store as base64: iv(16) + ciphertext
+    const combined = new Uint8Array(iv.length + new Uint8Array(ciphertext).length);
+    combined.set(iv);
+    combined.set(new Uint8Array(ciphertext), iv.length);
+    localStorage.setItem(ENCRYPTED_KEY, btoa(String.fromCharCode(...combined)));
+    // Also keep plaintext fallback for backward compat
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // Fallback: store plaintext if crypto unavailable
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+}
+
+/** Decrypt wallet data from localStorage */
+async function decryptFromStorage(): Promise<{ address: string; provider: string } | null> {
+  try {
+    const stored = localStorage.getItem(ENCRYPTED_KEY);
+    if (!stored) {
+      // Try plaintext fallback
+      const plain = localStorage.getItem(STORAGE_KEY);
+      return plain ? JSON.parse(plain) : null;
+    }
+    const combined = Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+    const key = await deriveStorageKey();
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      key,
+      ciphertext,
+    );
+    return JSON.parse(new TextDecoder().decode(decrypted));
+  } catch {
+    // Fallback: try plaintext
+    try {
+      const plain = localStorage.getItem(STORAGE_KEY);
+      return plain ? JSON.parse(plain) : null;
+    } catch {
+      return null;
+    }
+  }
+}
+
 export type WalletProvider = "xaman" | "gemwallet" | "crossmark" | "none";
 
 interface WalletState {
@@ -16,6 +108,9 @@ interface WalletState {
   setBalance: (balance: string) => void;
   setNutBalance: (nutBalance: string) => void;
   setError: (error: string | null) => void;
+
+  /** Restore wallet session from encrypted localStorage on app mount */
+  autoReconnect: () => Promise<void>;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -311,12 +406,11 @@ export const useWalletStore = create<WalletState>((set) => ({
           error: null,
         });
 
-        // Persist to localStorage
+        // Persist to encrypted localStorage
         if (typeof window !== "undefined") {
-          localStorage.setItem(
-            "fuzzy_wallet",
-            JSON.stringify({ address, provider })
-          );
+          encryptAndStore({ address, provider }).catch(() => {
+            // Non-critical: encrypted persist failed, plaintext already set by fallback
+          });
         }
       } else {
         throw new Error("No wallet address returned");
@@ -340,7 +434,8 @@ export const useWalletStore = create<WalletState>((set) => ({
       error: null,
     });
     if (typeof window !== "undefined") {
-      localStorage.removeItem("fuzzy_wallet");
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(ENCRYPTED_KEY);
 
       // Also logout from Xumm SDK to clear OAuth2 session
       try {
@@ -359,4 +454,37 @@ export const useWalletStore = create<WalletState>((set) => ({
   setBalance: (balance: string) => set({ balance }),
   setNutBalance: (nutBalance: string) => set({ nutBalance }),
   setError: (error: string | null) => set({ error }),
+
+  autoReconnect: async () => {
+    if (typeof window === "undefined") return;
+
+    const state = useWalletStore.getState();
+    if (state.isConnected || state.isConnecting) return;
+
+    try {
+      const stored = await decryptFromStorage();
+      if (!stored?.address || !stored?.provider) return;
+
+      // Validate address format
+      if (!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(stored.address)) {
+        console.warn("[Wallet] autoReconnect: invalid stored address, clearing");
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(ENCRYPTED_KEY);
+        return;
+      }
+
+      // Restore session (does NOT re-auth — just restores cached state)
+      set({
+        address: stored.address,
+        provider: stored.provider as WalletProvider,
+        isConnected: true,
+        isConnecting: false,
+        error: null,
+      });
+
+      console.log(`[Wallet] autoReconnect: restored ${stored.provider} session for ${stored.address.slice(0, 8)}...`);
+    } catch (err) {
+      console.warn("[Wallet] autoReconnect failed:", err);
+    }
+  },
 }));

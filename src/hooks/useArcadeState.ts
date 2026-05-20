@@ -38,6 +38,9 @@ export {
   type LeaderboardReturn,
   type ScoreSubmissionReturn,
   type PayoutReturn,
+  type CountdownState,
+  type ScorePayload,
+  type SecureScorePayload,
 
   // ── Constants ──
   API_SCORES,
@@ -52,7 +55,16 @@ export {
 
   // ── Hooks ──
   useLeaderboard,
+  useLeaderboardSSE,
   useScoreSubmission,
   usePayoutEligibility,
   useSyncLocalScores,
+  useWeeklyCountdown,
+
+  // ── Validation ──
+  ScorePayloadSchema,
+  SecureScorePayloadSchema,
+  generateNonce,
+  computeScoreHash,
+  isTimestampValid,
 } from "@/features/arcade";
