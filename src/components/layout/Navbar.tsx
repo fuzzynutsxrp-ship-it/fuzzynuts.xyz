@@ -9,11 +9,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 const NAV_LINKS = [
-  { href: "#games", label: "Arcade" },
+  { href: "/#games", label: "Arcade" },
   { href: "/leaderboard/", label: "Leaderboard", icon: "trophy" },
-  { href: "#features", label: "Features" },
-  { href: "#tokenomics", label: "Tokenomics" },
-  { href: "#how-to-get", label: "Get $NUT" },
+  { href: "/#features", label: "Features" },
+  { href: "/#tokenomics", label: "Tokenomics" },
+  { href: "/#how-to-get", label: "Get $NUT" },
 ];
 
 
@@ -104,7 +104,7 @@ export function Navbar() {
       >
         <div className="container-main flex items-center justify-between h-16 md:h-[72px]">
           {/* Logo */}
-          <a href="#hero" className="flex items-center gap-2 group shrink-0" aria-label="Fuzzynuts Home">
+          <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label="Fuzzynuts Home">
             <motion.div
               whileHover={{ scale: 1.08 }}
               transition={{ duration: 0.3 }}
@@ -122,12 +122,12 @@ export function Navbar() {
                 FUZZYNUTS
               </span>
             </motion.div>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-              const isRoute = link.href.startsWith("/");
+              const isRoute = link.href.startsWith("/") && !link.href.startsWith("/#");
               const isLeaderboard = link.icon === "trophy";
               const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors rounded-lg hover:bg-[rgba(245,196,66,0.05)] flex items-center gap-1.5 relative`;
 
@@ -146,9 +146,9 @@ export function Navbar() {
                 );
               }
               return (
-                <a key={link.href} href={link.href} className={classes}>
+                <Link key={link.href} href={link.href} className={classes}>
                   {link.label}
-                </a>
+                </Link>
               );
             })}
 
@@ -349,7 +349,7 @@ export function Navbar() {
             >
               <div className="container-main py-4 space-y-1">
                 {NAV_LINKS.map((link, i) => {
-                  const isRoute = link.href.startsWith("/");
+                  const isRoute = link.href.startsWith("/") && !link.href.startsWith("/#");
                   const classes = "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.05)] rounded-lg transition-colors min-h-[44px]";
 
                   if (isRoute) {
@@ -372,17 +372,20 @@ export function Navbar() {
                     );
                   }
                   return (
-                    <motion.a
+                    <motion.div
                       key={link.href}
-                      href={link.href}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      onClick={() => setMobileOpen(false)}
-                      className={classes}
                     >
-                      {link.label}
-                    </motion.a>
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={classes}
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
                   );
                 })}
 
