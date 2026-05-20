@@ -3,7 +3,8 @@
  * with performance-optimized settings for gameplay:
  *   - No video bg (games use their own)
  *   - No falling nuts particles (reduce GPU load)
- *   - Transparent navbar (overlay on game canvas)
+ *   - No Navbar (GameHeader replaces it with game-specific controls)
+ *   - No Footer (full-viewport game layout)
  */
 
 import { SubPageLayout } from "@/components/layout/SubPageLayout";
@@ -17,7 +18,8 @@ export default function GameLayout({
     <SubPageLayout
       showVideoBg={false}
       showFallingNuts={false}
-      navbarTransparent={true}
+      showNavbar={false}
+      showFooter={false}
     >
       {children}
     </SubPageLayout>

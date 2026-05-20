@@ -1,7 +1,7 @@
 /**
  * Shared status badge class definitions — single source of truth.
  *
- * Use these across GamePage, GameWrapper, and any future toast/badge UIs
+ * Use these across GamePage and any future toast/badge UIs
  * to prevent cross-route style drift.
  *
  * @example

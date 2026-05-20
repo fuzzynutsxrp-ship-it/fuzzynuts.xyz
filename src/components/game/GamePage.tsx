@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameSidebar } from "@/components/game/GameSidebar";
+import { GameViewport } from "@/components/game/GameViewport";
+import { GameControls, useFirstVisit } from "@/components/game/GameControls";
 import { ScoreSubmissionPanel } from "@/components/game/ScoreSubmissionPanel";
-import { LoadingOverlay } from "@/components/game/LoadingOverlay";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
 import {
   useLeaderboard,
@@ -27,16 +28,20 @@ import { TOAST_CLASSES } from "@/lib/ui/badges";
 /* ═══════════════════════════════════════════════════════════════
    GamePage — Unified game page template
 
-   Layout:
+   Layout (Navbar is HIDDEN via game layout — GameHeader replaces it):
    ┌──────────────────────────────────────────────────────┐
    │ GameHeader (sticky, 64px)                             │
    ├────────────────────────────────┬──────────────────────┤
    │                                │                      │
-   │   Game iframe (flex-1)         │  GameSidebar (280px) │
-   │                                │                      │
+   │   GameViewport (flex-1)        │  GameSidebar (280px) │
+   │   (iframe + loading + error)   │                      │
    ├────────────────────────────────┴──────────────────────┤
    │ ScoreSubmissionPanel (bottom bar)                     │
    └──────────────────────────────────────────────────────┘
+
+   Overlays:
+   • GameControls — floating controls dialog (? key)
+   • Toast — score submission feedback
 
    Responsive:
    • Desktop (≥1024px): Full layout with sidebar
@@ -71,11 +76,22 @@ export function GamePage({ game }: GamePageProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState(getCurrentWeekKey);
   const [scoreHistory, setScoreHistory] = useState<ScoreHistoryEntry[]>([]);
+  const [controlsOpen, setControlsOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { address } = useWalletStore();
+
+  // Show controls overlay on first visit
+  const isFirstVisit = useFirstVisit(game.slug);
+  useEffect(() => {
+    if (isFirstVisit) {
+      // Delay slightly so the loading screen shows first
+      const timer = setTimeout(() => setControlsOpen(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstVisit]);
 
   // ── Hooks ──
   const {
@@ -194,6 +210,10 @@ export function GamePage({ game }: GamePageProps) {
     setSidebarOpen((p) => !p);
   }, []);
 
+  const toggleControls = useCallback(() => {
+    setControlsOpen((p) => !p);
+  }, []);
+
   const handleWeekChange = useCallback((week: string) => {
     setSelectedWeek(week);
   }, []);
@@ -204,6 +224,10 @@ export function GamePage({ game }: GamePageProps) {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
+      // Don't handle shortcuts while controls overlay is open
+      // (GameControls has its own ESC handler with capture)
+      if (controlsOpen && e.key !== "?") return;
+
       switch (e.key) {
         case "Escape":
           // ESC → back to arcade
@@ -212,6 +236,10 @@ export function GamePage({ game }: GamePageProps) {
         case "F1":
           e.preventDefault();
           toggleSidebar();
+          break;
+        case "?":
+          e.preventDefault();
+          toggleControls();
           break;
         case "f":
         case "F":
@@ -232,7 +260,7 @@ export function GamePage({ game }: GamePageProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleFullscreen, toggleMute, toggleSidebar]);
+  }, [toggleFullscreen, toggleMute, toggleSidebar, toggleControls, controlsOpen]);
 
   // ── Toast config ──
   const toastConfig = useMemo(() => {
@@ -265,13 +293,6 @@ export function GamePage({ game }: GamePageProps) {
         return null;
     }
   }, [submissionStatus, errorMessage]);
-
-  const defaultSandbox = [
-    "allow-scripts",
-    "allow-same-origin",
-    "allow-popups",
-    "allow-forms",
-  ].join(" ");
 
   return (
     <GameErrorBoundary gameTitle={game.title} onRetry={handleRetry}>
@@ -321,96 +342,20 @@ export function GamePage({ game }: GamePageProps) {
 
         {/* ── Main content: Game + Sidebar ── */}
         <div className="flex-1 flex min-h-0">
-          {/* Game container */}
-          <div
-            ref={containerRef}
-            className="relative flex-1 flex items-center justify-center bg-black overflow-hidden"
-            style={{
-              ...(isFullscreen ? {} : { maxWidth: "100%" }),
-            }}
-          >
-            {/* Aspect ratio wrapper */}
-            <div
-              className="relative w-full h-full"
-              style={{
-                aspectRatio: isFullscreen ? "auto" : undefined,
-                maxWidth: isFullscreen ? "100%" : "1440px",
-              }}
-            >
-              {/* Loading overlay */}
-              <LoadingOverlay
-                isLoading={isLoading}
-                gameTitle={game.title}
-                accentColor={game.color}
-                onLoadComplete={handleLoadComplete}
-              />
-
-              {/* Error state */}
-              <AnimatePresence>
-                {iframeError && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-20 flex items-center justify-center bg-[var(--color-forest-dark)]"
-                  >
-                    <div className="glass-card-elevated p-8 max-w-sm text-center">
-                      <div className="text-5xl mb-4" aria-hidden="true">
-                        ⚠️
-                      </div>
-                      <h2 className="font-display text-xl font-bold text-[var(--color-cream)] mb-2">
-                        Failed to Load
-                      </h2>
-                      <p className="text-sm text-[var(--color-cream-dim)] mb-5">
-                        {game.title} couldn&apos;t be loaded. Check your
-                        connection and try again.
-                      </p>
-                      <div className="flex gap-3 justify-center">
-                        <motion.button
-                          onClick={handleRetry}
-                          whileHover={{ scale: 1.04 }}
-                          whileTap={{ scale: 0.96 }}
-                          className="btn-primary px-5 py-2 text-sm"
-                          id="game-iframe-retry"
-                        >
-                          🔄 Retry
-                        </motion.button>
-                        <motion.a
-                          href="/#games"
-                          whileHover={{ scale: 1.04 }}
-                          whileTap={{ scale: 0.96 }}
-                          className="btn-secondary px-5 py-2 text-sm"
-                          id="game-iframe-back"
-                        >
-                          ← Arcade
-                        </motion.a>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* The iframe */}
-              <iframe
-                ref={iframeRef}
-                key={iframeKey}
-                src={game.iframePath}
-                title={`Play ${game.title}`}
-                sandbox={game.sandbox || defaultSandbox}
-                loading="eager"
-                allow="autoplay; fullscreen; gamepad"
-                onLoad={handleIframeLoad}
-                onError={handleIframeError}
-                className="w-full h-full border-0"
-                style={{
-                  minHeight: "400px",
-                  background: "black",
-                }}
-                aria-label={`${game.title} game window`}
-                id="game-iframe"
-              />
-            </div>
-          </div>
+          {/* Game viewport (extracted component) */}
+          <GameViewport
+            game={game}
+            iframeRef={iframeRef}
+            iframeKey={iframeKey}
+            isFullscreen={isFullscreen}
+            isLoading={isLoading}
+            hasError={iframeError}
+            onLoad={handleIframeLoad}
+            onError={handleIframeError}
+            onRetry={handleRetry}
+            onLoadComplete={handleLoadComplete}
+            containerRef={containerRef}
+          />
 
           {/* Sidebar */}
           <GameSidebar
@@ -430,6 +375,15 @@ export function GamePage({ game }: GamePageProps) {
           lastSubmission={lastSubmission}
           history={scoreHistory}
           submissionStatus={submissionStatus}
+        />
+
+        {/* ── Controls Overlay ── */}
+        <GameControls
+          controls={game.controls}
+          gameTitle={game.title}
+          accentColor={game.color}
+          isOpen={controlsOpen}
+          onClose={() => setControlsOpen(false)}
         />
       </div>
     </GameErrorBoundary>

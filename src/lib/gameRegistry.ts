@@ -44,6 +44,8 @@ export interface GameMetadata {
   status: "live" | "coming-soon" | "maintenance";
   /** Score type — how scores accumulate */
   scoreType: "high-score" | "cumulative";
+  /** Contextual tips shown during the loading screen */
+  loadingTips: string[];
 }
 
 const DEFAULT_SANDBOX =
@@ -67,6 +69,12 @@ export const GAME_LIST: GameMetadata[] = [
     achievementsEnabled: false,
     status: "live",
     scoreType: "high-score",
+    loadingTips: [
+      "Pro tip: Hold Shift to sprint past enemies!",
+      "Try the random map generator for endless levels",
+      "Press P or right-click to pause",
+      "Collect coins to earn extra lives",
+    ],
   },
   {
     slug: "fuzzy-survivors",
@@ -85,6 +93,12 @@ export const GAME_LIST: GameMetadata[] = [
     achievementsEnabled: false,
     status: "live",
     scoreType: "high-score",
+    loadingTips: [
+      "Move with WASD or Arrow Keys — dodge incoming waves",
+      "Survive as long as possible for the highest score",
+      "Collect XP orbs to upgrade your abilities",
+      "Auto-attack fires automatically — focus on positioning!",
+    ],
   },
   {
     slug: "minigolf",
@@ -103,6 +117,12 @@ export const GAME_LIST: GameMetadata[] = [
     achievementsEnabled: false,
     status: "live",
     scoreType: "high-score",
+    loadingTips: [
+      "Click and drag to aim — release to putt",
+      "Watch the power meter — don't overhit!",
+      "Use bank shots off walls for tricky holes",
+      "Par is your goal — can you beat it?",
+    ],
   },
   {
     slug: "nut-racer",
@@ -121,6 +141,12 @@ export const GAME_LIST: GameMetadata[] = [
     achievementsEnabled: false,
     status: "live",
     scoreType: "high-score",
+    loadingTips: [
+      "Hold ↑ or W to accelerate through the track",
+      "Use ← → or A/D to steer around obstacles",
+      "Collect acorns for boost — use Space to activate",
+      "Finish the race as fast as possible for top score",
+    ],
   },
   {
     slug: "top-secret",
@@ -139,6 +165,12 @@ export const GAME_LIST: GameMetadata[] = [
     achievementsEnabled: false,
     status: "live",
     scoreType: "high-score",
+    loadingTips: [
+      "Classified game — discover the mechanics yourself",
+      "Use mouse or touch controls to interact",
+      "Complete objectives to earn points",
+      "Good luck, agent 🕵️",
+    ],
   },
   {
     slug: "fuzzynuts-world",
@@ -157,6 +189,13 @@ export const GAME_LIST: GameMetadata[] = [
     achievementsEnabled: true,
     status: "live",
     scoreType: "cumulative",
+    loadingTips: [
+      "Click to move and attack — explore the world!",
+      "Talk to NPCs to discover quests and lore",
+      "Defeat monsters and minibosses to earn XP",
+      "Open inventory with I, map with M, profile with P",
+      "Craft items and trade with other players",
+    ],
   },
 ];
 

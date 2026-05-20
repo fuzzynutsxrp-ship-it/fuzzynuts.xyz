@@ -40,6 +40,10 @@ interface SubPageLayoutProps {
   showFallingNuts?: boolean;
   /** Make navbar transparent / overlay mode (default: false) */
   navbarTransparent?: boolean;
+  /** Show the main Navbar (default: true) — set false on game pages where GameHeader replaces it */
+  showNavbar?: boolean;
+  /** Show the Footer (default: true) — set false on full-viewport game pages */
+  showFooter?: boolean;
 }
 
 export function SubPageLayout({
@@ -47,6 +51,8 @@ export function SubPageLayout({
   showVideoBg = true,
   showFallingNuts = true,
   navbarTransparent = false,
+  showNavbar = true,
+  showFooter = true,
 }: SubPageLayoutProps) {
   return (
     <div className="relative min-h-screen" data-navbar-transparent={navbarTransparent || undefined}>
@@ -109,7 +115,7 @@ export function SubPageLayout({
       {showFallingNuts && <ClientFallingNuts />}
 
       {/* ── Navbar ── */}
-      <Navbar />
+      {showNavbar && <Navbar />}
 
       {/* ── Content ── */}
       <div className={`relative ${showVideoBg ? "z-10" : ""}`}>
@@ -117,7 +123,7 @@ export function SubPageLayout({
       </div>
 
       {/* ── Footer ── */}
-      <Footer />
+      {showFooter && <Footer />}
     </div>
   );
 }

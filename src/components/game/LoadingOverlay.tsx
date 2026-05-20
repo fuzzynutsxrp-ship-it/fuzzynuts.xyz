@@ -14,9 +14,11 @@ interface LoadingOverlayProps {
   maxLoadTime?: number;
   /** Called when loading completes (either via event or timeout) */
   onLoadComplete?: () => void;
+  /** Game-specific loading tips (overrides defaults if provided) */
+  loadingTips?: string[];
 }
 
-const LOADING_TIPS = [
+const DEFAULT_LOADING_TIPS = [
   "Gathering acorns…",
   "Shaking the trees…",
   "Waking up the squirrels…",
@@ -38,10 +40,15 @@ export function LoadingOverlay({
   accentColor = "var(--color-brand-gold)",
   maxLoadTime = 5000,
   onLoadComplete,
+  loadingTips,
 }: LoadingOverlayProps) {
+  // Merge game-specific tips with defaults for variety
+  const tips = loadingTips && loadingTips.length > 0
+    ? [...loadingTips, ...DEFAULT_LOADING_TIPS]
+    : DEFAULT_LOADING_TIPS;
   const [progress, setProgress] = useState(0);
   const [tip, setTip] = useState(() =>
-    LOADING_TIPS[Math.floor(Math.random() * LOADING_TIPS.length)]
+    tips[Math.floor(Math.random() * tips.length)]
   );
 
   const handleComplete = useCallback(() => {
@@ -54,7 +61,7 @@ export function LoadingOverlay({
     if (!isLoading) return;
 
     setProgress(0);
-    setTip(LOADING_TIPS[Math.floor(Math.random() * LOADING_TIPS.length)]);
+    setTip(tips[Math.floor(Math.random() * tips.length)]);
 
     // Simulate progress that slows down as it approaches 90%
     let frame: number;
@@ -76,7 +83,7 @@ export function LoadingOverlay({
 
     // Rotate tips every 3s
     const tipInterval = setInterval(() => {
-      setTip(LOADING_TIPS[Math.floor(Math.random() * LOADING_TIPS.length)]);
+      setTip(tips[Math.floor(Math.random() * tips.length)]);
     }, 3000);
 
     // Safety fallback: auto-dismiss after maxLoadTime
