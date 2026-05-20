@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence, useDragControls, type PanInfo } from "framer-motion";
 import {
   Trophy,
   Crown,
@@ -15,6 +15,7 @@ import {
   PanelRightClose,
   PanelRightOpen,
   Coins,
+  GripHorizontal,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import type { ScoreEntry, EligibilityData } from "@/features/arcade";
@@ -25,8 +26,8 @@ import type { GameMetadata } from "@/lib/gameRegistry";
 
    Responsive behavior:
    • Desktop (≥1024px): Fixed 280px panel, right side
-   • Tablet (768–1023px): Collapsible overlay drawer
-   • Mobile (<768px): Bottom sheet (toggle button in header)
+   • Tablet (768–1023px): Collapsible overlay drawer (right)
+   • Mobile (<768px): Bottom sheet (swipe up/down to open/close)
    ═══════════════════════════════════════════════════════════════ */
 
 interface GameSidebarProps {
@@ -74,6 +75,17 @@ export function GameSidebar({
   const toggleSection = (key: string) => {
     setExpandedSection((prev) => (prev === key ? null : key));
   };
+
+  // Bottom sheet swipe-to-close
+  const handleDragEnd = useCallback(
+    (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      // If user drags down more than 80px or with velocity > 500, close
+      if (info.offset.y > 80 || info.velocity.y > 500) {
+        onToggle();
+      }
+    },
+    [onToggle],
+  );
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -302,7 +314,7 @@ export function GameSidebar({
         {sidebarContent}
       </aside>
 
-      {/* Mobile/Tablet: overlay drawer */}
+      {/* Mobile/Tablet: overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -314,18 +326,62 @@ export function GameSidebar({
               className="fixed inset-0 z-40 bg-black/50 lg:hidden"
               onClick={onToggle}
             />
-            {/* Drawer */}
+
+            {/* Mobile (<md): Bottom sheet */}
+            <motion.aside
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
+              transition={{ type: "spring", damping: 28, stiffness: 350 }}
+              className="fixed bottom-0 left-0 right-0 z-50 flex flex-col max-h-[65vh] border-t border-[var(--color-glass-border-strong)] rounded-t-2xl overflow-hidden md:hidden"
+              style={{
+                background: "rgba(6, 10, 6, 0.97)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+              }}
+              id="game-sidebar-mobile-sheet"
+            >
+              {/* Drag handle */}
+              <div className="flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing">
+                <div className="w-10 h-1 rounded-full bg-[var(--color-glass-border-strong)]" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 pb-2 border-b border-glass">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-cream-dim)] flex items-center gap-1.5">
+                  <GripHorizontal size={12} className="opacity-40" />
+                  Game Panel
+                </span>
+                <button
+                  onClick={onToggle}
+                  className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Content (scrollable) */}
+              <div className="overflow-y-auto flex-1 overscroll-contain">
+                {sidebarContent}
+              </div>
+            </motion.aside>
+
+            {/* Tablet (md to lg): Right drawer */}
             <motion.aside
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 z-50 w-[300px] max-w-[85vw] flex flex-col border-l border-glass-strong overflow-y-auto lg:hidden"
+              className="fixed right-0 top-0 bottom-0 z-50 w-[300px] max-w-[85vw] flex-col border-l border-glass-strong overflow-y-auto hidden md:flex lg:hidden"
               style={{
                 background: "rgba(6, 10, 6, 0.95)",
                 backdropFilter: "blur(16px)",
               }}
-              id="game-sidebar-mobile"
+              id="game-sidebar-tablet"
             >
               {/* Close button */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-glass">

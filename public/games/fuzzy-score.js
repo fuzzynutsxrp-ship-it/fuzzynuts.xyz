@@ -9,6 +9,50 @@
    leaderboard whether online or offline.
    ═══════════════════════════════════════════════════════════════ */
 
+/* ── Inner-game nav suppression ──
+   When loaded inside the Fuzzynuts arcade iframe, listens for
+   FUZZY_CONFIG messages and hides internal navigation elements
+   to prevent duplicate nav bars. */
+(function() {
+  'use strict';
+  if (window.parent === window) return; // Not in iframe, skip
+
+  var NAV_SELECTORS = [
+    '.game-nav',
+    '.inner-header',
+    '[data-nav]',
+    'header.game-ui',
+    '.game-header',
+    '.game-breadcrumb',
+    '.back-to-arcade',
+  ];
+
+  function hideNavElements() {
+    var hidden = 0;
+    NAV_SELECTORS.forEach(function(sel) {
+      var elements = document.querySelectorAll(sel);
+      for (var i = 0; i < elements.length; i++) {
+        elements[i].style.setProperty('display', 'none', 'important');
+        hidden++;
+      }
+    });
+    if (hidden > 0) {
+      console.log('[FuzzyScore] Hidden', hidden, 'inner-game nav element(s)');
+    }
+  }
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'FUZZY_CONFIG') {
+      if (event.data.hideNav) {
+        hideNavElements();
+        // Also try after a brief delay in case of lazy rendering
+        setTimeout(hideNavElements, 500);
+        setTimeout(hideNavElements, 2000);
+      }
+    }
+  });
+})();
+
 var FuzzyScoreSubmit = (function() {
   'use strict';
 

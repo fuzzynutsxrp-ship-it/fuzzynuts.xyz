@@ -12,6 +12,8 @@ import { GameHeader } from "@/components/game/GameHeader";
 import { GameSidebar } from "@/components/game/GameSidebar";
 import { GameViewport } from "@/components/game/GameViewport";
 import { GameControls, useFirstVisit } from "@/components/game/GameControls";
+import { GameMenu } from "@/components/game/GameMenu";
+import { TouchControlsHint, useTouchHint } from "@/components/game/TouchControlsHint";
 import { ScoreSubmissionPanel } from "@/components/game/ScoreSubmissionPanel";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
 import {
@@ -34,19 +36,22 @@ import { TOAST_CLASSES } from "@/lib/ui/badges";
    ├────────────────────────────────┬──────────────────────┤
    │                                │                      │
    │   GameViewport (flex-1)        │  GameSidebar (280px) │
-   │   (iframe + loading + error)   │                      │
+   │   (iframe + loading + error)   │  Desktop: right      │
+   │                                │  Mobile: bottom sheet│
    ├────────────────────────────────┴──────────────────────┤
    │ ScoreSubmissionPanel (bottom bar)                     │
    └──────────────────────────────────────────────────────┘
 
    Overlays:
+   • GameMenu — pause overlay (ESC key)
    • GameControls — floating controls dialog (? key)
+   • TouchControlsHint — mobile touch hint (auto-show)
    • Toast — score submission feedback
 
    Responsive:
    • Desktop (≥1024px): Full layout with sidebar
-   • Tablet: Sidebar is a toggle drawer
-   • Mobile: Sidebar is an overlay sheet
+   • Tablet (768-1023): Sidebar is a toggle drawer
+   • Mobile (<768px): Sidebar is a bottom sheet
    ═══════════════════════════════════════════════════════════════ */
 
 interface GamePageProps {
@@ -77,6 +82,7 @@ export function GamePage({ game }: GamePageProps) {
   const [selectedWeek, setSelectedWeek] = useState(getCurrentWeekKey);
   const [scoreHistory, setScoreHistory] = useState<ScoreHistoryEntry[]>([]);
   const [controlsOpen, setControlsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -92,6 +98,9 @@ export function GamePage({ game }: GamePageProps) {
       return () => clearTimeout(timer);
     }
   }, [isFirstVisit]);
+
+  // Touch hint for mobile
+  const { showHint, dismissHint } = useTouchHint(game.slug);
 
   // ── Hooks ──
   const {
@@ -166,6 +175,7 @@ export function GamePage({ game }: GamePageProps) {
     setIframeError(false);
     setIsLoading(true);
     setIframeKey((k) => k + 1);
+    setMenuOpen(false);
     markGameStart();
   }, [markGameStart]);
 
@@ -218,20 +228,40 @@ export function GamePage({ game }: GamePageProps) {
     setSelectedWeek(week);
   }, []);
 
+  // Pause menu handlers
+  const handlePauseResume = useCallback(() => {
+    setMenuOpen(false);
+    // Refocus iframe for keyboard passthrough
+    iframeRef.current?.focus();
+  }, []);
+
+  const handlePauseRestart = useCallback(() => {
+    setMenuOpen(false);
+    handleRetry();
+  }, [handleRetry]);
+
+  const handlePauseQuit = useCallback(() => {
+    setMenuOpen(false);
+    window.location.href = "/#games";
+  }, []);
+
   // ── Keyboard shortcuts ──
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
-      // Don't handle shortcuts while controls overlay is open
-      // (GameControls has its own ESC handler with capture)
+      // If menu is open, only ESC works (handled inside GameMenu)
+      if (menuOpen) return;
+
+      // If controls overlay is open, only ? works
       if (controlsOpen && e.key !== "?") return;
 
       switch (e.key) {
         case "Escape":
-          // ESC → back to arcade
-          window.location.href = "/#games";
+          e.preventDefault();
+          // Open pause menu instead of navigating away
+          setMenuOpen(true);
           break;
         case "F1":
           e.preventDefault();
@@ -260,7 +290,7 @@ export function GamePage({ game }: GamePageProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleFullscreen, toggleMute, toggleSidebar, toggleControls, controlsOpen]);
+  }, [toggleFullscreen, toggleMute, toggleSidebar, toggleControls, controlsOpen, menuOpen]);
 
   // ── Toast config ──
   const toastConfig = useMemo(() => {
@@ -377,13 +407,34 @@ export function GamePage({ game }: GamePageProps) {
           submissionStatus={submissionStatus}
         />
 
-        {/* ── Controls Overlay ── */}
+        {/* ── Overlays ── */}
+
+        {/* Pause Menu (ESC key) */}
+        <GameMenu
+          game={game}
+          isOpen={menuOpen}
+          currentScore={lastSubmission?.score}
+          bestScore={userBestScore}
+          onResume={handlePauseResume}
+          onRestart={handlePauseRestart}
+          onQuit={handlePauseQuit}
+          controls={game.controls}
+        />
+
+        {/* Controls Overlay (? key) */}
         <GameControls
           controls={game.controls}
           gameTitle={game.title}
           accentColor={game.color}
           isOpen={controlsOpen}
           onClose={() => setControlsOpen(false)}
+        />
+
+        {/* Touch Controls Hint (mobile only, auto-show) */}
+        <TouchControlsHint
+          game={game}
+          isVisible={showHint && !isLoading && !menuOpen && !controlsOpen}
+          onDismiss={dismissHint}
         />
       </div>
     </GameErrorBoundary>

@@ -1,6 +1,6 @@
 "use client";
 
-import { type RefObject } from "react";
+import { type RefObject, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoadingOverlay } from "@/components/game/LoadingOverlay";
 import type { GameMetadata } from "@/lib/gameRegistry";
@@ -15,6 +15,7 @@ import type { GameMetadata } from "@/lib/gameRegistry";
    • Focus management for keyboard passthrough to iframe
    • Max-width constraint (1440px) for ultra-wide monitors
    • Responsive padding on mobile
+   • Touch optimization: prevents scroll/zoom during gameplay
 
    This component is the single rendering point for all game
    iframes, ensuring pixel-perfect consistency across all 6 games.
@@ -65,11 +66,36 @@ export function GameViewport({
     "allow-forms",
   ].join(" ");
 
+  // Send FUZZY_CONFIG to iframe after load for nav suppression
+  useEffect(() => {
+    if (isLoading || !iframeRef.current) return;
+
+    const sendConfig = () => {
+      try {
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.origin },
+          "*",
+        );
+      } catch {
+        /* cross-origin, noop */
+      }
+    };
+
+    // Send immediately and after a delay for lazy-rendered iframes
+    sendConfig();
+    const timer = setTimeout(sendConfig, 1000);
+    return () => clearTimeout(timer);
+  }, [isLoading, iframeRef]);
+
   return (
     <div
       ref={containerRef}
       className="relative flex-1 flex items-center justify-center bg-black overflow-hidden"
       style={{
+        // Touch optimization: prevent scroll/zoom during gameplay
+        touchAction: "none",
+        userSelect: "none",
+        WebkitUserSelect: "none",
         ...(isFullscreen ? {} : { maxWidth: "100%" }),
       }}
     >
@@ -81,12 +107,13 @@ export function GameViewport({
           maxWidth: isFullscreen ? "100%" : "1440px",
         }}
       >
-        {/* Loading overlay */}
+        {/* Loading overlay with game-specific tips */}
         <LoadingOverlay
           isLoading={isLoading}
           gameTitle={game.title}
           accentColor={game.color}
           onLoadComplete={onLoadComplete}
+          loadingTips={game.loadingTips}
         />
 
         {/* Error state */}
@@ -149,6 +176,7 @@ export function GameViewport({
           style={{
             minHeight: "400px",
             background: "black",
+            touchAction: "none",
           }}
           aria-label={`${game.title} game window`}
           id="game-iframe"

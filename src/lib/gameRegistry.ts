@@ -46,6 +46,8 @@ export interface GameMetadata {
   scoreType: "high-score" | "cumulative";
   /** Contextual tips shown during the loading screen */
   loadingTips: string[];
+  /** Touch control hint for mobile devices (empty string for keyboard-only games) */
+  touchHint: string;
 }
 
 const DEFAULT_SANDBOX =
@@ -75,6 +77,7 @@ export const GAME_LIST: GameMetadata[] = [
       "Press P or right-click to pause",
       "Collect coins to earn extra lives",
     ],
+    touchHint: "",
   },
   {
     slug: "fuzzy-survivors",
@@ -99,6 +102,7 @@ export const GAME_LIST: GameMetadata[] = [
       "Collect XP orbs to upgrade your abilities",
       "Auto-attack fires automatically — focus on positioning!",
     ],
+    touchHint: "Swipe or use virtual joystick to move",
   },
   {
     slug: "minigolf",
@@ -123,6 +127,7 @@ export const GAME_LIST: GameMetadata[] = [
       "Use bank shots off walls for tricky holes",
       "Par is your goal — can you beat it?",
     ],
+    touchHint: "Drag and release to putt — watch the power meter!",
   },
   {
     slug: "nut-racer",
@@ -147,6 +152,7 @@ export const GAME_LIST: GameMetadata[] = [
       "Collect acorns for boost — use Space to activate",
       "Finish the race as fast as possible for top score",
     ],
+    touchHint: "Swipe left/right to steer, tap to accelerate",
   },
   {
     slug: "top-secret",
@@ -171,6 +177,7 @@ export const GAME_LIST: GameMetadata[] = [
       "Complete objectives to earn points",
       "Good luck, agent 🕵️",
     ],
+    touchHint: "Touch controls enabled — discover the mechanics",
   },
   {
     slug: "fuzzynuts-world",
@@ -196,6 +203,7 @@ export const GAME_LIST: GameMetadata[] = [
       "Open inventory with I, map with M, profile with P",
       "Craft items and trade with other players",
     ],
+    touchHint: "Virtual joystick: drag to move, tap to interact",
   },
 ];
 
