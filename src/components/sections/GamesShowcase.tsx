@@ -146,6 +146,13 @@ function GameCard({
         {/* Play Button — sleek pill */}
         <motion.a
           href={game.href}
+          onClick={(e) => {
+            // Force full page navigation to avoid Next.js prefetch/redirect issues
+            if (!isComingSoon && game.href !== "#") {
+              e.preventDefault();
+              window.location.href = game.href;
+            }
+          }}
           whileTap={{ scale: 0.95 }}
           onMouseDown={() => setPressed(true)}
           onMouseUp={() => setPressed(false)}

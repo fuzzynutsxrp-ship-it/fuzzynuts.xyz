@@ -159,6 +159,10 @@ export function Hero() {
         >
           <motion.a
             href="/games/fuzzynuts-world/"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = "/games/fuzzynuts-world/";
+            }}
             whileHover={{ scale: 1.06, boxShadow: "0 0 40px rgba(245,196,66,0.5)" }}
             whileTap={{ scale: 0.97 }}
             className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-lg transition-all"
