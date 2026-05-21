@@ -1175,8 +1175,109 @@ body {
   .hologram-flicker,
   .animate-gradient,
   .data-particle,
-  .shimmer {
+  .shimmer,
+  .floating-mascot__img-wrapper {
     animation: none;
   }
 }
 
+/* ──────────────────────────────────────────
+   Floating Mascot — Bottom-right slide-up
+   ────────────────────────────────────────── */
+.floating-mascot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 90;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
+}
+
+/* ── Close button ── */
+.floating-mascot__close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(1, 5, 8, 0.85);
+  color: var(--color-cream-dim);
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+
+.floating-mascot:hover .floating-mascot__close {
+  opacity: 1;
+}
+
+.floating-mascot__close:hover {
+  background: var(--color-accent-red);
+  color: #fff;
+}
+
+.floating-mascot__close:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--color-neon-green);
+  outline-offset: 2px;
+}
+
+/* ── Image wrapper ── */
+.floating-mascot__img-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* ── Image sizing — responsive ── */
+.floating-mascot__img {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (min-width: 640px) {
+  .floating-mascot__img {
+    width: 130px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .floating-mascot {
+    bottom: 24px;
+    right: 28px;
+  }
+  .floating-mascot__img {
+    width: 150px;
+  }
+}
+
+/* ── Ground shadow ellipse ── */
+.floating-mascot__shadow {
+  width: 60%;
+  height: 6px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.35) 0%,
+    transparent 70%
+  );
+  opacity: 0.3;
+}

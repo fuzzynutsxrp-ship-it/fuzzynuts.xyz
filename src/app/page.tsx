@@ -16,6 +16,7 @@ const Tokenomics = dynamic(() => import("@/components/sections/Tokenomics").then
 const OnChainVerification = dynamic(() => import("@/components/sections/OnChainVerification").then(m => ({ default: m.OnChainVerification })));
 const HowToGet = dynamic(() => import("@/components/sections/HowToGet").then(m => ({ default: m.HowToGet })));
 const Footer = dynamic(() => import("@/components/layout/Footer").then(m => ({ default: m.Footer })));
+const FloatingMascot = dynamic(() => import("@/components/home/FloatingMascot").then(m => ({ default: m.FloatingMascot })));
 
 export default function Home() {
   return (
@@ -112,6 +113,9 @@ export default function Home() {
           <Footer />
         </div>
       </div>
+
+      {/* ── Floating mascot — looping slide-up from bottom right ── */}
+      <FloatingMascot />
     </>
   );
 }
