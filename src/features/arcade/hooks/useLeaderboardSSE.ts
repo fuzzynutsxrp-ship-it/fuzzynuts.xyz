@@ -164,10 +164,10 @@ export function useLeaderboardSSE(
     es.onmessage = (event) => {
       if (!mountedRef.current) return;
       try {
-        const update: { type: "update" | "replace"; data: ScoreEntry[] } =
+        const update: { type: "initial" | "update" | "replace"; data: ScoreEntry[] } =
           JSON.parse(event.data);
 
-        if (update.type === "replace") {
+        if (update.type === "replace" || update.type === "initial") {
           processScores(update.data);
         } else {
           // Incremental merge
