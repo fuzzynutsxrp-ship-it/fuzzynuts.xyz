@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import PasswordGate from "@/components/auth/PasswordGate";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -221,7 +222,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        {children}
+        <PasswordGate>
+          {children}
+        </PasswordGate>
       </body>
     </html>
   );
