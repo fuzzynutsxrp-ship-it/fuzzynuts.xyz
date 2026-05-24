@@ -2,21 +2,32 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/sections/Hero";
-import { Hero3D } from "@/components/hero/Hero3D";
+import { FuzzyWorld } from "@/components/world/FuzzyWorld";
 import { ClientFallingNuts } from "@/components/ClientFallingNuts";
 
 /* ═══════════════════════════════════════════════════════════════
-   DEV_MODE — Flip to `true` to bring the original 2D hero back.
-   The 3D hero is lazy-loaded behind `ssr:false`, so toggling
-   this off does not bloat the initial bundle of the 2D path.
+   DEV_MODE — Single toggle controlling the entire homepage.
+
+   • use2DLayout = false (default)
+       The whole page below the Navbar becomes one continuous
+       immersive 3D scene (forest, portals, treasure vault,
+       leaderboard acorns, $NUT moon). The 3D bundle is dynamic-
+       imported behind `ssr:false`, so the initial HTML is light.
+
+   • use2DLayout = true
+       Falls back to the original 2D layout (Hero, GamesShowcase,
+       PrizeTiers, WalletCTA, Features, Tokenomics,
+       OnChainVerification, HowToGet, Footer). Useful for
+       debugging, A/B comparison, or rolling back without a
+       redeploy.
+
+   Site-wide `SITE_LOCKDOWN_PASSWORD` middleware is unaffected.
    ═══════════════════════════════════════════════════════════════ */
-const DEV_MODE: { use2DHero: boolean } = {
-  use2DHero: false,
+const DEV_MODE: { use2DLayout: boolean } = {
+  use2DLayout: false,
 };
 
-// ── Lazy-load below-fold sections ──
-// These components are dynamically imported so they don't block First Contentful Paint.
-// Each gets its own chunk → smaller initial JS bundle.
+// ── Lazy-loaded 2D sections (only mount when DEV_MODE.use2DLayout) ──
 const GamesShowcase = dynamic(() =>
   import("@/components/sections/GamesShowcase").then((m) => ({
     default: m.GamesShowcase,
@@ -28,7 +39,9 @@ const PrizeTiers = dynamic(() =>
   })),
 );
 const WalletCTA = dynamic(() =>
-  import("@/components/home/WalletCTA").then((m) => ({ default: m.WalletCTA })),
+  import("@/components/home/WalletCTA").then((m) => ({
+    default: m.WalletCTA,
+  })),
 );
 const SectionTransition = dynamic(() =>
   import("@/components/home/SectionTransition").then((m) => ({
@@ -65,53 +78,44 @@ const FloatingMascot = dynamic(() =>
 );
 
 export default function Home() {
+  if (DEV_MODE.use2DLayout) {
+    return <Legacy2DHome />;
+  }
+
+  return (
+    <>
+      <Navbar />
+      <FuzzyWorld />
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Legacy2DHome — Original 2D layout, kept verbatim so DEV_MODE
+   can revert with zero behavioral drift. Mounts dynamically;
+   none of these chunks load when the 3D world is active.
+   ───────────────────────────────────────────────────────────── */
+function Legacy2DHome() {
   return (
     <>
       <ClientFallingNuts />
       <Navbar />
       <main id="main-content" className="relative z-10">
-        {/* ═══ HERO — Immersive 3D forest experience.
-            Flip DEV_MODE.use2DHero above to bring the old 2D
-            hero back instantly. ═══ */}
-        {DEV_MODE.use2DHero ? <Hero /> : <Hero3D />}
-
-        {/* ── Vine transition: Hero → Games ── */}
+        <Hero />
         <SectionTransition variant="vine" />
-
-        {/* ═══ GAMES — The arcade showcase ═══ */}
         <GamesShowcase />
-
-        {/* ── Glow transition: Games → Prizes ── */}
         <SectionTransition variant="glow" />
-
-        {/* ═══ PRIZE TIERS — Holographic Vault (500K $NUT) ═══ */}
         <PrizeTiers />
-
-        {/* ── Wallet CTA: Convert interested visitors (NEW) ── */}
         <WalletCTA />
-
-        {/* ── Vine transition: Wallet CTA → Features ── */}
         <SectionTransition variant="vine" flip />
-
-        {/* ═══ FEATURES — Why Fuzzynuts ═══ */}
         <Features />
-
-        {/* ── Fade transition: Features → Tokenomics ── */}
         <SectionTransition variant="fade" />
-
-        {/* ═══ TOKENOMICS — Distribution & facts ═══ */}
         <Tokenomics />
-
-        {/* ── Vine transition: Tokenomics → Verification ── */}
         <SectionTransition variant="vine" />
-
-        {/* ═══ ON-CHAIN VERIFICATION — Addresses & proof ═══ */}
         <OnChainVerification />
       </main>
 
-      {/* ── Shared background: HowToGet bleeds into Footer ── */}
       <div className="relative overflow-hidden">
-        {/* Background image (herobackground flipped upside down) */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/sections/howto-bg.jpg"
@@ -135,7 +139,6 @@ export default function Home() {
           />
         </div>
 
-        {/* Combined overlay (merged 3 layers into 1 for fewer DOM nodes / compositing layers) */}
         <div
           className="absolute inset-0 z-[1] pointer-events-none"
           style={{
@@ -147,14 +150,12 @@ export default function Home() {
           }}
         />
 
-        {/* Content flows through: HowToGet → Footer */}
         <div className="relative z-10">
           <HowToGet />
           <Footer />
         </div>
       </div>
 
-      {/* ── Floating mascot — looping slide-up from bottom right ── */}
       <FloatingMascot />
     </>
   );
