@@ -30,11 +30,8 @@ export default function Hero3DCanvas({ isMobile }: Hero3DCanvasProps) {
   const explosionsRef = useRef<NutExplosionsHandle>(null);
   const [hoveredPos, setHoveredPos] = useState<THREE.Vector3 | null>(null);
 
-  // Live games only — coming-soon entries don't need a 3D portal.
-  const games = useMemo<GameMetadata[]>(
-    () => gameRegistry.getAll().filter((g) => !g.comingSoon),
-    [],
-  );
+  // Live games only — the registry filters by `status === "live"`.
+  const games = useMemo<GameMetadata[]>(() => gameRegistry.getAllLive(), []);
 
   // Auto-celebration: spawn ambient bursts every few seconds at random
   // points so the scene always feels alive even without interaction.
