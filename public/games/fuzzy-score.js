@@ -13,36 +13,36 @@
    When loaded inside the Fuzzynuts arcade iframe, listens for
    FUZZY_CONFIG messages and hides internal navigation elements
    to prevent duplicate nav bars. */
-(function () {
-  "use strict";
+(function() {
+  'use strict';
   if (window.parent === window) return; // Not in iframe, skip
 
   var NAV_SELECTORS = [
-    ".game-nav",
-    ".inner-header",
-    "[data-nav]",
-    "header.game-ui",
-    ".game-header",
-    ".game-breadcrumb",
-    ".back-to-arcade",
+    '.game-nav',
+    '.inner-header',
+    '[data-nav]',
+    'header.game-ui',
+    '.game-header',
+    '.game-breadcrumb',
+    '.back-to-arcade',
   ];
 
   function hideNavElements() {
     var hidden = 0;
-    NAV_SELECTORS.forEach(function (sel) {
+    NAV_SELECTORS.forEach(function(sel) {
       var elements = document.querySelectorAll(sel);
       for (var i = 0; i < elements.length; i++) {
-        elements[i].style.setProperty("display", "none", "important");
+        elements[i].style.setProperty('display', 'none', 'important');
         hidden++;
       }
     });
     if (hidden > 0) {
-      console.log("[FuzzyScore] Hidden", hidden, "inner-game nav element(s)");
+      console.log('[FuzzyScore] Hidden', hidden, 'inner-game nav element(s)');
     }
   }
 
-  window.addEventListener("message", function (event) {
-    if (event.data && event.data.type === "FUZZY_CONFIG") {
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'FUZZY_CONFIG') {
       if (event.data.hideNav) {
         hideNavElements();
         // Also try after a brief delay in case of lazy rendering
@@ -53,93 +53,59 @@
   });
 })();
 
-var FuzzyScoreSubmit = (function () {
-  "use strict";
+var FuzzyScoreSubmit = (function() {
+  'use strict';
 
-  var STORAGE_KEY = "fuzzy_arcade_scores";
-  var WALLET_KEY = "fuzzy_wallet";
-  var API_BASE = "https://world.fuzzynuts.xyz/api/scores";
-  // Keys are BACKEND slugs (what Mongo stores under). Frontend canonical
-  // slugs (e.g. 'fuzzy-survivors', 'nut-racer') are translated to these
-  // by src/features/arcade/slugAliases.ts at the React boundary, but
-  // games call FuzzyScoreSubmit() directly with the backend slug.
-  var SCORE_CAPS = {
-    "top-secret": 999999,
-    mario: 99999,
-    survivors: 999999,
-    minigolf: 10500,
-    "fuzzynuts-world": 9999999,
-    racer: 99999,
-  };
+  var STORAGE_KEY = 'fuzzy_arcade_scores';
+  var WALLET_KEY  = 'fuzzy_wallet';
+  var API_BASE    = 'https://world.fuzzynuts.xyz/api/scores';
+  var SCORE_CAPS  = { 'top-secret': 999999, mario: 99999, survivors: 999999, minigolf: 10500, 'fuzzynuts-world': 9999999, nutracer: 99999 };
   var MIN_DURATION = 15; // seconds
 
   function getCurrentWeekKey() {
     var now = new Date();
-    var d = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-    );
+    var d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     var weekNum = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-    return d.getUTCFullYear() + "-W" + String(weekNum).padStart(2, "0");
+    return d.getUTCFullYear() + '-W' + String(weekNum).padStart(2, '0');
   }
 
   function truncateAddress(addr) {
     if (!addr || addr.length < 10) return addr;
-    return addr.slice(0, 6) + "..." + addr.slice(-4);
+    return addr.slice(0, 6) + '...' + addr.slice(-4);
   }
 
   function getWalletState() {
-    // The React-side wallet store (src/store/wallet.ts) persists
-    // { address, provider } and (since the post-rewrite patch)
-    // also writes `connected: true` for compatibility. Older builds
-    // wrote { connected, address } only. Accept either shape — the
-    // presence of a valid r-address IS the connection signal.
     try {
-      var saved = JSON.parse(localStorage.getItem(WALLET_KEY) || "{}");
-      if (
-        saved &&
-        typeof saved.address === "string" &&
-        saved.address.charAt(0) === "r"
-      ) {
-        return saved;
-      }
-    } catch (e) {}
+      var saved = JSON.parse(localStorage.getItem(WALLET_KEY) || '{}');
+      if (saved.connected && saved.address) return saved;
+    } catch(e) {}
     return null;
   }
 
   function loadData() {
     try {
-      var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       var currentWeek = getCurrentWeekKey();
       if (data.weekKey !== currentWeek) {
-        return {
-          weekKey: currentWeek,
-          scores: {},
-          personalBests: {},
-          lastSubmitTime: {},
-        };
+        return { weekKey: currentWeek, scores: {}, personalBests: {}, lastSubmitTime: {} };
       }
       return {
         weekKey: currentWeek,
         scores: data.scores || {},
         personalBests: data.personalBests || {},
-        lastSubmitTime: data.lastSubmitTime || {},
+        lastSubmitTime: data.lastSubmitTime || {}
       };
-    } catch (e) {
-      return {
-        weekKey: getCurrentWeekKey(),
-        scores: {},
-        personalBests: {},
-        lastSubmitTime: {},
-      };
+    } catch(e) {
+      return { weekKey: getCurrentWeekKey(), scores: {}, personalBests: {}, lastSubmitTime: {} };
     }
   }
 
   function saveData(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (e) {}
+    } catch(e) {}
   }
 
   /**
@@ -154,107 +120,64 @@ var FuzzyScoreSubmit = (function () {
       score: Math.floor(score),
       wallet: walletAddress,
       timestamp: Date.now(),
-      duration: typeof duration === "number" ? Math.floor(duration) : undefined,
+      duration: typeof duration === 'number' ? Math.floor(duration) : undefined
     };
 
     fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (result) {
-        if (result.ok) {
-          console.log(
-            "[FuzzyScore] Backend synced:",
-            game,
-            Math.floor(score),
-            result.action === "no_update" ? "(existing higher)" : "",
-          );
-          // Notify parent GameWrapper of successful submission
-          try {
-            window.parent.postMessage(
-              {
-                type: "FUZZY_SCORE_SUBMITTED",
-                success: true,
-                score: Math.floor(score),
-                game: game,
-              },
-              "*",
-            );
-          } catch (e) {}
-        } else {
-          console.warn("[FuzzyScore] Backend rejected:", result.error);
-          // Notify parent GameWrapper of failed submission
-          try {
-            window.parent.postMessage(
-              {
-                type: "FUZZY_SCORE_SUBMITTED",
-                success: false,
-                score: Math.floor(score),
-                game: game,
-                reason: result.error || "backend_rejected",
-              },
-              "*",
-            );
-          } catch (e) {}
-        }
-      })
-      .catch(function (err) {
-        console.warn(
-          "[FuzzyScore] Backend sync failed (offline?):",
-          err.message,
-        );
-        // Notify parent GameWrapper of network failure
-        try {
-          window.parent.postMessage(
-            {
-              type: "FUZZY_SCORE_SUBMITTED",
-              success: false,
-              score: Math.floor(score),
-              game: game,
-              reason: err.message || "network_error",
-            },
-            "*",
-          );
-        } catch (e) {}
-      });
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(response) {
+      return response.json();
+    }).then(function(result) {
+      if (result.ok) {
+        console.log('[FuzzyScore] Backend synced:', game, Math.floor(score),
+                    result.action === 'no_update' ? '(existing higher)' : '');
+        // Notify parent GameWrapper of successful submission
+        try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: true }, '*'); } catch(e) {}
+      } else {
+        console.warn('[FuzzyScore] Backend rejected:', result.error);
+        // Notify parent GameWrapper of failed submission
+        try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: false }, '*'); } catch(e) {}
+      }
+    }).catch(function(err) {
+      console.warn('[FuzzyScore] Backend sync failed (offline?):', err.message);
+      // Notify parent GameWrapper of network failure
+      try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: false }, '*'); } catch(e) {}
+    });
   }
 
   /**
    * Submit a score from a game page.
-   * @param {string} game      - Backend game slug ('mario', 'survivors', 'minigolf', 'racer', 'top-secret', 'fuzzynuts-world')
+   * @param {string} game      - Game slug ('mario', 'survivors', 'minigolf', 'nutracer')
    * @param {number} score     - The player's score
    * @param {number} duration  - Seconds played (for anti-cheat)
    * @returns {{ success: boolean, reason?: string }}
    */
   function submit(game, score, duration) {
-    if (!game || typeof score !== "number" || score <= 0 || !isFinite(score)) {
-      console.warn("[FuzzyScore] Invalid score:", game, score);
-      return { success: false, reason: "invalid" };
+    if (!game || typeof score !== 'number' || score <= 0 || !isFinite(score)) {
+      console.warn('[FuzzyScore] Invalid score:', game, score);
+      return { success: false, reason: 'invalid' };
     }
 
     // Cap check
     var cap = SCORE_CAPS[game] || 999999;
     if (score > cap) {
-      console.warn("[FuzzyScore] Score exceeds cap:", score, ">", cap);
-      return { success: false, reason: "exceeds_cap" };
+      console.warn('[FuzzyScore] Score exceeds cap:', score, '>', cap);
+      return { success: false, reason: 'exceeds_cap' };
     }
 
     // Duration check
-    if (typeof duration === "number" && duration < MIN_DURATION) {
-      console.warn("[FuzzyScore] Duration too short:", duration);
-      return { success: false, reason: "too_short" };
+    if (typeof duration === 'number' && duration < MIN_DURATION) {
+      console.warn('[FuzzyScore] Duration too short:', duration);
+      return { success: false, reason: 'too_short' };
     }
 
     var data = loadData();
     var wallet = getWalletState();
     var playerAddress = wallet ? wallet.address : null;
-    var playerName = playerAddress ? truncateAddress(playerAddress) : "Guest";
-    var sessionId =
-      Math.random().toString(36).slice(2) + Date.now().toString(36);
+    var playerName = playerAddress ? truncateAddress(playerAddress) : 'Guest';
+    var sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
 
     // Init game array
     if (!data.scores[game]) data.scores[game] = [];
@@ -266,7 +189,7 @@ var FuzzyScoreSubmit = (function () {
       ts: Date.now(),
       session: sessionId,
       hasTrustline: false,
-      eligible: false,
+      eligible: false
     };
 
     // If wallet connected, only keep best score per address
@@ -297,9 +220,7 @@ var FuzzyScoreSubmit = (function () {
     }
 
     // Sort and cap
-    data.scores[game].sort(function (a, b) {
-      return b.score - a.score;
-    });
+    data.scores[game].sort(function(a, b) { return b.score - a.score; });
     data.scores[game] = data.scores[game].slice(0, 100);
 
     // Personal best
@@ -309,16 +230,8 @@ var FuzzyScoreSubmit = (function () {
 
     // Save to localStorage (instant)
     saveData(data);
-    console.log(
-      "[FuzzyScore] Saved:",
-      game,
-      "score:",
-      Math.floor(score),
-      "player:",
-      playerName,
-      "best:",
-      data.personalBests[game],
-    );
+    console.log('[FuzzyScore] Saved:', game, 'score:', Math.floor(score),
+                'player:', playerName, 'best:', data.personalBests[game]);
 
     // Sync to backend (async, fire-and-forget)
     syncToBackend(game, score, duration, playerAddress);
@@ -326,7 +239,7 @@ var FuzzyScoreSubmit = (function () {
     return {
       success: true,
       personalBest: data.personalBests[game],
-      isNewBest: score >= data.personalBests[game],
+      isNewBest: score >= data.personalBests[game]
     };
   }
 

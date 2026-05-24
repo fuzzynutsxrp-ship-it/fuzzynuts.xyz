@@ -15,7 +15,6 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type { ScoreEntry, LeaderboardReturn } from "../types/arcade";
 import { API_SCORES, AUTO_POLL_MS, MAX_ENTRIES } from "../constants";
 import { getCurrentWeekKey, getLocalScores, mergeScores } from "../utils/scoreHelpers";
-import { toBackendSlug, fromBackendSlug } from "../slugAliases";
 
 /**
  * Fetches leaderboard data for a given game and week, with auto-polling
@@ -57,8 +56,7 @@ export function useLeaderboard(
       }
 
       try {
-        const backendSlug = toBackendSlug(game);
-        const url = `${API_SCORES}?game=${backendSlug}&week=${resolvedWeek}&limit=${MAX_ENTRIES}`;
+        const url = `${API_SCORES}?game=${game}&week=${resolvedWeek}&limit=${MAX_ENTRIES}`;
         const response = await fetch(url, {
           signal: controller.signal,
         });
@@ -70,11 +68,11 @@ export function useLeaderboard(
           ? data
           : data.leaderboard || data.scores || data.data || [];
 
-        // Normalize: translate backend slugs back to canonical, fill missing `game`/`wallet`
+        // Normalize: API may return `rank`+`wallet` but missing `game` field
         const normalized = raw.map((entry) => ({
           ...entry,
           wallet: entry.wallet || "",
-          game: entry.game ? fromBackendSlug(entry.game) : game,
+          game: entry.game || game,
         }));
 
         // Merge with localStorage fallback scores

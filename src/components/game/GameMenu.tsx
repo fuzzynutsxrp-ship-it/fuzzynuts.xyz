@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
@@ -61,14 +61,11 @@ export function GameMenu({
   const [focusedAction, setFocusedAction] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const actions = useMemo(
-    () => [
-      { label: "Resume", icon: Play, onClick: onResume, primary: true },
-      { label: "Restart", icon: RotateCcw, onClick: onRestart, primary: false },
-      { label: "Quit to Arcade", icon: LogOut, onClick: onQuit, primary: false },
-    ],
-    [onResume, onRestart, onQuit],
-  );
+  const actions = [
+    { label: "Resume", icon: Play, onClick: onResume, primary: true },
+    { label: "Restart", icon: RotateCcw, onClick: onRestart, primary: false },
+    { label: "Quit to Arcade", icon: LogOut, onClick: onQuit, primary: false },
+  ];
 
   // Focus trap + keyboard navigation
   const handleKeyDown = useCallback(

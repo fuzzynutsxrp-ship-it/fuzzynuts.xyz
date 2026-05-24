@@ -11,16 +11,10 @@ The frontend is a **static export** (`output: "export"`). It has **no server-sid
 
 | Variable | Required | Value | Notes |
 |----------|----------|-------|-------|
-| `NEXT_PUBLIC_XAMAN_API_KEY` | **✅** | UUID from xaman.dev | Xaman (Xumm) OAuth2 PKCE API key. Without it, the Xaman connect button surfaces a "not configured" error. |
-| `NEXT_PUBLIC_PROJECT_ID` | **✅** | Reown Cloud project ID | WalletConnect v2 project ID for Joey Wallet. Free signup at `https://cloud.reown.com`. Without it, the JoeyProvider silently no-ops and Joey connect surfaces an "initializing" error. |
-| `NEXT_PUBLIC_SITE_URL` | optional | `https://fuzzynuts.xyz` | Used for WalletConnect `metadata.url` + iOS `redirect.universal` deep-link return. Defaults to the production URL. |
-| `SITE_LOCKDOWN_PASSWORD` | **✅** (staging) | any string | HTTP Basic Auth password enforced by `src/middleware.ts`. Without it the site returns 503 fail-closed. Remove on public launch. |
+| *(none currently required)* | — | — | API URL is hardcoded to `https://world.fuzzynuts.xyz` in components |
 
 > [!NOTE]
 > If you later want to make the API URL configurable, add `NEXT_PUBLIC_API_URL` to Vercel's project settings. Then update `ClaimRewards.tsx`, `UserProfile.tsx`, and `Leaderboard.tsx` to use `process.env.NEXT_PUBLIC_API_URL` instead of the hardcoded base URL. The `NEXT_PUBLIC_` prefix is required for client-side access in Next.js.
-
-> [!IMPORTANT]
-> **Wallet support is intentionally limited to Xaman + Joey.** GemWallet and Crossmark were removed during the wallet rewrite. Re-adding either is a deliberate scope change, not a config flip.
 
 ### Vercel Project Settings
 

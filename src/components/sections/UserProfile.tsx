@@ -13,9 +13,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
-import { truncateAddress, formatNumber } from "@/lib/utils";
-import { gameRegistry } from "@/lib/gameRegistry";
-import { fromBackendSlug } from "@/features/arcade/slugAliases";
+import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { ClaimRewards } from "@/components/sections/ClaimRewards";
 
@@ -43,9 +41,14 @@ interface ProfileState {
 
 const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
 
-/* ── Game lookup helpers (canonical slugs only — registry is the source of truth) ── */
-const getGameEmoji = (slug: string): string =>
-  gameRegistry.getBySlug(slug)?.emoji ?? "🎮";
+const GAME_EMOJIS: Record<string, string> = {
+  "top-secret": "🕵️",
+  "fuzzynuts-world": "🌍",
+  mario: "🍄",
+  survivors: "⚔️",
+  minigolf: "⛳",
+  racer: "🏎️",
+};
 
 /* ═══════════════════════════════════════════════════════════════
    Achievement Definitions
@@ -90,7 +93,7 @@ const ACHIEVEMENTS: Achievement[] = [
     title: "Survivor",
     description: "Survived a wave in Fuzzy Survivors",
     icon: "⚔️",
-    game: "fuzzy-survivors",
+    game: "survivors",
     storageKey: "fuzzy_achievement_survivor",
   },
   {
@@ -131,12 +134,12 @@ function formatDate(ts: number): string {
   });
 }
 
-function getGameTitle(slug: string): string {
-  return gameRegistry.getBySlug(slug)?.title || slug;
+function getGameTitle(gameId: string): string {
+  return GAMES.find((g) => g.id === gameId)?.title || gameId;
 }
 
-function getGameColor(slug: string): string {
-  return gameRegistry.getBySlug(slug)?.color || "#4ade80";
+function getGameColor(gameId: string): string {
+  return GAMES.find((g) => g.id === gameId)?.color || "#4ade80";
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -165,7 +168,8 @@ function ConnectPrompt() {
       <div className="flex flex-col sm:flex-row gap-3">
         {[
           { id: "xaman" as const, label: "Xaman", icon: "📱" },
-          { id: "joey" as const, label: "Joey", icon: "🐭" },
+          { id: "gemwallet" as const, label: "GemWallet", icon: "💎" },
+          { id: "crossmark" as const, label: "Crossmark", icon: "✖️" },
         ].map((w) => (
           <motion.button
             key={w.id}
@@ -248,18 +252,12 @@ export function UserProfile() {
         }
 
         const data = await response.json();
-        const raw: ScoreEntry[] = Array.isArray(data)
+        const scores: ScoreEntry[] = Array.isArray(data)
           ? data
           : data.scores || data.data || [];
 
-        // Normalize backend slugs → canonical so registry lookups work
-        const normalized = raw.map((entry) => ({
-          ...entry,
-          game: entry.game ? fromBackendSlug(entry.game) : entry.game,
-        }));
-
         // Sort by most recent first
-        const sorted = normalized.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        const sorted = scores.sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
         setState({ scores: sorted, loading: false, error: null });
       } catch (err) {
@@ -454,7 +452,7 @@ export function UserProfile() {
                         border: `1px solid ${getGameColor(gameId)}30`,
                       }}
                     >
-                      {getGameEmoji(gameId)}
+                      {GAME_EMOJIS[gameId] || "🎮"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
@@ -618,7 +616,7 @@ export function UserProfile() {
                     {/* Game emoji */}
                     <div className="w-10 flex justify-center shrink-0">
                       <span className="text-lg">
-                        {getGameEmoji(entry.game)}
+                        {GAME_EMOJIS[entry.game] || "🎮"}
                       </span>
                     </div>
 

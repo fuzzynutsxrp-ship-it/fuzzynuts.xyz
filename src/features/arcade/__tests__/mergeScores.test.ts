@@ -195,6 +195,7 @@ describe("mergeScores", () => {
     // mergeScores itself doesn't filter zeros — that's getLocalScores' job
     // But it shouldn't crash on them
     const local = [makeScore({ wallet: "rZero", score: 0 })];
+    const result = mergeScores([], local);
     // Zero scores are passed through mergeScores (filtering happens upstream)
     expect(() => mergeScores([], local)).not.toThrow();
   });

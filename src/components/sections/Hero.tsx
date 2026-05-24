@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Gamepad2, Globe, ArrowDown, ArrowRight, Check, Wallet } from "lucide-react";
 import Image from "next/image";
 import { useWalletStore } from "@/store/wallet";
-import { gameRegistry } from "@/lib/gameRegistry";
 
 /* ─────────────────────────────────────────────────────────────
    Hero — Holographic Vault Edition
@@ -199,7 +198,7 @@ export function Hero() {
         >
           {[
             { value: "321B", label: "Total Supply" },
-            { value: String(gameRegistry.getAll().length), label: "Games Live" },
+            { value: "5", label: "Games Live" },
             { value: "80%", label: "In Liquidity" },
           ].map((stat, i) => (
             <motion.div

@@ -27,7 +27,6 @@ import { useWalletStore } from "@/store/wallet";
 import type { ScoreEntry, LeaderboardReturn } from "../types/arcade";
 import { API_SCORES, MAX_ENTRIES } from "../constants";
 import { getCurrentWeekKey, getLocalScores, mergeScores } from "../utils/scoreHelpers";
-import { toBackendSlug, fromBackendSlug } from "../slugAliases";
 import { useLeaderboard } from "./useLeaderboard";
 
 /* ── SSE Configuration ── */
@@ -116,7 +115,7 @@ export function useLeaderboardSSE(
       const normalized = raw.map((entry) => ({
         ...entry,
         wallet: entry.wallet || "",
-        game: entry.game ? fromBackendSlug(entry.game) : game,
+        game: entry.game || game,
       }));
 
       const localScores = getLocalScores(game, resolvedWeek);
@@ -141,7 +140,7 @@ export function useLeaderboardSSE(
     const params = new URLSearchParams({
       timeframe: "weekly",
       stream: "true",
-      game: toBackendSlug(game),
+      game,
       week: resolvedWeek,
     });
     if (walletAddress) params.append("watch", walletAddress);

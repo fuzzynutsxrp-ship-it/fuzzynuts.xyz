@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface LoadingOverlayProps {
   /** Whether the overlay is visible */
@@ -43,13 +43,9 @@ export function LoadingOverlay({
   loadingTips,
 }: LoadingOverlayProps) {
   // Merge game-specific tips with defaults for variety
-  const tips = useMemo(
-    () =>
-      loadingTips && loadingTips.length > 0
-        ? [...loadingTips, ...DEFAULT_LOADING_TIPS]
-        : DEFAULT_LOADING_TIPS,
-    [loadingTips],
-  );
+  const tips = loadingTips && loadingTips.length > 0
+    ? [...loadingTips, ...DEFAULT_LOADING_TIPS]
+    : DEFAULT_LOADING_TIPS;
   const [progress, setProgress] = useState(0);
   const [tip, setTip] = useState(() =>
     tips[Math.floor(Math.random() * tips.length)]
@@ -98,7 +94,7 @@ export function LoadingOverlay({
       clearInterval(tipInterval);
       clearTimeout(fallback);
     };
-  }, [isLoading, maxLoadTime, handleComplete, tips]);
+  }, [isLoading, maxLoadTime, handleComplete]);
 
   // Listen for gameReady postMessage from iframe
   useEffect(() => {

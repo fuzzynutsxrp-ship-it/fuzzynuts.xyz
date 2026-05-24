@@ -7,6 +7,7 @@ import {
   Wallet,
   ExternalLink,
   Loader2,
+  CheckCircle,
   AlertTriangle,
   Gift,
   X,

@@ -12,7 +12,6 @@ import {
   Wallet,
   ChevronDown,
   Trophy,
-  AlertCircle,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { getCurrentWeekKey, getWeekKeyOffset } from "@/features/arcade";
@@ -60,28 +59,8 @@ export function GameHeader({
   bestScore,
   rank,
 }: GameHeaderProps) {
-  const {
-    address,
-    isConnected,
-    isConnecting,
-    connect,
-    error: walletError,
-    setError: setWalletError,
-  } = useWalletStore();
+  const { address, isConnected, connect } = useWalletStore();
   const [weekOpen, setWeekOpen] = useState(false);
-  const [walletOpen, setWalletOpen] = useState(false);
-
-  // Open the dropdown automatically when an error fires so the user sees it
-  useEffect(() => {
-    if (walletError && !isConnected) setWalletOpen(true);
-  }, [walletError, isConnected]);
-
-  // Auto-dismiss wallet errors after 8s (matches Navbar behavior)
-  useEffect(() => {
-    if (!walletError) return;
-    const t = setTimeout(() => setWalletError(null), 8_000);
-    return () => clearTimeout(t);
-  }, [walletError, setWalletError]);
 
   const currentWeek = getCurrentWeekKey();
   const lastWeek = getWeekKeyOffset(1);
@@ -93,14 +72,9 @@ export function GameHeader({
         ? "Last Week"
         : selectedWeek;
 
-  const handleConnect = useCallback(
-    (provider: "xaman" | "joey") => {
-      setWalletOpen(false);
-      setWalletError(null); // clear any prior error
-      void connect(provider);
-    },
-    [connect, setWalletError],
-  );
+  const handleConnect = useCallback(() => {
+    connect("xaman");
+  }, [connect]);
 
   // Close week dropdown on outside click
   useEffect(() => {
@@ -109,14 +83,6 @@ export function GameHeader({
     document.addEventListener("click", close, { once: true });
     return () => document.removeEventListener("click", close);
   }, [weekOpen]);
-
-  // Close wallet dropdown on outside click
-  useEffect(() => {
-    if (!walletOpen) return;
-    const close = () => setWalletOpen(false);
-    document.addEventListener("click", close, { once: true });
-    return () => document.removeEventListener("click", close);
-  }, [walletOpen]);
 
   return (
     <header
@@ -266,90 +232,21 @@ export function GameHeader({
             <span className="font-mono">{truncateAddress(address)}</span>
           </div>
         ) : (
-          <div className="relative hidden sm:block">
-            <motion.button
-              onClick={(e) => {
-                e.stopPropagation();
-                setWalletOpen((p) => !p);
-              }}
-              disabled={isConnecting}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
-              style={{
-                background: "rgba(251, 191, 36, 0.12)",
-                border: "1px solid rgba(251, 191, 36, 0.25)",
-                color: "var(--color-brand-gold)",
-              }}
-              id="game-connect-wallet"
-              aria-haspopup="listbox"
-              aria-expanded={walletOpen}
-            >
-              <Wallet size={12} />
-              {isConnecting ? "Connecting…" : "Connect"}
-              <ChevronDown
-                size={12}
-                className={`transition-transform ${walletOpen ? "rotate-180" : ""}`}
-              />
-            </motion.button>
-            {walletOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute right-0 top-full mt-1 w-64 rounded-lg border border-glass-strong bg-forest-900/95 backdrop-blur-xl shadow-xl z-50 overflow-hidden"
-                role="listbox"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <p className="text-[10px] uppercase tracking-widest text-cream-dim px-3 pt-2 pb-1 font-semibold">
-                  Choose wallet
-                </p>
-
-                {walletError && (
-                  <div className="mx-2 mb-2 flex items-start gap-2 px-3 py-2 rounded-md bg-red-500/10 border border-red-500/20">
-                    <AlertCircle
-                      size={12}
-                      className="text-red-400 mt-0.5 shrink-0"
-                    />
-                    <p className="text-[11px] text-red-400 leading-snug">
-                      {walletError}
-                    </p>
-                  </div>
-                )}
-
-                {[
-                  {
-                    id: "xaman" as const,
-                    name: "Xaman (Xumm)",
-                    icon: "📱",
-                    desc: "Mobile / Desktop",
-                  },
-                  {
-                    id: "joey" as const,
-                    name: "Joey Wallet",
-                    icon: "🐭",
-                    desc: "Mobile · WalletConnect",
-                  },
-                ].map((w) => (
-                  <button
-                    key={w.id}
-                    onClick={() => handleConnect(w.id)}
-                    disabled={isConnecting}
-                    role="option"
-                    aria-selected={false}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-[var(--color-cream)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.08)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-left"
-                  >
-                    <span className="text-base w-6 text-center">{w.icon}</span>
-                    <span className="flex-1">
-                      <span className="block font-semibold">{w.name}</span>
-                      <span className="block text-[10px] text-[var(--color-cream-dim)]">
-                        {w.desc}
-                      </span>
-                    </span>
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </div>
+          <motion.button
+            onClick={handleConnect}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            style={{
+              background: "rgba(251, 191, 36, 0.12)",
+              border: "1px solid rgba(251, 191, 36, 0.25)",
+              color: "var(--color-brand-gold)",
+            }}
+            id="game-connect-wallet"
+          >
+            <Wallet size={12} />
+            Connect
+          </motion.button>
         )}
 
         <div className="w-px h-4 bg-glass hidden sm:block" />
