@@ -15,6 +15,7 @@ import { CityHorizon } from "./scene/CityHorizon";
 import { GodRays } from "./scene/GodRays";
 import { BioluminescentFerns } from "./scene/BioluminescentFerns";
 import { ForestBackdrop } from "./scene/ForestBackdrop";
+import { AtmosphericMotes } from "./scene/AtmosphericMotes";
 import { FloatingAcorns } from "@/components/hero/scene/FloatingAcorns";
 import { Squirrels } from "@/components/hero/scene/Squirrels";
 import { NutMoon } from "@/components/hero/scene/NutMoon";
@@ -102,6 +103,22 @@ const ARCADE_PLACEMENTS: {
     accent: "#d946ef",
     screen: "#3b82f6",
   }, // far back   — magenta/blue
+  // ── Two NEW close-foreground cabinets, pushed right up to the
+  //    camera so they dominate the frame like the foreground cabinets
+  //    in herobackground2.jpg. Slight inward rotation so the marquees
+  //    face the camera path. ──
+  {
+    position: [-4.5, -0.5, 6.5],
+    rotation: 0.85,
+    accent: "#ef4444",
+    screen: "#22d3ee",
+  }, // foreground LEFT  — red/cyan, the "left wall" cabinet
+  {
+    position: [4.7, -0.5, 6.8],
+    rotation: -0.95,
+    accent: "#fbbf24",
+    screen: "#3b82f6",
+  }, // foreground RIGHT — yellow/blue, the "right wall" cabinet
 ];
 
 export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
@@ -128,15 +145,17 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       // `overallSceneMood` is a single 0..1 darkness multiplier applied on
       // top of the individual atmospheric controls below. 0 = bright /
       // cheerful; 1 = full eerie dusk like herobackground2.jpg.
-      // Default pushed to 0.8 to match the dark cyber-forest reference.
-      overallSceneMood: { value: 0.8, min: 0, max: 1, step: 0.02 },
+      // Default cranked to 0.9 — the user has consistently said previous
+      // passes were "not dark enough".
+      overallSceneMood: { value: 0.9, min: 0, max: 1, step: 0.02 },
     }),
     Atmosphere: folder({
-      // Deeper blue-tinted fog matching the dark plate.
-      fogColor: "#04101a",
-      fogNear: { value: 6, min: 0, max: 40, step: 0.5 },
-      fogFar: { value: isMobile ? 24 : 30, min: 8, max: 80, step: 1 },
-      saturation: { value: 1.0, min: 0.4, max: 1.8, step: 0.05 },
+      // Deeper blue-tinted fog matching the dark plate. Fog far pulled
+      // even closer so distance dissolves faster.
+      fogColor: "#03101a",
+      fogNear: { value: 5, min: 0, max: 40, step: 0.5 },
+      fogFar: { value: isMobile ? 22 : 27, min: 8, max: 80, step: 1 },
+      saturation: { value: 1.05, min: 0.4, max: 1.8, step: 0.05 },
     }),
     Vines: folder({
       vineIntensity: { value: 1.9, min: 0, max: 3, step: 0.05 },
@@ -149,8 +168,10 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       vineColorD: "#d946ef",
     }),
     Arcade: folder({
-      arcadeGlow: { value: 1.7, min: 0, max: 3, step: 0.05 },
-      arcadeCount: { value: isMobile ? 3 : 6, min: 0, max: 6, step: 1 },
+      arcadeGlow: { value: 2.0, min: 0, max: 3, step: 0.05 },
+      // Now 8 placements total (added 2 close-foreground). Default shows
+      // all 8 on desktop, 4 on mobile to keep render cheap.
+      arcadeCount: { value: isMobile ? 4 : 8, min: 0, max: 8, step: 1 },
       // ── Marquee color override ──
       // When `marqueeOverride` is on, every cabinet's marquee uses
       // `arcadeMarqueeColor`. When off, each cabinet keeps its preset
@@ -164,11 +185,11 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       arcadeScreenColor: "#22d3ee",
     }),
     Ferns: folder({
-      fernBrightness: { value: 1.6, min: 0, max: 3, step: 0.05 },
+      fernBrightness: { value: 2.1, min: 0, max: 3, step: 0.05 },
       fernCount: {
-        value: isMobile ? 60 : 130,
+        value: isMobile ? 90 : 180,
         min: 0,
-        max: 200,
+        max: 240,
         step: 5,
       },
     }),
@@ -180,17 +201,37 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       cityVisible: true,
     }),
     GodRays: folder({
-      // Cranked from 1.5 → 1.9 and shifted color from pale cyan-green
-      // toward the cool blue cast in herobackground2.jpg.
-      godRayBrightness: { value: 1.9, min: 0, max: 3, step: 0.05 },
+      // Cranked again (1.9 → 2.4) and ray density increased — now mixes
+      // wide hero shafts with narrow sharp pillars (see GodRays.tsx).
+      godRayBrightness: { value: 2.4, min: 0, max: 3, step: 0.05 },
+      godRayDensity: {
+        value: isMobile ? 7 : 12,
+        min: 0,
+        max: 16,
+        step: 1,
+      },
       godRayColor: "#a8d0ff",
+    }),
+    Motes: folder({
+      // Volumetric dust particles drifting through the air. They make
+      // god rays read as actually-volumetric instead of flat additive
+      // cones — the dust is what catches the light.
+      motesEnabled: !isMobile,
+      moteBrightness: { value: 1.0, min: 0, max: 2.5, step: 0.05 },
+      moteCount: {
+        value: isMobile ? 200 : 700,
+        min: 0,
+        max: 1200,
+        step: 50,
+      },
     }),
     Backdrop: folder({
       // Distant matte-painting using public/images/hero/herobackground.jpg.
-      // `backdropTint` darkens the photo so it sits inside the dark mood
-      // (1.0 = original brightness). Toggle off if you want pure procedural.
+      // `backdropTint` darkens the photo so it sits inside the dark mood.
+      // Default pulled down (0.55 → 0.4) since the user said previous
+      // passes were still too bright.
       backdropEnabled: true,
-      backdropTint: { value: 0.55, min: 0, max: 1.2, step: 0.02 },
+      backdropTint: { value: 0.4, min: 0, max: 1.2, step: 0.02 },
     }),
     PostFX: folder({
       // Bloom dampened HARD — previous pass washed the scene into
@@ -382,10 +423,18 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                   brightness={controls.fernBrightness}
                 />
                 <GodRays
-                  count={isMobile ? 5 : 8}
+                  count={controls.godRayDensity}
                   brightness={derived.godRayBrightness}
                   color={controls.godRayColor}
                 />
+                {/* Volumetric dust motes — make the god rays read as
+                    actually-volumetric. Disabled on mobile by default. */}
+                {controls.motesEnabled && (
+                  <AtmosphericMotes
+                    count={controls.moteCount}
+                    brightness={controls.moteBrightness}
+                  />
+                )}
                 {controls.cityVisible && (
                   <CityHorizon tint={controls.cityTint} count={32} />
                 )}

@@ -41,32 +41,51 @@ export function GodRays({
   color = "#bce8d6",
 }: GodRaysProps) {
   // Deterministic placement so the rays don't dance around on re-render.
+  // Now mixes TWO ray types for dramatic falloff matching herobackground2.jpg:
+  //   • Wide hero rays   (5–8 units wide, 18–24 long) — big atmospheric shafts
+  //   • Narrow spotlights (0.8–1.4 wide, 22–28 long) — sharp bright pillars
+  //     punching through the canopy
   const rays = useMemo<RayData[]>(() => {
     let seed = 5151;
     const rand = () => {
       seed = (seed * 9301 + 49297) % 233280;
       return seed / 233280;
     };
-    return Array.from({ length: count }, () => {
-      // Spread the rays across the canopy ahead of the camera path.
-      const x = (rand() - 0.5) * 22;
-      const z = -2 - rand() * 14;
-      return {
-        position: [x, 9, z] as [number, number, number],
+    const heroCount = Math.ceil(count * 0.55);
+    const narrowCount = count - heroCount;
+    const out: RayData[] = [];
+    for (let i = 0; i < heroCount; i++) {
+      const x = (rand() - 0.5) * 26;
+      const z = -2 - rand() * 16;
+      out.push({
+        position: [x, 10, z],
         rotation: [
-          (rand() - 0.5) * 0.25, // slight tilt
+          (rand() - 0.5) * 0.3,
           rand() * Math.PI,
-          (rand() - 0.5) * 0.15,
-        ] as [number, number, number],
-        scale: [
-          2 + rand() * 1.5, // width
-          14 + rand() * 6, // length (cone-tall)
-          2 + rand() * 1.5,
-        ] as [number, number, number],
+          (rand() - 0.5) * 0.18,
+        ],
+        scale: [5 + rand() * 3, 18 + rand() * 6, 5 + rand() * 3],
         phase: rand() * Math.PI * 2,
-        speed: 0.4 + rand() * 0.5,
-      };
-    });
+        speed: 0.35 + rand() * 0.4,
+      });
+    }
+    for (let i = 0; i < narrowCount; i++) {
+      const x = (rand() - 0.5) * 18;
+      const z = -3 - rand() * 12;
+      out.push({
+        position: [x, 11, z],
+        rotation: [
+          (rand() - 0.5) * 0.2,
+          rand() * Math.PI,
+          (rand() - 0.5) * 0.12,
+        ],
+        // Narrow + tall — sharp pillars
+        scale: [0.8 + rand() * 0.6, 22 + rand() * 6, 0.8 + rand() * 0.6],
+        phase: rand() * Math.PI * 2,
+        speed: 0.5 + rand() * 0.7,
+      });
+    }
+    return out;
   }, [count]);
 
   // Single shared geometry + material — instanced visually via per-ray refs.
@@ -81,9 +100,13 @@ export function GodRays({
       const m = matRefs.current[i];
       const d = rays[i];
       if (!m || !d) continue;
-      // Breathing opacity — never goes above ~0.22 so rays stay subtle.
+      // Narrow rays peak harder + faster — they look like sharp spotlights
+      // breaking through the canopy. Wide rays breathe softer.
+      const isNarrow = d.scale[0] < 2;
+      const peak = isNarrow ? 0.42 : 0.22;
+      const base = isNarrow ? 0.18 : 0.12;
       const o =
-        (0.12 + Math.abs(Math.sin(t * d.speed + d.phase)) * 0.1) * brightness;
+        (base + Math.abs(Math.sin(t * d.speed + d.phase)) * peak) * brightness;
       m.opacity = o;
     }
   });
