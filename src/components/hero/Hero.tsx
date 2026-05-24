@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import {
   ArrowDown,
@@ -13,27 +12,19 @@ import {
 import Image from "next/image";
 import { useWalletStore } from "@/store/wallet";
 import { gameRegistry } from "@/lib/gameRegistry";
-import { HeroVideoBackground } from "./HeroVideoBackground";
-
-// ssr:false dynamic — keeps the @react-three/fiber bundle (~80 kB
-// even for the lightweight particle field) out of the initial page
-// chunk. Hero ships as plain DOM + framer-motion + the small video
-// component; particles hydrate after first paint.
-const ParticleOverlay = dynamic(
-  () => import("./ParticleOverlay").then((m) => m.ParticleOverlay),
-  { ssr: false },
-);
+import { HeroBackground } from "./HeroBackground";
 
 /* ─────────────────────────────────────────────────────────────
-   Hero — Video-backed hero (replaces the procedural FuzzyWorld).
+   Hero — CLEAN RESET.
 
-   Three layers:
-     z-0   <HeroVideoBackground/>  pre-rendered MP4 + WebP fallback
-     z-10  <ParticleOverlay/>      lightweight instanced particles
-     z-20  HTML content            logo, title, CTAs, stats, vault
+   Zero Three.js, zero R3F, zero canvas, zero particle systems.
+   Just:
+     • HeroBackground   — static image w/ gradient mesh overlay
+     • Framer Motion    — entrance animations for the foreground content
+     • Lucide icons     — small SVGs already in the bundle
 
-   Wallet connect lives in <Navbar/> which is rendered above this
-   component in page.tsx — that requirement is preserved.
+   Wallet connect lives in <Navbar/> (rendered by page.tsx).
+   Scroll cue smooth-scrolls to the GamesShowcase section below.
    ───────────────────────────────────────────────────────────── */
 
 const FLOAT_ANIMATION = {
@@ -49,10 +40,11 @@ export function Hero() {
       id="hero"
       className="relative w-full min-h-[100svh] overflow-hidden bg-[var(--color-forest-dark)]"
     >
-      <HeroVideoBackground />
-      <ParticleOverlay />
+      {/* z-0 — background image + gradient mesh + vignette */}
+      <HeroBackground />
 
-      <div className="absolute inset-0 z-20 flex flex-col items-center text-center px-4 pt-24 pb-12 overflow-y-auto">
+      {/* z-20 — foreground content (no z-10 layer needed now) */}
+      <div className="relative z-20 flex flex-col items-center text-center px-4 pt-24 pb-12">
         {/* ── Logo ── */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
@@ -61,7 +53,7 @@ export function Hero() {
             type: "spring",
             stiffness: 200,
             damping: 15,
-            delay: 0.2,
+            delay: 0.15,
           }}
           className="mb-4"
         >
@@ -72,7 +64,7 @@ export function Hero() {
           >
             <Image
               src="/images/branding/logo.webp"
-              alt="Fuzzynuts mascot"
+              alt="Fuzzynuts mascot — pixel art squirrel with sunglasses holding an acorn"
               width={160}
               height={107}
               className="w-24 h-auto sm:w-32 md:w-36"
@@ -100,7 +92,7 @@ export function Hero() {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight mb-3"
         >
-          <span className="gradient-text-gold text-glow-gold">Fuzzynuts</span>
+          <span className="gradient-text-gold text-hero-glow">Fuzzynuts</span>
           <br />
           <span className="text-[var(--color-cream)] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
             ($NUT)
@@ -147,8 +139,7 @@ export function Hero() {
               boxShadow: "0 0 40px rgba(245,196,66,0.55)",
             }}
             whileTap={{ scale: 0.97 }}
-            className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-base sm:text-lg transition-all shadow-[0_8px_30px_rgba(245,196,66,0.35)]"
-            style={{ animation: "pulse-gold 3s ease-in-out infinite" }}
+            className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-base sm:text-lg transition-all shadow-[0_8px_30px_rgba(245,196,66,0.35)] animate-float"
           >
             <Globe size={18} />
             Enter World
