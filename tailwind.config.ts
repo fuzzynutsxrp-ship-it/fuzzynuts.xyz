@@ -71,12 +71,21 @@ const config: Config = {
         body: ["Inter", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
+      zIndex: {
+        "0": "0",
+        "10": "10",
+        "20": "20",
+        "30": "30",
+        "40": "40",
+        "50": "50",
+      },
       animation: {
         float: "float 3s ease-in-out infinite",
         "pulse-gold": "pulse-gold 2s ease-in-out infinite",
         "pulse-neon": "pulse-neon 3s ease-in-out infinite",
         shimmer: "shimmer 2s linear infinite",
         "vine-glow": "vine-glow 2.5s ease-in-out infinite",
+        "fade-in": "fade-in 600ms ease-out forwards",
       },
       keyframes: {
         float: {
@@ -99,10 +108,29 @@ const config: Config = {
           "0%, 100%": { opacity: "0.5" },
           "50%": { opacity: "1" },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({
+      addUtilities,
+    }: {
+      addUtilities: (u: Record<string, Record<string, string>>) => void;
+    }) {
+      addUtilities({
+        ".bg-video-cover": {
+          "object-fit": "cover",
+          "object-position": "center center",
+          width: "100%",
+          height: "100%",
+        },
+      });
+    },
+  ],
 };
 
 export default config;

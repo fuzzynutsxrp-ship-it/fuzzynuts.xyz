@@ -1,33 +1,21 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
-import { Hero } from "@/components/sections/Hero";
-import { FuzzyWorld } from "@/components/world/FuzzyWorld";
+import { Hero } from "@/components/hero/Hero";
 import { ClientFallingNuts } from "@/components/ClientFallingNuts";
 
 /* ═══════════════════════════════════════════════════════════════
-   DEV_MODE — Single toggle controlling the entire homepage.
+   Homepage — Video-backed hero + lightweight particle overlay +
+   the existing below-fold marketing sections.
 
-   • use2DLayout = false (default)
-       The whole page below the Navbar becomes one continuous
-       immersive 3D scene (forest, portals, treasure vault,
-       leaderboard acorns, $NUT moon). The 3D bundle is dynamic-
-       imported behind `ssr:false`, so the initial HTML is light.
-
-   • use2DLayout = true
-       Falls back to the original 2D layout (Hero, GamesShowcase,
-       PrizeTiers, WalletCTA, Features, Tokenomics,
-       OnChainVerification, HowToGet, Footer). Useful for
-       debugging, A/B comparison, or rolling back without a
-       redeploy.
-
-   Site-wide `SITE_LOCKDOWN_PASSWORD` middleware is unaffected.
+   The previous FuzzyWorld / CyberForest implementation has been
+   removed from the render path (component files remain in the
+   repo at src/components/world/* and src/components/hero/scene/*
+   for easy reinstatement if needed). The site-wide
+   SITE_LOCKDOWN_PASSWORD middleware is unaffected.
    ═══════════════════════════════════════════════════════════════ */
-const DEV_MODE: { use2DLayout: boolean } = {
-  use2DLayout: false,
-};
 
-// ── Lazy-loaded 2D sections (only mount when DEV_MODE.use2DLayout) ──
+// ── Lazy-loaded below-fold sections (chunks load on scroll) ──
 const GamesShowcase = dynamic(() =>
   import("@/components/sections/GamesShowcase").then((m) => ({
     default: m.GamesShowcase,
@@ -78,24 +66,6 @@ const FloatingMascot = dynamic(() =>
 );
 
 export default function Home() {
-  if (DEV_MODE.use2DLayout) {
-    return <Legacy2DHome />;
-  }
-
-  return (
-    <>
-      <Navbar />
-      <FuzzyWorld />
-    </>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────
-   Legacy2DHome — Original 2D layout, kept verbatim so DEV_MODE
-   can revert with zero behavioral drift. Mounts dynamically;
-   none of these chunks load when the 3D world is active.
-   ───────────────────────────────────────────────────────────── */
-function Legacy2DHome() {
   return (
     <>
       <ClientFallingNuts />
