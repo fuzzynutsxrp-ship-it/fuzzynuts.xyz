@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import PasswordGate from "@/components/auth/PasswordGate";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -101,9 +100,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-    ],
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
     apple: "/images/og/og-image.png",
   },
   category: "Gaming",
@@ -115,17 +112,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* ── Resource Hints ── */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href="https://xrpscan.com" />
         <link rel="dns-prefetch" href="https://xpmarket.com" />
         {/* Preload LCP hero image (mobile) — critical for FCP */}
-        <link rel="preload" as="image" href="/images/hero/hero-bg-mobile.jpg" media="(max-width: 639px)" />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero/hero-bg-mobile.jpg"
+          media="(max-width: 639px)"
+        />
         {/* Preload hero video poster (desktop) */}
-        <link rel="preload" as="video" href="/videos/herobackgroundvideo.mp4" media="(min-width: 640px)" />
+        <link
+          rel="preload"
+          as="video"
+          href="/videos/herobackgroundvideo.mp4"
+          media="(min-width: 640px)"
+        />
 
         {/* JSON-LD: Organization */}
         <script
@@ -221,11 +236,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-body antialiased">
-        <PasswordGate>
-          {children}
-        </PasswordGate>
-      </body>
+      <body className="font-body antialiased">{children}</body>
     </html>
   );
 }
