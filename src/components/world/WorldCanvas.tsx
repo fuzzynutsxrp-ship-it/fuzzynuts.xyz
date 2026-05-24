@@ -192,7 +192,9 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       // vines) for the 90 MB low_poly_forest.glb. Default OFF — flip
       // on once you've verified the asset loads at acceptable speed.
       useGLBForest: false,
-      glbForestScale: { value: 1.0, min: 0.1, max: 4, step: 0.05 },
+      // Source GLB bbox is ~4040 units → 0.005 default scales it to
+      // ~20 units across (right-sized for our playable area).
+      glbForestScale: { value: 0.005, min: 0.001, max: 0.03, step: 0.0005 },
       // useGLBFerns swaps the additive-sprite BioluminescentFerns for
       // ~40 cloned low_poly_fern.glb instances. ON by default — the
       // GLB is small (~670 KB) and looks more natural than sprites.

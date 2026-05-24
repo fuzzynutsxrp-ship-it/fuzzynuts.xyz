@@ -26,25 +26,26 @@ export interface ArcadeCabinetModelProps {
   count?: number;
 }
 
-// Placements tuned to mirror herobackground2.jpg: two prominent
-// cabinets framing the foreground (left + right, partially angled
-// inward), then 3 smaller / further cabinets receding into the
-// mid-ground mist. Larger scales on the foreground pair so they
-// dominate the silhouette like the reference.
+// IMPORTANT: the source GLB's natural bounding box is ~155 units
+// across (Sketchfab export unit weirdness). To get a player-height
+// cabinet (~2 units tall in our scene), we need scale ≈ 0.013.
+// The numbers below are scenes-relative arcade heights:
+//   0.013 → ~2.0 unit tall cabinet  (foreground)
+//   0.011 → ~1.7 unit tall cabinet  (mid-ground)
+//   0.009 → ~1.4 unit tall cabinet  (deep distance)
 const PLACEMENTS: Placement[] = [
-  // Foreground left  — closest, biggest, angled slightly inward.
-  { position: [-4.2, -0.5, 4.0], rotationY: 0.85, scale: 1.9 },
-  // Foreground right — slightly bigger still (mirrors the larger
-  // cabinet in the reference's right side).
-  { position: [4.4, -0.5, 4.3], rotationY: -0.9, scale: 2.0 },
-  // Mid-ground left — recessed and rotated to face the path.
-  { position: [-6.2, -0.5, -1.0], rotationY: 1.2, scale: 1.6 },
-  // Mid-ground right — paired with the left mid-ground.
-  { position: [5.8, -0.5, -1.2], rotationY: -1.1, scale: 1.6 },
-  // Deep center — small, peeking through the trees.
-  { position: [0.4, -0.5, -7.5], rotationY: 0.2, scale: 1.4 },
+  // Foreground left  — biggest, framing the left edge.
+  { position: [-3.5, -0.5, 4.0], rotationY: 0.85, scale: 0.013 },
+  // Foreground right — biggest, framing the right edge.
+  { position: [3.6, -0.5, 4.3], rotationY: -0.9, scale: 0.013 },
+  // Mid-ground left.
+  { position: [-5.5, -0.5, -0.5], rotationY: 1.2, scale: 0.011 },
+  // Mid-ground right.
+  { position: [5.2, -0.5, -0.8], rotationY: -1.1, scale: 0.011 },
+  // Deep center — peeking through trees.
+  { position: [0.4, -0.5, -7.5], rotationY: 0.2, scale: 0.009 },
   // Deep left — almost lost in the fog.
-  { position: [-3.6, -0.5, -10.0], rotationY: 0.7, scale: 1.3 },
+  { position: [-3.6, -0.5, -10.0], rotationY: 0.7, scale: 0.009 },
 ];
 
 export function ArcadeCabinetModel({ count = 6 }: ArcadeCabinetModelProps) {

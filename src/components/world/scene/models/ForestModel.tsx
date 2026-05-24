@@ -27,10 +27,14 @@ export interface ForestModelProps {
   scale?: number;
 }
 
+// Source GLB has a natural bbox of ~4040 units across (Sketchfab
+// export at meter scale × 1000ish). Default scale 0.005 brings that
+// down to ~20 units — about the size of our playable forest area.
+// Adjust via the Forest Studio "glbForestScale" slider.
 export function ForestModel({
   position = [0, -0.5, 0],
   rotationY = 0,
-  scale = 1.0,
+  scale = 0.005,
 }: ForestModelProps) {
   return (
     <Model
