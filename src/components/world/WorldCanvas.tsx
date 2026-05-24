@@ -103,22 +103,22 @@ const ARCADE_PLACEMENTS: {
     accent: "#d946ef",
     screen: "#3b82f6",
   }, // far back   — magenta/blue
-  // ── Two NEW close-foreground cabinets, pushed right up to the
-  //    camera so they dominate the frame like the foreground cabinets
-  //    in herobackground2.jpg. Slight inward rotation so the marquees
-  //    face the camera path. ──
+  // ── Two close-foreground cabinets — pulled BACK from z=6.5 → z=3
+  //    so they don't sit point-blank against the camera. At z=3 they
+  //    still read as foreground (5.5 units away) but their bright
+  //    marquees no longer flood the corners of the frame. ──
   {
-    position: [-4.5, -0.5, 6.5],
-    rotation: 0.85,
+    position: [-4.5, -0.5, 3.0],
+    rotation: 0.55,
     accent: "#ef4444",
     screen: "#22d3ee",
-  }, // foreground LEFT  — red/cyan, the "left wall" cabinet
+  }, // foreground LEFT  — red/cyan
   {
-    position: [4.7, -0.5, 6.8],
-    rotation: -0.95,
+    position: [4.7, -0.5, 3.2],
+    rotation: -0.6,
     accent: "#fbbf24",
     screen: "#3b82f6",
-  }, // foreground RIGHT — yellow/blue, the "right wall" cabinet
+  }, // foreground RIGHT — yellow/blue
 ];
 
 export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
@@ -158,17 +158,20 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       saturation: { value: 1.05, min: 0.4, max: 1.8, step: 0.05 },
     }),
     Vines: folder({
-      vineIntensity: { value: 1.9, min: 0, max: 3, step: 0.05 },
-      // Four-color palette: cyan / electric-blue / neon-green / hot-magenta
-      // — directly drawn from the references. Magenta is the new accent
-      // from the dark cyber-forest plate.
+      // 1.9 default was creating HDR-bright cyan/blue slashes across
+      // the frame at the hero scroll position. Dropped to 1.0 — vines
+      // still bloom and glow, but no longer drown the foreground.
+      vineIntensity: { value: 1.0, min: 0, max: 3, step: 0.05 },
       vineColorA: "#22d3ee",
       vineColorB: "#3b82f6",
       vineColorC: "#10b981",
       vineColorD: "#d946ef",
     }),
     Arcade: folder({
-      arcadeGlow: { value: 2.0, min: 0, max: 3, step: 0.05 },
+      // Was 2.0 — combined with the close-foreground cabinets it was
+      // flooding the corners of the frame. 1.3 reads as "lit machine",
+      // not "bloomed lighthouse".
+      arcadeGlow: { value: 1.3, min: 0, max: 3, step: 0.05 },
       // Now 8 placements total (added 2 close-foreground). Default shows
       // all 8 on desktop, 4 on mobile to keep render cheap.
       arcadeCount: { value: isMobile ? 4 : 8, min: 0, max: 8, step: 1 },

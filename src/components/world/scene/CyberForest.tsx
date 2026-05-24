@@ -115,9 +115,13 @@ export function CyberForest({
     //    the camera path that frame the view. Positions chosen to
     //    sit just outside the visible foreground of the hero camera
     //    while still flanking the games-station portals. ──
+    // Frame trees: bigger but with FEWER (and thinner) vines, because
+    // the close-camera ones were creating HDR-bright cyan/blue slashes
+    // across the frame at the hero scroll position. The back-center
+    // tree keeps its vines — it's far enough away to read as accent.
     const FRAME_TREES: TreeData[] = [
       {
-        // Hard left foreground — huge
+        // Hard left foreground — huge, NO vines (silhouette only).
         position: [-6.5, 0, 4.5],
         rotation: 1.1,
         scale: 2.4,
@@ -125,11 +129,11 @@ export function CyberForest({
         trunkRadius: 0.55,
         canopyHue: 0.3,
         phase: 0,
-        hasVines: true,
-        vineCount: 3,
+        hasVines: false,
+        vineCount: 0,
       },
       {
-        // Hard right foreground — huge
+        // Hard right foreground — huge, NO vines (silhouette only).
         position: [6.8, 0, 4.2],
         rotation: -0.9,
         scale: 2.6,
@@ -137,11 +141,11 @@ export function CyberForest({
         trunkRadius: 0.58,
         canopyHue: 0.31,
         phase: 1.8,
-        hasVines: true,
-        vineCount: 3,
+        hasVines: false,
+        vineCount: 0,
       },
       {
-        // Back center — slightly off-axis to leave the moon visible
+        // Back center — far enough that vines read as accent, not a wall.
         position: [2.5, 0, -10],
         rotation: 0.4,
         scale: 2.1,
