@@ -14,6 +14,7 @@ import { ArcadeCabinet } from "./scene/ArcadeCabinet";
 import { CityHorizon } from "./scene/CityHorizon";
 import { GodRays } from "./scene/GodRays";
 import { BioluminescentFerns } from "./scene/BioluminescentFerns";
+import { ForestBackdrop } from "./scene/ForestBackdrop";
 import { FloatingAcorns } from "@/components/hero/scene/FloatingAcorns";
 import { Squirrels } from "@/components/hero/scene/Squirrels";
 import { NutMoon } from "@/components/hero/scene/NutMoon";
@@ -184,10 +185,19 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       godRayBrightness: { value: 1.9, min: 0, max: 3, step: 0.05 },
       godRayColor: "#a8d0ff",
     }),
+    Backdrop: folder({
+      // Distant matte-painting using public/images/hero/herobackground.jpg.
+      // `backdropTint` darkens the photo so it sits inside the dark mood
+      // (1.0 = original brightness). Toggle off if you want pure procedural.
+      backdropEnabled: true,
+      backdropTint: { value: 0.55, min: 0, max: 1.2, step: 0.02 },
+    }),
     PostFX: folder({
-      bloomIntensity: { value: 1.15, min: 0, max: 3, step: 0.05 },
-      bloomThreshold: { value: 0.45, min: 0, max: 1, step: 0.02 },
-      vignetteDarkness: { value: 0.9, min: 0, max: 1.5, step: 0.05 },
+      // Bloom dampened HARD — previous pass washed the scene into
+      // bright pastel. New defaults only bloom the brightest neon.
+      bloomIntensity: { value: 0.55, min: 0, max: 3, step: 0.05 },
+      bloomThreshold: { value: 0.75, min: 0, max: 1, step: 0.02 },
+      vignetteDarkness: { value: 1.05, min: 0, max: 1.5, step: 0.05 },
     }),
   });
 
@@ -196,10 +206,14 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
         cheerful → eerie without the user having to retune everything. ── */
   const mood = controls.overallSceneMood;
   const derived = {
-    fogFar: controls.fogFar * (1 - mood * 0.35),
-    ambient: 0.45 * (1 - mood * 0.6), // ambient light intensity
-    vignette: Math.min(1.5, controls.vignetteDarkness + mood * 0.25),
-    bloomIntensity: controls.bloomIntensity * (1 + mood * 0.3),
+    // Mood pulls fog far further in (was 0.35, now 0.45) — heavier
+    // mist when dark, matching herobackground2.jpg's foggy depth.
+    fogFar: controls.fogFar * (1 - mood * 0.45),
+    // Ambient base lowered (0.45 → 0.35) and scaled more aggressively
+    // by mood so high-mood scenes are nearly silhouette-only.
+    ambient: 0.35 * (1 - mood * 0.7),
+    vignette: Math.min(1.5, controls.vignetteDarkness + mood * 0.2),
+    bloomIntensity: controls.bloomIntensity * (1 + mood * 0.2),
     godRayBrightness: controls.godRayBrightness * (1 + mood * 0.25),
   };
 
@@ -346,6 +360,12 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
               <Forest treeCount={isMobile ? 18 : 32} wind={!isMobile} />
             ) : (
               <>
+                {/* Distant matte painting using the reference photo. Sits
+                    BEHIND everything else; depthWrite is off in the
+                    backdrop material so it always renders first. */}
+                {controls.backdropEnabled && (
+                  <ForestBackdrop tint={controls.backdropTint} />
+                )}
                 <CyberForest
                   treeCount={isMobile ? 18 : 32}
                   wind={!isMobile}

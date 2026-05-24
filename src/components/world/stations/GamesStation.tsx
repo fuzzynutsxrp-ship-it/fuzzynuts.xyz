@@ -124,14 +124,17 @@ function Portal({ game, position, onHover, onActivate }: PortalProps) {
   const [hovered, setHovered] = useState(false);
   const [activating, setActivating] = useState(false);
 
+  // Idle portals are intentionally subdued — previously they dominated
+  // the frame and made the scene read as "abstract portal room". Now
+  // they sit inside the forest until hovered.
   const ringMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: game.color,
         emissive: game.color,
-        emissiveIntensity: 0.7,
-        roughness: 0.3,
-        metalness: 0.6,
+        emissiveIntensity: 0.3,
+        roughness: 0.35,
+        metalness: 0.55,
       }),
     [game.color],
   );
@@ -140,7 +143,7 @@ function Portal({ game, position, onHover, onActivate }: PortalProps) {
       new THREE.MeshBasicMaterial({
         color: game.color,
         transparent: true,
-        opacity: 0.4,
+        opacity: 0.22,
         side: THREE.DoubleSide,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
@@ -160,7 +163,9 @@ function Portal({ game, position, onHover, onActivate }: PortalProps) {
     groupRef.current.position.y =
       position[1] + Math.sin(t * 1.1 + position[0]) * 0.16;
 
-    const targetEmissive = hovered ? 1.6 : 0.7;
+    // Hover punches the portal way up (1.6×) so it reads as the
+    // interactive element when targeted, but idle stays dim (0.3×).
+    const targetEmissive = hovered ? 1.6 : 0.3;
     ringMat.emissiveIntensity = THREE.MathUtils.lerp(
       ringMat.emissiveIntensity,
       targetEmissive,
@@ -168,7 +173,7 @@ function Portal({ game, position, onHover, onActivate }: PortalProps) {
     );
     discMat.opacity = hovered
       ? 0.65
-      : 0.4 + Math.sin(t * 2 + position[0]) * 0.08;
+      : 0.22 + Math.sin(t * 2 + position[0]) * 0.05;
   });
 
   const handleOver = (e: { stopPropagation: () => void }) => {
