@@ -223,7 +223,7 @@ function Portal({
                 transition: "transform 200ms ease-out",
               }}
             >
-              {game.emoji} {game.title}
+              {game.title}
             </div>
           </Html>
         </Billboard>
