@@ -43,14 +43,32 @@ import { LeaderboardStation } from "./stations/LeaderboardStation";
 import { MoonStation } from "./stations/MoonStation";
 
 /* ═══════════════════════════════════════════════════════════════
-   DEV_MODE — Flip to `true` to fall back to the previous (pre-
-   cyber-forest) visual treatment: the simple cone-Forest, no
-   neon vines, no arcade cabinets, no god rays, no ferns, no
-   city horizon. Useful for A/B comparison or rolling back the
-   visual upgrade without redeploying.
+   DEV_MODE flags.
+
+   • legacyForest  — fall back to the simple cone-Forest (no neon
+                     vines / arcade cabinets / god rays / city /
+                     ferns). Useful for A/B comparison.
+   • bareForest    — hide EVERYTHING decorative and render only the
+                     low_poly_forest.glb. The stations (game portals,
+                     vault, leaderboard, moon) are also hidden so the
+                     forest GLB is visible "unhinged". Camera + lights
+                     + Navbar + WorldHUD remain so the page still
+                     navigates. Flip this back to `false` (or via the
+                     `?fullscene=1` URL param at runtime) to bring
+                     the full cyber-forest back.
    ═══════════════════════════════════════════════════════════════ */
-const DEV_MODE: { legacyForest: boolean } = {
+const DEV_MODE: { legacyForest: boolean; bareForest: boolean } = {
   legacyForest: false,
+  bareForest: true,
+};
+
+// Runtime override: `?fullscene=1` forces the full scene even when
+// DEV_MODE.bareForest is true. Lets you re-enable from a deploy
+// without a code change.
+const isBare = () => {
+  if (!DEV_MODE.bareForest) return false;
+  if (typeof window === "undefined") return true;
+  return !new URLSearchParams(window.location.search).has("fullscene");
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -359,94 +377,93 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
           <CameraRig override={cameraOverride} />
 
           <Suspense fallback={null}>
-            {/* ── Always-on scene primitives ── */}
-            <NutMoon />
-
-            {DEV_MODE.legacyForest ? (
-              <Forest treeCount={isMobile ? 18 : 32} wind={!isMobile} />
+            {/* ── Bare-forest mode: render ONLY the GLB forest so the
+                user can evaluate it without procedural decorations,
+                arcade cabinets, squirrels, ferns, god rays, motes,
+                matte painting, stations, or floating acorns blocking
+                the view. Camera + lights + Navbar + WorldHUD still
+                render. Append `?fullscene=1` to bring everything back
+                without a redeploy. ── */}
+            {isBare() ? (
+              <ForestModel scale={controls.glbForestScale} />
             ) : (
               <>
-                {/* Distant matte painting using the reference photo. Sits
-                    BEHIND everything else; depthWrite is off in the
-                    backdrop material so it always renders first. */}
-                {controls.backdropEnabled && (
-                  <ForestBackdrop tint={controls.backdropTint} />
-                )}
+                {/* ── Always-on scene primitives ── */}
+                <NutMoon />
 
-                {/* ── Forest body: GLB or procedural cone-trees ──
-                    The 90 MB low_poly_forest.glb takes several seconds
-                    to download; the Suspense fallback (SquirrelSpinner
-                    in FuzzyWorld) covers the wait. Switch off via
-                    Leva → Models → useGLBForest. */}
-                {controls.useGLBForest ? (
-                  <ForestModel scale={controls.glbForestScale} />
+                {DEV_MODE.legacyForest ? (
+                  <Forest treeCount={isMobile ? 18 : 32} wind={!isMobile} />
                 ) : (
-                  <CyberForest
-                    treeCount={isMobile ? 18 : 32}
-                    wind={!isMobile}
-                    vineIntensity={controls.vineIntensity}
-                    vineColors={[
-                      controls.vineColorA,
-                      controls.vineColorB,
-                      controls.vineColorC,
-                      controls.vineColorD,
-                    ]}
-                  />
+                  <>
+                    {/* Distant matte painting using the reference photo. */}
+                    {controls.backdropEnabled && (
+                      <ForestBackdrop tint={controls.backdropTint} />
+                    )}
+
+                    {/* ── Forest body: GLB or procedural cone-trees ── */}
+                    {controls.useGLBForest ? (
+                      <ForestModel scale={controls.glbForestScale} />
+                    ) : (
+                      <CyberForest
+                        treeCount={isMobile ? 18 : 32}
+                        wind={!isMobile}
+                        vineIntensity={controls.vineIntensity}
+                        vineColors={[
+                          controls.vineColorA,
+                          controls.vineColorB,
+                          controls.vineColorC,
+                          controls.vineColorD,
+                        ]}
+                      />
+                    )}
+
+                    {/* ── Ferns: GLB or procedural sprites ── */}
+                    {controls.useGLBFerns ? (
+                      <FernModel count={controls.glbFernCount} />
+                    ) : (
+                      <BioluminescentFerns
+                        count={controls.fernCount}
+                        brightness={controls.fernBrightness}
+                      />
+                    )}
+
+                    <GodRays
+                      count={controls.godRayDensity}
+                      brightness={derived.godRayBrightness}
+                      color={controls.godRayColor}
+                    />
+                    {controls.motesEnabled && (
+                      <AtmosphericMotes
+                        count={controls.moteCount}
+                        brightness={controls.moteBrightness}
+                      />
+                    )}
+                    {controls.cityVisible && (
+                      <CityHorizon tint={controls.cityTint} count={32} />
+                    )}
+
+                    <ArcadeCabinetModel count={controls.arcadeCount} />
+                  </>
                 )}
 
-                {/* ── Ferns: GLB or procedural sprites ── */}
-                {controls.useGLBFerns ? (
-                  <FernModel count={controls.glbFernCount} />
-                ) : (
-                  <BioluminescentFerns
-                    count={controls.fernCount}
-                    brightness={controls.fernBrightness}
-                  />
-                )}
+                <FloatingAcorns count={isMobile ? 6 : 14} trails={!isMobile} />
 
-                <GodRays
-                  count={controls.godRayDensity}
-                  brightness={derived.godRayBrightness}
-                  color={controls.godRayColor}
+                <SquirrelModel
+                  count={isMobile ? 3 : 6}
+                  target={hoveredPos}
+                  animSpeed={controls.squirrelAnimSpeed}
                 />
-                {/* Volumetric dust motes — make the god rays read as
-                    actually-volumetric. Disabled on mobile by default. */}
-                {controls.motesEnabled && (
-                  <AtmosphericMotes
-                    count={controls.moteCount}
-                    brightness={controls.moteBrightness}
-                  />
-                )}
-                {controls.cityVisible && (
-                  <CityHorizon tint={controls.cityTint} count={32} />
-                )}
 
-                {/* ── Arcade cabinets: GLB Model (replaces the procedural
-                      cabinet entirely — Leva accent / screen / glow
-                      overrides no longer apply since the GLB has baked
-                      materials). ── */}
-                <ArcadeCabinetModel count={controls.arcadeCount} />
+                {/* ── Stations ── */}
+                <GamesStation
+                  onHover={setHoveredPos}
+                  onActivate={handlePortalActivate}
+                />
+                <VaultStation onChestOpen={handleChestOpen} />
+                <LeaderboardStation />
+                <MoonStation gameCount={liveGameCount} />
               </>
             )}
-
-            <FloatingAcorns count={isMobile ? 6 : 14} trails={!isMobile} />
-
-            {/* ── Squirrels: GLB Model preserves orbit/hop/glance from
-                  the procedural component, just swaps geometry. ── */}
-            <SquirrelModel
-              count={isMobile ? 3 : 6}
-              target={hoveredPos}
-              animSpeed={controls.squirrelAnimSpeed}
-            />
-
-            {/* ── Stations ── */}
-            <GamesStation
-              onHover={setHoveredPos}
-              onActivate={handlePortalActivate}
-            />
-            <VaultStation onChestOpen={handleChestOpen} />
-            <LeaderboardStation />
-            <MoonStation gameCount={liveGameCount} />
 
             <NutExplosions
               ref={explosionsRef}
