@@ -49,26 +49,29 @@ import { MoonStation } from "./stations/MoonStation";
                      vines / arcade cabinets / god rays / city /
                      ferns). Useful for A/B comparison.
    • bareForest    — hide EVERYTHING decorative and render only the
-                     low_poly_forest.glb. The stations (game portals,
-                     vault, leaderboard, moon) are also hidden so the
-                     forest GLB is visible "unhinged". Camera + lights
-                     + Navbar + WorldHUD remain so the page still
-                     navigates. Flip this back to `false` (or via the
-                     `?fullscene=1` URL param at runtime) to bring
-                     the full cyber-forest back.
+                     low_poly_forest.glb (camera + lights + Navbar +
+                     WorldHUD still render). Default OFF so normal
+                     visitors get the full cyber-forest. Turn back on
+                     for evaluating the GLB forest in isolation, or
+                     append `?bareforest=1` at runtime to do the same
+                     without a code change.
    ═══════════════════════════════════════════════════════════════ */
 const DEV_MODE: { legacyForest: boolean; bareForest: boolean } = {
   legacyForest: false,
-  bareForest: true,
+  bareForest: false,
 };
 
-// Runtime override: `?fullscene=1` forces the full scene even when
-// DEV_MODE.bareForest is true. Lets you re-enable from a deploy
-// without a code change.
+// Runtime override: when DEV_MODE.bareForest is off (the default),
+// `?bareforest=1` lets you SEE the bare-forest mode from a live deploy
+// without a code change. When DEV_MODE.bareForest is on, `?fullscene=1`
+// brings the full scene back. Both override flows are supported so
+// either default works without redeploying.
 const isBare = () => {
-  if (!DEV_MODE.bareForest) return false;
-  if (typeof window === "undefined") return true;
-  return !new URLSearchParams(window.location.search).has("fullscene");
+  if (typeof window === "undefined") return DEV_MODE.bareForest;
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("bareforest")) return true;
+  if (params.has("fullscene")) return false;
+  return DEV_MODE.bareForest;
 };
 
 /* ─────────────────────────────────────────────────────────────
