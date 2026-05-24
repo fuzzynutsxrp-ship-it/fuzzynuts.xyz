@@ -27,8 +27,9 @@ export interface CyberForestProps {
   wind?: boolean;
   /** Live-tweaked vine glow strength from Leva (default 1). */
   vineIntensity?: number;
-  /** Hue mix for vines — cycles between cyan/electric-blue/neon-green. */
-  vineColors?: [string, string, string];
+  /** Hue mix for vines — cycles cyan / electric-blue / neon-green /
+   *  hot-magenta. Order is meaningful: vine i uses palette[i % 4]. */
+  vineColors?: string[];
 }
 
 interface TreeData {
@@ -48,7 +49,10 @@ export function CyberForest({
   treeCount = 28,
   wind = true,
   vineIntensity = 1,
-  vineColors = ["#22d3ee", "#3b82f6", "#10b981"],
+  // Default palette pulled directly from the reference plates: cyan,
+  // electric blue, neon green, and the hot-magenta accent visible in
+  // the dark cyber-forest image (herobackground2.jpg).
+  vineColors = ["#22d3ee", "#3b82f6", "#10b981", "#d946ef"],
 }: CyberForestProps) {
   // ── Generate tree data once (deterministic) ──
   const trees = useMemo<TreeData[]>(() => {

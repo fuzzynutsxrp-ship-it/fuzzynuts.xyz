@@ -54,20 +54,53 @@ interface WorldCanvasProps {
 // Fixed positions for arcade cabinets — placed along the camera path so
 // they're visible across all stations. Light scatter, slight rotation so
 // each cabinet faces a "natural" direction.
+//
+// `accent` drives the marquee + side-rim + ground-glow.
+// `screen` drives the CRT — kept in the cyan/blue family on every cabinet
+// to match herobackground2.jpg where every CRT reads cool against warm
+// marquees.
 const ARCADE_PLACEMENTS: {
   position: [number, number, number];
   rotation: number;
   accent: string;
+  screen: string;
 }[] = [
-  // Palette tightened to red/yellow/orange to match the 80s arcade cabinets
-  // visible in herobackground2.jpg. Vary by neighbour so adjacent cabinets
-  // don't share a marquee color.
-  { position: [-2.6, -0.5, 4.5], rotation: 0.45, accent: "#ef4444" }, // hero left  — red
-  { position: [3.1, -0.5, 4.8], rotation: -0.6, accent: "#fbbf24" }, // hero right — yellow
-  { position: [-5.2, -0.5, -2.5], rotation: 1.2, accent: "#ef4444" }, // games left  — red
-  { position: [5.0, -0.5, -2.0], rotation: -1.0, accent: "#fbbf24" }, // games right — yellow
-  { position: [0.6, -0.5, -6.5], rotation: 0.2, accent: "#f97316" }, // mid back   — orange
-  { position: [-3.5, -0.5, -8.2], rotation: 0.9, accent: "#ef4444" }, // far back   — red
+  {
+    position: [-2.6, -0.5, 4.5],
+    rotation: 0.45,
+    accent: "#ec4899",
+    screen: "#3b82f6",
+  }, // hero left  — pink/blue
+  {
+    position: [3.1, -0.5, 4.8],
+    rotation: -0.6,
+    accent: "#ef4444",
+    screen: "#22d3ee",
+  }, // hero right — red/cyan
+  {
+    position: [-5.2, -0.5, -2.5],
+    rotation: 1.2,
+    accent: "#ef4444",
+    screen: "#22d3ee",
+  }, // games left  — red/cyan
+  {
+    position: [5.0, -0.5, -2.0],
+    rotation: -1.0,
+    accent: "#fbbf24",
+    screen: "#3b82f6",
+  }, // games right — yellow/blue
+  {
+    position: [0.6, -0.5, -6.5],
+    rotation: 0.2,
+    accent: "#f97316",
+    screen: "#22d3ee",
+  }, // mid back   — orange/cyan
+  {
+    position: [-3.5, -0.5, -8.2],
+    rotation: 0.9,
+    accent: "#d946ef",
+    screen: "#3b82f6",
+  }, // far back   — magenta/blue
 ];
 
 export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
@@ -94,29 +127,40 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       // `overallSceneMood` is a single 0..1 darkness multiplier applied on
       // top of the individual atmospheric controls below. 0 = bright /
       // cheerful; 1 = full eerie dusk like herobackground2.jpg.
-      overallSceneMood: { value: 0.7, min: 0, max: 1, step: 0.02 },
+      // Default pushed to 0.8 to match the dark cyber-forest reference.
+      overallSceneMood: { value: 0.8, min: 0, max: 1, step: 0.02 },
     }),
     Atmosphere: folder({
-      fogColor: "#02100a",
-      fogNear: { value: 7, min: 0, max: 40, step: 0.5 },
-      fogFar: { value: isMobile ? 26 : 34, min: 8, max: 80, step: 1 },
-      saturation: { value: 0.95, min: 0.4, max: 1.8, step: 0.05 },
+      // Deeper blue-tinted fog matching the dark plate.
+      fogColor: "#04101a",
+      fogNear: { value: 6, min: 0, max: 40, step: 0.5 },
+      fogFar: { value: isMobile ? 24 : 30, min: 8, max: 80, step: 1 },
+      saturation: { value: 1.0, min: 0.4, max: 1.8, step: 0.05 },
     }),
     Vines: folder({
-      vineIntensity: { value: 1.7, min: 0, max: 3, step: 0.05 },
+      vineIntensity: { value: 1.9, min: 0, max: 3, step: 0.05 },
+      // Four-color palette: cyan / electric-blue / neon-green / hot-magenta
+      // — directly drawn from the references. Magenta is the new accent
+      // from the dark cyber-forest plate.
       vineColorA: "#22d3ee",
       vineColorB: "#3b82f6",
       vineColorC: "#10b981",
+      vineColorD: "#d946ef",
     }),
     Arcade: folder({
-      arcadeGlow: { value: 1.6, min: 0, max: 3, step: 0.05 },
+      arcadeGlow: { value: 1.7, min: 0, max: 3, step: 0.05 },
       arcadeCount: { value: isMobile ? 3 : 6, min: 0, max: 6, step: 1 },
-      // ── New: marquee color override ──
-      // When `marqueeOverride` is on, every cabinet's marquee + CRT uses
+      // ── Marquee color override ──
+      // When `marqueeOverride` is on, every cabinet's marquee uses
       // `arcadeMarqueeColor`. When off, each cabinet keeps its preset
       // accent from ARCADE_PLACEMENTS.
       marqueeOverride: false,
       arcadeMarqueeColor: "#ef4444",
+      // ── Screen color override ──
+      // Same pattern for CRT screens. Default off so the per-cabinet
+      // screen color (always blue/cyan) is used.
+      screenOverride: false,
+      arcadeScreenColor: "#22d3ee",
     }),
     Ferns: folder({
       fernBrightness: { value: 1.6, min: 0, max: 3, step: 0.05 },
@@ -135,8 +179,10 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       cityVisible: true,
     }),
     GodRays: folder({
-      godRayBrightness: { value: 1.5, min: 0, max: 3, step: 0.05 },
-      godRayColor: "#bce8d6",
+      // Cranked from 1.5 → 1.9 and shifted color from pale cyan-green
+      // toward the cool blue cast in herobackground2.jpg.
+      godRayBrightness: { value: 1.9, min: 0, max: 3, step: 0.05 },
+      godRayColor: "#a8d0ff",
     }),
     PostFX: folder({
       bloomIntensity: { value: 1.15, min: 0, max: 3, step: 0.05 },
@@ -308,6 +354,7 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                     controls.vineColorA,
                     controls.vineColorB,
                     controls.vineColorC,
+                    controls.vineColorD,
                   ]}
                 />
                 <BioluminescentFerns
@@ -331,6 +378,11 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                       controls.marqueeOverride
                         ? controls.arcadeMarqueeColor
                         : c.accent
+                    }
+                    screenColor={
+                      controls.screenOverride
+                        ? controls.arcadeScreenColor
+                        : c.screen
                     }
                     glow={controls.arcadeGlow}
                     overgrowth={!isMobile}

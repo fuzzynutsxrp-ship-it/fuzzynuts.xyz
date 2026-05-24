@@ -4,19 +4,23 @@ import { useMemo } from "react";
 import * as THREE from "three";
 
 /* ─────────────────────────────────────────────────────────────
-   NeonVine — A glowing biomechanical vine that spirals up a
-   tree trunk. Reference: thick LED-strip cables wrapped around
-   massive ancient trees in herobackground.jpg.
+   NeonVine — Glowing biomechanical cable wrapping a tree trunk.
 
-   Implementation:
-   • Build a CatmullRomCurve3 by sampling a helix path with a
-     small organic radial jitter.
-   • Extrude a TubeGeometry along the curve.
-   • Use a MeshBasicMaterial with strong emissive coloring so
-     Bloom in post-processing picks it up as a neon glow.
+   Reference (herobackground.jpg + herobackground2.jpg): thick,
+   chunky LED-cable bundles hugging ancient bark. Bright cyan /
+   electric blue / magenta with deep emissive glow that Bloom
+   picks up as halos.
 
-   Geometry budget per vine: 6 radial × 40 tubular = ~480 tris.
-   We only attach 1–2 vines to ~40% of trees (see CyberForest).
+   What changed from the first pass:
+   • Tube radius bumped from 0.07 → 0.20 (much chunkier).
+   • Sample resolution increased so big tubes still bend smoothly.
+   • Optional 2nd "strand" — a thin parallel inner core in a
+     contrasting tone, sells the "bundled cable" look you see in
+     image 2 where vines have a darker inner channel + bright
+     outer skin.
+
+   Geometry budget per vine: ~720 tris main + ~480 inner =
+   ~1.2k tris. We only attach 1–2 vines to ~40% of trees.
    ───────────────────────────────────────────────────────────── */
 
 export interface NeonVineProps {
@@ -32,6 +36,10 @@ export interface NeonVineProps {
   color: string;
   /** Live intensity multiplier from Leva. */
   intensity?: number;
+  /** Outer tube radius — defaults to the chunky look from references. */
+  radius?: number;
+  /** Add a thinner inner-core strand for the "bundled cable" look. */
+  withInnerCore?: boolean;
 }
 
 export function NeonVine({
@@ -41,42 +49,65 @@ export function NeonVine({
   turns = 2.5,
   color,
   intensity = 1,
+  radius = 0.2,
+  withInnerCore = true,
 }: NeonVineProps) {
-  const tubeGeo = useMemo(() => {
-    // Sample the helix with mild radial noise for an organic, "growing
-    // around the bark" feel rather than a perfect machined spiral.
-    const SAMPLES = 64;
+  // Build the curve once and reuse for both the outer + inner strands.
+  const curve = useMemo(() => {
+    const SAMPLES = 72;
     const pts: THREE.Vector3[] = [];
     for (let i = 0; i <= SAMPLES; i++) {
       const t = i / SAMPLES;
       const theta = startAngle + turns * Math.PI * 2 * t;
-      // Subtle radial jitter — sinusoidal so it stays smooth across samples.
+      // Wider radial breathing so the chunky tube doesn't look like a
+      // perfect machined spring — it should feel "grown" around the bark.
       const r =
-        trunkRadius + 0.08 + Math.sin(theta * 1.4 + startAngle * 3) * 0.06;
+        trunkRadius +
+        0.18 +
+        Math.sin(theta * 1.3 + startAngle * 3) * 0.12 +
+        Math.cos(theta * 2.7) * 0.04;
       const x = Math.cos(theta) * r;
       const z = Math.sin(theta) * r;
-      // Vine starts a hair above the ground, ends just below canopy.
       const y = 0.1 + t * (trunkHeight - 0.2);
       pts.push(new THREE.Vector3(x, y, z));
     }
-    const curve = new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.05);
-    return new THREE.TubeGeometry(curve, SAMPLES, 0.07, 6, false);
+    return new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.05);
   }, [trunkHeight, trunkRadius, startAngle, turns]);
 
-  // Bright emissive material — Bloom in the post-processing pass turns
-  // this into a halo. No need for fancy shaders.
-  const mat = useMemo(
+  const outerGeo = useMemo(
+    () => new THREE.TubeGeometry(curve, 72, radius, 8, false),
+    [curve, radius],
+  );
+  const innerGeo = useMemo(
     () =>
-      new THREE.MeshBasicMaterial({
-        color,
-        toneMapped: false,
-      }),
-    [color],
+      withInnerCore
+        ? new THREE.TubeGeometry(curve, 72, radius * 0.45, 6, false)
+        : null,
+    [curve, radius, withInnerCore],
   );
 
-  // Apply intensity by multiplying the color (Bloom threshold is luminance,
-  // so a brighter base color → bigger glow).
-  mat.color.set(color).multiplyScalar(Math.max(0.2, intensity));
+  // Outer skin — bright, Bloom-friendly.
+  const outerMat = useMemo(
+    () => new THREE.MeshBasicMaterial({ color, toneMapped: false }),
+    [color],
+  );
+  // Inner core — slightly desaturated / brighter white so the cable
+  // looks "lit from within".
+  const innerMat = useMemo(
+    () => new THREE.MeshBasicMaterial({ color: "#ffffff", toneMapped: false }),
+    [],
+  );
 
-  return <mesh geometry={tubeGeo} material={mat} />;
+  // Apply intensity by scaling the color (Bloom is luminance-thresholded).
+  outerMat.color.set(color).multiplyScalar(Math.max(0.25, intensity));
+  innerMat.color
+    .set("#ffffff")
+    .multiplyScalar(Math.max(0.15, intensity * 0.55));
+
+  return (
+    <group>
+      <mesh geometry={outerGeo} material={outerMat} />
+      {innerGeo && <mesh geometry={innerGeo} material={innerMat} />}
+    </group>
+  );
 }

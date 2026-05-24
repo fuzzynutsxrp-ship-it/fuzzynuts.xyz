@@ -25,8 +25,14 @@ import { useFrame } from "@react-three/fiber";
 export interface ArcadeCabinetProps {
   position?: [number, number, number];
   rotation?: number;
-  /** Marquee / accent color (hex). */
+  /** Marquee / accent color (hex). Drives the marquee + ground glow
+   *  + body rim. The CRT screen is a SEPARATE color (see `screenColor`)
+   *  because reference image 1 shows every cabinet's CRT lit cyan/blue
+   *  regardless of marquee hue. */
   accent?: string;
+  /** CRT screen color. Defaults to the cyan/electric-blue look from
+   *  herobackground2.jpg. Override per-cabinet for variety. */
+  screenColor?: string;
   /** Multiplier from Leva for CRT + marquee brightness. */
   glow?: number;
   /** Optional overgrowth (small ferns clinging to the base). */
@@ -39,6 +45,7 @@ export function ArcadeCabinet({
   position = [0, 0, 0],
   rotation = 0,
   accent = "#ef4444",
+  screenColor = "#22d3ee",
   glow = 1,
   overgrowth = true,
   label,
@@ -46,6 +53,11 @@ export function ArcadeCabinet({
   const screenMat = useRef<THREE.MeshBasicMaterial>(null);
   const marqueeMat = useRef<THREE.MeshBasicMaterial>(null);
   const groundGlowMat = useRef<THREE.MeshBasicMaterial>(null);
+  // Shared rim material — used on BOTH side strips so they pulse in sync.
+  const rimMat = useMemo(
+    () => new THREE.MeshBasicMaterial({ color: accent, toneMapped: false }),
+    [accent],
+  );
   // Avoid label warning when not provided.
   void label;
 
@@ -92,19 +104,25 @@ export function ArcadeCabinet({
     const t = state.clock.elapsedTime;
     const flicker = 0.78 + Math.sin(t * 17.3) * 0.12 + Math.sin(t * 41) * 0.06;
     if (screenMat.current) {
-      // Boosted from 2.5× → 3.6× for a more luminous CRT.
-      screenMat.current.color.set(accent).multiplyScalar(3.6 * glow * flicker);
+      // CRT uses its own (typically cyan/blue) color, not the marquee accent.
+      screenMat.current.color
+        .set(screenColor)
+        .multiplyScalar(3.4 * glow * flicker);
     }
     if (marqueeMat.current) {
-      // Marquees breathe slower than CRT, but punch harder (5.2×).
+      // Marquees breathe slower than CRT, but punch harder (5.4×).
       const breath = 0.9 + Math.sin(t * 1.5) * 0.1;
-      marqueeMat.current.color.set(accent).multiplyScalar(5.2 * glow * breath);
+      marqueeMat.current.color.set(accent).multiplyScalar(5.4 * glow * breath);
     }
-    // Ground glow under the cabinet — synced to marquee breath so the spill
-    // light reads as coming from the machine.
+    // Ground glow + rim accent — both sync to marquee breath so the spill
+    // light reads as coming from the machine's marquee specifically.
     if (groundGlowMat.current) {
       const breath = 0.6 + Math.sin(t * 1.5 + 0.3) * 0.15;
-      groundGlowMat.current.opacity = 0.4 * glow * breath;
+      groundGlowMat.current.opacity = 0.42 * glow * breath;
+    }
+    {
+      const breath = 0.85 + Math.sin(t * 1.5 + 0.4) * 0.08;
+      rimMat.color.set(accent).multiplyScalar(0.9 * glow * breath);
     }
   });
 
@@ -118,6 +136,18 @@ export function ArcadeCabinet({
       {/* ── Body ── */}
       <mesh material={bodyMat} position={[0, 1.0, 0]}>
         <boxGeometry args={[0.95, 1.7, 0.75]} />
+      </mesh>
+
+      {/* ── Side rim-glow strips — thin vertical LED rails on either
+            edge of the body. Reference: the dark cyber-forest plate
+            (herobackground2.jpg) shows cabinets with subtle accent-color
+            light running down their flanks. Shared `rimMat` so they
+            pulse in sync (mutated each frame in useFrame). ── */}
+      <mesh material={rimMat} position={[-0.485, 1.0, 0.0]}>
+        <boxGeometry args={[0.02, 1.55, 0.72]} />
+      </mesh>
+      <mesh material={rimMat} position={[0.485, 1.0, 0.0]}>
+        <boxGeometry args={[0.02, 1.55, 0.72]} />
       </mesh>
 
       {/* ── Top-rear stand (angled silhouette in profile) ── */}
