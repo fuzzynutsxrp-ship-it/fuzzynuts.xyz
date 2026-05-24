@@ -2,8 +2,20 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Trophy, Clock, Wifi, WifiOff, ChevronDown, Radio, Gift, Star, Zap } from "lucide-react";
-import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
+import {
+  RefreshCw,
+  Trophy,
+  Clock,
+  Wifi,
+  WifiOff,
+  ChevronDown,
+  Radio,
+  Gift,
+  Star,
+  Zap,
+} from "lucide-react";
+import { truncateAddress, formatNumber } from "@/lib/utils";
+import { gameRegistry } from "@/lib/gameRegistry";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { LeaderboardSkeleton } from "@/components/ui/LeaderboardSkeleton";
 import { useWalletStore } from "@/store/wallet";
@@ -24,31 +36,31 @@ const STORAGE_KEY = "fuzzy_arcade_scores";
 const MAX_ENTRIES = 50;
 
 /** Prize amounts shown inline next to top-3 scores */
-const PRIZE_LABELS: Record<number, { amount: string; color: string; glow: string }> = {
+const PRIZE_LABELS: Record<
+  number,
+  { amount: string; color: string; glow: string }
+> = {
   1: { amount: "250K $NUT", color: "text-brand-gold", glow: "winner-row-glow" },
   2: { amount: "150K $NUT", color: "text-silver", glow: "silver-row-glow" },
   3: { amount: "100K $NUT", color: "text-bronze", glow: "bronze-row-glow" },
 };
 
-/** Map game IDs to accent colors for the CyberCard system */
-const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange" | "gold"> = {
+/** Map canonical slugs to accent colors for the CyberCard system */
+const GAME_ACCENTS: Record<
+  string,
+  "green" | "red" | "purple" | "cyan" | "orange" | "gold"
+> = {
   "top-secret": "purple",
   "fuzzynuts-world": "green",
   mario: "red",
-  survivors: "purple",
+  "fuzzy-survivors": "purple",
   minigolf: "cyan",
-  racer: "orange",
+  "nut-racer": "orange",
 };
 
-/** Map game IDs to emojis for the tab selector */
-const GAME_EMOJIS: Record<string, string> = {
-  "top-secret": "🕵️",
-  "fuzzynuts-world": "🌍",
-  mario: "🍄",
-  survivors: "⚔️",
-  minigolf: "⛳",
-  racer: "🏎️",
-};
+/** Emoji helper — pulls from the registry so there's a single source of truth */
+const getGameEmoji = (slug: string): string =>
+  gameRegistry.getBySlug(slug)?.emoji ?? "🎮";
 
 /** Week options for the week selector dropdown */
 const WEEK_OPTIONS = [
@@ -83,7 +95,10 @@ function getPersonalBest(gameId: string): number | null {
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) {
     return (
-      <span className="text-lg font-bold trophy-float" title="1st Place — 250,000 $NUT">
+      <span
+        className="text-lg font-bold trophy-float"
+        title="1st Place — 250,000 $NUT"
+      >
         🥇
       </span>
     );
@@ -124,19 +139,32 @@ export function Leaderboard() {
 
   // Compute selected week key
   const selectedWeek = useMemo(
-    () => (weekOffset === 0 ? getCurrentWeekKey() : getWeekKeyOffset(weekOffset)),
-    [weekOffset]
+    () =>
+      weekOffset === 0 ? getCurrentWeekKey() : getWeekKeyOffset(weekOffset),
+    [weekOffset],
   );
 
   // SSE-powered leaderboard with automatic polling fallback
-  const { scores, loading, error, lastFetched, isRefreshing, refetch, manualRefresh } =
-    useLeaderboardSSE(selectedGame, selectedWeek);
+  const {
+    scores,
+    loading,
+    error,
+    lastFetched,
+    isRefreshing,
+    refetch,
+    manualRefresh,
+  } = useLeaderboardSSE(selectedGame, selectedWeek);
 
   // Tick-accurate countdown (1 s visible, 60 s hidden)
   const countdown = useWeeklyCountdown();
 
   /* ── Derived state ── */
-  const currentGameMeta = GAMES.find((g) => g.id === selectedGame);
+  const currentGameMeta = gameRegistry.getBySlug(selectedGame);
+  // Tabs come straight from the registry's `leaderboardEnabled` flag.
+  // Games with no scores yet (e.g. Nut Racer pre-engine) still get a
+  // tab and just render the empty state — that's now safe because the
+  // backend correctly returns [] for empty slugs (commit b92c64437).
+  const allGames = gameRegistry.getAll().filter((g) => g.leaderboardEnabled);
   const accent = GAME_ACCENTS[selectedGame] || "green";
   const isOnline = lastFetched !== null;
   const isCurrentWeek = weekOffset === 0;
@@ -144,12 +172,14 @@ export function Leaderboard() {
   /* ── Check if user's score is in the list ── */
   const userRank = walletAddress
     ? scores.findIndex(
-        (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase()
+        (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase(),
       ) + 1
     : 0;
 
   // Prize eligibility for connected wallet
-  const { eligibility, status: claimStatus } = usePayoutEligibility(walletAddress ?? null);
+  const { eligibility, status: claimStatus } = usePayoutEligibility(
+    walletAddress ?? null,
+  );
   const isWinner = isCurrentWeek && userRank > 0 && userRank <= 3;
   const prizeInfo = isWinner ? PRIZE_LABELS[userRank] : null;
 
@@ -178,73 +208,93 @@ export function Leaderboard() {
             Top scores reset every Monday. Climb the ranks, earn $NUT.
           </p>
           {isCurrentWeek && (
-            <p className={`text-xs font-mono mt-2 ${countdown.isCritical ? "text-red-400 animate-pulse" : countdown.isUrgent ? "text-orange" : "text-cream-dim/60"} countdown-pulse`}>
-              ⏱ Resets in <span className={`font-semibold ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>{countdown.display}</span> · Monday 00:00 UTC
+            <p
+              className={`text-xs font-mono mt-2 ${countdown.isCritical ? "text-red-400 animate-pulse" : countdown.isUrgent ? "text-orange" : "text-cream-dim/60"} countdown-pulse`}
+            >
+              ⏱ Resets in{" "}
+              <span
+                className={`font-semibold ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}
+              >
+                {countdown.display}
+              </span>{" "}
+              · Monday 00:00 UTC
             </p>
           )}
         </motion.div>
 
         {/* ═══ PRIZE WINNER BANNER ═══ */}
         <AnimatePresence>
-          {isWinner && prizeInfo && isCurrentWeek && claimStatus !== "success" && claimStatus !== "already-claimed" && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", damping: 15, stiffness: 200 }}
-              className="mb-8"
-            >
-              <div className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/40 prize-shimmer"
-                style={{
-                  background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(1,5,8,0.95) 40%, rgba(16,185,129,0.05) 100%)",
-                  boxShadow: "0 0 40px rgba(251,191,36,0.15), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)"
-                }}
+          {isWinner &&
+            prizeInfo &&
+            isCurrentWeek &&
+            claimStatus !== "success" &&
+            claimStatus !== "already-claimed" && (
+              <motion.div
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ type: "spring", damping: 15, stiffness: 200 }}
+                className="mb-8"
               >
-                <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5 p-6 sm:p-8">
-                  {/* Trophy */}
-                  <div className="trophy-float text-6xl sm:text-7xl shrink-0">
-                    {userRank === 1 ? "🏆" : userRank === 2 ? "🥈" : "🥉"}
-                  </div>
-
-                  {/* Message */}
-                  <div className="flex-1 text-center sm:text-left">
-                    <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                      <Star size={16} className="text-brand-gold" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
-                        You&apos;re a Winner!
-                      </span>
-                      <Star size={16} className="text-brand-gold" />
+                <div
+                  className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/40 prize-shimmer"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(1,5,8,0.95) 40%, rgba(16,185,129,0.05) 100%)",
+                    boxShadow:
+                      "0 0 40px rgba(251,191,36,0.15), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)",
+                  }}
+                >
+                  <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5 p-6 sm:p-8">
+                    {/* Trophy */}
+                    <div className="trophy-float text-6xl sm:text-7xl shrink-0">
+                      {userRank === 1 ? "🏆" : userRank === 2 ? "🥈" : "🥉"}
                     </div>
-                    <h3 className="font-display text-2xl sm:text-3xl font-black text-cream mb-1">
-                      You&apos;re <span className="gradient-text-gold">#{userRank}</span> this week!
-                    </h3>
-                    <p className="text-sm text-cream-dim">
-                      in {currentGameMeta?.title ?? selectedGame}
-                    </p>
-                    <p className="font-display text-3xl sm:text-4xl font-black text-brand-gold text-glow-gold mt-2">
-                      {prizeInfo.amount}
-                    </p>
-                  </div>
 
-                  {/* Claim CTA */}
-                  {eligibility?.eligible && claimStatus !== "claiming" && (
-                    <motion.a
-                      href="/profile/"
-                      whileHover={{ scale: 1.06, boxShadow: "0 0 50px rgba(251,191,36,0.6)" }}
-                      whileTap={{ scale: 0.95 }}
-                      className="claim-fab-pulse flex items-center gap-2.5 px-7 py-4 rounded-xl
+                    {/* Message */}
+                    <div className="flex-1 text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                        <Star size={16} className="text-brand-gold" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+                          You&apos;re a Winner!
+                        </span>
+                        <Star size={16} className="text-brand-gold" />
+                      </div>
+                      <h3 className="font-display text-2xl sm:text-3xl font-black text-cream mb-1">
+                        You&apos;re{" "}
+                        <span className="gradient-text-gold">#{userRank}</span>{" "}
+                        this week!
+                      </h3>
+                      <p className="text-sm text-cream-dim">
+                        in {currentGameMeta?.title ?? selectedGame}
+                      </p>
+                      <p className="font-display text-3xl sm:text-4xl font-black text-brand-gold text-glow-gold mt-2">
+                        {prizeInfo.amount}
+                      </p>
+                    </div>
+
+                    {/* Claim CTA */}
+                    {eligibility?.eligible && claimStatus !== "claiming" && (
+                      <motion.a
+                        href="/profile/"
+                        whileHover={{
+                          scale: 1.06,
+                          boxShadow: "0 0 50px rgba(251,191,36,0.6)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        className="claim-fab-pulse flex items-center gap-2.5 px-7 py-4 rounded-xl
                                  bg-gradient-to-r from-brand-gold to-yellow-500
                                  text-forest-dark font-black text-base shrink-0
                                  cursor-pointer min-h-[52px]"
-                    >
-                      <Gift size={20} />
-                      Claim Prize
-                    </motion.a>
-                  )}
+                      >
+                        <Gift size={20} />
+                        Claim Prize
+                      </motion.a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
         </AnimatePresence>
 
         {/* ── Controls Bar ── */}
@@ -257,22 +307,22 @@ export function Leaderboard() {
         >
           {/* Game Selector — Desktop Tabs */}
           <div className="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-[var(--color-card)] border border-[var(--color-glass-border)]">
-            {GAMES.map((game) => (
+            {allGames.map((game) => (
               <button
-                key={game.id}
-                onClick={() => setSelectedGame(game.id)}
+                key={game.slug}
+                onClick={() => setSelectedGame(game.slug)}
                 className={`
                   flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold
                   transition-all duration-200 min-h-[44px]
                   ${
-                    selectedGame === game.id
+                    selectedGame === game.slug
                       ? "bg-neon-green/15 text-neon-green border border-neon-green/30 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
                       : "text-cream-dim hover:text-cream hover:bg-white/[0.04] border border-transparent"
                   }
                 `}
-                aria-pressed={selectedGame === game.id}
+                aria-pressed={selectedGame === game.slug}
               >
-                <span className="text-base">{GAME_EMOJIS[game.id]}</span>
+                <span className="text-base">{game.emoji}</span>
                 <span className="hidden lg:inline">{game.title}</span>
               </button>
             ))}
@@ -289,7 +339,7 @@ export function Leaderboard() {
               aria-haspopup="listbox"
             >
               <span className="flex items-center gap-2">
-                <span>{GAME_EMOJIS[selectedGame]}</span>
+                <span>{getGameEmoji(selectedGame)}</span>
                 <span>{currentGameMeta?.title || selectedGame}</span>
               </span>
               <ChevronDown
@@ -310,28 +360,30 @@ export function Leaderboard() {
                              backdrop-blur-xl shadow-2xl"
                   role="listbox"
                 >
-                  {GAMES.map((game) => (
+                  {allGames.map((game) => (
                     <button
-                      key={game.id}
+                      key={game.slug}
                       onClick={() => {
-                        setSelectedGame(game.id);
+                        setSelectedGame(game.slug);
                         setDropdownOpen(false);
                       }}
                       role="option"
-                      aria-selected={selectedGame === game.id}
+                      aria-selected={selectedGame === game.slug}
                       className={`
                         w-full flex items-center gap-3 px-4 py-3 text-sm font-medium
                         transition-colors min-h-[44px]
                         ${
-                          selectedGame === game.id
+                          selectedGame === game.slug
                             ? "bg-neon-green/10 text-neon-green"
                             : "text-cream-dim hover:text-cream hover:bg-white/[0.04]"
                         }
                       `}
                     >
-                      <span className="text-base">{GAME_EMOJIS[game.id]}</span>
+                      <span className="text-base">{game.emoji}</span>
                       <span>{game.title}</span>
-                      <span className="ml-auto text-xs opacity-60">{game.type}</span>
+                      <span className="ml-auto text-xs opacity-60">
+                        {game.genre}
+                      </span>
                     </button>
                   ))}
                 </motion.div>
@@ -373,7 +425,10 @@ export function Leaderboard() {
                     role="listbox"
                   >
                     {WEEK_OPTIONS.map((opt) => {
-                      const weekKey = opt.offset === 0 ? getCurrentWeekKey() : getWeekKeyOffset(opt.offset);
+                      const weekKey =
+                        opt.offset === 0
+                          ? getCurrentWeekKey()
+                          : getWeekKeyOffset(opt.offset);
                       return (
                         <button
                           key={opt.offset}
@@ -394,7 +449,9 @@ export function Leaderboard() {
                           `}
                         >
                           <span>{opt.label}</span>
-                          <span className="text-[10px] font-mono opacity-60">{weekKey}</span>
+                          <span className="text-[10px] font-mono opacity-60">
+                            {weekKey}
+                          </span>
                         </button>
                       );
                     })}
@@ -483,28 +540,46 @@ export function Leaderboard() {
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-brand-gold/20 text-center">
               <span className="text-lg">🥇</span>
               <div className="text-left">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-gold/70">1st</p>
-                <p className="text-sm sm:text-base font-black font-mono text-brand-gold">250K</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-gold/70">
+                  1st
+                </p>
+                <p className="text-sm sm:text-base font-black font-mono text-brand-gold">
+                  250K
+                </p>
               </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">
+                $NUT
+              </span>
             </div>
             {/* 2nd Place */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-gray-400/20 text-center">
               <span className="text-lg">🥈</span>
               <div className="text-left">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400/70">2nd</p>
-                <p className="text-sm sm:text-base font-black font-mono text-gray-300">150K</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400/70">
+                  2nd
+                </p>
+                <p className="text-sm sm:text-base font-black font-mono text-gray-300">
+                  150K
+                </p>
               </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">
+                $NUT
+              </span>
             </div>
             {/* 3rd Place */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-amber-700/20 text-center">
               <span className="text-lg">🥉</span>
               <div className="text-left">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600/70">3rd</p>
-                <p className="text-sm sm:text-base font-black font-mono text-amber-600">100K</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600/70">
+                  3rd
+                </p>
+                <p className="text-sm sm:text-base font-black font-mono text-amber-600">
+                  100K
+                </p>
               </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">
+                $NUT
+              </span>
             </div>
           </motion.div>
         )}
@@ -529,9 +604,7 @@ export function Leaderboard() {
             </div>
 
             {/* ── Loading State ── */}
-            {loading && (
-              <LeaderboardSkeleton />
-            )}
+            {loading && <LeaderboardSkeleton />}
 
             {/* ── Error State (full error, no data) ── */}
             {!loading && error && scores.length === 0 && (
@@ -540,9 +613,7 @@ export function Leaderboard() {
                 <p className="font-display text-lg font-bold text-cream mb-2">
                   Server Unreachable
                 </p>
-                <p className="text-sm text-cream-dim max-w-sm mb-6">
-                  {error}
-                </p>
+                <p className="text-sm text-cream-dim max-w-sm mb-6">{error}</p>
                 <button
                   onClick={() => refetch(true)}
                   className="btn-secondary text-sm"
@@ -605,8 +676,8 @@ export function Leaderboard() {
                           isCurrentUser
                             ? `bg-brand-gold/[0.08] border-l-2 border-l-brand-gold ${rowPrize?.glow ?? ""}`
                             : rank <= 3
-                            ? `bg-white/[0.015] ${rowPrize?.glow ?? ""}`
-                            : "hover:bg-white/[0.02]"
+                              ? `bg-white/[0.015] ${rowPrize?.glow ?? ""}`
+                              : "hover:bg-white/[0.02]"
                         }
                       `}
                     >
@@ -624,8 +695,8 @@ export function Leaderboard() {
                               isCurrentUser
                                 ? "text-brand-gold font-bold"
                                 : rank <= 3
-                                ? "text-cream font-semibold"
-                                : "text-cream-dim"
+                                  ? "text-cream font-semibold"
+                                  : "text-cream-dim"
                             }
                           `}
                         >
@@ -641,15 +712,18 @@ export function Leaderboard() {
                       {/* Prize Badge — current week only for top 3 */}
                       {rowPrize && isCurrentWeek && (
                         <div className="hidden sm:flex items-center gap-1 shrink-0">
-                          <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border
-                            ${rank === 1
-                              ? "bg-brand-gold/10 border-brand-gold/30 text-brand-gold"
-                              : rank === 2
-                              ? "bg-silver/10 border-silver/30 text-silver"
-                              : "bg-bronze/10 border-bronze/30 text-bronze"
+                          <span
+                            className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border
+                            ${
+                              rank === 1
+                                ? "bg-brand-gold/10 border-brand-gold/30 text-brand-gold"
+                                : rank === 2
+                                  ? "bg-silver/10 border-silver/30 text-silver"
+                                  : "bg-bronze/10 border-bronze/30 text-bronze"
                             }`}
                           >
-                            <Zap size={8} className="inline mr-0.5" />{rowPrize.amount}
+                            <Zap size={8} className="inline mr-0.5" />
+                            {rowPrize.amount}
                           </span>
                         </div>
                       )}
@@ -663,8 +737,8 @@ export function Leaderboard() {
                               rank === 1
                                 ? "text-brand-gold text-glow-gold"
                                 : rank <= 3
-                                ? "text-neon-green"
-                                : "text-cream"
+                                  ? "text-neon-green"
+                                  : "text-cream"
                             }
                           `}
                         >
@@ -701,7 +775,10 @@ export function Leaderboard() {
             animate={{ opacity: 1 }}
             className="text-[11px] text-cream-dim/50 text-center mt-4 font-mono"
           >
-            Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} · {isCurrentWeek ? "Resets Monday 00:00 UTC" : `Week: ${selectedWeek}`}
+            Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} ·{" "}
+            {isCurrentWeek
+              ? "Resets Monday 00:00 UTC"
+              : `Week: ${selectedWeek}`}
           </motion.p>
         )}
       </div>

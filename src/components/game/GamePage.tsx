@@ -2,18 +2,16 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Loader2,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-} from "lucide-react";
+import { Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameSidebar } from "@/components/game/GameSidebar";
 import { GameViewport } from "@/components/game/GameViewport";
 import { GameControls, useFirstVisit } from "@/components/game/GameControls";
 import { GameMenu } from "@/components/game/GameMenu";
-import { TouchControlsHint, useTouchHint } from "@/components/game/TouchControlsHint";
+import {
+  TouchControlsHint,
+  useTouchHint,
+} from "@/components/game/TouchControlsHint";
 import { ScoreSubmissionPanel } from "@/components/game/ScoreSubmissionPanel";
 import { GameErrorBoundary } from "@/components/game/ErrorBoundary";
 import {
@@ -110,10 +108,10 @@ export function GamePage({ game }: GamePageProps) {
     dismiss,
   } = useScoreSubmission(game.slug);
 
-  const {
-    scores,
-    refetch: refetchLeaderboard,
-  } = useLeaderboard(game.slug, selectedWeek);
+  const { scores, refetch: refetchLeaderboard } = useLeaderboard(
+    game.slug,
+    selectedWeek,
+  );
 
   const { eligibility } = usePayoutEligibility(address ?? null);
 
@@ -166,6 +164,20 @@ export function GamePage({ game }: GamePageProps) {
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
+  // ── Iframe-initiated "back to arcade" navigation ──
+  // Games inside the iframe send { type: "FUZZY_NAV_BACK" } when the user
+  // clicks an in-game back link. The iframe sandbox blocks top navigation,
+  // so the parent has to do it. Matches handlePauseQuit below.
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "FUZZY_NAV_BACK") {
+        window.location.href = "/#games";
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
   // ── Handlers ──
   const handleLoadComplete = useCallback(() => {
     setIsLoading(false);
@@ -212,7 +224,7 @@ export function GamePage({ game }: GamePageProps) {
     }
     iframeRef.current?.contentWindow?.postMessage(
       { type: "setMute", muted: next },
-      "*"
+      "*",
     );
   }, [isMuted]);
 
@@ -290,7 +302,14 @@ export function GamePage({ game }: GamePageProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleFullscreen, toggleMute, toggleSidebar, toggleControls, controlsOpen, menuOpen]);
+  }, [
+    toggleFullscreen,
+    toggleMute,
+    toggleSidebar,
+    toggleControls,
+    controlsOpen,
+    menuOpen,
+  ]);
 
   // ── Toast config ──
   const toastConfig = useMemo(() => {
@@ -310,8 +329,7 @@ export function GamePage({ game }: GamePageProps) {
       case "error":
         return {
           icon:
-            errorMessage?.includes("Rate") ||
-            errorMessage?.includes("fast") ? (
+            errorMessage?.includes("Rate") || errorMessage?.includes("fast") ? (
               <AlertTriangle size={18} className="shrink-0" />
             ) : (
               <XCircle size={18} className="shrink-0" />

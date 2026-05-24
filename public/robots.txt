@@ -1,12 +1,8 @@
-# Fuzzynuts — https://fuzzynuts.xyz
-# Optimized for search engine crawling
+# Fuzzynuts — PRE-LAUNCH LOCKDOWN
+# All crawling is prohibited until official launch.
 
 User-agent: *
-Allow: /
+Disallow: /
 
-# Static sitemap
-Sitemap: https://fuzzynuts.xyz/sitemap.xml
-
-# Block internal/dev paths
-Disallow: /_next/
-Disallow: /api/
+# No sitemap available
+# Sitemap: none

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GAMES } from "@/lib/utils";
+import { gameRegistry, type GameMetadata } from "@/lib/gameRegistry";
 import { useState, useCallback } from "react";
 import Image from "next/image";
 
@@ -16,7 +16,7 @@ function GameCard({
   index,
   featured = false,
 }: {
-  game: (typeof GAMES)[number];
+  game: GameMetadata;
   index: number;
   featured?: boolean;
 }) {
@@ -29,7 +29,8 @@ function GameCard({
     setPressed(false);
   }, []);
 
-  const isComingSoon = game.id === "racer" || game.id === "top-secret";
+  const isComingSoon = game.comingSoon;
+  const href = isComingSoon ? "#" : `/games/${game.slug}/`;
 
   return (
     <motion.article
@@ -39,7 +40,7 @@ function GameCard({
       transition={{ delay: index * 0.07, duration: 0.5, ease: "easeOut" }}
       onMouseEnter={handleHover}
       onMouseLeave={handleLeave}
-      aria-label={`${game.title} — ${game.type}`}
+      aria-label={`${game.title} — ${game.genre}`}
       className={`game-card group relative flex flex-col ${
         featured ? "game-card--featured sm:col-span-2 lg:col-span-2" : ""
       }`}
@@ -68,7 +69,7 @@ function GameCard({
           aria-hidden="true"
         />
 
-        {game.icon && (
+        {game.iconPath && (
           <div
             className={`relative z-10 ${
               featured
@@ -77,7 +78,7 @@ function GameCard({
             } mx-auto flex items-center justify-center`}
           >
             <Image
-              src={game.icon}
+              src={game.iconPath}
               alt={`${game.title} icon`}
               width={featured ? 200 : 160}
               height={featured ? 200 : 160}
@@ -113,7 +114,7 @@ function GameCard({
               border: `1px solid ${game.color}25`,
             }}
           >
-            {game.type}
+            {game.genre}
           </span>
         </div>
 
@@ -145,12 +146,12 @@ function GameCard({
 
         {/* Play Button — sleek pill */}
         <motion.a
-          href={game.href}
+          href={href}
           onClick={(e) => {
             // Force full page navigation to avoid Next.js prefetch/redirect issues
-            if (!isComingSoon && game.href !== "#") {
+            if (!isComingSoon) {
               e.preventDefault();
-              window.location.href = game.href;
+              window.location.href = href;
             }
           }}
           whileTap={{ scale: 0.95 }}
@@ -178,8 +179,7 @@ function GameCard({
                 : `0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 var(--color-glass-border-strong)`,
             border: isComingSoon ? "1px solid #333" : "1px solid #d97706",
             cursor: isComingSoon ? "not-allowed" : "pointer",
-            pointerEvents:
-              isComingSoon && game.href === "#" ? "none" : "auto",
+            pointerEvents: isComingSoon ? "none" : "auto",
           }}
         >
           {isComingSoon ? "🔒 Coming Soon" : "▶ PLAY"}
@@ -257,12 +257,12 @@ export function GamesShowcase() {
 
         {/* Game Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-          {GAMES.map((game, i) => (
+          {gameRegistry.getAll().map((game, i) => (
             <GameCard
-              key={game.id}
+              key={game.slug}
               game={game}
               index={i}
-              featured={game.id === "fuzzynuts-world"}
+              featured={game.slug === "fuzzynuts-world"}
             />
           ))}
         </div>

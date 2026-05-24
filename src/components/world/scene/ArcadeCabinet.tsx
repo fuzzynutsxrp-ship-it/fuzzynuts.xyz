@@ -6,17 +6,20 @@ import { useFrame } from "@react-three/fiber";
 
 /* ─────────────────────────────────────────────────────────────
    ArcadeCabinet — Low-poly retro arcade machine sitting in the
-   forest. Black body, glowing marquee, flickering CRT screen.
+   forest, in the style of herobackground2.jpg: matte-black body,
+   bright red/yellow marquee, glowing CRT with strong flicker,
+   slight overgrowth at the base (ferns/vines clinging to it).
 
    Body parts (all simple boxes):
    • Base (deeper bottom box)
    • Body (vertical box)
-   • Marquee (small box on top with emissive color)
-   • Screen (front-facing plane with animated emissive)
+   • Marquee (small box on top with strong emissive)
+   • Screen (front-facing plane with bigger flicker amplitude)
    • Control panel (angled box at sit-down level)
-   • Joystick + 2 buttons (cylinder + spheres)
+   • Joystick + 3 buttons
+   • Overgrowth: 4 cheap additive sprite "ferns" at the base
 
-   Tris budget: ~70 per cabinet. Cheap.
+   Tris budget: ~80 per cabinet (still trivial).
    ───────────────────────────────────────────────────────────── */
 
 export interface ArcadeCabinetProps {
@@ -26,6 +29,8 @@ export interface ArcadeCabinetProps {
   accent?: string;
   /** Multiplier from Leva for CRT + marquee brightness. */
   glow?: number;
+  /** Optional overgrowth (small ferns clinging to the base). */
+  overgrowth?: boolean;
   /** Static label (we don't render Text inside to keep it cheap). */
   label?: string;
 }
@@ -33,22 +38,25 @@ export interface ArcadeCabinetProps {
 export function ArcadeCabinet({
   position = [0, 0, 0],
   rotation = 0,
-  accent = "#fbbf24",
+  accent = "#ef4444",
   glow = 1,
+  overgrowth = true,
   label,
 }: ArcadeCabinetProps) {
   const screenMat = useRef<THREE.MeshBasicMaterial>(null);
   const marqueeMat = useRef<THREE.MeshBasicMaterial>(null);
+  const groundGlowMat = useRef<THREE.MeshBasicMaterial>(null);
   // Avoid label warning when not provided.
   void label;
 
-  // Shared materials per cabinet.
+  // Shared materials per cabinet — matte black body matching the dark
+  // cabinets in herobackground2.jpg.
   const bodyMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#0c0c10",
-        roughness: 0.4,
-        metalness: 0.5,
+        color: "#06060a",
+        roughness: 0.55,
+        metalness: 0.45,
         flatShading: true,
       }),
     [],
@@ -56,24 +64,47 @@ export function ArcadeCabinet({
   const trimMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#2a2030",
-        roughness: 0.6,
-        metalness: 0.3,
+        color: "#1a1622",
+        roughness: 0.65,
+        metalness: 0.35,
         flatShading: true,
+      }),
+    [],
+  );
+  // A few cheap glowing overgrowth sprites.
+  const fernMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: "#10b981",
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        toneMapped: false,
       }),
     [],
   );
 
   useFrame((state) => {
-    // CRT scanline flicker — modulate emissive intensity by a noisy sine.
+    // CRT scanline flicker — stronger amplitude to match the dramatic CRTs
+    // in herobackground2.jpg. Two noise sources at different frequencies.
     const t = state.clock.elapsedTime;
-    const flicker = 0.85 + Math.sin(t * 17.3) * 0.05 + Math.sin(t * 41) * 0.03;
+    const flicker = 0.78 + Math.sin(t * 17.3) * 0.12 + Math.sin(t * 41) * 0.06;
     if (screenMat.current) {
-      screenMat.current.color.set(accent).multiplyScalar(2.5 * glow * flicker);
+      // Boosted from 2.5× → 3.6× for a more luminous CRT.
+      screenMat.current.color.set(accent).multiplyScalar(3.6 * glow * flicker);
     }
     if (marqueeMat.current) {
-      const breath = 0.95 + Math.sin(t * 1.7) * 0.05;
-      marqueeMat.current.color.set(accent).multiplyScalar(3.5 * glow * breath);
+      // Marquees breathe slower than CRT, but punch harder (5.2×).
+      const breath = 0.9 + Math.sin(t * 1.5) * 0.1;
+      marqueeMat.current.color.set(accent).multiplyScalar(5.2 * glow * breath);
+    }
+    // Ground glow under the cabinet — synced to marquee breath so the spill
+    // light reads as coming from the machine.
+    if (groundGlowMat.current) {
+      const breath = 0.6 + Math.sin(t * 1.5 + 0.3) * 0.15;
+      groundGlowMat.current.opacity = 0.4 * glow * breath;
     }
   });
 
@@ -152,6 +183,42 @@ export function ArcadeCabinet({
       <mesh material={trimMat} position={[0, 0.55, 0.38]}>
         <boxGeometry args={[0.18, 0.04, 0.02]} />
       </mesh>
+
+      {/* ── Ground glow plate — additive disc on the forest floor right
+            under the cabinet. Synced to the marquee breath in useFrame so
+            it reads as colored spill light from the machine itself. ── */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0.2]}>
+        <circleGeometry args={[1.1, 24]} />
+        <meshBasicMaterial
+          ref={groundGlowMat}
+          color={accent}
+          transparent
+          opacity={0.4}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+
+      {/* ── Overgrowth: a handful of tiny glowing "fern" sprites clinging
+            to the base. Four crossed planes each so they read from any
+            angle. Skipped when `overgrowth=false` for perf. ── */}
+      {overgrowth &&
+        [
+          { x: -0.55, z: 0.2, r: 0.6, s: 0.55 },
+          { x: 0.6, z: 0.25, r: -0.4, s: 0.5 },
+          { x: -0.4, z: -0.35, r: 1.2, s: 0.45 },
+          { x: 0.45, z: -0.3, r: -0.9, s: 0.4 },
+        ].map((f, i) => (
+          <group key={i} position={[f.x, 0.08, f.z]} rotation={[0, f.r, 0]}>
+            <mesh material={fernMat}>
+              <planeGeometry args={[0.55 * f.s, 0.7 * f.s]} />
+            </mesh>
+            <mesh material={fernMat} rotation={[0, Math.PI / 2, 0]}>
+              <planeGeometry args={[0.55 * f.s, 0.7 * f.s]} />
+            </mesh>
+          </group>
+        ))}
     </group>
   );
 }

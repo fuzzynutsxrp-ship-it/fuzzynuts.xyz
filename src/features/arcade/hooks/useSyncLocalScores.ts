@@ -16,6 +16,7 @@ import { useRef, useEffect } from "react";
 import type { LocalScoreEntry } from "../types/arcade";
 import { API_SCORES, LOCAL_STORAGE_KEY } from "../constants";
 import { getCurrentWeekKey } from "../utils/scoreHelpers";
+import { toBackendSlug } from "../slugAliases";
 
 /**
  * Auto-syncs localStorage scores to the backend when a wallet is connected.
@@ -57,9 +58,9 @@ export function useSyncLocalScores(game: string, wallet: string | null): void {
 
       if (bestScore <= 0) return;
 
-      // POST to backend
+      // POST to backend (translate canonical → backend slug at the boundary)
       const payload = {
-        game,
+        game: toBackendSlug(game),
         score: Math.floor(bestScore),
         wallet,
         timestamp: Date.now(),

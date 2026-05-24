@@ -22,74 +22,10 @@ export const TOKENOMICS = [
   { label: "Squirrel's Pile (Founder)", percentage: 2, amount: "6.42B NUT", color: "#8B6914" },
 ];
 
-export const GAMES = [
-  {
-    id: "top-secret",
-    title: "Top Secret",
-    type: "??? Classified",
-    description: "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
-    href: "/games/top-secret/",
-    icon: "/icons/icon-top-secret-pop.webp",
-    image: "🕵️",
-    color: "#8B5CF6",
-    tags: ["Coming Soon", "🔒 Classified"],
-  },
-  {
-    id: "fuzzynuts-world",
-    title: "Fuzzynuts World",
-    type: "MMORPG",
-    description: "Explore a massive open world, complete quests, craft items, and compete with players worldwide. The flagship Fuzzynuts experience.",
-    href: "/games/fuzzynuts-world/",
-    icon: "/icons/icon-world-pop.webp",
-    image: "🌍",
-    color: "#4ade80",
-    tags: ["Multiplayer", "RPG", "Quests"],
-  },
-  {
-    id: "mario",
-    title: "Super Fuzzynuts",
-    type: "Platformer",
-    description: "Classic side-scrolling action with all 32 original levels, random map generator, and level editor. Jump, stomp, collect nuts!",
-    href: "/games/mario/",
-    icon: "/icons/icon-super-pop.webp",
-    image: "🍄",
-    color: "#ef4444",
-    tags: ["Platformer", "Classic", "32 Levels"],
-  },
-  {
-    id: "survivors",
-    title: "Fuzzy Survivors",
-    type: "Horde Survival",
-    description: "Survive endless waves of enemies with auto-attack combat. Upgrade weapons, unlock abilities, and see how long you last.",
-    href: "/games/fuzzy-survivors/",
-    icon: "/icons/icon-survivors-pop.webp",
-    image: "⚔️",
-    color: "#a855f7",
-    tags: ["Roguelite", "Survival", "Auto-combat"],
-  },
-  {
-    id: "minigolf",
-    title: "Fuzzy Putt",
-    type: "Mini Golf",
-    description: "3D mini-golf with physics-based putting. Navigate tricky courses and aim for hole-in-one on every shot.",
-    href: "/games/minigolf/",
-    icon: "/icons/icon-putt-pop.webp",
-    image: "⛳",
-    color: "#22d3ee",
-    tags: ["3D", "Physics", "Casual"],
-  },
-  {
-    id: "racer",
-    title: "Nut Racer",
-    type: "Racing",
-    description: "High-speed racing through forest tracks. Collect acorns for boost, dodge obstacles, and race to the finish!",
-    href: "#",
-    icon: "/icons/icon-racer-pop.webp",
-    image: "🏎️",
-    color: "#f97316",
-    tags: ["Racing", "Speed", "Coming Soon"],
-  },
-];
+/* The GAMES array previously lived here. All game metadata is now
+   in @/lib/gameRegistry (the source of truth). Use:
+     gameRegistry.getAll()   — for tabs/grids
+     gameRegistry.getBySlug(slug)  — for individual lookups */
 
 export const FEATURES = [
   {

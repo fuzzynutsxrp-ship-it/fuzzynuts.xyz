@@ -252,7 +252,7 @@ export function WalletCTA() {
                     <span className="text-xs">No transactions required</span>
                   </div>
                   <span className="text-xs text-[var(--color-cream-dim)] opacity-50">
-                    Xaman · GemWallet · Crossmark
+                    Xaman · Joey
                   </span>
                 </div>
               </motion.div>

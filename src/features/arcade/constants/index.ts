@@ -28,18 +28,20 @@ export const MIN_PLAY_DURATION_MS = 5_000;
 /** Debounce cooldown between score submissions (ms) */
 export const SUBMIT_COOLDOWN_MS = 5_000;
 
+import { gameRegistry } from "@/lib/gameRegistry";
+
 /**
  * Per-game score submission caps (anti-cheat ceiling).
  * Scores above these values are automatically rejected.
+ *
+ * DERIVED from the gameRegistry — the registry is the single source
+ * of truth for game metadata. Keys are CANONICAL slugs (matching
+ * `public/games/<slug>/` folder names). API requests get translated
+ * to backend slugs by `slugAliases.ts` at the boundary.
  */
-export const SCORE_CAPS: Record<string, number> = {
-  "top-secret": 1_000_000,
-  "fuzzynuts-world": 10_000_000,
-  mario: 9_999_990,
-  survivors: 5_000_000,
-  minigolf: 100_000,
-  racer: 2_000_000,
-};
+export const SCORE_CAPS: Record<string, number> = Object.fromEntries(
+  gameRegistry.getAll().map((g) => [g.slug, g.scoreCap]),
+);
 
 /**
  * Weekly prize tiers — maps rank to $NUT prize amounts.
