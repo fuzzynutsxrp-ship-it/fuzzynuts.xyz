@@ -15,9 +15,12 @@
     "check:tokens": "node scripts/verify-ui-fixes.mjs"
   },
   "dependencies": {
+    "@joey-wallet/wc-client": "^1.0.4",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@react-three/postprocessing": "^3.0.4",
     "@types/three": "^0.184.1",
+    "@walletconnect/universal-provider": "^2.23.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",

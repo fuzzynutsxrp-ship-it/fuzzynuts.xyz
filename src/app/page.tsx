@@ -2,38 +2,78 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/sections/Hero";
+import { Hero3D } from "@/components/hero/Hero3D";
 import { ClientFallingNuts } from "@/components/ClientFallingNuts";
+
+/* ═══════════════════════════════════════════════════════════════
+   DEV_MODE — Flip to `true` to bring the original 2D hero back.
+   The 3D hero is lazy-loaded behind `ssr:false`, so toggling
+   this off does not bloat the initial bundle of the 2D path.
+   ═══════════════════════════════════════════════════════════════ */
+const DEV_MODE: { use2DHero: boolean } = {
+  use2DHero: false,
+};
 
 // ── Lazy-load below-fold sections ──
 // These components are dynamically imported so they don't block First Contentful Paint.
 // Each gets its own chunk → smaller initial JS bundle.
-const GamesShowcase = dynamic(() => import("@/components/sections/GamesShowcase").then(m => ({ default: m.GamesShowcase })));
-const PrizeTiers = dynamic(() => import("@/components/sections/PrizeTiers").then(m => ({ default: m.PrizeTiers })));
-const WalletCTA = dynamic(() => import("@/components/home/WalletCTA").then(m => ({ default: m.WalletCTA })));
-const SectionTransition = dynamic(() => import("@/components/home/SectionTransition").then(m => ({ default: m.SectionTransition })));
-const Features = dynamic(() => import("@/components/sections/Features").then(m => ({ default: m.Features })));
-const Tokenomics = dynamic(() => import("@/components/sections/Tokenomics").then(m => ({ default: m.Tokenomics })));
-const OnChainVerification = dynamic(() => import("@/components/sections/OnChainVerification").then(m => ({ default: m.OnChainVerification })));
-const HowToGet = dynamic(() => import("@/components/sections/HowToGet").then(m => ({ default: m.HowToGet })));
-const Footer = dynamic(() => import("@/components/layout/Footer").then(m => ({ default: m.Footer })));
-const FloatingMascot = dynamic(() => import("@/components/home/FloatingMascot").then(m => ({ default: m.FloatingMascot })));
+const GamesShowcase = dynamic(() =>
+  import("@/components/sections/GamesShowcase").then((m) => ({
+    default: m.GamesShowcase,
+  })),
+);
+const PrizeTiers = dynamic(() =>
+  import("@/components/sections/PrizeTiers").then((m) => ({
+    default: m.PrizeTiers,
+  })),
+);
+const WalletCTA = dynamic(() =>
+  import("@/components/home/WalletCTA").then((m) => ({ default: m.WalletCTA })),
+);
+const SectionTransition = dynamic(() =>
+  import("@/components/home/SectionTransition").then((m) => ({
+    default: m.SectionTransition,
+  })),
+);
+const Features = dynamic(() =>
+  import("@/components/sections/Features").then((m) => ({
+    default: m.Features,
+  })),
+);
+const Tokenomics = dynamic(() =>
+  import("@/components/sections/Tokenomics").then((m) => ({
+    default: m.Tokenomics,
+  })),
+);
+const OnChainVerification = dynamic(() =>
+  import("@/components/sections/OnChainVerification").then((m) => ({
+    default: m.OnChainVerification,
+  })),
+);
+const HowToGet = dynamic(() =>
+  import("@/components/sections/HowToGet").then((m) => ({
+    default: m.HowToGet,
+  })),
+);
+const Footer = dynamic(() =>
+  import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
+);
+const FloatingMascot = dynamic(() =>
+  import("@/components/home/FloatingMascot").then((m) => ({
+    default: m.FloatingMascot,
+  })),
+);
 
 export default function Home() {
   return (
     <>
-      {/* Skip to content link for accessibility */}
-      <a
-        href="#hero"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--color-gold)] focus:text-[var(--color-forest-900)] focus:font-bold focus:text-sm"
-      >
-        Skip to content
-      </a>
-
       <ClientFallingNuts />
       <Navbar />
       <main id="main-content" className="relative z-10">
-        {/* ═══ HERO — First impression, tagline, CTAs ═══ */}
-        <Hero />
+        {/* ═══ HERO — Immersive 3D forest experience.
+            Flip DEV_MODE.use2DHero above to bring the old 2D
+            hero back instantly. ═══ */}
+        {DEV_MODE.use2DHero ? <Hero /> : <Hero3D />}
 
         {/* ── Vine transition: Hero → Games ── */}
         <SectionTransition variant="vine" />
