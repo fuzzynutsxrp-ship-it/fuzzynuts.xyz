@@ -27,6 +27,7 @@
 
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useState } from "react";
+import { Leva } from "leva";
 import { SquirrelSpinner } from "@/components/hero/SquirrelSpinner";
 import { WorldHUD } from "./WorldHUD";
 import { WORLD_SCROLL_PAGES } from "./ScrollContext";
@@ -62,6 +63,17 @@ export function FuzzyWorld() {
       className="relative bg-[var(--color-forest-dark)]"
       style={{ height: `${WORLD_SCROLL_PAGES * 100}vh` }}
     >
+      {/* ── Live-tweak panel — starts collapsed so it doesn't dominate
+            the UI. Click the chevron in the top-right to expand. The
+            controls are defined inside <WorldCanvas/> via useControls().
+            Hidden on mobile (touch-unfriendly for fine slider control). */}
+      <Leva
+        collapsed
+        hidden={isMobile}
+        hideCopyButton
+        titleBar={{ title: "Forest Studio" }}
+      />
+
       {/* ── Fixed canvas — fills viewport, scrolls underneath the page ── */}
       <Suspense fallback={<SquirrelSpinner />}>
         <WorldCanvas isMobile={isMobile} />

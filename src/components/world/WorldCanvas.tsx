@@ -4,10 +4,16 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { useControls, folder } from "leva";
 import { gameRegistry, type GameMetadata } from "@/lib/gameRegistry";
 import { ScrollContext, type ScrollState } from "./ScrollContext";
 import { CameraRig, type CameraOverride } from "./CameraRig";
 import { Forest } from "@/components/hero/scene/Forest";
+import { CyberForest } from "./scene/CyberForest";
+import { ArcadeCabinet } from "./scene/ArcadeCabinet";
+import { CityHorizon } from "./scene/CityHorizon";
+import { GodRays } from "./scene/GodRays";
+import { BioluminescentFerns } from "./scene/BioluminescentFerns";
 import { FloatingAcorns } from "@/components/hero/scene/FloatingAcorns";
 import { Squirrels } from "@/components/hero/scene/Squirrels";
 import { NutMoon } from "@/components/hero/scene/NutMoon";
@@ -20,21 +26,46 @@ import { VaultStation } from "./stations/VaultStation";
 import { LeaderboardStation } from "./stations/LeaderboardStation";
 import { MoonStation } from "./stations/MoonStation";
 
-/* ─────────────────────────────────────────────────────────────
-   WorldCanvas — Single fixed Canvas spanning the viewport that
-   renders the entire 3D world. The page above gives us
-   `WORLD_SCROLL_PAGES × 100vh` of vertical scroll so the camera
-   has somewhere to travel.
+/* ═══════════════════════════════════════════════════════════════
+   DEV_MODE — Flip to `true` to fall back to the previous (pre-
+   cyber-forest) visual treatment: the simple cone-Forest, no
+   neon vines, no arcade cabinets, no god rays, no ferns, no
+   city horizon. Useful for A/B comparison or rolling back the
+   visual upgrade without redeploying.
+   ═══════════════════════════════════════════════════════════════ */
+const DEV_MODE: { legacyForest: boolean } = {
+  legacyForest: false,
+};
 
-   We avoid drei's <ScrollControls> deliberately — its internal
-   scroll proxy is fragile on mobile and clashes with Next.js
-   anchor navigation. A plain window scroll listener feeding a
-   ref-context is rock solid on both desktop and touch.
+/* ─────────────────────────────────────────────────────────────
+   WorldCanvas — Single fixed Canvas spanning the viewport.
+
+   • Window-scroll listener → ref-context → CameraRig
+   • Leva controls (grouped in folders) drive the live look:
+       Atmosphere · Vines · Arcade · Ferns · Squirrels · City · FX
+   • All control values are destructured from useControls() and
+     forwarded as plain props to the scene primitives.
    ───────────────────────────────────────────────────────────── */
 
 interface WorldCanvasProps {
   isMobile: boolean;
 }
+
+// Fixed positions for arcade cabinets — placed along the camera path so
+// they're visible across all stations. Light scatter, slight rotation so
+// each cabinet faces a "natural" direction.
+const ARCADE_PLACEMENTS: {
+  position: [number, number, number];
+  rotation: number;
+  accent: string;
+}[] = [
+  { position: [-2.6, -0.5, 4.5], rotation: 0.45, accent: "#ef4444" }, // hero left
+  { position: [3.1, -0.5, 4.8], rotation: -0.6, accent: "#22d3ee" }, // hero right
+  { position: [-5.2, -0.5, -2.5], rotation: 1.2, accent: "#a855f7" }, // games left
+  { position: [5.0, -0.5, -2.0], rotation: -1.0, accent: "#fbbf24" }, // games right
+  { position: [0.6, -0.5, -6.5], rotation: 0.2, accent: "#10b981" }, // mid back
+  { position: [-3.5, -0.5, -8.2], rotation: 0.9, accent: "#f97316" }, // far back
+];
 
 export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
   const explosionsRef = useRef<NutExplosionsHandle>(null);
@@ -48,6 +79,61 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
     () => gameRegistry.getAllLive().length,
     [],
   );
+
+  /* ─────────────────────────────────────────────────────────
+     Leva controls — grouped by visual subsystem.
+
+     Mobile users get a less aggressive default (lower density,
+     fewer particles), but every value is still tweakable.
+     ───────────────────────────────────────────────────────── */
+  const controls = useControls({
+    Atmosphere: folder({
+      fogColor: "#03110a",
+      fogNear: { value: 9, min: 0, max: 40, step: 0.5 },
+      fogFar: { value: isMobile ? 30 : 42, min: 8, max: 80, step: 1 },
+      saturation: { value: 1.0, min: 0.4, max: 1.8, step: 0.05 },
+    }),
+    Vines: folder({
+      vineIntensity: { value: 1.4, min: 0, max: 3, step: 0.05 },
+      vineColorA: "#22d3ee",
+      vineColorB: "#3b82f6",
+      vineColorC: "#10b981",
+    }),
+    Arcade: folder({
+      arcadeGlow: { value: 1.2, min: 0, max: 3, step: 0.05 },
+      arcadeCount: {
+        value: isMobile ? 3 : 6,
+        min: 0,
+        max: 6,
+        step: 1,
+      },
+    }),
+    Ferns: folder({
+      fernBrightness: { value: 1.1, min: 0, max: 3, step: 0.05 },
+      fernCount: {
+        value: isMobile ? 40 : 90,
+        min: 0,
+        max: 200,
+        step: 5,
+      },
+    }),
+    Squirrels: folder({
+      squirrelAnimSpeed: { value: 1.0, min: 0.1, max: 3, step: 0.05 },
+    }),
+    City: folder({
+      cityTint: "#3b5d8f",
+      cityVisible: true,
+    }),
+    GodRays: folder({
+      godRayBrightness: { value: 1.0, min: 0, max: 3, step: 0.05 },
+      godRayColor: "#bce8d6",
+    }),
+    PostFX: folder({
+      bloomIntensity: { value: 0.85, min: 0, max: 3, step: 0.05 },
+      bloomThreshold: { value: 0.5, min: 0, max: 1, step: 0.02 },
+      vignetteDarkness: { value: 0.75, min: 0, max: 1.5, step: 0.05 },
+    }),
+  });
 
   // ── Window-scroll → scrollState.current ──
   useEffect(() => {
@@ -74,8 +160,7 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
     };
   }, []);
 
-  // ── Ambient particle bursts so the scene always feels alive
-  //    (desktop only — saves battery on mobile). ──
+  // ── Ambient particle bursts (desktop only) ──
   useEffect(() => {
     if (isMobile) return;
     let cancelled = false;
@@ -103,7 +188,6 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
     worldPos: THREE.Vector3,
   ) => {
     explosionsRef.current?.burst(worldPos, game.color);
-    // Push a camera override pointing past the portal for a "diving in" feel.
     const camTarget = worldPos.clone();
     camTarget.z += 1.2;
     camTarget.y += 0.4;
@@ -122,13 +206,15 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Background click — ambient sparkle. Stops only at portal handlers.
     if (!explosionsRef.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     explosionsRef.current.burst(new THREE.Vector3(nx * 6, 1.5 + ny * 2.5, -4));
   };
+
+  // Visible arcade cabinets — slice by Leva's `arcadeCount` value.
+  const arcadeCabinets = ARCADE_PLACEMENTS.slice(0, controls.arcadeCount);
 
   return (
     <div
@@ -143,6 +229,7 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
           antialias: !isMobile,
           alpha: false,
           powerPreference: "high-performance",
+          toneMappingExposure: controls.saturation,
         }}
         dpr={isMobile ? [1, 1.25] : [1, 1.75]}
         shadows={false}
@@ -151,7 +238,10 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
         <ScrollContext.Provider value={scrollState.current}>
           {/* ── Background + atmosphere ── */}
           <color attach="background" args={["#020608"]} />
-          <fog attach="fog" args={["#03110a", 9, 38]} />
+          <fog
+            attach="fog"
+            args={[controls.fogColor, controls.fogNear, controls.fogFar]}
+          />
 
           {/* ── Lights ── */}
           <ambientLight intensity={0.35} color="#3a4a5a" />
@@ -183,11 +273,53 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
           <Suspense fallback={null}>
             {/* ── Always-on scene primitives ── */}
             <NutMoon />
-            <Forest treeCount={isMobile ? 18 : 32} wind={!isMobile} />
-            <FloatingAcorns count={isMobile ? 6 : 14} trails={!isMobile} />
-            <Squirrels count={isMobile ? 3 : 6} target={hoveredPos} />
 
-            {/* ── Stations: each fades in/out based on scroll progress ── */}
+            {DEV_MODE.legacyForest ? (
+              <Forest treeCount={isMobile ? 18 : 32} wind={!isMobile} />
+            ) : (
+              <>
+                <CyberForest
+                  treeCount={isMobile ? 18 : 32}
+                  wind={!isMobile}
+                  vineIntensity={controls.vineIntensity}
+                  vineColors={[
+                    controls.vineColorA,
+                    controls.vineColorB,
+                    controls.vineColorC,
+                  ]}
+                />
+                <BioluminescentFerns
+                  count={controls.fernCount}
+                  brightness={controls.fernBrightness}
+                />
+                <GodRays
+                  count={isMobile ? 4 : 6}
+                  brightness={controls.godRayBrightness}
+                  color={controls.godRayColor}
+                />
+                {controls.cityVisible && (
+                  <CityHorizon tint={controls.cityTint} count={32} />
+                )}
+                {arcadeCabinets.map((c, i) => (
+                  <ArcadeCabinet
+                    key={i}
+                    position={c.position}
+                    rotation={c.rotation}
+                    accent={c.accent}
+                    glow={controls.arcadeGlow}
+                  />
+                ))}
+              </>
+            )}
+
+            <FloatingAcorns count={isMobile ? 6 : 14} trails={!isMobile} />
+            <Squirrels
+              count={isMobile ? 3 : 6}
+              target={hoveredPos}
+              animSpeed={controls.squirrelAnimSpeed}
+            />
+
+            {/* ── Stations ── */}
             <GamesStation
               onHover={setHoveredPos}
               onActivate={handlePortalActivate}
@@ -203,16 +335,20 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
             />
           </Suspense>
 
-          {/* ── Post-processing (desktop only — too costly on mobile) ── */}
+          {/* ── Post-processing (desktop only) ── */}
           {!isMobile && (
             <EffectComposer multisampling={0} enableNormalPass={false}>
               <Bloom
-                intensity={0.75}
-                luminanceThreshold={0.55}
+                intensity={controls.bloomIntensity}
+                luminanceThreshold={controls.bloomThreshold}
                 luminanceSmoothing={0.2}
                 mipmapBlur
               />
-              <Vignette eskil={false} offset={0.2} darkness={0.7} />
+              <Vignette
+                eskil={false}
+                offset={0.2}
+                darkness={controls.vignetteDarkness}
+              />
             </EffectComposer>
           )}
         </ScrollContext.Provider>

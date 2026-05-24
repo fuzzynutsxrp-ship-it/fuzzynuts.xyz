@@ -23,6 +23,8 @@ export interface SquirrelsProps {
   count?: number;
   /** Optional world-space point a curious squirrel will run toward. */
   target?: THREE.Vector3 | null;
+  /** Multiplier on orbit + scamper speed (Leva-controlled). Default 1. */
+  animSpeed?: number;
 }
 
 interface SquirrelData {
@@ -34,7 +36,11 @@ interface SquirrelData {
   glanceOffset: number;
 }
 
-export function Squirrels({ count = 5, target = null }: SquirrelsProps) {
+export function Squirrels({
+  count = 5,
+  target = null,
+  animSpeed = 1,
+}: SquirrelsProps) {
   // Deterministic per-squirrel parameters.
   const squirrels = useMemo<SquirrelData[]>(() => {
     let seed = 909;
@@ -78,10 +84,13 @@ export function Squirrels({ count = 5, target = null }: SquirrelsProps) {
         }),
         eye: new THREE.MeshStandardMaterial({
           color: "#0a0a0a",
-          roughness: 0.3,
+          roughness: 0.25,
           emissive: "#ffffff",
-          emissiveIntensity: 0.15,
+          emissiveIntensity: 0.2,
         }),
+        // Tiny bright sphere on each eye for that "glistening expressive
+        // eye" look in herobackground.jpg.
+        eyeShine: new THREE.MeshBasicMaterial({ color: "#ffffff" }),
       };
     });
   }, [squirrels]);
@@ -94,6 +103,7 @@ export function Squirrels({ count = 5, target = null }: SquirrelsProps) {
           data={s}
           target={target}
           isLead={i === 0}
+          animSpeed={animSpeed}
           bodyGeo={bodyGeo}
           headGeo={headGeo}
           earGeo={earGeo}
@@ -111,6 +121,7 @@ interface SquirrelProps {
   data: SquirrelData;
   target: THREE.Vector3 | null;
   isLead: boolean;
+  animSpeed: number;
   bodyGeo: THREE.BufferGeometry;
   headGeo: THREE.BufferGeometry;
   earGeo: THREE.BufferGeometry;
@@ -121,6 +132,7 @@ interface SquirrelProps {
     body: THREE.Material;
     belly: THREE.Material;
     eye: THREE.Material;
+    eyeShine: THREE.Material;
   };
 }
 
@@ -131,6 +143,7 @@ function Squirrel({
   data,
   target,
   isLead,
+  animSpeed,
   bodyGeo,
   headGeo,
   earGeo,
@@ -141,11 +154,15 @@ function Squirrel({
 }: SquirrelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const headRef = useRef<THREE.Group>(null);
-  const tailRef = useRef<THREE.Mesh>(null);
+  const tailRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
+    // `animSpeed` scales effective time so all scampering/wagging slows
+    // or speeds together. Wall clock is still used for the camera-glance
+    // probability so a fully paused squirrel doesn't get stuck staring.
+    const wall = state.clock.elapsedTime;
+    const t = wall * animSpeed;
 
     // Base orbit position.
     const angle = t * data.orbitSpeed + data.phase;
@@ -179,7 +196,9 @@ function Squirrel({
     // position, get the angle from head→camera in world space, then
     // subtract the parent's facing to get a local Y rotation.
     if (headRef.current) {
-      const glance = Math.sin(t * 0.6 + data.glanceOffset) > 0.7;
+      // Glance probability uses wall clock so a paused squirrel doesn't
+      // freeze its head mid-stare.
+      const glance = Math.sin(wall * 0.6 + data.glanceOffset) > 0.7;
       if (glance) {
         const worldHead = headRef.current.getWorldPosition(_scratch);
         const camPos = state.camera.position;
@@ -216,14 +235,22 @@ function Squirrel({
         scale={[0.7, 0.5, 0.9]}
       />
 
-      {/* ── Tail (bushy, behind) ── */}
-      <mesh
-        ref={tailRef}
-        geometry={tailGeo}
-        material={mats.body}
-        position={[0, 0.6, -0.45]}
-        scale={[0.9, 1.4, 0.6]}
-      />
+      {/* ── Tail (bushy, behind) — two-layer fluffy stack ── */}
+      <group ref={tailRef} position={[0, 0.6, -0.45]}>
+        <mesh
+          geometry={tailGeo}
+          material={mats.body}
+          scale={[0.95, 1.55, 0.7]}
+        />
+        {/* Lighter fluffy outer puff for that "bushy" silhouette in the
+            reference photo. */}
+        <mesh
+          geometry={tailGeo}
+          material={mats.belly}
+          position={[0, 0.15, -0.05]}
+          scale={[0.6, 0.6, 0.5]}
+        />
+      </group>
 
       {/* ── Head (front) ── */}
       <group ref={headRef} position={[0, 0.55, 0.4]}>
@@ -246,16 +273,31 @@ function Squirrel({
           position={[0, -0.05, 0.18]}
           scale={[0.55, 0.4, 0.5]}
         />
-        {/* Eyes */}
+        {/* Eyes — bigger, with a tiny white shine sphere offset on each
+            for the expressive realistic look in herobackground.jpg. */}
         <mesh
           geometry={eyeGeo}
           material={mats.eye}
-          position={[0.08, 0.05, 0.18]}
+          position={[0.085, 0.05, 0.185]}
+          scale={1.4}
+        />
+        <mesh
+          geometry={eyeGeo}
+          material={mats.eyeShine}
+          position={[0.095, 0.07, 0.205]}
+          scale={0.55}
         />
         <mesh
           geometry={eyeGeo}
           material={mats.eye}
-          position={[-0.08, 0.05, 0.18]}
+          position={[-0.085, 0.05, 0.185]}
+          scale={1.4}
+        />
+        <mesh
+          geometry={eyeGeo}
+          material={mats.eyeShine}
+          position={[-0.075, 0.07, 0.205]}
+          scale={0.55}
         />
       </group>
 
