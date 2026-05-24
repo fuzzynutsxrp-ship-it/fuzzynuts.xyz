@@ -10,15 +10,29 @@ import { ScrollContext, type ScrollState } from "./ScrollContext";
 import { CameraRig, type CameraOverride } from "./CameraRig";
 import { Forest } from "@/components/hero/scene/Forest";
 import { CyberForest } from "./scene/CyberForest";
-import { ArcadeCabinet } from "./scene/ArcadeCabinet";
 import { CityHorizon } from "./scene/CityHorizon";
 import { GodRays } from "./scene/GodRays";
 import { BioluminescentFerns } from "./scene/BioluminescentFerns";
 import { ForestBackdrop } from "./scene/ForestBackdrop";
 import { AtmosphericMotes } from "./scene/AtmosphericMotes";
 import { FloatingAcorns } from "@/components/hero/scene/FloatingAcorns";
-import { Squirrels } from "@/components/hero/scene/Squirrels";
 import { NutMoon } from "@/components/hero/scene/NutMoon";
+// ── GLB-backed model components — drop-in replacements for the
+//    previous procedural ArcadeCabinet, Squirrels, BioluminescentFerns,
+//    and CyberForest. Selected via Leva's `useGLBModels` toggle. ──
+import { ArcadeCabinetModel } from "./scene/models/ArcadeCabinetModel";
+import { SquirrelModel } from "./scene/models/SquirrelModel";
+import { FernModel } from "./scene/models/FernModel";
+import { ForestModel } from "./scene/models/ForestModel";
+import { preloadModel } from "./scene/models/Model";
+
+// Preload the most-likely-needed GLBs as soon as this module
+// imports — useGLTF caches by URL so when <Model> renders, the
+// download is already in-flight (or done). We DO NOT preload the
+// 90 MB forest unconditionally; let it suspend only when chosen.
+preloadModel("/models/arcade-cabinet.glb");
+preloadModel("/models/low_poly_squirrel.glb");
+preloadModel("/models/low_poly_fern.glb");
 import {
   NutExplosions,
   type NutExplosionsHandle,
@@ -53,73 +67,9 @@ interface WorldCanvasProps {
   isMobile: boolean;
 }
 
-// Fixed positions for arcade cabinets — placed along the camera path so
-// they're visible across all stations. Light scatter, slight rotation so
-// each cabinet faces a "natural" direction.
-//
-// `accent` drives the marquee + side-rim + ground-glow.
-// `screen` drives the CRT — kept in the cyan/blue family on every cabinet
-// to match herobackground2.jpg where every CRT reads cool against warm
-// marquees.
-const ARCADE_PLACEMENTS: {
-  position: [number, number, number];
-  rotation: number;
-  accent: string;
-  screen: string;
-}[] = [
-  {
-    position: [-2.6, -0.5, 4.5],
-    rotation: 0.45,
-    accent: "#ec4899",
-    screen: "#3b82f6",
-  }, // hero left  — pink/blue
-  {
-    position: [3.1, -0.5, 4.8],
-    rotation: -0.6,
-    accent: "#ef4444",
-    screen: "#22d3ee",
-  }, // hero right — red/cyan
-  {
-    position: [-5.2, -0.5, -2.5],
-    rotation: 1.2,
-    accent: "#ef4444",
-    screen: "#22d3ee",
-  }, // games left  — red/cyan
-  {
-    position: [5.0, -0.5, -2.0],
-    rotation: -1.0,
-    accent: "#fbbf24",
-    screen: "#3b82f6",
-  }, // games right — yellow/blue
-  {
-    position: [0.6, -0.5, -6.5],
-    rotation: 0.2,
-    accent: "#f97316",
-    screen: "#22d3ee",
-  }, // mid back   — orange/cyan
-  {
-    position: [-3.5, -0.5, -8.2],
-    rotation: 0.9,
-    accent: "#d946ef",
-    screen: "#3b82f6",
-  }, // far back   — magenta/blue
-  // ── Two close-foreground cabinets — pulled BACK from z=6.5 → z=3
-  //    so they don't sit point-blank against the camera. At z=3 they
-  //    still read as foreground (5.5 units away) but their bright
-  //    marquees no longer flood the corners of the frame. ──
-  {
-    position: [-4.5, -0.5, 3.0],
-    rotation: 0.55,
-    accent: "#ef4444",
-    screen: "#22d3ee",
-  }, // foreground LEFT  — red/cyan
-  {
-    position: [4.7, -0.5, 3.2],
-    rotation: -0.6,
-    accent: "#fbbf24",
-    screen: "#3b82f6",
-  }, // foreground RIGHT — yellow/blue
-];
+// Note: the old ARCADE_PLACEMENTS constant has been removed. The new
+// GLB-backed <ArcadeCabinetModel/> owns its own placement array
+// internally (src/components/world/scene/models/ArcadeCabinetModel.tsx).
 
 export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
   const explosionsRef = useRef<NutExplosionsHandle>(null);
@@ -236,6 +186,19 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       backdropEnabled: true,
       backdropTint: { value: 0.4, min: 0, max: 1.2, step: 0.02 },
     }),
+    Models: folder({
+      // ── GLB toggles ──
+      // useGLBForest swaps the procedural CyberForest (cone-trees +
+      // vines) for the 90 MB low_poly_forest.glb. Default OFF — flip
+      // on once you've verified the asset loads at acceptable speed.
+      useGLBForest: false,
+      glbForestScale: { value: 1.0, min: 0.1, max: 4, step: 0.05 },
+      // useGLBFerns swaps the additive-sprite BioluminescentFerns for
+      // ~40 cloned low_poly_fern.glb instances. ON by default — the
+      // GLB is small (~670 KB) and looks more natural than sprites.
+      useGLBFerns: true,
+      glbFernCount: { value: isMobile ? 25 : 40, min: 0, max: 60, step: 1 },
+    }),
     PostFX: folder({
       // Bloom dampened HARD — previous pass washed the scene into
       // bright pastel. New defaults only bloom the brightest neon.
@@ -339,9 +302,6 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
     explosionsRef.current.burst(new THREE.Vector3(nx * 6, 1.5 + ny * 2.5, -4));
   };
 
-  // Visible arcade cabinets — slice by Leva's `arcadeCount` value.
-  const arcadeCabinets = ARCADE_PLACEMENTS.slice(0, controls.arcadeCount);
-
   return (
     <div
       className="fixed inset-0 w-full h-full"
@@ -410,21 +370,38 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                 {controls.backdropEnabled && (
                   <ForestBackdrop tint={controls.backdropTint} />
                 )}
-                <CyberForest
-                  treeCount={isMobile ? 18 : 32}
-                  wind={!isMobile}
-                  vineIntensity={controls.vineIntensity}
-                  vineColors={[
-                    controls.vineColorA,
-                    controls.vineColorB,
-                    controls.vineColorC,
-                    controls.vineColorD,
-                  ]}
-                />
-                <BioluminescentFerns
-                  count={controls.fernCount}
-                  brightness={controls.fernBrightness}
-                />
+
+                {/* ── Forest body: GLB or procedural cone-trees ──
+                    The 90 MB low_poly_forest.glb takes several seconds
+                    to download; the Suspense fallback (SquirrelSpinner
+                    in FuzzyWorld) covers the wait. Switch off via
+                    Leva → Models → useGLBForest. */}
+                {controls.useGLBForest ? (
+                  <ForestModel scale={controls.glbForestScale} />
+                ) : (
+                  <CyberForest
+                    treeCount={isMobile ? 18 : 32}
+                    wind={!isMobile}
+                    vineIntensity={controls.vineIntensity}
+                    vineColors={[
+                      controls.vineColorA,
+                      controls.vineColorB,
+                      controls.vineColorC,
+                      controls.vineColorD,
+                    ]}
+                  />
+                )}
+
+                {/* ── Ferns: GLB or procedural sprites ── */}
+                {controls.useGLBFerns ? (
+                  <FernModel count={controls.glbFernCount} />
+                ) : (
+                  <BioluminescentFerns
+                    count={controls.fernCount}
+                    brightness={controls.fernBrightness}
+                  />
+                )}
+
                 <GodRays
                   count={controls.godRayDensity}
                   brightness={derived.godRayBrightness}
@@ -441,30 +418,20 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                 {controls.cityVisible && (
                   <CityHorizon tint={controls.cityTint} count={32} />
                 )}
-                {arcadeCabinets.map((c, i) => (
-                  <ArcadeCabinet
-                    key={i}
-                    position={c.position}
-                    rotation={c.rotation}
-                    accent={
-                      controls.marqueeOverride
-                        ? controls.arcadeMarqueeColor
-                        : c.accent
-                    }
-                    screenColor={
-                      controls.screenOverride
-                        ? controls.arcadeScreenColor
-                        : c.screen
-                    }
-                    glow={controls.arcadeGlow}
-                    overgrowth={!isMobile}
-                  />
-                ))}
+
+                {/* ── Arcade cabinets: GLB Model (replaces the procedural
+                      cabinet entirely — Leva accent / screen / glow
+                      overrides no longer apply since the GLB has baked
+                      materials). ── */}
+                <ArcadeCabinetModel count={controls.arcadeCount} />
               </>
             )}
 
             <FloatingAcorns count={isMobile ? 6 : 14} trails={!isMobile} />
-            <Squirrels
+
+            {/* ── Squirrels: GLB Model preserves orbit/hop/glance from
+                  the procedural component, just swaps geometry. ── */}
+            <SquirrelModel
               count={isMobile ? 3 : 6}
               target={hoveredPos}
               animSpeed={controls.squirrelAnimSpeed}
