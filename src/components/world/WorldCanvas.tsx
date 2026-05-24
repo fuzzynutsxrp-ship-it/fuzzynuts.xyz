@@ -59,12 +59,15 @@ const ARCADE_PLACEMENTS: {
   rotation: number;
   accent: string;
 }[] = [
-  { position: [-2.6, -0.5, 4.5], rotation: 0.45, accent: "#ef4444" }, // hero left
-  { position: [3.1, -0.5, 4.8], rotation: -0.6, accent: "#22d3ee" }, // hero right
-  { position: [-5.2, -0.5, -2.5], rotation: 1.2, accent: "#a855f7" }, // games left
-  { position: [5.0, -0.5, -2.0], rotation: -1.0, accent: "#fbbf24" }, // games right
-  { position: [0.6, -0.5, -6.5], rotation: 0.2, accent: "#10b981" }, // mid back
-  { position: [-3.5, -0.5, -8.2], rotation: 0.9, accent: "#f97316" }, // far back
+  // Palette tightened to red/yellow/orange to match the 80s arcade cabinets
+  // visible in herobackground2.jpg. Vary by neighbour so adjacent cabinets
+  // don't share a marquee color.
+  { position: [-2.6, -0.5, 4.5], rotation: 0.45, accent: "#ef4444" }, // hero left  — red
+  { position: [3.1, -0.5, 4.8], rotation: -0.6, accent: "#fbbf24" }, // hero right — yellow
+  { position: [-5.2, -0.5, -2.5], rotation: 1.2, accent: "#ef4444" }, // games left  — red
+  { position: [5.0, -0.5, -2.0], rotation: -1.0, accent: "#fbbf24" }, // games right — yellow
+  { position: [0.6, -0.5, -6.5], rotation: 0.2, accent: "#f97316" }, // mid back   — orange
+  { position: [-3.5, -0.5, -8.2], rotation: 0.9, accent: "#ef4444" }, // far back   — red
 ];
 
 export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
@@ -87,31 +90,38 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
      fewer particles), but every value is still tweakable.
      ───────────────────────────────────────────────────────── */
   const controls = useControls({
+    Mood: folder({
+      // `overallSceneMood` is a single 0..1 darkness multiplier applied on
+      // top of the individual atmospheric controls below. 0 = bright /
+      // cheerful; 1 = full eerie dusk like herobackground2.jpg.
+      overallSceneMood: { value: 0.7, min: 0, max: 1, step: 0.02 },
+    }),
     Atmosphere: folder({
-      fogColor: "#03110a",
-      fogNear: { value: 9, min: 0, max: 40, step: 0.5 },
-      fogFar: { value: isMobile ? 30 : 42, min: 8, max: 80, step: 1 },
-      saturation: { value: 1.0, min: 0.4, max: 1.8, step: 0.05 },
+      fogColor: "#02100a",
+      fogNear: { value: 7, min: 0, max: 40, step: 0.5 },
+      fogFar: { value: isMobile ? 26 : 34, min: 8, max: 80, step: 1 },
+      saturation: { value: 0.95, min: 0.4, max: 1.8, step: 0.05 },
     }),
     Vines: folder({
-      vineIntensity: { value: 1.4, min: 0, max: 3, step: 0.05 },
+      vineIntensity: { value: 1.7, min: 0, max: 3, step: 0.05 },
       vineColorA: "#22d3ee",
       vineColorB: "#3b82f6",
       vineColorC: "#10b981",
     }),
     Arcade: folder({
-      arcadeGlow: { value: 1.2, min: 0, max: 3, step: 0.05 },
-      arcadeCount: {
-        value: isMobile ? 3 : 6,
-        min: 0,
-        max: 6,
-        step: 1,
-      },
+      arcadeGlow: { value: 1.6, min: 0, max: 3, step: 0.05 },
+      arcadeCount: { value: isMobile ? 3 : 6, min: 0, max: 6, step: 1 },
+      // ── New: marquee color override ──
+      // When `marqueeOverride` is on, every cabinet's marquee + CRT uses
+      // `arcadeMarqueeColor`. When off, each cabinet keeps its preset
+      // accent from ARCADE_PLACEMENTS.
+      marqueeOverride: false,
+      arcadeMarqueeColor: "#ef4444",
     }),
     Ferns: folder({
-      fernBrightness: { value: 1.1, min: 0, max: 3, step: 0.05 },
+      fernBrightness: { value: 1.6, min: 0, max: 3, step: 0.05 },
       fernCount: {
-        value: isMobile ? 40 : 90,
+        value: isMobile ? 60 : 130,
         min: 0,
         max: 200,
         step: 5,
@@ -125,15 +135,27 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       cityVisible: true,
     }),
     GodRays: folder({
-      godRayBrightness: { value: 1.0, min: 0, max: 3, step: 0.05 },
+      godRayBrightness: { value: 1.5, min: 0, max: 3, step: 0.05 },
       godRayColor: "#bce8d6",
     }),
     PostFX: folder({
-      bloomIntensity: { value: 0.85, min: 0, max: 3, step: 0.05 },
-      bloomThreshold: { value: 0.5, min: 0, max: 1, step: 0.02 },
-      vignetteDarkness: { value: 0.75, min: 0, max: 1.5, step: 0.05 },
+      bloomIntensity: { value: 1.15, min: 0, max: 3, step: 0.05 },
+      bloomThreshold: { value: 0.45, min: 0, max: 1, step: 0.02 },
+      vignetteDarkness: { value: 0.9, min: 0, max: 1.5, step: 0.05 },
     }),
   });
+
+  /* ── Derived values — `overallSceneMood` (0..1) is mixed into the
+        atmospheric values so a single slider sweep takes the scene from
+        cheerful → eerie without the user having to retune everything. ── */
+  const mood = controls.overallSceneMood;
+  const derived = {
+    fogFar: controls.fogFar * (1 - mood * 0.35),
+    ambient: 0.45 * (1 - mood * 0.6), // ambient light intensity
+    vignette: Math.min(1.5, controls.vignetteDarkness + mood * 0.25),
+    bloomIntensity: controls.bloomIntensity * (1 + mood * 0.3),
+    godRayBrightness: controls.godRayBrightness * (1 + mood * 0.25),
+  };
 
   // ── Window-scroll → scrollState.current ──
   useEffect(() => {
@@ -240,11 +262,11 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
           <color attach="background" args={["#020608"]} />
           <fog
             attach="fog"
-            args={[controls.fogColor, controls.fogNear, controls.fogFar]}
+            args={[controls.fogColor, controls.fogNear, derived.fogFar]}
           />
 
-          {/* ── Lights ── */}
-          <ambientLight intensity={0.35} color="#3a4a5a" />
+          {/* ── Lights — ambient is mood-scaled (mood↑ → ambient↓). ── */}
+          <ambientLight intensity={derived.ambient} color="#3a4a5a" />
           <directionalLight
             position={[-6, 8, 4]}
             intensity={1.1}
@@ -293,8 +315,8 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                   brightness={controls.fernBrightness}
                 />
                 <GodRays
-                  count={isMobile ? 4 : 6}
-                  brightness={controls.godRayBrightness}
+                  count={isMobile ? 5 : 8}
+                  brightness={derived.godRayBrightness}
                   color={controls.godRayColor}
                 />
                 {controls.cityVisible && (
@@ -305,8 +327,13 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                     key={i}
                     position={c.position}
                     rotation={c.rotation}
-                    accent={c.accent}
+                    accent={
+                      controls.marqueeOverride
+                        ? controls.arcadeMarqueeColor
+                        : c.accent
+                    }
                     glow={controls.arcadeGlow}
+                    overgrowth={!isMobile}
                   />
                 ))}
               </>
@@ -339,7 +366,7 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
           {!isMobile && (
             <EffectComposer multisampling={0} enableNormalPass={false}>
               <Bloom
-                intensity={controls.bloomIntensity}
+                intensity={derived.bloomIntensity}
                 luminanceThreshold={controls.bloomThreshold}
                 luminanceSmoothing={0.2}
                 mipmapBlur
@@ -347,7 +374,7 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
               <Vignette
                 eskil={false}
                 offset={0.2}
-                darkness={controls.vignetteDarkness}
+                darkness={derived.vignette}
               />
             </EffectComposer>
           )}
