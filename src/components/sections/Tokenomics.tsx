@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { TOKENOMICS } from "@/lib/utils";
 
@@ -187,7 +188,13 @@ export function Tokenomics() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
-          <span className="section-badge mb-4">📊 Tokenomics</span>
+          <Image
+            src="/tokenomics.png"
+            alt="Tokenomics"
+            width={720}
+            height={140}
+            className="mx-auto mb-4 h-10 sm:h-12 md:h-14 w-auto drop-shadow-[0_0_24px_rgba(245,196,66,0.45)]"
+          />
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
             No Rugs. No Games.
           </h2>
