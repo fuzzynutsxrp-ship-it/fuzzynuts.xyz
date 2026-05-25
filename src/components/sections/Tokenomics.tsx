@@ -195,10 +195,7 @@ export function Tokenomics() {
             height={140}
             className="mx-auto mb-4 h-10 sm:h-12 md:h-14 w-auto drop-shadow-[0_0_24px_rgba(245,196,66,0.45)]"
           />
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
-            No Rugs. No Games.
-          </h2>
-          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
+          <p className="mt-4 text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
             321 billion $NUT. Permanently fixed supply. Issuer blackholed. What
             you see is what you get.
           </p>
