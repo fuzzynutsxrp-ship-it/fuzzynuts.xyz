@@ -22,7 +22,12 @@ import { useWalletStore } from "@/store/wallet";
 /* Data stream labels — more descriptive, sci-fi */
 const DATA_STREAMS = {
   1: ["prize_pool", "verified", "ready_to_claim", "instant_payout"],
-  2: ["wallet_verified", "blockchain_confirmed", "rank_eligible", "xrpl_mainnet"],
+  2: [
+    "wallet_verified",
+    "blockchain_confirmed",
+    "rank_eligible",
+    "xrpl_mainnet",
+  ],
   3: ["smart_contract", "auto_deploy", "on_chain", "trust_line"],
 };
 
@@ -30,10 +35,7 @@ export function PrizeTiers() {
   const { isConnected } = useWalletStore();
 
   return (
-    <section
-      id="prizes"
-      className="py-24 md:py-32 relative overflow-hidden"
-    >
+    <section id="prizes" className="py-12 relative overflow-hidden">
       {/* ── Layer 0: Deep space gradient ── */}
       <div
         className="absolute inset-0 z-0"
@@ -118,10 +120,7 @@ export function PrizeTiers() {
           className="text-center mb-16 md:mb-20"
         >
           <div className="flex items-center justify-center gap-2 mb-5">
-            <Trophy
-              size={15}
-              className="text-[var(--color-gold)] opacity-60"
-            />
+            <Trophy size={15} className="text-[var(--color-gold)] opacity-60" />
             <span className="text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[var(--color-gold)] opacity-60">
               Treasure Vault
             </span>

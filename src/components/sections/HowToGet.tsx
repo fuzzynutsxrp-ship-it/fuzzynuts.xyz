@@ -28,7 +28,7 @@ export function HowToGet() {
   }, []);
 
   return (
-    <section id="how-to-get" className="py-28 relative">
+    <section id="how-to-get" className="py-12 relative">
       <div className="container-main relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -79,7 +79,11 @@ export function HowToGet() {
                 {/* Content */}
                 <div className="flex-1">
                   <h3 className="font-display font-bold text-lg text-[var(--color-cream)] mb-1 flex items-center gap-2 group-hover:text-neon-green transition-colors">
-                    <Icon size={18} className="text-neon-green" strokeWidth={2} />
+                    <Icon
+                      size={18}
+                      className="text-neon-green"
+                      strokeWidth={2}
+                    />
                     {step.title}
                   </h3>
                   <p className="text-sm text-[var(--color-cream-dim)] leading-relaxed">
@@ -93,24 +97,36 @@ export function HowToGet() {
                         href={`https://xpmarket.com/token/NUT-${XRPL_CONFIG.issuer}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(251,191,36,0.4)" }}
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0 0 25px rgba(251,191,36,0.4)",
+                        }}
                         whileTap={{ scale: 0.95 }}
                         className="btn-primary"
-                        style={{ animation: "pulse-gold 3s ease-in-out infinite" }}
+                        style={{
+                          animation: "pulse-gold 3s ease-in-out infinite",
+                        }}
                       >
                         <Link size={16} />
                         Set Trustline Instantly
                       </motion.a>
                       <div className="flex items-center gap-2 text-xs">
-                        <span className="text-[var(--color-cream-dim)]">Or add manually:</span>
+                        <span className="text-[var(--color-cream-dim)]">
+                          Or add manually:
+                        </span>
                         <motion.button
                           onClick={handleCopy}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className="flex items-center gap-1 px-2 py-1 rounded bg-[rgba(16,185,129,0.08)] font-mono text-[var(--color-cream)] hover:bg-[rgba(16,185,129,0.15)] transition-colors cursor-pointer"
                         >
-                          {XRPL_CONFIG.issuer.slice(0, 6)}...{XRPL_CONFIG.issuer.slice(-5)}
-                          {copied ? <Check size={12} className="text-neon-green" /> : <Copy size={12} />}
+                          {XRPL_CONFIG.issuer.slice(0, 6)}...
+                          {XRPL_CONFIG.issuer.slice(-5)}
+                          {copied ? (
+                            <Check size={12} className="text-neon-green" />
+                          ) : (
+                            <Copy size={12} />
+                          )}
                         </motion.button>
                       </div>
                     </div>

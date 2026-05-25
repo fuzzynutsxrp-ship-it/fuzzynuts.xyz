@@ -16,7 +16,7 @@ import Image from "next/image";
 
 export function Features() {
   return (
-    <section id="features" className="py-24 relative overflow-hidden">
+    <section id="features" className="py-12 relative overflow-hidden">
       {/* Section background removed — page-level herobackground3.jpg
           shows through. */}
       <div className="container-main relative z-10">

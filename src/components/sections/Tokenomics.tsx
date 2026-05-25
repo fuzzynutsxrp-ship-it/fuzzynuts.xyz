@@ -176,7 +176,7 @@ function DonutChart() {
 
 export function Tokenomics() {
   return (
-    <section id="tokenomics" className="py-24 relative overflow-hidden">
+    <section id="tokenomics" className="py-12 relative overflow-hidden">
       {/* Section background removed — page-level herobackground3.jpg
           shows through. */}
       <div className="container-main relative z-10">

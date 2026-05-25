@@ -33,11 +33,6 @@ const WalletCTA = dynamic(() =>
     default: m.WalletCTA,
   })),
 );
-const SectionTransition = dynamic(() =>
-  import("@/components/home/SectionTransition").then((m) => ({
-    default: m.SectionTransition,
-  })),
-);
 const Features = dynamic(() =>
   import("@/components/sections/Features").then((m) => ({
     default: m.Features,
@@ -80,16 +75,11 @@ export default function Home() {
       <Navbar />
       <main id="main-content" className="relative z-10">
         <Hero />
-        <SectionTransition variant="vine" />
         <GamesShowcase />
-        <SectionTransition variant="glow" />
         <PrizeTiers />
         <WalletCTA />
-        <SectionTransition variant="vine" flip />
         <Features />
-        <SectionTransition variant="fade" />
         <Tokenomics />
-        <SectionTransition variant="vine" />
         <OnChainVerification />
       </main>
 
