@@ -203,12 +203,14 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       },
     }),
     Backdrop: folder({
-      // Distant matte-painting using public/images/hero/herobackground.jpg.
-      // `backdropTint` darkens the photo so it sits inside the dark mood.
-      // Default pulled down (0.55 → 0.4) since the user said previous
-      // passes were still too bright.
+      // Matte-painting using herobackground3.jpg (the user's bird's-eye
+      // cyber-forest reference). When ENABLED, the procedural
+      // CyberForest + ferns + CityHorizon are skipped — the photo
+      // already shows all of that, layering procedural on top muddies
+      // it. Tint default raised to 0.85 because the new photo is
+      // already balanced; the previous 0.4 was over-darkening it.
       backdropEnabled: true,
-      backdropTint: { value: 0.4, min: 0, max: 1.2, step: 0.02 },
+      backdropTint: { value: 0.85, min: 0, max: 1.2, step: 0.02 },
     }),
     Models: folder({
       // ── GLB toggles ──
@@ -406,38 +408,46 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                   <Forest treeCount={isMobile ? 18 : 32} wind={!isMobile} />
                 ) : (
                   <>
-                    {/* Distant matte painting using the reference photo. */}
+                    {/* Distant matte painting (herobackground3.jpg). When
+                        enabled, we SKIP the procedural forest body, ferns,
+                        and CityHorizon below — the photo already shows
+                        all of that, and layering procedural over it just
+                        muddies the view. */}
                     {controls.backdropEnabled && (
                       <ForestBackdrop tint={controls.backdropTint} />
                     )}
 
-                    {/* ── Forest body: GLB or procedural cone-trees ── */}
-                    {controls.useGLBForest ? (
-                      <ForestModel scale={controls.glbForestScale} />
-                    ) : (
-                      <CyberForest
-                        treeCount={isMobile ? 18 : 32}
-                        wind={!isMobile}
-                        vineIntensity={controls.vineIntensity}
-                        vineColors={[
-                          controls.vineColorA,
-                          controls.vineColorB,
-                          controls.vineColorC,
-                          controls.vineColorD,
-                        ]}
-                      />
-                    )}
+                    {/* ── Procedural forest body (only when backdrop is OFF) ── */}
+                    {!controls.backdropEnabled &&
+                      (controls.useGLBForest ? (
+                        <ForestModel scale={controls.glbForestScale} />
+                      ) : (
+                        <CyberForest
+                          treeCount={isMobile ? 18 : 32}
+                          wind={!isMobile}
+                          vineIntensity={controls.vineIntensity}
+                          vineColors={[
+                            controls.vineColorA,
+                            controls.vineColorB,
+                            controls.vineColorC,
+                            controls.vineColorD,
+                          ]}
+                        />
+                      ))}
 
-                    {/* ── Ferns: GLB or procedural sprites ── */}
-                    {controls.useGLBFerns ? (
-                      <FernModel count={controls.glbFernCount} />
-                    ) : (
-                      <BioluminescentFerns
-                        count={controls.fernCount}
-                        brightness={controls.fernBrightness}
-                      />
-                    )}
+                    {/* ── Ferns (only when backdrop is OFF — photo has its own) ── */}
+                    {!controls.backdropEnabled &&
+                      (controls.useGLBFerns ? (
+                        <FernModel count={controls.glbFernCount} />
+                      ) : (
+                        <BioluminescentFerns
+                          count={controls.fernCount}
+                          brightness={controls.fernBrightness}
+                        />
+                      ))}
 
+                    {/* Atmospheric layers stay in both modes — they add
+                        volumetric "real" depth that sells the photo as 3D. */}
                     <GodRays
                       count={controls.godRayDensity}
                       brightness={derived.godRayBrightness}
@@ -449,7 +459,10 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
                         brightness={controls.moteBrightness}
                       />
                     )}
-                    {controls.cityVisible && (
+
+                    {/* City horizon: photo already includes one. Only render
+                        the procedural silhouette when backdrop is OFF. */}
+                    {!controls.backdropEnabled && controls.cityVisible && (
                       <CityHorizon tint={controls.cityTint} count={32} />
                     )}
 
