@@ -2,7 +2,19 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Wallet, LogOut, ChevronDown, ExternalLink, Gift, Coins, Trophy, User, AlertCircle } from "lucide-react";
+import {
+  Menu,
+  X,
+  Wallet,
+  LogOut,
+  ChevronDown,
+  ExternalLink,
+  Gift,
+  Coins,
+  Trophy,
+  User,
+  AlertCircle,
+} from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { truncateAddress } from "@/lib/utils";
 import Image from "next/image";
@@ -16,12 +28,21 @@ const NAV_LINKS = [
   { href: "/#how-to-get", label: "Get $NUT" },
 ];
 
-
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
-  const { address, isConnected, isConnecting, connect, disconnect, provider, nutBalance, error, setError } = useWalletStore();
+  const {
+    address,
+    isConnected,
+    isConnecting,
+    connect,
+    disconnect,
+    provider,
+    nutBalance,
+    error,
+    setError,
+  } = useWalletStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [hasClaimable, setHasClaimable] = useState(false);
 
@@ -35,17 +56,24 @@ export function Navbar() {
     const checkRewards = async () => {
       try {
         const now = new Date();
-        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        const d = new Date(
+          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+        );
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
         const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        const weekNum = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+        const weekNum = Math.ceil(
+          ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+        );
         const week = `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
 
         const res = await fetch(
           `https://world.fuzzynuts.xyz/api/rewards/eligibility?wallet=${encodeURIComponent(address)}&week=${week}`,
-          { signal: AbortSignal.timeout(5000) }
+          { signal: AbortSignal.timeout(5000) },
         );
-        if (!res.ok) { setHasClaimable(false); return; }
+        if (!res.ok) {
+          setHasClaimable(false);
+          return;
+        }
         const data = await res.json();
         setHasClaimable(data.eligible === true && !data.claimed);
       } catch {
@@ -65,7 +93,10 @@ export function Navbar() {
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setWalletMenuOpen(false);
       }
     };
@@ -82,11 +113,14 @@ export function Navbar() {
     return () => clearTimeout(timer);
   }, [error, setError]);
 
-  const handleConnect = useCallback(async (prov: "xaman" | "gemwallet" | "crossmark") => {
-    setWalletMenuOpen(false);
-    setError(null); // Clear any previous error
-    await connect(prov);
-  }, [connect, setError]);
+  const handleConnect = useCallback(
+    async (prov: "xaman" | "gemwallet" | "crossmark") => {
+      setWalletMenuOpen(false);
+      setError(null); // Clear any previous error
+      await connect(prov);
+    },
+    [connect, setError],
+  );
 
   return (
     <>
@@ -103,8 +137,12 @@ export function Navbar() {
         aria-label="Main navigation"
       >
         <div className="container-main flex items-center justify-between h-16 md:h-[72px]">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label="Fuzzynuts Home">
+          {/* Logo — squirrel emblem + text_logo.png wordmark */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 group shrink-0"
+            aria-label="Fuzzynuts Home"
+          >
             <motion.div
               whileHover={{ scale: 1.08 }}
               transition={{ duration: 0.3 }}
@@ -112,29 +150,44 @@ export function Navbar() {
             >
               <Image
                 src="/images/branding/logo-nav.webp"
-                alt="Fuzzynuts"
+                alt=""
                 width={54}
                 height={36}
                 className="rounded-md"
                 priority
               />
-              <span className="font-display font-bold text-lg md:text-xl gradient-text-gold tracking-tight">
-                FUZZYNUTS
-              </span>
+              <Image
+                src="/text_logo.png"
+                alt="Fuzzynuts"
+                width={160}
+                height={32}
+                className="h-7 md:h-8 w-auto"
+                priority
+              />
             </motion.div>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-              const isRoute = link.href.startsWith("/") && !link.href.startsWith("/#");
+              const isRoute =
+                link.href.startsWith("/") && !link.href.startsWith("/#");
               const isLeaderboard = link.icon === "trophy";
               const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors rounded-lg hover:bg-[rgba(245,196,66,0.05)] flex items-center gap-1.5 relative`;
 
               if (isRoute) {
                 return (
                   <Link key={link.href} href={link.href} className={classes}>
-                    {isLeaderboard && <Trophy size={14} className={hasClaimable ? "text-brand-gold" : "text-brand-gold opacity-70"} />}
+                    {isLeaderboard && (
+                      <Trophy
+                        size={14}
+                        className={
+                          hasClaimable
+                            ? "text-brand-gold"
+                            : "text-brand-gold opacity-70"
+                        }
+                      />
+                    )}
                     {link.label}
                     {/* Prize badge on Leaderboard link */}
                     {isLeaderboard && hasClaimable && (
@@ -185,22 +238,40 @@ export function Navbar() {
                   className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[rgba(245,196,66,0.1)] border border-[rgba(245,196,66,0.2)] text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.15)] transition-all text-sm font-medium"
                 >
                   <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
-                  <span className="hidden sm:inline">{truncateAddress(address)}</span>
-                  <span className="sm:hidden"><Wallet size={16} /></span>
-                  <ChevronDown size={14} className={`transition-transform ${walletMenuOpen ? "rotate-180" : ""}`} />
+                  <span className="hidden sm:inline">
+                    {truncateAddress(address)}
+                  </span>
+                  <span className="sm:hidden">
+                    <Wallet size={16} />
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform ${walletMenuOpen ? "rotate-180" : ""}`}
+                  />
                 </motion.button>
               ) : (
                 <motion.button
                   onClick={() => setWalletMenuOpen(!walletMenuOpen)}
                   disabled={isConnecting}
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(245,196,66,0.4)" }}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0 0 25px rgba(245,196,66,0.4)",
+                  }}
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-sm transition-all disabled:opacity-50 cursor-pointer"
-                  style={{ animation: !isConnecting ? "pulse-gold 3s ease-in-out infinite" : "none" }}
+                  style={{
+                    animation: !isConnecting
+                      ? "pulse-gold 3s ease-in-out infinite"
+                      : "none",
+                  }}
                 >
                   <Wallet size={16} />
-                  <span className="hidden sm:inline">{isConnecting ? "Connecting…" : "Connect Wallet"}</span>
-                  <span className="sm:hidden">{isConnecting ? "…" : "Connect"}</span>
+                  <span className="hidden sm:inline">
+                    {isConnecting ? "Connecting…" : "Connect Wallet"}
+                  </span>
+                  <span className="sm:hidden">
+                    {isConnecting ? "…" : "Connect"}
+                  </span>
                 </motion.button>
               )}
 
@@ -219,17 +290,26 @@ export function Navbar() {
                         {/* Address display */}
                         <div className="px-3 py-2.5 rounded-lg bg-[rgba(245,196,66,0.05)] border border-[rgba(245,196,66,0.08)]">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-[var(--color-cream-dim)] capitalize">Connected via {provider}</p>
+                            <p className="text-xs text-[var(--color-cream-dim)] capitalize">
+                              Connected via {provider}
+                            </p>
                             <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)]" />
                           </div>
-                          <p className="text-xs font-mono text-[var(--color-gold)] break-all leading-relaxed">{address}</p>
+                          <p className="text-xs font-mono text-[var(--color-gold)] break-all leading-relaxed">
+                            {address}
+                          </p>
                         </div>
 
                         {/* NUT Balance */}
                         <div className="px-3 py-2 rounded-lg bg-[rgba(245,196,66,0.03)] flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Coins size={14} className="text-[var(--color-gold)]" />
-                            <span className="text-xs text-[var(--color-cream-dim)]">$NUT Balance</span>
+                            <Coins
+                              size={14}
+                              className="text-[var(--color-gold)]"
+                            />
+                            <span className="text-xs text-[var(--color-cream-dim)]">
+                              $NUT Balance
+                            </span>
                           </div>
                           <span className="text-sm font-bold text-[var(--color-gold)]">
                             {nutBalance || "—"}
@@ -256,7 +336,10 @@ export function Navbar() {
                         </a>
                         <div className="h-px bg-[rgba(245,196,66,0.08)] mx-1" />
                         <button
-                          onClick={() => { disconnect(); setWalletMenuOpen(false); }}
+                          onClick={() => {
+                            disconnect();
+                            setWalletMenuOpen(false);
+                          }}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg transition-colors cursor-pointer"
                         >
                           <LogOut size={14} />
@@ -265,15 +348,21 @@ export function Navbar() {
                       </div>
                     ) : (
                       <div className="space-y-1">
-                        <p className="text-xs text-[var(--color-cream-dim)] px-2 pb-2 font-medium">Choose wallet</p>
+                        <p className="text-xs text-[var(--color-cream-dim)] px-2 pb-2 font-medium">
+                          Choose wallet
+                        </p>
 
                         {/* Inline error in dropdown */}
                         {error && (
                           <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 mb-1">
-                            <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                            <AlertCircle
+                              size={14}
+                              className="text-red-400 mt-0.5 shrink-0"
+                            />
                             <div className="text-xs text-red-400 leading-relaxed">
                               {error}
-                              {error.includes("installed") || error.includes("not found") ? (
+                              {error.includes("installed") ||
+                              error.includes("not found") ? (
                                 <>
                                   {" "}
                                   <a
@@ -291,9 +380,24 @@ export function Navbar() {
                         )}
 
                         {[
-                          { id: "xaman" as const, name: "Xaman (Xumm)", icon: "📱", desc: "Mobile / Desktop" },
-                          { id: "gemwallet" as const, name: "GemWallet", icon: "💎", desc: "Browser Extension" },
-                          { id: "crossmark" as const, name: "Crossmark", icon: "✖️", desc: "Browser Extension" },
+                          {
+                            id: "xaman" as const,
+                            name: "Xaman (Xumm)",
+                            icon: "📱",
+                            desc: "Mobile / Desktop",
+                          },
+                          {
+                            id: "gemwallet" as const,
+                            name: "GemWallet",
+                            icon: "💎",
+                            desc: "Browser Extension",
+                          },
+                          {
+                            id: "crossmark" as const,
+                            name: "Crossmark",
+                            icon: "✖️",
+                            desc: "Browser Extension",
+                          },
                         ].map((w) => (
                           <motion.button
                             key={w.id}
@@ -302,10 +406,14 @@ export function Navbar() {
                             whileHover={{ x: 4 }}
                             className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-[var(--color-cream)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.08)] rounded-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                           >
-                            <span className="text-xl w-8 text-center">{w.icon}</span>
+                            <span className="text-xl w-8 text-center">
+                              {w.icon}
+                            </span>
                             <div className="text-left">
                               <div className="font-medium">{w.name}</div>
-                              <div className="text-xs text-[var(--color-cream-dim)]">{w.desc}</div>
+                              <div className="text-xs text-[var(--color-cream-dim)]">
+                                {w.desc}
+                              </div>
                             </div>
                           </motion.button>
                         ))}
@@ -324,11 +432,23 @@ export function Navbar() {
             >
               <AnimatePresence mode="wait">
                 {mobileOpen ? (
-                  <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
                     <X size={24} />
                   </motion.div>
                 ) : (
-                  <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
                     <Menu size={24} />
                   </motion.div>
                 )}
@@ -349,8 +469,10 @@ export function Navbar() {
             >
               <div className="container-main py-4 space-y-1">
                 {NAV_LINKS.map((link, i) => {
-                  const isRoute = link.href.startsWith("/") && !link.href.startsWith("/#");
-                  const classes = "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.05)] rounded-lg transition-colors min-h-[44px]";
+                  const isRoute =
+                    link.href.startsWith("/") && !link.href.startsWith("/#");
+                  const classes =
+                    "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.05)] rounded-lg transition-colors min-h-[44px]";
 
                   if (isRoute) {
                     return (
@@ -365,7 +487,12 @@ export function Navbar() {
                           onClick={() => setMobileOpen(false)}
                           className={classes}
                         >
-                          {link.icon === "trophy" && <Trophy size={16} className="text-brand-gold opacity-70" />}
+                          {link.icon === "trophy" && (
+                            <Trophy
+                              size={16}
+                              className="text-brand-gold opacity-70"
+                            />
+                          )}
                           {link.label}
                         </Link>
                       </motion.div>
@@ -404,7 +531,10 @@ export function Navbar() {
                       {hasClaimable ? (
                         <Gift size={16} className="text-brand-gold" />
                       ) : (
-                        <User size={16} className="text-neon-green opacity-70" />
+                        <User
+                          size={16}
+                          className="text-neon-green opacity-70"
+                        />
                       )}
                       {hasClaimable ? "Claim Rewards!" : "My Profile"}
                       {hasClaimable && (
@@ -420,7 +550,6 @@ export function Navbar() {
           )}
         </AnimatePresence>
       </motion.nav>
-
     </>
   );
 }

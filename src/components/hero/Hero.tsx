@@ -69,31 +69,29 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* ── Badge ── */}
+        {/* ── Title — text_logo.png wordmark + ($NUT) subtitle.
+              The "Live on XRPL Mainnet" badge that used to sit
+              between the squirrel logo and the title has been
+              removed. ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-4"
-        >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-widest uppercase bg-[rgba(245,196,66,0.18)] backdrop-blur-sm text-[var(--color-gold)] border border-[rgba(251,191,36,0.25)]">
-            🌰 Live on XRPL Mainnet
-          </span>
-        </motion.div>
-
-        {/* ── Title ── */}
-        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight mb-3"
+          className="mb-3 flex flex-col items-center"
+          aria-label="Fuzzynuts ($NUT)"
         >
-          <span className="gradient-text-gold text-hero-glow">Fuzzynuts</span>
-          <br />
-          <span className="text-[var(--color-cream)] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
+          <Image
+            src="/text_logo.png"
+            alt="Fuzzynuts"
+            width={920}
+            height={196}
+            className="h-20 sm:h-28 md:h-36 lg:h-44 w-auto drop-shadow-[0_0_30px_rgba(245,196,66,0.35)]"
+            priority
+          />
+          <span className="mt-2 text-[var(--color-cream)] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-display">
             ($NUT)
           </span>
-        </motion.h1>
+        </motion.div>
 
         {/* ── Tagline ── */}
         <motion.p
