@@ -79,6 +79,16 @@ const config: Config = {
         "40": "40",
         "50": "50",
       },
+      boxShadow: {
+        cabinet:
+          "0 12px 32px -8px rgba(0,0,0,0.85), 0 24px 64px -16px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -3px 6px rgba(0,0,0,0.5)",
+        "cabinet-hover":
+          "0 24px 56px -12px rgba(0,0,0,0.9), 0 40px 96px -24px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -3px 6px rgba(0,0,0,0.5)",
+        "play-arcade":
+          "0 4px 12px rgba(0,0,0,0.5), 0 0 24px rgba(251,191,36,0.25), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -3px 0 rgba(120,53,15,0.5)",
+        "play-arcade-hover":
+          "0 6px 24px rgba(0,0,0,0.6), 0 0 48px rgba(251,191,36,0.55), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -3px 0 rgba(120,53,15,0.4)",
+      },
       animation: {
         float: "float 3s ease-in-out infinite",
         "pulse-gold": "pulse-gold 2s ease-in-out infinite",
@@ -90,6 +100,8 @@ const config: Config = {
         // background-position so the gradient feels alive without
         // any JS animation work.
         "hero-mesh": "hero-mesh 22s ease-in-out infinite",
+        "cabinet-shine": "cabinet-shine 1.6s ease-out",
+        "neon-flicker": "neon-flicker 2.5s ease-in-out infinite",
       },
       keyframes: {
         float: {
@@ -119,6 +131,14 @@ const config: Config = {
         "fade-in": {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
+        },
+        "cabinet-shine": {
+          "0%": { transform: "translateX(-160%) skewX(-20deg)" },
+          "100%": { transform: "translateX(260%) skewX(-20deg)" },
+        },
+        "neon-flicker": {
+          "0%, 100%": { opacity: "0.85" },
+          "50%": { opacity: "1" },
         },
       },
     },

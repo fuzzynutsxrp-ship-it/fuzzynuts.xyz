@@ -1,203 +1,252 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GAMES } from "@/lib/utils";
-import { useState, useCallback } from "react";
 import Image from "next/image";
+import { useState } from "react";
+import { GAMES } from "@/lib/utils";
 
 /* ─────────────────────────────────────────────────────────────
-   GameCard — Cyber-Nature Premium Edition
-   Clean, tight layout with ambient glow, gradient borders,
-   and dynamic hover interactions.
+   GamesShowcase — Retro 3D Arcade Cabinet Edition
+
+   Per-card branding tokens (all defined in src/app/globals.css):
+     --color-cream      = #f0ede6   (primary text on dark surfaces)
+     --color-cream-dim  = #b0a890   (secondary / description text)
+     --color-gold       = #FBBF24   (FuzzyNuts brand gold — PLAY button)
+     --accent           = game.color (set per-card inline, e.g.
+                                      #4ade80 neon-green, #ef4444 red,
+                                      #a855f7 purple, #22d3ee cyan,
+                                      #f97316 orange, #8B5CF6 secret-purple)
+
+   Mobile / reduced-motion strategy:
+     • Heavy 3D rotateX hover + cabinet-hover shadow gated behind
+       `motion-safe:md:hover:` — on phones or when the user has
+       prefers-reduced-motion set, cards stay flat with the base
+       `shadow-cabinet` only.
+     • Shine sweep is hidden entirely under `prefers-reduced-motion`.
+     • CRT scanlines dim from opacity-15 → md:opacity-30.
    ───────────────────────────────────────────────────────────── */
 
-function GameCard({
+const CABINET_CLASSES =
+  "arcade-cabinet group relative flex flex-col rounded-3xl " +
+  "[transform-style:preserve-3d] will-change-transform " +
+  "transition-[transform,box-shadow] duration-500 ease-out shadow-cabinet " +
+  "motion-safe:md:hover:shadow-cabinet-hover " +
+  "motion-safe:md:focus-within:shadow-cabinet-hover " +
+  "motion-safe:md:hover:[transform:perspective(1200px)_rotateX(-3deg)_translateY(-8px)_scale(1.03)] " +
+  "motion-safe:md:focus-within:[transform:perspective(1200px)_rotateX(-3deg)_translateY(-8px)_scale(1.03)]";
+
+const PLAY_BTN_BASE =
+  "relative inline-flex items-center justify-center gap-2 w-full px-5 py-3 " +
+  "rounded-full font-display font-black text-sm tracking-widest uppercase select-none " +
+  "transition-all duration-200 focus:outline-none focus-visible:ring-2 " +
+  "focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050507]";
+
+function ArcadeCabinet({
   game,
   index,
-  featured = false,
 }: {
   game: (typeof GAMES)[number];
   index: number;
-  featured?: boolean;
 }) {
-  const [hovered, setHovered] = useState(false);
-  const [pressed, setPressed] = useState(false);
-
-  const handleHover = useCallback(() => setHovered(true), []);
-  const handleLeave = useCallback(() => {
-    setHovered(false);
-    setPressed(false);
-  }, []);
-
   const isComingSoon = game.id === "top-secret";
+
+  // Graceful fallback: try new /images/games/<id>.jpg cabinet art,
+  // fall back to the existing /icons/icon-*-pop.webp on error.
+  const [artSrc, setArtSrc] = useState(`/images/games/${game.id}.jpg`);
+  const handleArtError = () => {
+    if (artSrc !== game.icon) setArtSrc(game.icon);
+  };
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 40, scale: 0.97 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: index * 0.07, duration: 0.5, ease: "easeOut" }}
-      onMouseEnter={handleHover}
-      onMouseLeave={handleLeave}
+      style={{ "--accent": game.color } as React.CSSProperties}
+      className={CABINET_CLASSES}
       aria-label={`${game.title} — ${game.type}`}
-      className={`game-card group relative flex flex-col ${
-        featured ? "game-card--featured sm:col-span-2 lg:col-span-2" : ""
-      }`}
-      style={{ "--gc-accent": game.color } as React.CSSProperties}
     >
-      {/* ── Gradient border overlay ── */}
-      <div className="game-card__border" aria-hidden="true" />
-
-      {/* ── Inner highlight (top edge glow) ── */}
-      <div className="game-card__highlight" aria-hidden="true" />
-
-      {/* ════════════════════════════════════════════
-          ICON ZONE — Tight framing, ambient glow
-          ════════════════════════════════════════════ */}
+      {/* Cabinet body — beveled metal/wood gradient */}
       <div
-        className={`relative flex items-center justify-center overflow-visible ${
-          featured ? "py-6 px-6" : "py-5 px-4"
-        }`}
-      >
-        {/* Ambient radial glow behind icon */}
-        <div
-          className="game-card__ambient absolute inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(circle at center, ${game.color}20, transparent 70%)`,
-          }}
-          aria-hidden="true"
-        />
+        aria-hidden="true"
+        className="absolute inset-0 rounded-3xl pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, #2c2c30 0%, #1a1a1d 18%, #0d0d10 75%, #050507 100%)",
+        }}
+      />
 
-        {game.icon && (
-          <div
-            className={`relative z-10 ${
-              featured
-                ? "w-full max-w-[200px] aspect-square"
-                : "w-full max-w-[160px] aspect-square"
-            } mx-auto flex items-center justify-center`}
-          >
-            <Image
-              src={game.icon}
-              alt={`${game.title} icon`}
-              width={featured ? 200 : 160}
-              height={featured ? 200 : 160}
-              loading="lazy"
-              className="relative w-full h-full object-contain image-render-pixel
-                drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)]
-                group-hover:scale-[1.08] transition-transform duration-300 ease-out"
-            />
-          </div>
-        )}
+      {/* Hairline highlight on top edge */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-5 top-0 h-px rounded-full pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
+        }}
+      />
+
+      {/* Subtle brushed-metal texture */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 rounded-3xl opacity-25 mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(180deg, transparent 0 2px, rgba(255,255,255,0.04) 2px 3px)",
+        }}
+      />
+
+      {/* Shine sweep on hover — hidden when reduced-motion is requested */}
+      <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none motion-reduce:hidden">
+        <div className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.05] md:via-white/[0.09] to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-cabinet-shine" />
       </div>
 
-      {/* ════════════════════════════════════════════
-          CONTENT ZONE — Title, Genre, Description, Tags, Button
-          ════════════════════════════════════════════ */}
-      <div className="flex flex-col flex-1 px-4 pb-5 pt-1 gap-3">
-        {/* Title + Genre Row */}
-        <div className="flex items-start justify-between gap-2">
-          <h3
-            className="font-display text-lg sm:text-xl font-bold leading-tight game-card__title"
-            style={
-              {
-                "--gc-title-glow": hovered
-                  ? `0 0 18px ${game.color}40`
-                  : "none",
-              } as React.CSSProperties
-            }
-          >
-            {game.title}
-          </h3>
-          <span
-            className="shrink-0 font-mono text-[10px] tracking-widest uppercase px-2 py-0.5 rounded-sm mt-0.5 whitespace-nowrap"
-            style={{
-              borderColor: `${game.color}40`,
-              color: `${game.color}cc`,
-              background: `${game.color}08`,
-              border: `1px solid ${game.color}25`,
-            }}
-          >
-            {game.type}
-          </span>
-        </div>
-
-        {/* Description */}
-        <p className="font-body text-sm leading-relaxed text-[var(--color-cream-dim)] line-clamp-3">
-          {game.description}
-        </p>
-
-        {/* Tags — slide up on hover */}
-        <div className="flex flex-wrap gap-1.5">
-          {game.tags.map((tag, ti) => (
-            <span
-              key={tag}
-              className="game-card__tag font-mono text-[10px] px-2 py-0.5 rounded uppercase tracking-wider"
-              style={{
-                background: `${game.color}0c`,
-                color: `${game.color}dd`,
-                border: `1px solid ${game.color}1a`,
-                transitionDelay: `${ti * 40}ms`,
-              }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Spacer */}
-        <div className="flex-1 min-h-1" />
-
-        {/* Play Button — sleek pill */}
-        <motion.a
-          href={game.href}
-          onClick={(e) => {
-            // Force full page navigation to avoid Next.js prefetch/redirect issues
-            if (!isComingSoon && game.href !== "#") {
-              e.preventDefault();
-              window.location.href = game.href;
-            }
-          }}
-          whileTap={{ scale: 0.95 }}
-          onMouseDown={() => setPressed(true)}
-          onMouseUp={() => setPressed(false)}
-          tabIndex={0}
-          role="button"
-          aria-label={
-            isComingSoon ? `${game.title} — Coming Soon` : `Play ${game.title}`
-          }
-          className="game-card__play-btn flex items-center justify-center gap-2
-            w-full px-5 py-2.5 rounded-full font-display font-bold text-sm
-            transition-all duration-200 select-none"
+      {/* ── Inner panel (screen + control deck) ── */}
+      <div className="relative m-3 rounded-2xl bg-[#08080a] overflow-hidden flex flex-col flex-1 [transform:translateZ(0)]">
+        {/* Neon inset border — gently flickers on hover (motion-safe only) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 rounded-2xl pointer-events-none motion-safe:group-hover:animate-neon-flicker"
           style={{
-            background: isComingSoon
-              ? "linear-gradient(180deg, #222 0%, #141414 100%)"
-              : "linear-gradient(180deg, #FBBF24 0%, #f59e0b 60%, #d97706 100%)",
-            color: isComingSoon ? "#555" : "#010508",
-            boxShadow: pressed
-              ? "inset 0 2px 8px rgba(0,0,0,0.6)"
-              : hovered && !isComingSoon
-                ? `0 4px 24px rgba(251, 191, 36, 0.45), 0 0 40px rgba(251, 191, 36, 0.15), inset 0 1px 0 var(--color-glass-border-strong)`
-                : `0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 var(--color-glass-border-strong)`,
-            border: isComingSoon ? "1px solid #333" : "1px solid #d97706",
-            cursor: isComingSoon ? "not-allowed" : "pointer",
-            pointerEvents: isComingSoon && game.href === "#" ? "none" : "auto",
+            boxShadow: `inset 0 0 0 1px ${game.color}33, inset 0 0 24px ${game.color}1f`,
+          }}
+        />
+
+        {/* ── Screen / hero art ── */}
+        <div
+          className="relative aspect-[4/3] overflow-hidden"
+          style={{
+            background: "radial-gradient(ellipse at top, #1a1a1c, #050507 80%)",
+            boxShadow: `inset 0 6px 16px rgba(0,0,0,0.7), inset 0 0 40px ${game.color}14`,
           }}
         >
-          {isComingSoon ? "🔒 Coming Soon" : "▶ PLAY"}
-        </motion.a>
+          {/* Ambient accent glow */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at 50% 55%, ${game.color}28, transparent 70%)`,
+            }}
+          />
+
+          {/* Cabinet art with onError → existing icon fallback */}
+          <Image
+            src={artSrc}
+            alt={`${game.title} — cabinet art`}
+            fill
+            sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
+            loading="lazy"
+            onError={handleArtError}
+            className="object-contain p-5 sm:p-6 drop-shadow-[0_10px_28px_rgba(0,0,0,0.7)] transition-transform duration-500 ease-out group-hover:scale-[1.07]"
+          />
+
+          {/* Marquee glow strip — also picks up neon-flicker on hover */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-6 pointer-events-none motion-safe:group-hover:animate-neon-flicker"
+            style={{
+              background: `linear-gradient(180deg, ${game.color}22, transparent)`,
+            }}
+          />
+
+          {/* CRT scanlines — dimmed on mobile, full intensity on md+ */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-15 md:opacity-30 pointer-events-none z-10"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px)",
+            }}
+          />
+        </div>
+
+        {/* ── Control panel: title, meta, button ── */}
+        <div className="relative flex flex-col flex-1 px-5 pt-4 pb-5 gap-3 bg-gradient-to-b from-[#0c0c0e] via-[#08080a] to-[#040406]">
+          {/* Title + type pill */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-display text-lg sm:text-xl font-extrabold leading-tight tracking-tight text-[var(--color-cream)] transition-colors duration-300 group-hover:text-[color:var(--accent)]">
+              {game.title}
+            </h3>
+            <span
+              className="shrink-0 font-mono text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-sm mt-0.5 whitespace-nowrap border"
+              style={{
+                borderColor: `${game.color}40`,
+                color: `${game.color}dd`,
+                background: `${game.color}0e`,
+              }}
+            >
+              {game.type}
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="font-body text-sm leading-relaxed text-[var(--color-cream-dim)] line-clamp-3">
+            {game.description}
+          </p>
+
+          {/* Tag pills */}
+          <div className="flex flex-wrap gap-1.5">
+            {game.tags.map((tag) => (
+              <span
+                key={tag}
+                className="font-mono text-[10px] px-2 py-0.5 rounded uppercase tracking-wider border"
+                style={{
+                  background: `${game.color}0c`,
+                  color: `${game.color}dd`,
+                  borderColor: `${game.color}1f`,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex-1 min-h-2" />
+
+          {/* PLAY — beveled orange arcade button (locked variant for Top Secret) */}
+          <motion.a
+            href={isComingSoon ? undefined : game.href}
+            onClick={(e) => {
+              if (!isComingSoon && game.href !== "#") {
+                e.preventDefault();
+                window.location.href = game.href;
+              }
+            }}
+            whileTap={isComingSoon ? undefined : { scale: 0.96 }}
+            tabIndex={isComingSoon ? -1 : 0}
+            role="button"
+            aria-label={
+              isComingSoon
+                ? `${game.title} — Coming Soon`
+                : `Play ${game.title}`
+            }
+            aria-disabled={isComingSoon}
+            className={
+              isComingSoon
+                ? `${PLAY_BTN_BASE} cursor-not-allowed text-[#555]`
+                : `${PLAY_BTN_BASE} cursor-pointer text-[#0a0500] shadow-play-arcade hover:shadow-play-arcade-hover`
+            }
+            style={{
+              background: isComingSoon
+                ? "linear-gradient(180deg, #2a2a2a 0%, #141414 100%)"
+                : "linear-gradient(180deg, #FCD34D 0%, #FBBF24 35%, #f59e0b 70%, #d97706 100%)",
+              border: isComingSoon ? "1px solid #2e2e2e" : "1px solid #b45309",
+              pointerEvents:
+                isComingSoon && game.href === "#" ? "none" : "auto",
+            }}
+          >
+            {isComingSoon ? "🔒 Coming Soon" : "▶ PLAY"}
+          </motion.a>
+        </div>
       </div>
     </motion.article>
   );
 }
 
-/* ─────────────────────────────────────────────────────────────
-   GamesShowcase — Section Container
-   ───────────────────────────────────────────────────────────── */
 export function GamesShowcase() {
   return (
     <section id="games" className="py-12 relative overflow-hidden">
-      {/* Section background removed — page-level herobackground3.jpg
-          shows through. */}
       <div className="container-main relative z-10">
         {/* Section header */}
         <motion.div
@@ -221,10 +270,10 @@ export function GamesShowcase() {
           </p>
         </motion.div>
 
-        {/* Game Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+        {/* 3×2 grid — shared perspective so hover tilts feel coordinated */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 [perspective:1400px]">
           {GAMES.map((game, i) => (
-            <GameCard key={game.id} game={game} index={i} />
+            <ArcadeCabinet key={game.id} game={game} index={i} />
           ))}
         </div>
       </div>
