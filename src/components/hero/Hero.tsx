@@ -69,28 +69,26 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* ── Title — text_logo.png wordmark + ($NUT) subtitle.
-              The "Live on XRPL Mainnet" badge that used to sit
-              between the squirrel logo and the title has been
-              removed. ── */}
+        {/* ── Title — text_logo.png wordmark sized at ~25% of the
+              previous heights. Hero now leads with the squirrel
+              mascot, then a compact wordmark, then the tagline.
+              The "Live on XRPL Mainnet" badge and the ($NUT)
+              subtitle were removed at the user's request. ── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
           className="mb-3 flex flex-col items-center"
-          aria-label="Fuzzynuts ($NUT)"
+          aria-label="Fuzzynuts"
         >
           <Image
             src="/text_logo.png"
             alt="Fuzzynuts"
-            width={920}
-            height={196}
-            className="h-20 sm:h-28 md:h-36 lg:h-44 w-auto drop-shadow-[0_0_30px_rgba(245,196,66,0.35)]"
+            width={473}
+            height={89}
+            className="h-5 sm:h-7 md:h-9 lg:h-11 w-auto drop-shadow-[0_0_18px_rgba(245,196,66,0.35)]"
             priority
           />
-          <span className="mt-2 text-[var(--color-cream)] text-[0.6rem] sm:text-[0.7rem] md:text-[0.85rem] lg:text-[1rem] font-bold font-display">
-            ($NUT)
-          </span>
         </motion.div>
 
         {/* ── Tagline ── */}
