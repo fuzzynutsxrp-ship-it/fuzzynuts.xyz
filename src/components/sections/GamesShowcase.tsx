@@ -224,12 +224,7 @@ export function GamesShowcase() {
         {/* Game Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
           {GAMES.map((game, i) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              index={i}
-              featured={game.id === "fuzzynuts-world"}
-            />
+            <GameCard key={game.id} game={game} index={i} />
           ))}
         </div>
       </div>
