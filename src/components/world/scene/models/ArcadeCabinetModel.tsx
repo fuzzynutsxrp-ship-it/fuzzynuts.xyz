@@ -26,29 +26,28 @@ export interface ArcadeCabinetModelProps {
   count?: number;
 }
 
-// IMPORTANT: the source GLB's natural bounding box is ~155 units
-// across (Sketchfab export unit weirdness). To get a player-height
-// cabinet (~2 units tall in our scene), we need scale ≈ 0.013.
-// The numbers below are scenes-relative arcade heights:
-//   0.013 → ~2.0 unit tall cabinet  (foreground)
-//   0.011 → ~1.7 unit tall cabinet  (mid-ground)
-//   0.009 → ~1.4 unit tall cabinet  (deep distance)
+// 5 cabinets matching the reference image's "clearing in the
+// canopy" arrangement: cabinets arranged in a loose ring at the
+// center of the scene with several units of clear space between
+// each one (not clustered tight). The bird's-eye hero camera at
+// (0, 18, 14) looking at (0, 0, -4) sees all five from above.
+//
+// Source GLB natural bbox is ~155 units; scale 0.013 → ~2-unit-tall
+// player-height cabinets.
 const PLACEMENTS: Placement[] = [
-  // Foreground left  — biggest, framing the left edge.
-  { position: [-3.5, -0.5, 4.0], rotationY: 0.85, scale: 0.013 },
-  // Foreground right — biggest, framing the right edge.
-  { position: [3.6, -0.5, 4.3], rotationY: -0.9, scale: 0.013 },
-  // Mid-ground left.
-  { position: [-5.5, -0.5, -0.5], rotationY: 1.2, scale: 0.011 },
-  // Mid-ground right.
-  { position: [5.2, -0.5, -0.8], rotationY: -1.1, scale: 0.011 },
-  // Deep center — peeking through trees.
-  { position: [0.4, -0.5, -7.5], rotationY: 0.2, scale: 0.009 },
-  // Deep left — almost lost in the fog.
-  { position: [-3.6, -0.5, -10.0], rotationY: 0.7, scale: 0.009 },
+  // Front-left — slightly closer to camera, angled inward.
+  { position: [-3.2, -0.5, 1.5], rotationY: 0.6, scale: 0.013 },
+  // Front-right — paired with front-left, mirrored angle.
+  { position: [3.2, -0.5, 1.5], rotationY: -0.6, scale: 0.013 },
+  // Center — facing the camera, anchoring the clearing.
+  { position: [0, -0.5, -1.5], rotationY: 0, scale: 0.013 },
+  // Back-left — recessed, rotated to face the clearing center.
+  { position: [-2.8, -0.5, -4.5], rotationY: 0.8, scale: 0.013 },
+  // Back-right — paired with back-left.
+  { position: [2.8, -0.5, -4.5], rotationY: -0.8, scale: 0.013 },
 ];
 
-export function ArcadeCabinetModel({ count = 6 }: ArcadeCabinetModelProps) {
+export function ArcadeCabinetModel({ count = 5 }: ArcadeCabinetModelProps) {
   const visible = useMemo(
     () => PLACEMENTS.slice(0, Math.max(0, Math.min(count, PLACEMENTS.length))),
     [count],

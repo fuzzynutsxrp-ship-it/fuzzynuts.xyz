@@ -116,16 +116,19 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       // `overallSceneMood` is a single 0..1 darkness multiplier applied on
       // top of the individual atmospheric controls below. 0 = bright /
       // cheerful; 1 = full eerie dusk like herobackground2.jpg.
-      // Default cranked to 0.9 — the user has consistently said previous
-      // passes were "not dark enough".
-      overallSceneMood: { value: 0.9, min: 0, max: 1, step: 0.02 },
+      // Default lowered to 0.35 to match the BRIGHT TWILIGHT reference
+      // (cyan-blue sky, soft mist, visible distant city). The previous
+      // 0.9 default was for the dark dusk plate; the new reference is
+      // brighter and more aerial.
+      overallSceneMood: { value: 0.35, min: 0, max: 1, step: 0.02 },
     }),
     Atmosphere: folder({
-      // Deeper blue-tinted fog matching the dark plate. Fog far pulled
-      // even closer so distance dissolves faster.
-      fogColor: "#03101a",
-      fogNear: { value: 5, min: 0, max: 40, step: 0.5 },
-      fogFar: { value: isMobile ? 22 : 27, min: 8, max: 80, step: 1 },
+      // Soft blue-grey fog instead of near-black: matches the misty
+      // valleys between hills in the reference photo. Fog far pushed
+      // way out so the distant city skyline is visible.
+      fogColor: "#7a9bb8",
+      fogNear: { value: 12, min: 0, max: 40, step: 0.5 },
+      fogFar: { value: isMobile ? 60 : 80, min: 8, max: 120, step: 1 },
       saturation: { value: 1.05, min: 0.4, max: 1.8, step: 0.05 },
     }),
     Vines: folder({
@@ -145,7 +148,7 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       arcadeGlow: { value: 1.3, min: 0, max: 3, step: 0.05 },
       // Now 8 placements total (added 2 close-foreground). Default shows
       // all 8 on desktop, 4 on mobile to keep render cheap.
-      arcadeCount: { value: isMobile ? 4 : 8, min: 0, max: 8, step: 1 },
+      arcadeCount: { value: isMobile ? 3 : 5, min: 0, max: 5, step: 1 },
       // ── Marquee color override ──
       // When `marqueeOverride` is on, every cabinet's marquee uses
       // `arcadeMarqueeColor`. When off, each cabinet keeps its preset
@@ -236,8 +239,10 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
         cheerful → eerie without the user having to retune everything. ── */
   const mood = controls.overallSceneMood;
   const derived = {
-    // Mood pulls fog far further in (was 0.35, now 0.45) — heavier
-    // mist when dark, matching herobackground2.jpg's foggy depth.
+    // Mood-driven fog pull-in. With the new bright-twilight default
+    // (mood=0.35) the multiplier `1 - 0.35*0.45 ≈ 0.84` keeps fogFar
+    // near 80 → distant city silhouette stays visible. Cranking mood
+    // toward 1.0 darkens + tightens to the dusk look.
     fogFar: controls.fogFar * (1 - mood * 0.45),
     // Ambient base lowered (0.45 → 0.35) and scaled more aggressively
     // by mood so high-mood scenes are nearly silhouette-only.
@@ -346,7 +351,10 @@ export default function WorldCanvas({ isMobile }: WorldCanvasProps) {
       >
         <ScrollContext.Provider value={scrollState.current}>
           {/* ── Background + atmosphere ── */}
-          <color attach="background" args={["#020608"]} />
+          {/* Twilight-blue sky color — matches the reference's
+              cyan-grey horizon. Bird's-eye camera sees this above
+              the canopy where the distant city silhouette sits. */}
+          <color attach="background" args={["#a8c1d6"]} />
           <fog
             attach="fog"
             args={[controls.fogColor, controls.fogNear, derived.fogFar]}

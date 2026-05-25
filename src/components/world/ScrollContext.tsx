@@ -59,17 +59,26 @@ export interface StationDef {
 
 export const STATIONS: StationDef[] = [
   {
+    // Bird's-eye twilight view of the canopy + arcade clearing,
+    // matching the reference plate. Camera sits high and pulled
+    // back, pitched downward so the canopy fills the lower 2/3 of
+    // the frame and the distant horizon (city silhouette) sits
+    // along the top edge. As the user scrolls into the next
+    // station, the camera descends + tilts forward, giving a
+    // cinematic "dive into the forest" feel.
     id: "hero",
     from: 0,
     to: 0.18,
-    cameraPos: [0, 2.4, 8.5],
-    lookAt: [0, 1.5, 0],
+    cameraPos: [0, 18, 14],
+    lookAt: [0, 0, -4],
   },
   {
+    // Games station — descended halfway, camera now near canopy
+    // level looking forward at the portal circle.
     id: "games",
     from: 0.18,
     to: 0.42,
-    cameraPos: [0, 3.2, 4.5],
+    cameraPos: [0, 6, 6],
     lookAt: [0, 2.0, -1.2],
   },
   {
