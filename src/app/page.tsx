@@ -2,18 +2,21 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/hero/Hero";
+import { HeroBackground } from "@/components/hero/HeroBackground";
 import { ClientFallingNuts } from "@/components/ClientFallingNuts";
 
 /* ═══════════════════════════════════════════════════════════════
-   Homepage — herobackground3.jpg as a clean HTML hero, the same
-   pattern as the EMERGENCY RESET (commit bfc8901). Below-fold
-   marketing sections (GamesShowcase, PrizeTiers, etc.) are
-   preserved.
+   Homepage — `herobackground3.jpg` is now the fixed page-level
+   background. <HeroBackground/> sits behind everything via
+   `fixed inset-0 z-0`; the page content (Hero + below-fold
+   marketing sections) scrolls on top of it. Sections that have
+   their own opaque backgrounds (GamesShowcase, etc.) cover the
+   image where they render; transparent gaps let it show through.
 
-   FuzzyWorld (3D scene + game portals + treasure vault + leader-
-   board acorns + moon close-up + Leva) is still in the repo at
-   src/components/world/. Re-import + replace <Hero/> below to
-   bring it back when the 3D side is wanted again.
+   All 3D / Three.js scene code has been deleted from the
+   homepage path. Three.js stays installed because
+   src/components/ui/RotatingNut.tsx still uses R3F elsewhere
+   in the app (game pages).
    ═══════════════════════════════════════════════════════════════ */
 
 const GamesShowcase = dynamic(() =>
@@ -68,6 +71,12 @@ const FloatingMascot = dynamic(() =>
 export default function Home() {
   return (
     <>
+      {/* Page-level fixed backdrop — herobackground3.jpg stays put while
+          the rest of the page scrolls on top of it. */}
+      <div className="fixed inset-0 z-0" aria-hidden="true">
+        <HeroBackground />
+      </div>
+
       <ClientFallingNuts />
       <Navbar />
       <main id="main-content" className="relative z-10">

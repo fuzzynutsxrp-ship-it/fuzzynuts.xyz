@@ -12,19 +12,19 @@ import {
 import Image from "next/image";
 import { useWalletStore } from "@/store/wallet";
 import { gameRegistry } from "@/lib/gameRegistry";
-import { HeroBackground } from "./HeroBackground";
 
 /* ─────────────────────────────────────────────────────────────
-   Hero — CLEAN RESET.
+   Hero — Foreground content only.
 
-   Zero Three.js, zero R3F, zero canvas, zero particle systems.
-   Just:
-     • HeroBackground   — static image w/ gradient mesh overlay
-     • Framer Motion    — entrance animations for the foreground content
-     • Lucide icons     — small SVGs already in the bundle
+   The hero photo (`herobackground3.jpg`) is now rendered at the
+   page level by <HeroBackground/> in src/app/page.tsx with a
+   `fixed inset-0` wrapper, so it sits behind the ENTIRE page
+   and is visible everywhere the content scrolls past it.
+   This component is just the centered HUD overlay (logo, title,
+   CTAs, stats, vault teaser, scroll cue).
 
-   Wallet connect lives in <Navbar/> (rendered by page.tsx).
-   Scroll cue smooth-scrolls to the GamesShowcase section below.
+   Zero Three.js, zero R3F, zero canvas. Just framer-motion for
+   entrance animations + lucide-react icons.
    ───────────────────────────────────────────────────────────── */
 
 const FLOAT_ANIMATION = {
@@ -38,12 +38,8 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full min-h-[100svh] overflow-hidden bg-[var(--color-forest-dark)]"
+      className="relative w-full min-h-[100svh] overflow-hidden"
     >
-      {/* z-0 — background image + gradient mesh + vignette */}
-      <HeroBackground />
-
-      {/* z-20 — foreground content (no z-10 layer needed now) */}
       <div className="relative z-20 flex flex-col items-center text-center px-4 pt-24 pb-12">
         {/* ── Logo ── */}
         <motion.div
