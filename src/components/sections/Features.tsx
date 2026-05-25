@@ -28,7 +28,7 @@ export function Features() {
           className="text-center mb-16"
         >
           <Image
-            src="/highlights.png"
+            src="/images/branding/wordmarks/highlights.png"
             alt="Highlights"
             width={720}
             height={140}

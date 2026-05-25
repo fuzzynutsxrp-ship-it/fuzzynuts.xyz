@@ -113,7 +113,8 @@ export function FloatingMascot() {
   if (dismissed) return null;
 
   /* ── Determine if mascot should be visible in DOM ── */
-  const isPresent = phase === "entering" || phase === "visible" || phase === "exiting";
+  const isPresent =
+    phase === "entering" || phase === "visible" || phase === "exiting";
 
   /* ── Reduced motion: show static image briefly, no animation ── */
   if (prefersReduced) {
@@ -134,7 +135,7 @@ export function FloatingMascot() {
               ×
             </button>
             <Image
-              src="/images/FuzzyBear.png"
+              src="/images/branding/FuzzyBear.png"
               alt=""
               width={150}
               height={200}
@@ -168,8 +169,8 @@ export function FloatingMascot() {
                 phase === "exiting" ? SLIDE_DOWN_DURATION : SLIDE_UP_DURATION,
               ease:
                 phase === "exiting"
-                  ? [0.4, 0, 1, 1]   /* ease-in for exit */
-                  : [0, 0, 0.2, 1],  /* ease-out for entry */
+                  ? [0.4, 0, 1, 1] /* ease-in for exit */
+                  : [0, 0, 0.2, 1] /* ease-out for entry */,
             },
             opacity: {
               duration: phase === "exiting" ? SLIDE_DOWN_DURATION * 0.6 : 0.4,
@@ -218,7 +219,7 @@ export function FloatingMascot() {
             }
           >
             <Image
-              src="/images/FuzzyBear.png"
+              src="/images/branding/FuzzyBear.png"
               alt=""
               width={150}
               height={200}

@@ -189,7 +189,7 @@ export function Tokenomics() {
           className="text-center mb-16"
         >
           <Image
-            src="/tokenomics.png"
+            src="/images/branding/wordmarks/tokenomics.png"
             alt="Tokenomics"
             width={720}
             height={140}

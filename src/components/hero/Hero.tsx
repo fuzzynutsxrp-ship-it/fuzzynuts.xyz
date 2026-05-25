@@ -82,7 +82,7 @@ export function Hero() {
           aria-label="Fuzzynuts"
         >
           <Image
-            src="/text_logo.png"
+            src="/images/branding/wordmarks/text_logo.png"
             alt="Fuzzynuts"
             width={473}
             height={89}

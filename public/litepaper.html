@@ -1,539 +1,688 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fuzzynuts ($NUT) — Litepaper</title>
-    <meta name="description" content="Fuzzynuts ($NUT) Litepaper: A community-driven meme coin on the XRP Ledger with a permanently locked supply of 321 billion tokens.">
-    <link rel="icon" href="/logo_512.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta
+      name="description"
+      content="Fuzzynuts ($NUT) Litepaper: A community-driven meme coin on the XRP Ledger with a permanently locked supply of 321 billion tokens."
+    />
+    <link rel="icon" href="/images/branding/logo_512.png" type="image/png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            --bg-primary: #0A0A0F;
-            --bg-secondary: #12121A;
-            --bg-card: rgba(26, 26, 36, 0.85);
-            --gold: #DAA520;
-            --gold-dark: #B8860B;
-            --cream: #F0EDE6;
-            --cream-muted: #B8B4AC;
-            --green: #4ADE80;
-            --red: #F87171;
-            --blue: #60A5FA;
-        }
+      :root {
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #12121a;
+        --bg-card: rgba(26, 26, 36, 0.85);
+        --gold: #daa520;
+        --gold-dark: #b8860b;
+        --cream: #f0ede6;
+        --cream-muted: #b8b4ac;
+        --green: #4ade80;
+        --red: #f87171;
+        --blue: #60a5fa;
+      }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
+      body {
+        font-family: "Outfit", sans-serif;
+        background: var(--bg-primary);
+        color: var(--cream);
+        line-height: 1.7;
+        min-height: 100vh;
+      }
+
+      /* Background gradient */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            ellipse at 20% 0%,
+            rgba(218, 165, 32, 0.06) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at 80% 100%,
+            rgba(218, 165, 32, 0.04) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 3rem 2rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(218, 165, 32, 0.2);
+      }
+
+      .header img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin-bottom: 1.5rem;
+        border: 3px solid var(--gold);
+        box-shadow: 0 0 30px rgba(218, 165, 32, 0.3);
+      }
+
+      .header h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        background: linear-gradient(
+          135deg,
+          var(--gold),
+          #f5deb3,
+          var(--gold-dark)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+      }
+
+      .header .subtitle {
+        font-size: 1.1rem;
+        color: var(--cream-muted);
+        font-weight: 300;
+      }
+
+      .header .version {
+        font-size: 0.85rem;
+        color: rgba(184, 180, 172, 0.5);
+        margin-top: 0.5rem;
+      }
+
+      /* Sections */
+      h2 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--gold);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(218, 165, 32, 0.15);
+      }
+
+      h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--cream);
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      p {
+        margin-bottom: 1rem;
+        color: var(--cream-muted);
+      }
+
+      strong {
+        color: var(--cream);
+      }
+
+      a {
+        color: var(--gold);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(218, 165, 32, 0.3);
+        transition: border-color 0.2s;
+      }
+      a:hover {
+        border-color: var(--gold);
+      }
+
+      /* Cards */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid rgba(218, 165, 32, 0.12);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        backdrop-filter: blur(10px);
+      }
+
+      .card.highlight {
+        border-color: rgba(218, 165, 32, 0.35);
+        box-shadow: 0 0 20px rgba(218, 165, 32, 0.08);
+      }
+
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+      }
+
+      th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        background: rgba(218, 165, 32, 0.1);
+        color: var(--gold);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--cream-muted);
+        font-size: 0.95rem;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      td:first-child {
+        color: var(--cream);
+        font-weight: 500;
+      }
+
+      /* Stats grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+
+      .stat {
+        background: var(--bg-card);
+        border: 1px solid rgba(218, 165, 32, 0.12);
+        border-radius: 10px;
+        padding: 1.25rem;
+        text-align: center;
+      }
+
+      .stat .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gold);
+      }
+
+      .stat .label {
+        font-size: 0.8rem;
+        color: var(--cream-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.25rem;
+      }
+
+      /* Badge */
+      .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .badge.green {
+        background: rgba(74, 222, 128, 0.15);
+        color: var(--green);
+      }
+      .badge.gold {
+        background: rgba(218, 165, 32, 0.15);
+        color: var(--gold);
+      }
+      .badge.red {
+        background: rgba(248, 113, 113, 0.15);
+        color: var(--red);
+      }
+
+      /* Verified addresses */
+      .address {
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        word-break: break-all;
+      }
+
+      /* List */
+      ul {
+        margin: 0.75rem 0 1rem 1.5rem;
+        color: var(--cream-muted);
+      }
+      li {
+        margin-bottom: 0.4rem;
+      }
+
+      /* Footer */
+      .footer {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(218, 165, 32, 0.15);
+        text-align: center;
+        color: rgba(184, 180, 172, 0.4);
+        font-size: 0.85rem;
+      }
+
+      .footer a {
+        color: rgba(218, 165, 32, 0.6);
+      }
+
+      .disclaimer {
+        margin-top: 2rem;
+        padding: 1.25rem;
+        background: rgba(248, 113, 113, 0.05);
+        border: 1px solid rgba(248, 113, 113, 0.15);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: rgba(184, 180, 172, 0.6);
+      }
+
+      /* Print styles */
+      @media print {
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-primary);
-            color: var(--cream);
-            line-height: 1.7;
-            min-height: 100vh;
+          background: white;
+          color: #1a1a1a;
         }
-
-        /* Background gradient */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 0%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(218, 165, 32, 0.04) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(218, 165, 32, 0.2);
-        }
-
-        .header img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin-bottom: 1.5rem;
-            border: 3px solid var(--gold);
-            box-shadow: 0 0 30px rgba(218, 165, 32, 0.3);
-        }
-
-        .header h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gold), #F5DEB3, var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-
-        .header .subtitle {
-            font-size: 1.1rem;
-            color: var(--cream-muted);
-            font-weight: 300;
-        }
-
-        .header .version {
-            font-size: 0.85rem;
-            color: rgba(184, 180, 172, 0.5);
-            margin-top: 0.5rem;
-        }
-
-        /* Sections */
-        h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--gold);
-            margin-top: 3rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(218, 165, 32, 0.15);
-        }
-
-        h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--cream);
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-
-        p {
-            margin-bottom: 1rem;
-            color: var(--cream-muted);
-        }
-
-        strong { color: var(--cream); }
-
-        a {
-            color: var(--gold);
-            text-decoration: none;
-            border-bottom: 1px solid rgba(218, 165, 32, 0.3);
-            transition: border-color 0.2s;
-        }
-        a:hover { border-color: var(--gold); }
-
-        /* Cards */
         .card {
-            background: var(--bg-card);
-            border: 1px solid rgba(218, 165, 32, 0.12);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            backdrop-filter: blur(10px);
+          border: 1px solid #ddd;
+          background: #f9f9f9;
         }
-
-        .card.highlight {
-            border-color: rgba(218, 165, 32, 0.35);
-            box-shadow: 0 0 20px rgba(218, 165, 32, 0.08);
+        h2 {
+          color: #8b6914;
         }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-        }
-
-        th {
-            text-align: left;
-            padding: 0.75rem 1rem;
-            background: rgba(218, 165, 32, 0.1);
-            color: var(--gold);
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            color: var(--cream-muted);
-            font-size: 0.95rem;
-        }
-
-        tr:last-child td { border-bottom: none; }
-
-        td:first-child { color: var(--cream); font-weight: 500; }
-
-        /* Stats grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .stat {
-            background: var(--bg-card);
-            border: 1px solid rgba(218, 165, 32, 0.12);
-            border-radius: 10px;
-            padding: 1.25rem;
-            text-align: center;
-        }
-
         .stat .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--gold);
+          color: #8b6914;
         }
-
-        .stat .label {
-            font-size: 0.8rem;
-            color: var(--cream-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.25rem;
+        th {
+          background: #f0f0f0;
+          color: #8b6914;
         }
+      }
 
-        /* Badge */
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+      @media (max-width: 600px) {
+        .container {
+          padding: 2rem 1.25rem;
         }
-        .badge.green { background: rgba(74, 222, 128, 0.15); color: var(--green); }
-        .badge.gold { background: rgba(218, 165, 32, 0.15); color: var(--gold); }
-        .badge.red { background: rgba(248, 113, 113, 0.15); color: var(--red); }
-
-        /* Verified addresses */
-        .address {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            word-break: break-all;
+        .header h1 {
+          font-size: 2rem;
         }
-
-        /* List */
-        ul {
-            margin: 0.75rem 0 1rem 1.5rem;
-            color: var(--cream-muted);
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
         }
-        li { margin-bottom: 0.4rem; }
-
-        /* Footer */
-        .footer {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(218, 165, 32, 0.15);
-            text-align: center;
-            color: rgba(184, 180, 172, 0.4);
-            font-size: 0.85rem;
-        }
-
-        .footer a { color: rgba(218, 165, 32, 0.6); }
-
-        .disclaimer {
-            margin-top: 2rem;
-            padding: 1.25rem;
-            background: rgba(248, 113, 113, 0.05);
-            border: 1px solid rgba(248, 113, 113, 0.15);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: rgba(184, 180, 172, 0.6);
-        }
-
-        /* Print styles */
-        @media print {
-            body { background: white; color: #1a1a1a; }
-            .card { border: 1px solid #ddd; background: #f9f9f9; }
-            h2 { color: #8B6914; }
-            .stat .value { color: #8B6914; }
-            th { background: #f0f0f0; color: #8B6914; }
-        }
-
-        @media (max-width: 600px) {
-            .container { padding: 2rem 1.25rem; }
-            .header h1 { font-size: 2rem; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <img src="/logo_512.png" alt="Fuzzynuts Logo">
-            <h1>Fuzzynuts ($NUT)</h1>
-            <p class="subtitle">The nuttiest meme on the XRP Ledger</p>
-            <p class="version">Litepaper v1.0 — May 2026</p>
+      <div class="header">
+        <img src="/images/branding/logo_512.png" alt="Fuzzynuts Logo" />
+        <h1>Fuzzynuts ($NUT)</h1>
+        <p class="subtitle">The nuttiest meme on the XRP Ledger</p>
+        <p class="version">Litepaper v1.0 — May 2026</p>
+      </div>
+
+      <!-- 1. OVERVIEW -->
+      <h2>1. Overview</h2>
+      <p>
+        <strong>Fuzzynuts ($NUT)</strong> is a community-driven meme coin built
+        natively on the <strong>XRP Ledger (XRPL)</strong>. With a fixed supply
+        of <strong>321 billion tokens</strong>
+        and a permanently blackholed issuer account, $NUT is designed to be fun,
+        transparent, and impossible to rug.
+      </p>
+      <p>
+        The project combines meme culture with the XRPL's speed, low fees, and
+        built-in decentralized exchange to create an accessible, community-first
+        token with no smart contract risk.
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="value">321B</div>
+          <div class="label">Total Supply</div>
         </div>
-
-        <!-- 1. OVERVIEW -->
-        <h2>1. Overview</h2>
-        <p>
-            <strong>Fuzzynuts ($NUT)</strong> is a community-driven meme coin built natively on the 
-            <strong>XRP Ledger (XRPL)</strong>. With a fixed supply of <strong>321 billion tokens</strong> 
-            and a permanently blackholed issuer account, $NUT is designed to be fun, transparent, and 
-            impossible to rug.
-        </p>
-        <p>
-            The project combines meme culture with the XRPL's speed, low fees, and built-in decentralized 
-            exchange to create an accessible, community-first token with no smart contract risk.
-        </p>
-
-        <div class="stats-grid">
-            <div class="stat">
-                <div class="value">321B</div>
-                <div class="label">Total Supply</div>
-            </div>
-            <div class="stat">
-                <div class="value">🔒</div>
-                <div class="label">Permanently Locked</div>
-            </div>
-            <div class="stat">
-                <div class="value">80%</div>
-                <div class="label">AMM Liquidity</div>
-            </div>
-            <div class="stat">
-                <div class="value">1%</div>
-                <div class="label">Trading Fee</div>
-            </div>
+        <div class="stat">
+          <div class="value">🔒</div>
+          <div class="label">Permanently Locked</div>
         </div>
+        <div class="stat">
+          <div class="value">80%</div>
+          <div class="label">AMM Liquidity</div>
+        </div>
+        <div class="stat">
+          <div class="value">1%</div>
+          <div class="label">Trading Fee</div>
+        </div>
+      </div>
 
-        <!-- 2. WHY XRPL -->
-        <h2>2. Why the XRP Ledger?</h2>
+      <!-- 2. WHY XRPL -->
+      <h2>2. Why the XRP Ledger?</h2>
+      <p>
+        $NUT is a <strong>native XRPL token</strong>, not a smart contract. This
+        provides distinct advantages:
+      </p>
+      <ul>
+        <li>
+          <strong>3-5 second settlement</strong> — near-instant transactions
+        </li>
+        <li><strong>~$0.0002 per transaction</strong> — negligible fees</li>
+        <li>
+          <strong>Built-in DEX</strong> — no bridges, no wrapping, no
+          third-party contracts
+        </li>
+        <li>
+          <strong>Native AMM</strong> — XRPL's protocol-level automated market
+          maker (not a dApp)
+        </li>
+        <li>
+          <strong>No smart contract risk</strong> — token logic lives in the
+          protocol itself
+        </li>
+        <li>
+          <strong>Carbon neutral</strong> — XRPL's consensus mechanism uses
+          minimal energy
+        </li>
+      </ul>
+
+      <!-- 3. TOKENOMICS -->
+      <h2>3. Tokenomics</h2>
+      <p>
+        The token follows a simple, transparent
+        <strong>80/18/2 allocation model</strong>:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Allocation</th>
+            <th>%</th>
+            <th>Amount</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AMM Liquidity Pool</td>
+            <td>80%</td>
+            <td>256.8B NUT</td>
+            <td>Paired with XRP on native XRPL DEX</td>
+          </tr>
+          <tr>
+            <td>Community Nut Jar</td>
+            <td>18%</td>
+            <td>57.78B NUT</td>
+            <td>Airdrops, rewards, ecosystem growth</td>
+          </tr>
+          <tr>
+            <td>Squirrel's Pile (Founder)</td>
+            <td>2%</td>
+            <td>6.42B NUT</td>
+            <td>Founder allocation</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="card highlight">
+        <h3>💀 Blackholed Issuer — Zero Inflation Guarantee</h3>
         <p>
-            $NUT is a <strong>native XRPL token</strong>, not a smart contract. This provides distinct advantages:
+          The issuer account has been <strong>permanently blackholed</strong> by
+          disabling the master key and setting the regular key to a provably
+          unspendable address (<code>rrrrrrrrrrrrrrrrrrrrBZbvji</code>). This
+          means:
         </p>
         <ul>
-            <li><strong>3-5 second settlement</strong> — near-instant transactions</li>
-            <li><strong>~$0.0002 per transaction</strong> — negligible fees</li>
-            <li><strong>Built-in DEX</strong> — no bridges, no wrapping, no third-party contracts</li>
-            <li><strong>Native AMM</strong> — XRPL's protocol-level automated market maker (not a dApp)</li>
-            <li><strong>No smart contract risk</strong> — token logic lives in the protocol itself</li>
-            <li><strong>Carbon neutral</strong> — XRPL's consensus mechanism uses minimal energy</li>
+          <li>
+            <strong>No new tokens can ever be minted</strong> — the supply is
+            fixed forever
+          </li>
+          <li>
+            <strong>No one can modify the issuer</strong> — including the
+            original creators
+          </li>
+          <li>
+            <strong>Verifiable on-chain</strong> — anyone can confirm this on
+            any XRPL explorer
+          </li>
         </ul>
+      </div>
 
-        <!-- 3. TOKENOMICS -->
-        <h2>3. Tokenomics</h2>
-        <p>The token follows a simple, transparent <strong>80/18/2 allocation model</strong>:</p>
+      <!-- 4. ARCHITECTURE -->
+      <h2>4. Wallet Architecture</h2>
+      <p>
+        $NUT uses a <strong>4-wallet security model</strong> to separate
+        concerns:
+      </p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Allocation</th>
-                    <th>%</th>
-                    <th>Amount</th>
-                    <th>Purpose</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>AMM Liquidity Pool</td>
-                    <td>80%</td>
-                    <td>256.8B NUT</td>
-                    <td>Paired with XRP on native XRPL DEX</td>
-                </tr>
-                <tr>
-                    <td>Community Nut Jar</td>
-                    <td>18%</td>
-                    <td>57.78B NUT</td>
-                    <td>Airdrops, rewards, ecosystem growth</td>
-                </tr>
-                <tr>
-                    <td>Squirrel's Pile (Founder)</td>
-                    <td>2%</td>
-                    <td>6.42B NUT</td>
-                    <td>Founder allocation</td>
-                </tr>
-            </tbody>
-        </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Wallet</th>
+            <th>Role</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Issuer</td>
+            <td>Token creation (now locked)</td>
+            <td><span class="badge red">Blackholed</span></td>
+          </tr>
+          <tr>
+            <td>Distributor</td>
+            <td>LP provider, operations</td>
+            <td><span class="badge green">Active</span></td>
+          </tr>
+          <tr>
+            <td>321 Nut Fund</td>
+            <td>Community treasury</td>
+            <td><span class="badge gold">Reserved</span></td>
+          </tr>
+          <tr>
+            <td>Squirrel's Pile</td>
+            <td>Founder allocation (2%)</td>
+            <td><span class="badge green">Allocated</span></td>
+          </tr>
+        </tbody>
+      </table>
 
-        <div class="card highlight">
-            <h3>💀 Blackholed Issuer — Zero Inflation Guarantee</h3>
-            <p>
-                The issuer account has been <strong>permanently blackholed</strong> by disabling the master key 
-                and setting the regular key to a provably unspendable address (<code>rrrrrrrrrrrrrrrrrrrrBZbvji</code>). 
-                This means:
-            </p>
-            <ul>
-                <li><strong>No new tokens can ever be minted</strong> — the supply is fixed forever</li>
-                <li><strong>No one can modify the issuer</strong> — including the original creators</li>
-                <li><strong>Verifiable on-chain</strong> — anyone can confirm this on any XRPL explorer</li>
-            </ul>
-        </div>
-
-        <!-- 4. ARCHITECTURE -->
-        <h2>4. Wallet Architecture</h2>
-        <p>$NUT uses a <strong>4-wallet security model</strong> to separate concerns:</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Wallet</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Issuer</td>
-                    <td>Token creation (now locked)</td>
-                    <td><span class="badge red">Blackholed</span></td>
-                </tr>
-                <tr>
-                    <td>Distributor</td>
-                    <td>LP provider, operations</td>
-                    <td><span class="badge green">Active</span></td>
-                </tr>
-                <tr>
-                    <td>321 Nut Fund</td>
-                    <td>Community treasury</td>
-                    <td><span class="badge gold">Reserved</span></td>
-                </tr>
-                <tr>
-                    <td>Squirrel's Pile</td>
-                    <td>Founder allocation (2%)</td>
-                    <td><span class="badge green">Allocated</span></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- 5. VERIFIED ADDRESSES -->
-        <h2>5. Verified Addresses</h2>
-        <div class="card">
-            <p><strong>Issuer (Blackholed):</strong></p>
-            <p class="address">rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7</p>
-            <br>
-            <p><strong>Distributor:</strong></p>
-            <p class="address">rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh</p>
-            <br>
-            <p><strong>AMM Pool:</strong></p>
-            <p class="address">r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg</p>
-            <br>
-            <p><strong>Domain Verification:</strong></p>
-            <p class="address"><a href="https://fuzzynuts.xyz/.well-known/xrp-ledger.toml">fuzzynuts.xyz/.well-known/xrp-ledger.toml</a></p>
-        </div>
-
-        <!-- 6. TRUST & TRANSPARENCY -->
-        <h2>6. Trust & Transparency</h2>
-        <p>Every aspect of $NUT is verifiable on-chain:</p>
-        <ul>
-            <li><strong>Open-source tools</strong> — all issuance scripts published on GitHub</li>
-            <li><strong>Domain-verified</strong> — TOML file hosted at the standard XRPL path</li>
-            <li><strong>No admin keys</strong> — the issuer cannot be controlled by anyone</li>
-            <li><strong>80% in public liquidity</strong> — the vast majority of supply is in the AMM pool</li>
-            <li><strong>Only 2% founder allocation</strong> — one of the lowest in the meme token space</li>
-            <li><strong>1% trading fee</strong> — set at the AMM level, generating yield for LP providers</li>
-        </ul>
-
-        <!-- 7. COMMUNITY -->
-        <h2>7. Community & Ecosystem</h2>
-        <p>
-            $NUT is powered by its community. The <strong>Community Nut Jar</strong> (18% of supply) is 
-            reserved for airdrops, rewards, partnerships, and ecosystem growth — all decided with 
-            community input.
+      <!-- 5. VERIFIED ADDRESSES -->
+      <h2>5. Verified Addresses</h2>
+      <div class="card">
+        <p><strong>Issuer (Blackholed):</strong></p>
+        <p class="address">rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7</p>
+        <br />
+        <p><strong>Distributor:</strong></p>
+        <p class="address">rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh</p>
+        <br />
+        <p><strong>AMM Pool:</strong></p>
+        <p class="address">r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg</p>
+        <br />
+        <p><strong>Domain Verification:</strong></p>
+        <p class="address">
+          <a href="https://fuzzynuts.xyz/.well-known/xrp-ledger.toml"
+            >fuzzynuts.xyz/.well-known/xrp-ledger.toml</a
+          >
         </p>
-        <h3>Ecosystem Features</h3>
-        <ul>
-            <li><strong>Fuzzynuts Arcade</strong> — browser-based games at fuzzynuts.xyz/arcade</li>
-            <li><strong>Nut Drops</strong> — community airdrops for holders and participants</li>
-            <li><strong>XRPL-native trading</strong> — no bridges or third-party smart contracts needed</li>
-        </ul>
+      </div>
 
-        <!-- 8. ROADMAP -->
-        <h2>8. Roadmap</h2>
+      <!-- 6. TRUST & TRANSPARENCY -->
+      <h2>6. Trust & Transparency</h2>
+      <p>Every aspect of $NUT is verifiable on-chain:</p>
+      <ul>
+        <li>
+          <strong>Open-source tools</strong> — all issuance scripts published on
+          GitHub
+        </li>
+        <li>
+          <strong>Domain-verified</strong> — TOML file hosted at the standard
+          XRPL path
+        </li>
+        <li>
+          <strong>No admin keys</strong> — the issuer cannot be controlled by
+          anyone
+        </li>
+        <li>
+          <strong>80% in public liquidity</strong> — the vast majority of supply
+          is in the AMM pool
+        </li>
+        <li>
+          <strong>Only 2% founder allocation</strong> — one of the lowest in the
+          meme token space
+        </li>
+        <li>
+          <strong>1% trading fee</strong> — set at the AMM level, generating
+          yield for LP providers
+        </li>
+      </ul>
+
+      <!-- 7. COMMUNITY -->
+      <h2>7. Community & Ecosystem</h2>
+      <p>
+        $NUT is powered by its community. The
+        <strong>Community Nut Jar</strong> (18% of supply) is reserved for
+        airdrops, rewards, partnerships, and ecosystem growth — all decided with
+        community input.
+      </p>
+      <h3>Ecosystem Features</h3>
+      <ul>
+        <li>
+          <strong>Fuzzynuts Arcade</strong> — browser-based games at
+          fuzzynuts.xyz/arcade
+        </li>
+        <li>
+          <strong>Nut Drops</strong> — community airdrops for holders and
+          participants
+        </li>
+        <li>
+          <strong>XRPL-native trading</strong> — no bridges or third-party smart
+          contracts needed
+        </li>
+      </ul>
+
+      <!-- 8. ROADMAP -->
+      <h2>8. Roadmap</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Milestone</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 — Planning</td>
+            <td>Tokenomics, wallet architecture, branding</td>
+            <td><span class="badge green">Complete</span></td>
+          </tr>
+          <tr>
+            <td>2 — Issuance</td>
+            <td>Token minting, blackhole, distribution</td>
+            <td><span class="badge green">Complete</span></td>
+          </tr>
+          <tr>
+            <td>3 — Pre-Launch</td>
+            <td>AMM pool, website, domain verification, socials</td>
+            <td><span class="badge green">Complete</span></td>
+          </tr>
+          <tr>
+            <td>4 — Community Launch</td>
+            <td>Tracker listings, airdrops, ecosystem outreach</td>
+            <td><span class="badge gold">In Progress</span></td>
+          </tr>
+          <tr>
+            <td>5 — Growth</td>
+            <td>Exchange listings, partnerships, expanded utility</td>
+            <td><span class="badge red">Upcoming</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 9. LINKS -->
+      <h2>9. Official Links</h2>
+      <div class="card">
         <table>
-            <thead>
-                <tr>
-                    <th>Phase</th>
-                    <th>Milestone</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1 — Planning</td>
-                    <td>Tokenomics, wallet architecture, branding</td>
-                    <td><span class="badge green">Complete</span></td>
-                </tr>
-                <tr>
-                    <td>2 — Issuance</td>
-                    <td>Token minting, blackhole, distribution</td>
-                    <td><span class="badge green">Complete</span></td>
-                </tr>
-                <tr>
-                    <td>3 — Pre-Launch</td>
-                    <td>AMM pool, website, domain verification, socials</td>
-                    <td><span class="badge green">Complete</span></td>
-                </tr>
-                <tr>
-                    <td>4 — Community Launch</td>
-                    <td>Tracker listings, airdrops, ecosystem outreach</td>
-                    <td><span class="badge gold">In Progress</span></td>
-                </tr>
-                <tr>
-                    <td>5 — Growth</td>
-                    <td>Exchange listings, partnerships, expanded utility</td>
-                    <td><span class="badge red">Upcoming</span></td>
-                </tr>
-            </tbody>
+          <tbody>
+            <tr>
+              <td>🌐 Website</td>
+              <td><a href="https://fuzzynuts.xyz">fuzzynuts.xyz</a></td>
+            </tr>
+            <tr>
+              <td>🐦 Twitter/X</td>
+              <td><a href="https://x.com/fuzzynutsxrp">@fuzzynutsxrp</a></td>
+            </tr>
+            <tr>
+              <td>💬 Telegram</td>
+              <td><a href="https://t.me/FuzzynutsXRP">t.me/FuzzynutsXRP</a></td>
+            </tr>
+            <tr>
+              <td>🔍 Explorer</td>
+              <td>
+                <a
+                  href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7"
+                  >XRPScan</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>📊 Trade</td>
+              <td>
+                <a
+                  href="https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP"
+                  >XPMarket DEX</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>💻 GitHub</td>
+              <td>
+                <a href="https://github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz"
+                  >Open Source</a
+                >
+              </td>
+            </tr>
+          </tbody>
         </table>
+      </div>
 
-        <!-- 9. LINKS -->
-        <h2>9. Official Links</h2>
-        <div class="card">
-            <table>
-                <tbody>
-                    <tr>
-                        <td>🌐 Website</td>
-                        <td><a href="https://fuzzynuts.xyz">fuzzynuts.xyz</a></td>
-                    </tr>
-                    <tr>
-                        <td>🐦 Twitter/X</td>
-                        <td><a href="https://x.com/fuzzynutsxrp">@fuzzynutsxrp</a></td>
-                    </tr>
-                    <tr>
-                        <td>💬 Telegram</td>
-                        <td><a href="https://t.me/FuzzynutsXRP">t.me/FuzzynutsXRP</a></td>
-                    </tr>
-                    <tr>
-                        <td>🔍 Explorer</td>
-                        <td><a href="https://xrpscan.com/account/rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7">XRPScan</a></td>
-                    </tr>
-                    <tr>
-                        <td>📊 Trade</td>
-                        <td><a href="https://xpmarket.com/dex/NUT-rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7/XRP">XPMarket DEX</a></td>
-                    </tr>
-                    <tr>
-                        <td>💻 GitHub</td>
-                        <td><a href="https://github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz">Open Source</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+      <!-- DISCLAIMER -->
+      <div class="disclaimer">
+        <strong>⚠️ Disclaimer:</strong> $NUT is a meme token created for
+        entertainment and community purposes. It is not an investment vehicle
+        and carries no guarantee of financial return. Do not invest more than
+        you can afford to lose. This document does not constitute financial
+        advice. The Fuzzynuts project is based in Canada and operates in
+        compliance with applicable regulations. Always do your own research
+        (DYOR).
+      </div>
 
-        <!-- DISCLAIMER -->
-        <div class="disclaimer">
-            <strong>⚠️ Disclaimer:</strong> $NUT is a meme token created for entertainment and community purposes. 
-            It is not an investment vehicle and carries no guarantee of financial return. Do not invest more than 
-            you can afford to lose. This document does not constitute financial advice. The Fuzzynuts project is 
-            based in Canada and operates in compliance with applicable regulations. Always do your own research (DYOR).
-        </div>
-
-        <!-- FOOTER -->
-        <div class="footer">
-            <p>Fuzzynuts ($NUT) — Built on the XRP Ledger 🥜</p>
-            <p><a href="https://fuzzynuts.xyz">fuzzynuts.xyz</a></p>
-            <p style="margin-top: 0.5rem;">© 2026 Fuzzynuts. All rights reserved.</p>
-        </div>
+      <!-- FOOTER -->
+      <div class="footer">
+        <p>Fuzzynuts ($NUT) — Built on the XRP Ledger 🥜</p>
+        <p><a href="https://fuzzynuts.xyz">fuzzynuts.xyz</a></p>
+        <p style="margin-top: 0.5rem">© 2026 Fuzzynuts. All rights reserved.</p>
+      </div>
     </div>
-</body>
+  </body>
 </html>

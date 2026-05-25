@@ -157,7 +157,7 @@ export function Navbar() {
                 priority
               />
               <Image
-                src="/text_logo.png"
+                src="/images/branding/wordmarks/text_logo.png"
                 alt="Fuzzynuts"
                 width={160}
                 height={32}
