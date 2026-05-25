@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/hero/Hero";
 import { HeroBackground } from "@/components/hero/HeroBackground";
@@ -94,45 +93,11 @@ export default function Home() {
         <OnChainVerification />
       </main>
 
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/sections/howto-bg.jpg"
-            alt=""
-            fill
-            quality={72}
-            className="object-cover object-center hidden sm:block"
-            sizes="100vw"
-            aria-hidden="true"
-            loading="lazy"
-          />
-          <Image
-            src="/images/sections/howto-bg-mobile.jpg"
-            alt=""
-            fill
-            quality={68}
-            className="object-cover object-center sm:hidden"
-            sizes="100vw"
-            aria-hidden="true"
-            loading="lazy"
-          />
-        </div>
-
-        <div
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{
-            background: [
-              "linear-gradient(to bottom, rgba(1,5,8,0.95) 0%, rgba(1,5,8,0.6) 12%, rgba(1,5,8,0.48) 35%, rgba(1,5,8,0.55) 65%, rgba(1,5,8,0.75) 100%)",
-              "linear-gradient(to right, rgba(1,5,8,0.6) 0%, transparent 18%, transparent 82%, rgba(1,5,8,0.6) 100%)",
-              "radial-gradient(ellipse 60% 50% at 50% 30%, rgba(74,222,128,0.05) 0%, transparent 65%)",
-            ].join(", "),
-          }}
-        />
-
-        <div className="relative z-10">
-          <HowToGet />
-          <Footer />
-        </div>
+      {/* howto-bg.jpg + dark overlay removed — HowToGet and Footer
+          now render directly over the page-level herobackground3.jpg. */}
+      <div className="relative z-10">
+        <HowToGet />
+        <Footer />
       </div>
 
       <FloatingMascot />

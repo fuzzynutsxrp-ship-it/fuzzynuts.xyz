@@ -98,9 +98,13 @@ function GameCard({
         <div className="flex items-start justify-between gap-2">
           <h3
             className="font-display text-lg sm:text-xl font-bold leading-tight game-card__title"
-            style={{
-              "--gc-title-glow": hovered ? `0 0 18px ${game.color}40` : "none",
-            } as React.CSSProperties}
+            style={
+              {
+                "--gc-title-glow": hovered
+                  ? `0 0 18px ${game.color}40`
+                  : "none",
+              } as React.CSSProperties
+            }
           >
             {game.title}
           </h3>
@@ -159,9 +163,7 @@ function GameCard({
           tabIndex={0}
           role="button"
           aria-label={
-            isComingSoon
-              ? `${game.title} — Coming Soon`
-              : `Play ${game.title}`
+            isComingSoon ? `${game.title} — Coming Soon` : `Play ${game.title}`
           }
           className="game-card__play-btn flex items-center justify-center gap-2
             w-full px-5 py-2.5 rounded-full font-display font-bold text-sm
@@ -178,8 +180,7 @@ function GameCard({
                 : `0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 var(--color-glass-border-strong)`,
             border: isComingSoon ? "1px solid #333" : "1px solid #d97706",
             cursor: isComingSoon ? "not-allowed" : "pointer",
-            pointerEvents:
-              isComingSoon && game.href === "#" ? "none" : "auto",
+            pointerEvents: isComingSoon && game.href === "#" ? "none" : "auto",
           }}
         >
           {isComingSoon ? "🔒 Coming Soon" : "▶ PLAY"}
@@ -195,43 +196,8 @@ function GameCard({
 export function GamesShowcase() {
   return (
     <section id="games" className="py-24 relative overflow-hidden">
-      {/* ── Games Section Background Image ── */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/sections/games-bg.jpg"
-          alt=""
-          fill
-          quality={72}
-          className="object-cover object-center hidden sm:block"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-        <Image
-          src="/images/sections/games-bg-mobile.jpg"
-          alt=""
-          fill
-          quality={68}
-          className="object-cover object-center sm:hidden"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-      </div>
-
-      {/* ── Combined Overlay (merged 4 layers → 1) ── */}
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{
-          background: [
-            "linear-gradient(to bottom, rgba(1,5,8,0.96) 0%, rgba(1,5,8,0.68) 15%, rgba(1,5,8,0.52) 40%, rgba(1,5,8,0.68) 75%, rgba(1,5,8,0.96) 100%)",
-            "linear-gradient(to right, rgba(1,5,8,0.6) 0%, transparent 18%, transparent 82%, rgba(1,5,8,0.6) 100%)",
-            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(16,185,129,0.06) 0%, transparent 65%)",
-            "radial-gradient(ellipse 40% 40% at 50% 40%, rgba(251,191,36,0.03) 0%, transparent 60%)",
-          ].join(", "),
-        }}
-      />
-
+      {/* Section background removed — page-level herobackground3.jpg
+          shows through. */}
       <div className="container-main relative z-10">
         {/* Section header */}
         <motion.div

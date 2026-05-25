@@ -17,43 +17,8 @@ import Image from "next/image";
 export function Features() {
   return (
     <section id="features" className="py-24 relative overflow-hidden">
-      {/* ── Background Image ── */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/sections/features-bg.jpg"
-          alt=""
-          fill
-          quality={72}
-          className="object-cover object-center hidden sm:block"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-        <Image
-          src="/images/sections/features-bg-mobile.jpg"
-          alt=""
-          fill
-          quality={68}
-          className="object-cover object-center sm:hidden"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-      </div>
-
-      {/* ── Overlay ── */}
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{
-          background: [
-            "linear-gradient(to bottom, rgba(1,5,8,0.96) 0%, rgba(1,5,8,0.68) 18%, rgba(1,5,8,0.52) 50%, rgba(1,5,8,0.68) 82%, rgba(1,5,8,0.96) 100%)",
-            "linear-gradient(to right, rgba(1,5,8,0.6) 0%, transparent 18%, transparent 82%, rgba(1,5,8,0.6) 100%)",
-            "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(59,130,246,0.07) 0%, transparent 65%)",
-            "radial-gradient(ellipse 40% 40% at 30% 70%, rgba(16,185,129,0.04) 0%, transparent 60%)",
-          ].join(", "),
-        }}
-      />
-
+      {/* Section background removed — page-level herobackground3.jpg
+          shows through. */}
       <div className="container-main relative z-10">
         {/* Section header */}
         <motion.div

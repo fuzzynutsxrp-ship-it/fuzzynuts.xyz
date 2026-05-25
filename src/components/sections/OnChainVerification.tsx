@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Copy, ExternalLink, Check, ShieldCheck, Terminal } from "lucide-react";
 import { XRPL_CONFIG } from "@/lib/utils";
 import { useState, useCallback } from "react";
-import Image from "next/image";
 
 /* ─────────────────────────────────────────────────────────────
    On-Chain Verification — Terminal / Ledger Aesthetic
@@ -18,9 +17,9 @@ import Image from "next/image";
    ───────────────────────────────────────────────────────────── */
 
 const ACCENT_COLORS: Record<string, string> = {
-  issuer: "#ef4444",      // Red — blackholed, dangerous, permanent
+  issuer: "#ef4444", // Red — blackholed, dangerous, permanent
   distributor: "#FBBF24", // Gold — active treasury
-  amm: "#10B981",         // Green — liquidity, alive
+  amm: "#10B981", // Green — liquidity, alive
 };
 
 interface LedgerEntryProps {
@@ -71,10 +70,7 @@ function LedgerEntry({
       style={{ "--ledger-accent": accentColor } as React.CSSProperties}
     >
       {/* Left accent bar */}
-      <div
-        className="ledger-entry__bar"
-        style={{ background: accentColor }}
-      />
+      <div className="ledger-entry__bar" style={{ background: accentColor }} />
 
       <div className="flex-1 min-w-0 py-4 sm:py-5 pr-4 sm:pr-5 pl-5 sm:pl-6">
         {/* Row 1: Index + Label + Tag + Explorer link */}
@@ -139,7 +135,10 @@ function LedgerEntry({
             {copied ? (
               <Check size={14} className="text-[var(--color-neon-green)]" />
             ) : (
-              <Copy size={14} className="opacity-40 group-hover:opacity-70 transition-opacity" />
+              <Copy
+                size={14}
+                className="opacity-40 group-hover:opacity-70 transition-opacity"
+              />
             )}
           </motion.button>
         </div>
@@ -150,42 +149,12 @@ function LedgerEntry({
 
 export function OnChainVerification() {
   return (
-    <section id="verification" className="py-20 sm:py-24 relative overflow-hidden">
-      {/* ── Background Image ── */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/sections/verify-bg.jpg"
-          alt=""
-          fill
-          quality={72}
-          className="object-cover object-center hidden sm:block"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-        <Image
-          src="/images/sections/verify-bg-mobile.jpg"
-          alt=""
-          fill
-          quality={68}
-          className="object-cover object-center sm:hidden"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-      </div>
-
-      {/* ── Overlay — darker than other sections for contrast with terminal UI ── */}
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{
-          background: [
-            "linear-gradient(to bottom, rgba(1,5,8,0.97) 0%, rgba(1,5,8,0.78) 15%, rgba(1,5,8,0.68) 50%, rgba(1,5,8,0.78) 85%, rgba(1,5,8,0.97) 100%)",
-            "linear-gradient(to right, rgba(1,5,8,0.65) 0%, transparent 20%, transparent 80%, rgba(1,5,8,0.65) 100%)",
-          ].join(", "),
-        }}
-      />
-
+    <section
+      id="verification"
+      className="py-20 sm:py-24 relative overflow-hidden"
+    >
+      {/* Section background removed — page-level herobackground3.jpg
+          shows through. */}
       <div className="container-main relative z-10">
         {/* ── Section Header ── */}
         <motion.div
@@ -205,7 +174,8 @@ export function OnChainVerification() {
             Verify Everything
           </h2>
           <p className="text-[var(--color-cream-dim)] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-            Don&apos;t trust, verify. Every address is public on the XRP&nbsp;Ledger.
+            Don&apos;t trust, verify. Every address is public on the
+            XRP&nbsp;Ledger.
           </p>
         </motion.div>
 
@@ -220,7 +190,10 @@ export function OnChainVerification() {
             className="ledger-terminal__header"
           >
             <div className="flex items-center gap-2">
-              <Terminal size={13} className="text-[var(--color-neon-green)] opacity-70" />
+              <Terminal
+                size={13}
+                className="text-[var(--color-neon-green)] opacity-70"
+              />
               <span className="font-mono text-[10px] sm:text-xs text-[var(--color-cream-dim)] opacity-60 tracking-wider uppercase">
                 xrpl-ledger — $NUT on-chain records
               </span>

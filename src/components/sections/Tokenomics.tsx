@@ -3,9 +3,14 @@
 import { motion } from "framer-motion";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { TOKENOMICS } from "@/lib/utils";
-import Image from "next/image";
 
-function AnimatedBar({ item, index }: { item: typeof TOKENOMICS[number]; index: number }) {
+function AnimatedBar({
+  item,
+  index,
+}: {
+  item: (typeof TOKENOMICS)[number];
+  index: number;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -18,15 +23,22 @@ function AnimatedBar({ item, index }: { item: typeof TOKENOMICS[number]; index: 
         <div className="flex items-center gap-3">
           <div
             className="w-3.5 h-3.5 rounded-full"
-            style={{ background: item.color, boxShadow: `0 0 12px ${item.color}50` }}
+            style={{
+              background: item.color,
+              boxShadow: `0 0 12px ${item.color}50`,
+            }}
           />
           <span className="font-display font-semibold text-[var(--color-cream)]">
             {item.label}
           </span>
         </div>
         <div className="text-right">
-          <span className="font-bold text-[var(--color-gold)]">{item.percentage}%</span>
-          <span className="text-xs text-[var(--color-cream-dim)] ml-2">({item.amount})</span>
+          <span className="font-bold text-[var(--color-gold)]">
+            {item.percentage}%
+          </span>
+          <span className="text-xs text-[var(--color-cream-dim)] ml-2">
+            ({item.amount})
+          </span>
         </div>
       </div>
 
@@ -36,7 +48,11 @@ function AnimatedBar({ item, index }: { item: typeof TOKENOMICS[number]; index: 
           initial={{ width: 0 }}
           whileInView={{ width: `${item.percentage}%` }}
           viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 1.2, delay: 0.2 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+          transition={{
+            duration: 1.2,
+            delay: 0.2 + index * 0.1,
+            ease: [0.16, 1, 0.3, 1],
+          }}
           className="h-full rounded-full relative"
           style={{
             background: `linear-gradient(90deg, ${item.color}CC, ${item.color})`,
@@ -47,7 +63,8 @@ function AnimatedBar({ item, index }: { item: typeof TOKENOMICS[number]; index: 
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              background: "linear-gradient(90deg, transparent, var(--color-glass-border-strong), transparent)",
+              background:
+                "linear-gradient(90deg, transparent, var(--color-glass-border-strong), transparent)",
               backgroundSize: "200% 100%",
               animation: "shimmer 2s linear infinite",
             }}
@@ -62,7 +79,12 @@ function DonutChart() {
   const total = TOKENOMICS.reduce((sum, t) => sum + t.percentage, 0);
 
   // Build SVG paths
-  const segments: { path: string; color: string; percentage: number; label: string }[] = [];
+  const segments: {
+    path: string;
+    color: string;
+    percentage: number;
+    label: string;
+  }[] = [];
   let currentAngle = -90;
 
   for (const item of TOKENOMICS) {
@@ -88,7 +110,12 @@ function DonutChart() {
 
   return (
     <div className="relative w-64 h-64 mx-auto">
-      <svg viewBox="0 0 200 200" className="w-full h-full" role="img" aria-label="Token distribution chart: 80% AMM Liquidity, 18% Prize Pool, 2% Dev/Ops">
+      <svg
+        viewBox="0 0 200 200"
+        className="w-full h-full"
+        role="img"
+        aria-label="Token distribution chart: 80% AMM Liquidity, 18% Prize Pool, 2% Dev/Ops"
+      >
         <title>Tokenomics Distribution</title>
 
         {/* Segments - always visible, animate rotation on entry */}
@@ -150,43 +177,8 @@ function DonutChart() {
 export function Tokenomics() {
   return (
     <section id="tokenomics" className="py-24 relative overflow-hidden">
-      {/* ── Tokenomics Section Background Image ── */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/sections/tokenomics-bg.jpg"
-          alt=""
-          fill
-          quality={72}
-          className="object-cover object-center hidden sm:block"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-        <Image
-          src="/images/sections/tokenomics-bg-mobile.jpg"
-          alt=""
-          fill
-          quality={68}
-          className="object-cover object-center sm:hidden"
-          sizes="100vw"
-          aria-hidden="true"
-          loading="lazy"
-        />
-      </div>
-
-      {/* ── Combined Overlay (merged 4 layers → 1) ── */}
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{
-          background: [
-            "linear-gradient(to bottom, rgba(1,5,8,0.96) 0%, rgba(1,5,8,0.70) 15%, rgba(1,5,8,0.58) 50%, rgba(1,5,8,0.70) 85%, rgba(1,5,8,0.96) 100%)",
-            "linear-gradient(to right, rgba(1,5,8,0.6) 0%, transparent 18%, transparent 82%, rgba(1,5,8,0.6) 100%)",
-            "radial-gradient(ellipse 50% 50% at 50% 50%, rgba(251,191,36,0.05) 0%, transparent 65%)",
-            "radial-gradient(ellipse 40% 40% at 70% 30%, rgba(16,185,129,0.04) 0%, transparent 60%)",
-          ].join(", "),
-        }}
-      />
-
+      {/* Section background removed — page-level herobackground3.jpg
+          shows through. */}
       <div className="container-main relative z-10">
         {/* Section header */}
         <motion.div
@@ -195,14 +187,13 @@ export function Tokenomics() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
-          <span className="section-badge mb-4">
-            📊 Tokenomics
-          </span>
+          <span className="section-badge mb-4">📊 Tokenomics</span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
             No Rugs. No Games.
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
-            321 billion $NUT. Permanently fixed supply. Issuer blackholed. What you see is what you get.
+            321 billion $NUT. Permanently fixed supply. Issuer blackholed. What
+            you see is what you get.
           </p>
         </motion.div>
 
@@ -227,18 +218,26 @@ export function Tokenomics() {
               className="mt-8"
             >
               <CyberCard accentColor="gold" className="p-5 space-y-3">
-                <h4 className="font-display font-bold text-[var(--color-brand-gold)] text-sm uppercase tracking-wider">Key Facts</h4>
+                <h4 className="font-display font-bold text-[var(--color-brand-gold)] text-sm uppercase tracking-wider">
+                  Key Facts
+                </h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-[var(--color-cream-dim)]">Total Supply</p>
-                    <p className="font-bold text-[var(--color-cream)]">321,000,000,000</p>
+                    <p className="text-[var(--color-cream-dim)]">
+                      Total Supply
+                    </p>
+                    <p className="font-bold text-[var(--color-cream)]">
+                      321,000,000,000
+                    </p>
                   </div>
                   <div>
                     <p className="text-[var(--color-cream-dim)]">Trading Fee</p>
                     <p className="font-bold text-[var(--color-cream)]">1%</p>
                   </div>
                   <div>
-                    <p className="text-[var(--color-cream-dim)]">Issuer Status</p>
+                    <p className="text-[var(--color-cream-dim)]">
+                      Issuer Status
+                    </p>
                     <p className="font-bold text-red-400">💀 Blackholed</p>
                   </div>
                   <div>
