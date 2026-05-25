@@ -1,6 +1,6 @@
 # Fuzzynuts.xyz — Project Structure
 
-> Last updated: 2026-05-16
+> Last updated: 2026-05-25
 
 ## Architecture
 
@@ -79,10 +79,16 @@ fuzzynuts-optimized/
 │   │   │   ├── tokenomics-bg.jpg / tokenomics-bg-mobile.jpg
 │   │   │   ├── verify-bg.jpg / verify-bg-mobile.jpg
 │   │   │   └── howto-bg.jpg / howto-bg-mobile.jpg
-│   │   ├── branding/               # Logo assets
-│   │   │   ├── logo.webp           # Main logo (WebP, 16K)
-│   │   │   ├── logo-nav.webp       # Navigation bar logo (8K)
-│   │   │   └── logo.png            # ⚠️ Schema-only (JSON-LD). Do NOT use in UI.
+│   │   ├── branding/               # All brand assets (logos, mascots, wordmarks)
+│   │   │   ├── logo.webp           # Main squirrel logo (WebP, 16K)
+│   │   │   ├── logo-nav.webp       # Navigation bar squirrel logo (8K)
+│   │   │   ├── logo.png            # ⚠️ Schema-only (JSON-LD). Do NOT use in UI.
+│   │   │   ├── logo_512.png        # 512px squirrel logo (used by litepaper.html)
+│   │   │   ├── FuzzyBear.png       # Floating mascot art (FloatingMascot.tsx)
+│   │   │   └── wordmarks/          # Gold 3D-textured text wordmarks (section headers)
+│   │   │       ├── text_logo.png   # "FUZZYNUTS" — Hero, Navbar, Footer
+│   │   │       ├── tokenomics.png  # "TOKENOMICS" — Tokenomics section header
+│   │   │       └── highlights.png  # "HIGHLIGHTS" — Features section header
 │   │   ├── features/               # Feature section icons
 │   │   │   └── feat-*.webp         # 6 WebP feature icons
 │   │   └── og/
@@ -92,12 +98,16 @@ fuzzynuts-optimized/
 │   ├── videos/
 │   │   └── herobackgroundvideo.mp4 # Hero background loop (1.8M)
 │   ├── games/                      # ⚠️ STATIC GAME BUNDLES — careful here
-│   │   ├── fuzzynuts-world/                # MMORPG (redirect stub → world.fuzzynuts.xyz)
+│   │   ├── fuzzynuts-world/        # MMORPG (redirect stub → world.fuzzynuts.xyz)
 │   │   ├── mario/                  # Super Fuzzynuts (11M, FullScreenMario fork)
 │   │   ├── fuzzy-survivors/        # Vampire Survivors clone (runtime only)
 │   │   ├── minigolf/               # Nut Golf WebAssembly (18M)
 │   │   ├── nut-racer/              # Pseudo-3D racer (288K)
+│   │   ├── top-secret/             # Placeholder stub for unannounced game
 │   │   └── fuzzy-score.js          # Score bridge (postMessage → API)
+│   ├── css/                        # Static CSS shared with game iframes
+│   │   ├── design-tokens.css       # CSS custom properties for games
+│   │   └── game-wrapper.css        # Iframe wrapper styles
 │   ├── litepaper.html              # Static litepaper document
 │   ├── robots.txt
 │   └── sitemap.xml
@@ -126,24 +136,25 @@ fuzzynuts-optimized/
 
 ## Where to Put New Files
 
-| Type | Location | Example |
-|------|----------|---------|
-| New page route | `src/app/<route>/page.tsx` | `src/app/roadmap/page.tsx` |
-| New page section | `src/components/sections/` | `Roadmap.tsx` |
-| New UI primitive | `src/components/ui/` | `Modal.tsx`, `Badge.tsx` |
-| New game component | `src/components/game/` | `ScoreSubmitter.tsx` |
-| Wallet integration | `src/components/wallet/` (create) | `XamanConnect.tsx` |
-| Section background | `public/images/sections/` | `roadmap-bg.jpg` + `roadmap-bg-mobile.jpg` |
-| Brand asset (logo, mascot) | `public/images/branding/` | `fuzz-pose-2.webp` |
-| OG / social image | `public/images/og/` | `og-arcade.png` |
-| Feature icon | `public/images/features/` | `feat-roadmap.webp` |
-| Game icon | `public/icons/` | `icon-newgame-pop.webp` |
-| Documentation | `docs/` | `API_REFERENCE.md` |
-| Archived/old files | `docs/archive/` | anything superseded |
-| Utility function | `src/lib/` | `api.ts`, `constants.ts` |
-| Custom hook | `src/hooks/` | `useAutoRefresh.ts` |
-| Type definitions | `src/types/` | `game.types.ts` |
-| Build/optimization scripts | `scripts/` | `optimize-images.sh` |
+| Type                       | Location                            | Example                                    |
+| -------------------------- | ----------------------------------- | ------------------------------------------ |
+| New page route             | `src/app/<route>/page.tsx`          | `src/app/roadmap/page.tsx`                 |
+| New page section           | `src/components/sections/`          | `Roadmap.tsx`                              |
+| New UI primitive           | `src/components/ui/`                | `Modal.tsx`, `Badge.tsx`                   |
+| New game component         | `src/components/game/`              | `ScoreSubmitter.tsx`                       |
+| Wallet integration         | `src/components/wallet/` (create)   | `XamanConnect.tsx`                         |
+| Section background         | `public/images/sections/`           | `roadmap-bg.jpg` + `roadmap-bg-mobile.jpg` |
+| Brand asset (logo, mascot) | `public/images/branding/`           | `fuzz-pose-2.webp`                         |
+| Text wordmark (PNG header) | `public/images/branding/wordmarks/` | `roadmap.png`                              |
+| OG / social image          | `public/images/og/`                 | `og-arcade.png`                            |
+| Feature icon               | `public/images/features/`           | `feat-roadmap.webp`                        |
+| Game icon                  | `public/icons/`                     | `icon-newgame-pop.webp`                    |
+| Documentation              | `docs/`                             | `API_REFERENCE.md`                         |
+| Archived/old files         | `docs/archive/`                     | anything superseded                        |
+| Utility function           | `src/lib/`                          | `api.ts`, `constants.ts`                   |
+| Custom hook                | `src/hooks/`                        | `useAutoRefresh.ts`                        |
+| Type definitions           | `src/types/`                        | `game.types.ts`                            |
+| Build/optimization scripts | `scripts/`                          | `optimize-images.sh`                       |
 
 ---
 
@@ -175,17 +186,19 @@ fuzzynuts-optimized/
 ```
 
 ### Key rules:
+
 - **Never edit files in `public/games/` directly** — always edit in `fuzzynuts-games-dev/` and sync
 - Each game has its own dev server on an isolated port (3001-3005)
 - The sync script creates timestamped backups and **auto-rolls back** if the build fails
 - See `../fuzzynuts-games-dev/README.md` for full workflow documentation
 
 ### postMessage Contract (games ↔ GameWrapper):
-| Message | Direction | Purpose |
-|---------|-----------|---------|
+
+| Message                                            | Direction      | Purpose                       |
+| -------------------------------------------------- | -------------- | ----------------------------- |
 | `{ type: 'FUZZY_SCORE_SUBMITTED', success: bool }` | Game → Wrapper | Score submission result toast |
-| `{ type: 'gameReady' }` | Game → Wrapper | Dismiss loading overlay early |
-| `{ type: 'setMute', muted: bool }` | Wrapper → Game | Mute/unmute audio |
+| `{ type: 'gameReady' }`                            | Game → Wrapper | Dismiss loading overlay early |
+| `{ type: 'setMute', muted: bool }`                 | Wrapper → Game | Mute/unmute audio             |
 
 ---
 
@@ -196,4 +209,3 @@ fuzzynuts-optimized/
 - **Archive before deleting** — when removing assets, move to `docs/archive/` first.
 - **One section per file** — each homepage section is its own component in `sections/`.
 - **Game dev artifacts stay out of `public/`** — tests, scripts, and docs for individual games belong in `docs/archive/`, not shipped to production.
-
