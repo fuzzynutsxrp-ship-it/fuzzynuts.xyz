@@ -88,7 +88,7 @@ export function Hero() {
             className="h-20 sm:h-28 md:h-36 lg:h-44 w-auto drop-shadow-[0_0_30px_rgba(245,196,66,0.35)]"
             priority
           />
-          <span className="mt-2 text-[var(--color-cream)] text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold font-display">
+          <span className="mt-2 text-[var(--color-cream)] text-xs sm:text-sm md:text-base lg:text-lg font-bold font-display">
             ($NUT)
           </span>
         </motion.div>
