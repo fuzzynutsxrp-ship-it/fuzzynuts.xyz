@@ -30,8 +30,11 @@ export interface HeroBackgroundProps {
 }
 
 export function HeroBackground({
-  desktopSrc = "/images/hero-bg-desktop.webp",
-  mobileSrc = "/images/hero-bg-mobile.webp",
+  // Both pointed at herobackground3.jpg — the user's bird's-eye
+  // cyber-forest reference. Same image desktop + mobile for now;
+  // swap mobileSrc to a portrait crop later if needed.
+  desktopSrc = "/images/hero/herobackground3.jpg",
+  mobileSrc = "/images/hero/herobackground3.jpg",
 }: HeroBackgroundProps) {
   return (
     <div
