@@ -27,10 +27,14 @@ export function Features() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
-            Built Different
-          </h2>
-          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
+          <Image
+            src="/highlights.png"
+            alt="Highlights"
+            width={720}
+            height={140}
+            className="mx-auto mb-4 h-10 sm:h-12 md:h-14 w-auto drop-shadow-[0_0_24px_rgba(245,196,66,0.45)]"
+          />
+          <p className="mt-4 text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
             Not your average meme coin. Every feature is designed for fairness,
             transparency, and real fun.
           </p>
