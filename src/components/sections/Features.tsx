@@ -27,12 +27,6 @@ export function Features() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="section-badge mb-4"
-          >
-            🛡️ Why Fuzzynuts
-          </motion.span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
             Built Different
           </h2>

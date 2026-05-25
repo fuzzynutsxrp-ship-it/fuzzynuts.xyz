@@ -13,14 +13,26 @@ const SOCIAL_LINKS = [
 ];
 
 const XRPL_LINKS = [
-  { label: "XPMarket", href: `https://xpmarket.com/token/NUT-${XRPL_CONFIG.issuer}` },
-  { label: "XRPScan", href: `https://xrpscan.com/account/${XRPL_CONFIG.issuer}` },
-  { label: "DEX Trading", href: `https://xpmarket.com/dex/NUT-${XRPL_CONFIG.issuer}/XRP` },
+  {
+    label: "XPMarket",
+    href: `https://xpmarket.com/token/NUT-${XRPL_CONFIG.issuer}`,
+  },
+  {
+    label: "XRPScan",
+    href: `https://xrpscan.com/account/${XRPL_CONFIG.issuer}`,
+  },
+  {
+    label: "DEX Trading",
+    href: `https://xpmarket.com/dex/NUT-${XRPL_CONFIG.issuer}/XRP`,
+  },
 ];
 
 export function Footer() {
   return (
-    <footer className="relative pt-20 pb-8 border-t border-[rgba(245,196,66,0.12)]" role="contentinfo">
+    <footer
+      className="relative pt-20 pb-8 border-t border-[rgba(245,196,66,0.12)]"
+      role="contentinfo"
+    >
       <div className="container-main">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
           {/* Brand */}
@@ -32,17 +44,24 @@ export function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <Image
                 src="/images/branding/logo-nav.webp"
-                alt="Fuzzynuts"
+                alt=""
                 width={48}
                 height={32}
                 className="rounded-md"
                 loading="lazy"
               />
-              <span className="font-display font-bold text-xl gradient-text-gold">FUZZYNUTS</span>
+              <Image
+                src="/text_logo.png"
+                alt="Fuzzynuts"
+                width={473}
+                height={89}
+                className="h-8 w-auto"
+                loading="lazy"
+              />
             </div>
             <p className="text-sm text-[var(--color-cream-dim)] leading-relaxed mb-6">
-              The nuttiest meme coin on XRPL. Play games, earn $NUT, and join a community
-              that refuses to take crypto seriously.
+              The nuttiest meme coin on XRPL. Play games, earn $NUT, and join a
+              community that refuses to take crypto seriously.
             </p>
             <div className="flex gap-3">
               {SOCIAL_LINKS.map((link) => (
@@ -86,7 +105,10 @@ export function Footer() {
                       href={link.href}
                       className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-neon-green)] transition-colors inline-flex items-center gap-1.5 group"
                     >
-                      <Trophy size={13} className="opacity-60 group-hover:opacity-100 transition-opacity" />
+                      <Trophy
+                        size={13}
+                        className="opacity-60 group-hover:opacity-100 transition-opacity"
+                      />
                       {link.label}
                     </Link>
                   ) : (
@@ -94,7 +116,9 @@ export function Footer() {
                       href={link.href}
                       className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors inline-flex items-center gap-1 group"
                     >
-                      <span className="w-0 group-hover:w-2 transition-all overflow-hidden text-[var(--color-gold)]">→</span>
+                      <span className="w-0 group-hover:w-2 transition-all overflow-hidden text-[var(--color-gold)]">
+                        →
+                      </span>
                       {link.label}
                     </a>
                   )}
@@ -138,7 +162,11 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-cream-dim)]">
           <p className="flex items-center gap-1">
             © {new Date().getFullYear()} Fuzzynuts. Built with
-            <Heart size={12} className="text-red-400 inline" fill="currentColor" />
+            <Heart
+              size={12}
+              className="text-red-400 inline"
+              fill="currentColor"
+            />
             not financial advice.
           </p>
           <p className="flex items-center gap-1">
