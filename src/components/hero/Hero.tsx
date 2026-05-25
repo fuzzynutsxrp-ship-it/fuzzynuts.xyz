@@ -86,7 +86,7 @@ export function Hero() {
             alt="Fuzzynuts"
             width={473}
             height={89}
-            className="h-8 sm:h-11 md:h-14 lg:h-16 w-auto drop-shadow-[0_0_27px_rgba(245,196,66,0.35)]"
+            className="h-8 sm:h-11 md:h-14 lg:h-16 w-auto drop-shadow-[0_0_30px_rgba(245,196,66,0.5)]"
             priority
           />
         </motion.div>
