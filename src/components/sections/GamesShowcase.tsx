@@ -29,7 +29,7 @@ function GameCard({
     setPressed(false);
   }, []);
 
-  const isComingSoon = game.id === "racer" || game.id === "top-secret";
+  const isComingSoon = game.id === "top-secret";
 
   return (
     <motion.article

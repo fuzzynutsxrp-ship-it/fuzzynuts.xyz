@@ -97,11 +97,11 @@ export const GAMES = [
     type: "Racing",
     description:
       "High-speed racing through forest tracks. Collect acorns for boost, dodge obstacles, and race to the finish!",
-    href: "#",
+    href: "/games/nut-racer/",
     icon: "/icons/icon-racer-pop.webp",
     image: "🏎️",
     color: "#f97316",
-    tags: ["Racing", "Speed", "Coming Soon"],
+    tags: ["Racing", "Speed", "3 Laps"],
   },
   {
     id: "top-secret",
