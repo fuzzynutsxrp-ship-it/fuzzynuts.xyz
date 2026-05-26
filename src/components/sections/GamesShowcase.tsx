@@ -77,16 +77,6 @@ function ArcadeCabinet({
         }}
       />
 
-      {/* Hairline highlight on top edge */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-5 top-0 h-px rounded-full pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
-        }}
-      />
-
       {/* Subtle brushed-metal texture */}
       <div
         aria-hidden="true"
@@ -97,91 +87,144 @@ function ArcadeCabinet({
         }}
       />
 
+      {/* T-molding — accent-colored plastic edge trim around the cabinet */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 rounded-3xl pointer-events-none z-20"
+        style={{
+          boxShadow: `inset 0 0 0 2px ${game.color}66, inset 0 0 0 3px rgba(0,0,0,0.6)`,
+        }}
+      />
+
       {/* Shine sweep on hover — hidden when reduced-motion is requested */}
-      <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none motion-reduce:hidden">
+      <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none motion-reduce:hidden z-20">
         <div className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.05] md:via-white/[0.09] to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-cabinet-shine" />
       </div>
 
-      {/* ── Inner panel (screen + control deck) ── */}
-      <div className="relative m-3 rounded-2xl bg-[#08080a] overflow-hidden flex flex-col flex-1 [transform:translateZ(0)]">
-        {/* Neon inset border — gently flickers on hover (motion-safe only) */}
+      {/* ── Inner panel (marquee + screen + control deck) ── */}
+      <div className="relative m-2.5 rounded-2xl bg-[#08080a] overflow-hidden flex flex-col flex-1 [transform:translateZ(0)]">
+        {/* ── MARQUEE — backlit header carrying the game name ── */}
         <div
-          aria-hidden="true"
-          className="absolute inset-0 rounded-2xl pointer-events-none motion-safe:group-hover:animate-neon-flicker"
+          className="relative flex items-center justify-center px-8 py-2.5 text-center overflow-hidden"
           style={{
-            boxShadow: `inset 0 0 0 1px ${game.color}33, inset 0 0 24px ${game.color}1f`,
-          }}
-        />
-
-        {/* ── Screen / hero art ── */}
-        <div
-          className="relative aspect-[4/3] overflow-hidden"
-          style={{
-            background: "radial-gradient(ellipse at top, #1a1a1c, #050507 80%)",
-            boxShadow: `inset 0 6px 16px rgba(0,0,0,0.7), inset 0 0 40px ${game.color}14`,
+            background: `linear-gradient(180deg, ${game.color}33 0%, ${game.color}12 60%, transparent 100%)`,
+            borderBottom: `1px solid ${game.color}55`,
           }}
         >
-          {/* Ambient accent glow */}
-          <div
+          {/* Speaker-grille dots flanking the marquee */}
+          <span
             aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2.5 h-7 opacity-50"
             style={{
-              background: `radial-gradient(circle at 50% 55%, ${game.color}28, transparent 70%)`,
+              backgroundImage: `radial-gradient(${game.color}aa 0.9px, transparent 1.3px)`,
+              backgroundSize: "4px 4px",
             }}
           />
-
-          {/* Cabinet art with onError → existing icon fallback */}
-          <Image
-            src={artSrc}
-            alt={`${game.title} — cabinet art`}
-            fill
-            sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
-            loading="lazy"
-            onError={handleArtError}
-            className="object-contain p-5 sm:p-6 drop-shadow-[0_10px_28px_rgba(0,0,0,0.7)] transition-transform duration-500 ease-out group-hover:scale-[1.07]"
-          />
-
-          {/* Marquee glow strip — also picks up neon-flicker on hover */}
-          <div
+          <span
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-6 pointer-events-none motion-safe:group-hover:animate-neon-flicker"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-2.5 h-7 opacity-50"
             style={{
-              background: `linear-gradient(180deg, ${game.color}22, transparent)`,
+              backgroundImage: `radial-gradient(${game.color}aa 0.9px, transparent 1.3px)`,
+              backgroundSize: "4px 4px",
             }}
           />
-
-          {/* CRT scanlines — dimmed on mobile, full intensity on md+ */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-15 md:opacity-30 pointer-events-none z-10"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px)",
-            }}
-          />
-        </div>
-
-        {/* ── Control panel: title, meta, button ── */}
-        <div className="relative flex flex-col flex-1 px-5 pt-4 pb-5 gap-3 bg-gradient-to-b from-[#0c0c0e] via-[#08080a] to-[#040406]">
-          {/* Title + type pill */}
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-display text-lg sm:text-xl font-extrabold leading-tight tracking-tight text-[var(--color-cream)] transition-colors duration-300 group-hover:text-[color:var(--accent)]">
+          <div className="motion-safe:group-hover:animate-neon-flicker">
+            <h3
+              className="font-display text-base sm:text-lg font-black uppercase tracking-wide leading-none text-[var(--color-cream)]"
+              style={{ textShadow: `0 0 12px ${game.color}aa` }}
+            >
               {game.title}
             </h3>
             <span
-              className="shrink-0 font-mono text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-sm mt-0.5 whitespace-nowrap border"
-              style={{
-                borderColor: `${game.color}40`,
-                color: `${game.color}dd`,
-                background: `${game.color}0e`,
-              }}
+              className="block mt-1 font-mono text-[9px] tracking-[0.28em] uppercase"
+              style={{ color: `${game.color}dd` }}
             >
               {game.type}
             </span>
           </div>
+        </div>
+
+        {/* ── Screen — CRT inside a bezel ── */}
+        <div className="relative px-3 pt-3 pb-1">
+          <div
+            className="relative aspect-[4/3] overflow-hidden rounded-lg"
+            style={{
+              background:
+                "radial-gradient(ellipse at top, #1a1a1c, #050507 80%)",
+              boxShadow: `inset 0 0 0 3px #0a0a0c, inset 0 0 0 4px ${game.color}22, inset 0 8px 22px rgba(0,0,0,0.85), inset 0 0 40px ${game.color}12`,
+            }}
+          >
+            {/* Ambient accent glow */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `radial-gradient(circle at 50% 55%, ${game.color}26, transparent 70%)`,
+              }}
+            />
+
+            {/* Cabinet art with onError → existing icon fallback */}
+            <Image
+              src={artSrc}
+              alt={`${game.title} — cabinet art`}
+              fill
+              sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
+              loading="lazy"
+              onError={handleArtError}
+              className="object-contain p-4 sm:p-5 drop-shadow-[0_10px_28px_rgba(0,0,0,0.7)] transition-transform duration-500 ease-out group-hover:scale-[1.07]"
+            />
+
+            {/* CRT scanlines */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 opacity-20 md:opacity-30 pointer-events-none z-10"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(0deg, rgba(0,0,0,0.20) 0 1px, transparent 1px 3px)",
+              }}
+            />
+
+            {/* Glass glare — diagonal highlight, top-left */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none z-10"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.03) 16%, transparent 42%)",
+              }}
+            />
+
+            {/* Vignette — fakes the CRT's curved-glass darkening at the edges */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none z-10"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%)",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* ── Control deck ── */}
+        <div
+          className="relative flex flex-col flex-1 px-5 pt-4 pb-5 gap-3"
+          style={{
+            background:
+              "linear-gradient(180deg, #101013 0%, #0a0a0c 55%, #050506 100%)",
+          }}
+        >
+          {/* Deck lip — the physical break between screen and control panel */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-px"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${game.color}55, transparent)`,
+            }}
+          />
 
           {/* Description */}
-          <p className="font-body text-sm leading-relaxed text-[var(--color-cream-dim)] line-clamp-3">
+          <p className="font-body text-sm leading-relaxed text-[var(--color-cream-dim)] line-clamp-2">
             {game.description}
           </p>
 
@@ -202,42 +245,76 @@ function ArcadeCabinet({
             ))}
           </div>
 
-          <div className="flex-1 min-h-2" />
+          <div className="flex-1 min-h-1" />
 
-          {/* PLAY — beveled orange arcade button (locked variant for Top Secret) */}
-          <motion.a
-            href={isComingSoon ? undefined : game.href}
-            onClick={(e) => {
-              if (!isComingSoon && game.href !== "#") {
-                e.preventDefault();
-                window.location.href = game.href;
+          {/* Control row — decorative arcade buttons + PLAY */}
+          <div className="flex items-center gap-3">
+            {/* Two round buttons, like a real control panel */}
+            <div className="hidden sm:flex flex-col gap-1.5 shrink-0">
+              <span
+                aria-hidden="true"
+                className="w-4 h-4 rounded-full"
+                style={{
+                  background: `radial-gradient(circle at 35% 28%, rgba(255,255,255,0.55), ${game.color})`,
+                  boxShadow: `0 2px 3px rgba(0,0,0,0.6), 0 0 8px ${game.color}66`,
+                }}
+              />
+              <span
+                aria-hidden="true"
+                className="w-4 h-4 rounded-full"
+                style={{
+                  background:
+                    "radial-gradient(circle at 35% 28%, rgba(255,255,255,0.5), #e2483b)",
+                  boxShadow: "0 2px 3px rgba(0,0,0,0.6)",
+                }}
+              />
+            </div>
+
+            {/* PLAY — chunky domed arcade button (locked for Top Secret) */}
+            <motion.a
+              href={isComingSoon ? undefined : game.href}
+              onClick={(e) => {
+                if (!isComingSoon && game.href !== "#") {
+                  e.preventDefault();
+                  window.location.href = game.href;
+                }
+              }}
+              whileTap={isComingSoon ? undefined : { scale: 0.96, y: 2 }}
+              tabIndex={isComingSoon ? -1 : 0}
+              role="button"
+              aria-label={
+                isComingSoon
+                  ? `${game.title} — Coming Soon`
+                  : `Play ${game.title}`
               }
-            }}
-            whileTap={isComingSoon ? undefined : { scale: 0.96 }}
-            tabIndex={isComingSoon ? -1 : 0}
-            role="button"
-            aria-label={
-              isComingSoon
-                ? `${game.title} — Coming Soon`
-                : `Play ${game.title}`
-            }
-            aria-disabled={isComingSoon}
-            className={
-              isComingSoon
-                ? `${PLAY_BTN_BASE} cursor-not-allowed text-[#555]`
-                : `${PLAY_BTN_BASE} cursor-pointer text-[#0a0500] shadow-play-arcade hover:shadow-play-arcade-hover`
-            }
-            style={{
-              background: isComingSoon
-                ? "linear-gradient(180deg, #2a2a2a 0%, #141414 100%)"
-                : "linear-gradient(180deg, #FCD34D 0%, #FBBF24 35%, #f59e0b 70%, #d97706 100%)",
-              border: isComingSoon ? "1px solid #2e2e2e" : "1px solid #b45309",
-              pointerEvents:
-                isComingSoon && game.href === "#" ? "none" : "auto",
-            }}
+              aria-disabled={isComingSoon}
+              className={`${PLAY_BTN_BASE} flex-1 ${
+                isComingSoon
+                  ? "cursor-not-allowed text-[#666]"
+                  : "cursor-pointer text-[#3a1d00]"
+              }`}
+              style={{
+                background: isComingSoon
+                  ? "linear-gradient(180deg, #26262a 0%, #131316 100%)"
+                  : "radial-gradient(130% 130% at 50% 0%, #FFE7A3 0%, #FCD34D 32%, #f59e0b 70%, #d97706 100%)",
+                boxShadow: isComingSoon
+                  ? "inset 0 1px 0 rgba(255,255,255,0.08), 0 3px 0 #0a0a0c, 0 6px 10px rgba(0,0,0,0.5)"
+                  : "inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -3px 6px rgba(120,53,15,0.5), 0 4px 0 #92400e, 0 9px 16px rgba(0,0,0,0.5)",
+                pointerEvents:
+                  isComingSoon && game.href === "#" ? "none" : "auto",
+              }}
+            >
+              {isComingSoon ? "🔒 Coming Soon" : "▶ PLAY"}
+            </motion.a>
+          </div>
+
+          {/* Coin-slot caption */}
+          <p
+            className="text-center font-mono text-[9px] tracking-[0.3em] uppercase opacity-55"
+            style={{ color: `${game.color}cc` }}
           >
-            {isComingSoon ? "🔒 Coming Soon" : "▶ PLAY"}
-          </motion.a>
+            {isComingSoon ? "Coming soon" : "Insert coin · free to play"}
+          </p>
         </div>
       </div>
     </motion.article>
