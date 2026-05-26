@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { JoeyProvider } from "@/components/providers/JoeyProvider";
+import { AppMount } from "@/components/providers/AppMount";
+import { MotionProvider } from "@/components/providers/MotionProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +25,14 @@ const jetbrainsMono = JetBrains_Mono({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fuzzynuts.xyz";
 
+/**
+ * Search-engine indexing switch. Defaults to OFF (noindex) so the site stays
+ * locked down through pre-launch. To go live: set NEXT_PUBLIC_ALLOW_INDEXING=true
+ * in the deploy environment and redeploy — no code change needed. (Read at build
+ * time, which is correct for a static export.)
+ */
+const ALLOW_INDEXING = process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true";
+
 export const viewport: Viewport = {
   themeColor: "#010508",
   colorScheme: "dark",
@@ -36,7 +47,7 @@ export const metadata: Metadata = {
     template: "%s | Fuzzynuts",
   },
   description:
-    "The nuttiest meme coin on the XRP Ledger. Play 5 arcade games, earn real $NUT tokens, and join a community of degens. 321B fixed supply, blackholed issuer, 80% liquidity.",
+    "The nuttiest meme coin on the XRP Ledger. Play 6 arcade games, earn real $NUT tokens, and join a community of degens. 321B fixed supply, blackholed issuer, 80% liquidity.",
   keywords: [
     "Fuzzynuts",
     "$NUT",
@@ -65,7 +76,7 @@ export const metadata: Metadata = {
     siteName: "Fuzzynuts",
     title: "Fuzzynuts — Play. Earn. Own. | $NUT on XRPL",
     description:
-      "The nuttiest meme coin on XRPL. Play 5 arcade games, earn $NUT tokens. 321B fixed supply, blackholed issuer, 80% liquidity locked.",
+      "The nuttiest meme coin on XRPL. Play 6 arcade games, earn $NUT tokens. 321B fixed supply, blackholed issuer, 80% liquidity locked.",
     images: [
       {
         url: "/images/og/og-image.png",
@@ -82,25 +93,41 @@ export const metadata: Metadata = {
     creator: "@fuzzynutsxrp",
     title: "Fuzzynuts — Play. Earn. Own. | $NUT on XRPL",
     description:
-      "🐿️ The nuttiest meme coin on XRPL. 5 arcade games, real $NUT prizes, 321B fixed supply. Play free, earn crypto!",
+      "🐿️ The nuttiest meme coin on XRPL. 6 arcade games, real $NUT prizes, 321B fixed supply. Play free, earn crypto!",
     images: {
       url: "/images/og/og-image.png",
       alt: "Fuzzynuts — Play. Earn. Own.",
     },
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
+  robots: ALLOW_INDEXING
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      }
+    : {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+          "max-video-preview": 0,
+          "max-image-preview": "none",
+          "max-snippet": 0,
+        },
+      },
   icons: {
-    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+    ],
     apple: "/images/og/og-image.png",
   },
   category: "Gaming",
@@ -112,131 +139,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
-        {/* ── Resource Hints ── */}
+        {/* Extra belt-and-suspenders noindex tags while locked down. These are
+            omitted once NEXT_PUBLIC_ALLOW_INDEXING=true so they can't override
+            the indexable robots metadata above. */}
+        {!ALLOW_INDEXING && (
+          <>
+            <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+            <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+          </>
+        )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link rel="dns-prefetch" href="https://xrpscan.com" />
-        <link rel="dns-prefetch" href="https://xpmarket.com" />
-        {/* Preload LCP hero image (mobile) — critical for FCP */}
-        <link
-          rel="preload"
-          as="image"
-          href="/images/hero/hero-bg-mobile.jpg"
-          media="(max-width: 639px)"
-        />
-        {/* Preload hero video poster (desktop) */}
-        <link
-          rel="preload"
-          as="video"
-          href="/videos/herobackgroundvideo.mp4"
-          media="(min-width: 640px)"
-        />
-
-        {/* JSON-LD: Organization */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Fuzzynuts",
-              url: "https://fuzzynuts.xyz",
-              logo: "https://fuzzynuts.xyz/images/branding/logo.png",
-              description: "The nuttiest meme coin on the XRP Ledger.",
-              sameAs: [
-                "https://x.com/fuzzynutsxrp",
-                "https://t.me/FuzzynutsXRP",
-              ],
-            }),
-          }}
-        />
-        {/* JSON-LD: WebSite */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "Fuzzynuts",
-              url: "https://fuzzynuts.xyz",
-              description:
-                "Play 5 arcade games and earn $NUT tokens on the XRP Ledger. 321 billion fixed supply, blackholed issuer.",
-            }),
-          }}
-        />
-        {/* JSON-LD: SoftwareApplication (Gaming) */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "Fuzzynuts Arcade",
-              operatingSystem: "Web",
-              applicationCategory: "GameApplication",
-              offers: {
-                "@type": "Offer",
-                price: "0",
-                priceCurrency: "USD",
-              },
-              description:
-                "Play 5 free arcade games and earn $NUT tokens on the XRP Ledger. Features Fuzzynuts World MMORPG, Super Fuzzynuts platformer, Fuzzy Survivors, and more.",
-              screenshot: "https://fuzzynuts.xyz/images/og/og-image.png",
-              author: {
-                "@type": "Organization",
-                name: "Fuzzynuts",
-              },
-            }),
-          }}
-        />
-        {/* JSON-LD: FAQPage for SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "What is Fuzzynuts ($NUT)?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Fuzzynuts ($NUT) is a meme coin on the XRP Ledger with 321 billion fixed supply and a blackholed issuer. Players earn $NUT by playing 5 arcade games.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "How do I get $NUT tokens?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Get a Xaman wallet, fund it with XRP, set a NUT trustline on XPMarket, then swap XRP for NUT on the DEX or earn NUT by playing games in the arcade.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Is $NUT safe? Can more tokens be minted?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "The issuer account is permanently blackholed — no one can ever mint more tokens. 80% of supply is in the AMM liquidity pool. All addresses are publicly verifiable on the XRP Ledger.",
-                  },
-                },
-              ],
-            }),
-          }}
-        />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="font-body antialiased">{children}</body>
+      <body className="font-body antialiased">
+        <MotionProvider>
+          <JoeyProvider>
+            <AppMount />
+            {children}
+          </JoeyProvider>
+        </MotionProvider>
+      </body>
     </html>
   );
 }

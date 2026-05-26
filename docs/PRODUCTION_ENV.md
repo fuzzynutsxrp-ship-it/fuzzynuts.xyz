@@ -11,7 +11,8 @@ The frontend is a **static export** (`output: "export"`). It has **no server-sid
 
 | Variable | Required | Value | Notes |
 |----------|----------|-------|-------|
-| *(none currently required)* | — | — | API URL is hardcoded to `https://world.fuzzynuts.xyz` in components |
+| `NEXT_PUBLIC_ALLOW_INDEXING` | At launch | `true` | **Launch switch.** Unset/`false` = `noindex` (pre-launch default). Set to `true` and redeploy to let search engines index the site. Baked in at build time. |
+| *(others)* | — | — | API URL is hardcoded to `https://world.fuzzynuts.xyz` in components |
 
 > [!NOTE]
 > If you later want to make the API URL configurable, add `NEXT_PUBLIC_API_URL` to Vercel's project settings. Then update `ClaimRewards.tsx`, `UserProfile.tsx`, and `Leaderboard.tsx` to use `process.env.NEXT_PUBLIC_API_URL` instead of the hardcoded base URL. The `NEXT_PUBLIC_` prefix is required for client-side access in Next.js.

@@ -87,7 +87,10 @@ export function getLocalScores(game: string, weekKey: string): ScoreEntry[] {
  * not yet present in the API results.
  */
 export function mergeScores(apiScores: ScoreEntry[], localScores: ScoreEntry[]): ScoreEntry[] {
-  if (localScores.length === 0) return apiScores;
+  // NOTE: deliberately no early-return when localScores is empty — the output
+  // contract is "always sorted descending and capped at MAX_ENTRIES." Returning
+  // apiScores verbatim would skip the sort/cap below and surface unsorted or
+  // >50 rows whenever the API returns them in that shape.
   const merged = [...apiScores];
   const apiWallets = new Set(apiScores.map((s) => s.wallet?.toLowerCase()));
   for (const local of localScores) {

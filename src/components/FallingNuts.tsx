@@ -220,6 +220,16 @@ export function FallingNuts() {
     });
 
     let lastTime = 0;
+
+    const drawNutByType = (n: Nut) => {
+      switch (n.type) {
+        case 0: drawAcorn(n); break;
+        case 1: drawNut(n); break;
+        case 2: drawLeaf(n); break;
+        case 3: drawGoldenAcorn(n); break;
+      }
+    };
+
     const animate = (time: number) => {
       const delta = Math.min(time - lastTime, 50); // cap at 50ms (20fps min)
       lastTime = time;
@@ -236,34 +246,66 @@ export function FallingNuts() {
           Object.assign(n, createNut(w));
         }
 
-        switch (n.type) {
-          case 0: drawAcorn(n); break;
-          case 1: drawNut(n); break;
-          case 2: drawLeaf(n); break;
-          case 3: drawGoldenAcorn(n); break;
-        }
+        drawNutByType(n);
       }
 
       animFrameRef.current = requestAnimationFrame(animate);
     };
 
-    animFrameRef.current = requestAnimationFrame(animate);
+    // Render one still frame instead of the running loop. A CSS
+    // @media (prefers-reduced-motion) rule can't stop a requestAnimationFrame
+    // loop, so the reduced-motion gate has to live here in JS.
+    const drawStaticFrame = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (const n of nuts) drawNutByType(n);
+    };
 
-    // Pause animation when tab is hidden to save CPU
+    const startLoop = () => {
+      cancelAnimationFrame(animFrameRef.current);
+      lastTime = performance.now();
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+    const stopLoop = () => cancelAnimationFrame(animFrameRef.current);
+
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+
+    // Start animating, or freeze to a static frame, based on the user's
+    // OS-level motion preference — and react if they toggle it live.
+    const applyMotionPreference = () => {
+      if (reducedMotionQuery.matches) {
+        stopLoop();
+        drawStaticFrame();
+      } else {
+        startLoop();
+      }
+    };
+
+    applyMotionPreference();
+    reducedMotionQuery.addEventListener("change", applyMotionPreference);
+
+    // Pause animation when tab is hidden to save CPU (respect reduced motion)
     const handleVisibility = () => {
       if (document.hidden) {
-        cancelAnimationFrame(animFrameRef.current);
-      } else {
+        stopLoop();
+      } else if (!reducedMotionQuery.matches) {
         lastTime = performance.now();
         animFrameRef.current = requestAnimationFrame(animate);
       }
     };
     document.addEventListener("visibilitychange", handleVisibility);
 
-    window.addEventListener("resize", resize, { passive: true });
+    const handleResize = () => {
+      resize();
+      if (reducedMotionQuery.matches) drawStaticFrame();
+    };
+    window.addEventListener("resize", handleResize, { passive: true });
+
     return () => {
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibility);
+      reducedMotionQuery.removeEventListener("change", applyMotionPreference);
       cancelAnimationFrame(animFrameRef.current);
     };
   }, [createNut]);

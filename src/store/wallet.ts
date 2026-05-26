@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getJoeyAdapter } from "@/lib/wallet/joeyAdapter";
 
 /* ═══════════════════════════════════════════════════════════════
    Encrypted Storage Utilities (AES-GCM via Web Crypto)
@@ -92,7 +93,12 @@ async function decryptFromStorage(): Promise<{ address: string; provider: string
   }
 }
 
-export type WalletProvider = "xaman" | "gemwallet" | "crossmark" | "none";
+export type WalletProvider =
+  | "xaman"
+  | "gemwallet"
+  | "crossmark"
+  | "joey"
+  | "none";
 
 interface WalletState {
   address: string | null;
@@ -105,6 +111,18 @@ interface WalletState {
 
   connect: (provider: WalletProvider) => Promise<void>;
   disconnect: () => void;
+  /**
+   * Push connected state in from an external adapter (e.g. the Joey /
+   * WalletConnect bridge), where the session is established outside the
+   * store's own connect() flow. Persists like a normal connect.
+   */
+  setConnectedFromAdapter: (address: string, provider: WalletProvider) => void;
+  /**
+   * Clear connected state when an external adapter session ends (e.g. the
+   * user disconnects from inside the Joey app). Does NOT call back into the
+   * adapter — it is the response to a teardown that already happened.
+   */
+  setDisconnectedFromAdapter: () => void;
   setBalance: (balance: string) => void;
   setNutBalance: (nutBalance: string) => void;
   setError: (error: string | null) => void;
@@ -395,6 +413,20 @@ export const useWalletStore = create<WalletState>((set) => ({
           }
           break;
         }
+
+        case "joey": {
+          // Joey is mobile-only over WalletConnect. The actual modal lives
+          // in <JoeyProvider> (needs React hooks); the store reaches it
+          // through an imperative adapter registered at mount.
+          const adapter = getJoeyAdapter();
+          if (!adapter) {
+            throw new Error(
+              "Joey Wallet isn't ready. Make sure WalletConnect is configured, then try again.",
+            );
+          }
+          address = await adapter.connect();
+          break;
+        }
       }
 
       if (address) {
@@ -424,6 +456,16 @@ export const useWalletStore = create<WalletState>((set) => ({
   },
 
   disconnect: () => {
+    // If the active session is Joey/WalletConnect, tear down the WC session
+    // too (fire-and-forget — local state clears regardless).
+    if (useWalletStore.getState().provider === "joey") {
+      getJoeyAdapter()
+        ?.disconnect()
+        .catch(() => {
+          // Non-critical: WC session teardown failed; local state still clears
+        });
+    }
+
     set({
       address: null,
       provider: "none",
@@ -454,6 +496,39 @@ export const useWalletStore = create<WalletState>((set) => ({
   setBalance: (balance: string) => set({ balance }),
   setNutBalance: (nutBalance: string) => set({ nutBalance }),
   setError: (error: string | null) => set({ error }),
+
+  setConnectedFromAdapter: (address: string, provider: WalletProvider) => {
+    set({
+      address,
+      provider,
+      isConnected: true,
+      isConnecting: false,
+      error: null,
+    });
+
+    // Persist to encrypted localStorage so the session auto-restores.
+    if (typeof window !== "undefined") {
+      encryptAndStore({ address, provider }).catch(() => {
+        // Non-critical: encrypted persist failed, plaintext fallback already set
+      });
+    }
+  },
+
+  setDisconnectedFromAdapter: () => {
+    set({
+      address: null,
+      provider: "none",
+      balance: null,
+      nutBalance: null,
+      isConnected: false,
+      isConnecting: false,
+      error: null,
+    });
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(ENCRYPTED_KEY);
+    }
+  },
 
   autoReconnect: async () => {
     if (typeof window === "undefined") return;
