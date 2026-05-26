@@ -104,6 +104,12 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
         prize: null,
         claimed: false,
         txHash: null,
+        usd_value: null,
+        nut_amount: null,
+        snapshot_price: null,
+        snapshot_timestamp: null,
+        announced: false,
+        tiers: null,
       });
       setStatus("not-eligible");
     }

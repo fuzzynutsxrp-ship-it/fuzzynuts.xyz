@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Trophy, Clock, Wifi, WifiOff, ChevronDown, Radio, Gift, Star, Zap } from "lucide-react";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
+import { API_REWARDS } from "@/features/arcade/constants";
+import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import { CyberCard } from "@/components/ui/CyberCard";
 import { LeaderboardSkeleton } from "@/components/ui/LeaderboardSkeleton";
 import { useWalletStore } from "@/store/wallet";
@@ -23,11 +25,11 @@ import {
 const STORAGE_KEY = "fuzzy_arcade_scores";
 const MAX_ENTRIES = 50;
 
-/** Prize amounts shown inline next to top-3 scores */
-const PRIZE_LABELS: Record<number, { amount: string; color: string; glow: string }> = {
-  1: { amount: "250K $NUT", color: "text-brand-gold", glow: "winner-row-glow" },
-  2: { amount: "150K $NUT", color: "text-silver", glow: "silver-row-glow" },
-  3: { amount: "100K $NUT", color: "text-bronze", glow: "bronze-row-glow" },
+/** Rank → styling only; amounts are dynamic (USD-announced, NUT @ snapshot). */
+const PRIZE_LABELS: Record<number, { color: string; glow: string }> = {
+  1: { color: "text-brand-gold", glow: "winner-row-glow" },
+  2: { color: "text-silver", glow: "silver-row-glow" },
+  3: { color: "text-bronze", glow: "bronze-row-glow" },
 };
 
 /** Map game IDs to accent colors for the CyberCard system */
@@ -150,6 +152,26 @@ export function Leaderboard() {
 
   // Prize eligibility for connected wallet
   const { eligibility, status: claimStatus } = usePayoutEligibility(walletAddress ?? null);
+
+  // Dynamic prize tiers for the selected week (USD-announced, NUT @ snapshot)
+  const [weekTiers, setWeekTiers] = useState<WeeklyTiersResponse | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_REWARDS}/tiers?week=${selectedWeek}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled) setWeekTiers(d); })
+      .catch(() => { if (!cancelled) setWeekTiers(null); });
+    return () => { cancelled = true; };
+  }, [selectedWeek]);
+
+  const fmtPrice = (p?: number | null) => (p && isFinite(p) ? `$${Number(p).toPrecision(4)}` : "—");
+  const tierUsd = (rank: number) => weekTiers?.tiers?.[rank - 1]?.usd_value ?? null;
+  const tierNut = (rank: number) => {
+    const n = weekTiers?.tiers?.[rank - 1]?.nut_amount;
+    return n != null ? Number(n) : null;
+  };
+  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? `$${u}` : "—"; };
+  const tierNutLabel = (rank: number) => { const n = tierNut(rank); return n != null ? `${formatNumber(n)} NUT` : "TBA"; };
   const isWinner = isCurrentWeek && userRank > 0 && userRank <= 3;
   const prizeInfo = isWinner ? PRIZE_LABELS[userRank] : null;
 
@@ -222,7 +244,10 @@ export function Leaderboard() {
                       in {currentGameMeta?.title ?? selectedGame}
                     </p>
                     <p className="font-display text-3xl sm:text-4xl font-black text-brand-gold text-glow-gold mt-2">
-                      {prizeInfo.amount}
+                      {tierUsdLabel(userRank)}
+                    </p>
+                    <p className="text-xs font-mono text-cream-dim mt-1">
+                      ({tierNutLabel(userRank)} @ {fmtPrice(weekTiers?.snapshot_price)} snapshot)
                     </p>
                   </div>
 
@@ -484,27 +509,27 @@ export function Leaderboard() {
               <span className="text-lg">🥇</span>
               <div className="text-left">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-gold/70">1st</p>
-                <p className="text-sm sm:text-base font-black font-mono text-brand-gold">250K</p>
+                <p className="text-sm sm:text-base font-black font-mono text-brand-gold">{tierUsdLabel(1)}</p>
               </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">{tierNutLabel(1)}</span>
             </div>
             {/* 2nd Place */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-gray-400/20 text-center">
               <span className="text-lg">🥈</span>
               <div className="text-left">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400/70">2nd</p>
-                <p className="text-sm sm:text-base font-black font-mono text-gray-300">150K</p>
+                <p className="text-sm sm:text-base font-black font-mono text-gray-300">{tierUsdLabel(2)}</p>
               </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">{tierNutLabel(2)}</span>
             </div>
             {/* 3rd Place */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-amber-700/20 text-center">
               <span className="text-lg">🥉</span>
               <div className="text-left">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600/70">3rd</p>
-                <p className="text-sm sm:text-base font-black font-mono text-amber-600">100K</p>
+                <p className="text-sm sm:text-base font-black font-mono text-amber-600">{tierUsdLabel(3)}</p>
               </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">$NUT</span>
+              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">{tierNutLabel(3)}</span>
             </div>
           </motion.div>
         )}
@@ -648,8 +673,9 @@ export function Leaderboard() {
                               ? "bg-silver/10 border-silver/30 text-silver"
                               : "bg-bronze/10 border-bronze/30 text-bronze"
                             }`}
+                            title={`${tierNutLabel(rank)} @ ${fmtPrice(weekTiers?.snapshot_price)} snapshot`}
                           >
-                            <Zap size={8} className="inline mr-0.5" />{rowPrize.amount}
+                            <Zap size={8} className="inline mr-0.5" />{tierUsdLabel(rank)}
                           </span>
                         </div>
                       )}

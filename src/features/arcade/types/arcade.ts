@@ -27,6 +27,13 @@ export interface EligibilityData {
   prize: number | null;
   claimed: boolean;
   txHash: string | null;
+  usd_value?: number | null;
+  nut_amount?: string | null;
+  snapshot_price?: number | null;
+  snapshot_timestamp?: string | null;
+  announced?: boolean;
+  cap_applied?: boolean | null;
+  tiers?: WeeklyPrizeTier[] | null;
 }
 
 /** Claim response from /api/rewards/claim */
@@ -34,6 +41,27 @@ export interface ClaimResponse {
   success: boolean;
   txHash?: string;
   error?: string;
+  nut_amount_paid?: string;
+  usd_value?: number;
+  snapshot_price?: number;
+}
+
+/** A single dynamic prize tier (USD-announced, NUT pre-calculated at snapshot) */
+export interface WeeklyPrizeTier {
+  rank: number;
+  label: string;
+  usd_value: number;
+  nut_amount: string | null;
+}
+
+/** Response shape of GET /api/rewards/tiers */
+export interface WeeklyTiersResponse {
+  announced: boolean;
+  weekKey: string;
+  tiers: WeeklyPrizeTier[] | null;
+  snapshot_price: number | null;
+  snapshot_timestamp: string | null;
+  cap_applied?: boolean;
 }
 
 /** Status for score submission toasts */

@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
+import { formatNumber } from "@/lib/utils";
 import { CyberCard } from "@/components/ui/CyberCard";
 import {
   usePayoutEligibility,
@@ -25,11 +26,17 @@ import {
    Prize Tier Config
    ═══════════════════════════════════════════════════════════════ */
 
-const PRIZE_TIERS: Record<number, { label: string; amount: string; nutAmount: number; emoji: string }> = {
-  1: { label: "1st Place", amount: "250,000 $NUT", nutAmount: 250_000, emoji: "🥇" },
-  2: { label: "2nd Place", amount: "150,000 $NUT", nutAmount: 150_000, emoji: "🥈" },
-  3: { label: "3rd Place", amount: "100,000 $NUT", nutAmount: 100_000, emoji: "🥉" },
+const PRIZE_TIERS: Record<number, { label: string; emoji: string }> = {
+  1: { label: "1st Place", emoji: "🥇" },
+  2: { label: "2nd Place", emoji: "🥈" },
+  3: { label: "3rd Place", emoji: "🥉" },
 };
+
+/** Sub-cent memecoin price formatter, e.g. $0.0001234 */
+function fmtSnapshotPrice(p?: number | null): string {
+  if (!p || !isFinite(p)) return "—";
+  return `$${Number(p).toPrecision(4)}`;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    Confetti Burst — Lightweight CSS-only confetti animation
@@ -214,6 +221,18 @@ export function ClaimRewards() {
   const weekKey = getCurrentWeekKey();
   const tier = eligibility?.rank ? PRIZE_TIERS[eligibility.rank] : null;
 
+  // Dynamic, snapshot-locked amounts (USD announced + exact NUT @ snapshot price)
+  const usdValue = eligibility?.usd_value ?? null;
+  const nutAmount = eligibility?.nut_amount != null ? Number(eligibility.nut_amount) : null;
+  const snapPrice = eligibility?.snapshot_price ?? null;
+  const usdLabel = usdValue != null ? `$${usdValue}` : "—";
+  const nutLabel =
+    nutAmount != null
+      ? `${formatNumber(nutAmount)} NUT @ ${fmtSnapshotPrice(snapPrice)} snapshot`
+      : eligibility?.announced === false
+      ? "amount set at Monday snapshot"
+      : "—";
+
   /** Status-to-string for claim button */
   const getButtonLabel = useCallback(
     (claimStatus: ClaimStatus): string => {
@@ -225,10 +244,10 @@ export function ClaimRewards() {
         case "polling":
           return "Confirming transaction…";
         default:
-          return tier ? `Claim ${tier.amount}` : "Claim Prize";
+          return usdValue != null ? `Claim ${usdLabel} in NUT` : "Claim Prize";
       }
     },
-    [tier]
+    [usdValue, usdLabel]
   );
 
   /* ═══════════════════════════════════════════════════════
@@ -323,7 +342,7 @@ export function ClaimRewards() {
                 className="text-sm text-cream-dim"
               >
                 {tier
-                  ? `${tier.emoji} ${tier.label} — ${tier.amount} sent to your wallet.`
+                  ? `${tier.emoji} ${tier.label} — ${usdLabel} (${nutLabel}) sent to your wallet.`
                   : "Your $NUT prize has been sent to your wallet."}
               </motion.p>
             </div>
@@ -336,7 +355,7 @@ export function ClaimRewards() {
                 transition={{ delay: 0.4, type: "spring" }}
                 className="font-display text-4xl sm:text-5xl font-black text-brand-gold text-glow-gold"
               >
-                +{tier.amount}
+                +{usdLabel}
               </motion.p>
             )}
 
@@ -425,7 +444,7 @@ export function ClaimRewards() {
       <AnimatePresence>
         {(status === "confirming" || status === "claiming" || status === "polling") && tier && (
           <ClaimConfirmModal
-            tier={tier}
+            tier={{ ...tier, amount: `${usdLabel} — ${nutLabel}` }}
             game={eligibility?.game || null}
             onConfirm={confirmClaim}
             onCancel={cancelClaim}
@@ -459,10 +478,11 @@ export function ClaimRewards() {
               initial={{ scale: 0.8 }}
               animate={{ scale: [0.8, 1.05, 1] }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="font-display text-4xl sm:text-5xl font-black text-brand-gold text-glow-gold mb-6"
+              className="font-display text-4xl sm:text-5xl font-black text-brand-gold text-glow-gold mb-1"
             >
-              {tier?.amount ?? "—"}
+              {usdLabel}
             </motion.p>
+            <p className="text-sm text-cream-dim font-mono mb-6">({nutLabel})</p>
 
             {/* Error banner */}
             <AnimatePresence>
