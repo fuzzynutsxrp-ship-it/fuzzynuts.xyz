@@ -317,6 +317,16 @@ export function Trust() {
 
   return (
     <section id="tokenomics" className="py-16 md:py-20 relative overflow-hidden">
+      {/* Subtle scrim — darkens the bright forest backdrop behind the content
+          so the legend/text stays legible, while the edges keep the theme. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 92% 72% at 50% 50%, rgba(1,5,8,0.74) 0%, rgba(1,5,8,0.5) 55%, transparent 100%)",
+        }}
+      />
       <div className="container-main relative z-10">
         {/* ── Header ── */}
         <motion.div

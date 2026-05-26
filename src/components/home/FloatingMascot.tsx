@@ -135,13 +135,14 @@ export function FloatingMascot() {
               ×
             </button>
             <Image
-              src="/images/branding/FuzzyBear.png"
+              src="/images/branding/logo_512.png"
               alt=""
-              width={150}
-              height={200}
+              width={160}
+              height={160}
               className="floating-mascot__img"
               priority={false}
               draggable={false}
+              style={{ imageRendering: "pixelated" }}
             />
           </div>
         )}
@@ -219,13 +220,14 @@ export function FloatingMascot() {
             }
           >
             <Image
-              src="/images/branding/FuzzyBear.png"
+              src="/images/branding/logo_512.png"
               alt=""
-              width={150}
-              height={200}
+              width={160}
+              height={160}
               className="floating-mascot__img"
               priority={false}
               draggable={false}
+              style={{ imageRendering: "pixelated" }}
             />
           </motion.div>
 

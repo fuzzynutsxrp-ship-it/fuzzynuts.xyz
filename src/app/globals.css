@@ -1197,6 +1197,14 @@ body {
   filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
 }
 
+/* Hidden on small screens — a persistent floating mascot shouldn't risk
+   covering content or CTAs on phones. */
+@media (max-width: 639px) {
+  .floating-mascot {
+    display: none;
+  }
+}
+
 /* ── Close button ── */
 .floating-mascot__close {
   position: absolute;

@@ -1,16 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  ArrowDown,
-  ArrowRight,
-  Check,
-  Gamepad2,
-  Globe,
-  Wallet,
-} from "lucide-react";
+import { ArrowDown, ArrowRight, Gamepad2, Globe } from "lucide-react";
 import Image from "next/image";
-import { useWalletStore } from "@/store/wallet";
 import { gameRegistry } from "@/lib/gameRegistry";
 
 /* ─────────────────────────────────────────────────────────────
@@ -33,8 +25,6 @@ const FLOAT_ANIMATION = {
 };
 
 export function Hero() {
-  const { isConnected, connect, isConnecting } = useWalletStore();
-
   return (
     <section
       id="hero"
@@ -191,70 +181,27 @@ export function Hero() {
           ))}
         </motion.div>
 
-        {/* ── Vault teaser ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
+        {/* ── Prize teaser (compact) ── the full Top-3 pitch + connect CTA
+              live in the Prizes section; the hero just points there. */}
+        <motion.a
+          href="#prizes"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.7 }}
-          className="relative mt-10 max-w-xl mx-auto"
+          transition={{ delay: 1.2, duration: 0.6 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          className="group mt-9 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[rgba(1,5,8,0.55)] backdrop-blur-md border border-[rgba(251,191,36,0.25)] text-sm sm:text-base"
         >
-          <div className="rounded-2xl px-5 py-4 sm:px-6 sm:py-5 bg-[rgba(1,5,8,0.55)] backdrop-blur-md border border-[rgba(251,191,36,0.25)] shadow-[0_10px_40px_rgba(0,0,0,0.45)]">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
-              <span className="text-[var(--color-gold)] text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase">
-                500,000 $NUT vault is live this week
-              </span>
-            </div>
-            <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-black mb-2 leading-tight">
-              <span className="text-[var(--color-cream)]">Are You in the </span>
-              <span
-                className="gradient-text-gold"
-                style={{ textShadow: "0 0 24px rgba(251,191,36,0.4)" }}
-              >
-                Top 3?
-              </span>
-            </h2>
-            <motion.button
-              onClick={() => {
-                if (isConnected) {
-                  window.location.href = "/leaderboard/";
-                } else {
-                  connect("xaman");
-                }
-              }}
-              disabled={isConnecting}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="relative group inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-gradient-to-r from-[var(--color-gold)] to-yellow-500 font-bold text-sm sm:text-base text-[var(--color-forest-900)] overflow-hidden transition-shadow hover:shadow-[0_0_30px_rgba(251,191,36,0.45)]"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
-              <span className="relative flex items-center gap-2">
-                {isConnecting ? (
-                  "Connecting…"
-                ) : isConnected ? (
-                  <>
-                    View My Rank
-                    <ArrowRight size={16} />
-                  </>
-                ) : (
-                  <>
-                    <Wallet size={16} />
-                    See If I&rsquo;m in the Top 3
-                    <ArrowRight size={16} />
-                  </>
-                )}
-              </span>
-            </motion.button>
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-[10px] sm:text-xs text-[var(--color-cream-dim)] opacity-70">
-              {["Free", "10 seconds", "Read-only"].map((sig) => (
-                <div key={sig} className="flex items-center gap-1">
-                  <Check size={12} className="text-[var(--color-neon-green)]" />
-                  {sig}
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          <span className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
+          <span className="text-[var(--color-cream)]">
+            <span className="font-bold text-[var(--color-gold)]">500K $NUT</span>{" "}
+            in weekly prizes — top 3 split the pool
+          </span>
+          <ArrowRight
+            size={15}
+            className="text-[var(--color-gold)] opacity-70 transition-transform group-hover:translate-x-0.5"
+          />
+        </motion.a>
 
         {/* ── Scroll cue ── */}
         <motion.div
