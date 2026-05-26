@@ -332,14 +332,8 @@ export function GamesShowcase() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="section-badge mb-4"
-          >
-            🎮 Play-to-Earn Arcade
-          </motion.span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
-            The Games
+            Arcade
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
             Six hand-tuned games, one weekly leaderboard, real $NUT on the line.

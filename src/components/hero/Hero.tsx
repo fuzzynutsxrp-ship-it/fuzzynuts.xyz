@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowRight, Gamepad2, Globe } from "lucide-react";
+import { ArrowRight, Gamepad2, Globe } from "lucide-react";
 import Image from "next/image";
 import { gameRegistry } from "@/lib/gameRegistry";
 
@@ -209,39 +209,6 @@ export function Hero() {
             className="text-[var(--color-gold)] opacity-70 transition-transform group-hover:translate-x-0.5"
           />
         </motion.a>
-
-        {/* ── Scroll cue ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="mt-8"
-        >
-          <button
-            type="button"
-            onClick={() =>
-              document
-                .getElementById("games")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-            className="inline-flex flex-col items-center text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors"
-            aria-label="Scroll to games"
-          >
-            <span className="text-[10px] sm:text-xs mb-1.5 tracking-widest uppercase">
-              Explore Arcade
-            </span>
-            <motion.span
-              animate={{ y: [0, 8, 0] }}
-              transition={{
-                repeat: Infinity,
-                duration: 1.5,
-                ease: "easeInOut",
-              }}
-            >
-              <ArrowDown size={20} />
-            </motion.span>
-          </button>
-        </motion.div>
       </div>
     </section>
   );
