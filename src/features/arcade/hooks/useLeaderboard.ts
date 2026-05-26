@@ -15,6 +15,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type { ScoreEntry, LeaderboardReturn } from "../types/arcade";
 import { API_SCORES, AUTO_POLL_MS, MAX_ENTRIES } from "../constants";
 import { getCurrentWeekKey, getLocalScores, mergeScores } from "../utils/scoreHelpers";
+import { toBackendSlug } from "../slugAliases";
 
 /**
  * Fetches leaderboard data for a given game and week, with auto-polling
@@ -55,8 +56,14 @@ export function useLeaderboard(
         setError(null);
       }
 
+      // The backend (Mongo) stores legacy slugs (e.g. "survivors", "racer")
+      // while the frontend speaks canonical registry slugs ("fuzzy-survivors",
+      // "nut-racer"). Translate at the API/localStorage boundary; identity for
+      // already-aligned slugs.
+      const backendGame = toBackendSlug(game);
+
       try {
-        const url = `${API_SCORES}?game=${game}&week=${resolvedWeek}&limit=${MAX_ENTRIES}`;
+        const url = `${API_SCORES}?game=${backendGame}&week=${resolvedWeek}&limit=${MAX_ENTRIES}`;
         const response = await fetch(url, {
           signal: controller.signal,
         });
@@ -76,7 +83,7 @@ export function useLeaderboard(
         }));
 
         // Merge with localStorage fallback scores
-        const localScores = getLocalScores(game, resolvedWeek);
+        const localScores = getLocalScores(backendGame, resolvedWeek);
         const merged = mergeScores(normalized, localScores);
 
         const sorted = merged
@@ -93,7 +100,7 @@ export function useLeaderboard(
 
         // Fallback to localStorage
         try {
-          const localScores = getLocalScores(game, resolvedWeek);
+          const localScores = getLocalScores(backendGame, resolvedWeek);
           if (localScores.length > 0) {
             setScores(localScores.sort((a, b) => b.score - a.score).slice(0, MAX_ENTRIES));
             setLoading(false);
