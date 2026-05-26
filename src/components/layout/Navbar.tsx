@@ -23,7 +23,7 @@ import Link from "next/link";
 const NAV_LINKS = [
   { href: "/#games", label: "Arcade" },
   { href: "/leaderboard/", label: "Leaderboard", icon: "trophy" },
-  { href: "/#features", label: "Features" },
+  { href: "/#prizes", label: "Prizes" },
   { href: "/#tokenomics", label: "Tokenomics" },
   { href: "/#how-to-get", label: "Get $NUT" },
 ];

@@ -265,8 +265,8 @@ export function GamesShowcase() {
             The Games
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
-            6 hand-tuned games with real $NUT prizes. Play for free, compete on
-            the weekly leaderboard, and earn tokens just for having fun.
+            Six hand-tuned games, one weekly leaderboard, real $NUT on the line.
+            Pick a cabinet and start climbing.
           </p>
         </motion.div>
 

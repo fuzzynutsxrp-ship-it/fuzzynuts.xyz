@@ -1,0 +1,409 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Copy, Check, ExternalLink, Terminal, Bot, Users } from "lucide-react";
+import { useState, useCallback } from "react";
+import { CyberCard } from "@/components/ui/CyberCard";
+import { TOKENOMICS, XRPL_CONFIG } from "@/lib/utils";
+
+/* ─────────────────────────────────────────────────────────────
+   Trust — "Don't Trust. Verify."
+
+   Merges the old Tokenomics + OnChainVerification sections and the
+   two trust-flavored items rescued from the cut Features grid
+   (Anti-Bot, Community-Governed). Moved high on the page so the
+   rug-pull objection is answered right after the prize promise.
+
+   Heading is real text (the old section used a tokenomics.png
+   wordmark) for a consistent type scale + selectable/SEO text.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Distribution bar ── */
+function AnimatedBar({
+  item,
+  index,
+}: {
+  item: (typeof TOKENOMICS)[number];
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+      className="space-y-2"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-3.5 h-3.5 rounded-full"
+            style={{ background: item.color, boxShadow: `0 0 12px ${item.color}50` }}
+          />
+          <span className="font-display font-semibold text-[var(--color-cream)]">
+            {item.label}
+          </span>
+        </div>
+        <div className="text-right">
+          <span className="font-bold text-[var(--color-gold)]">
+            {item.percentage}%
+          </span>
+          <span className="text-xs text-[var(--color-cream-dim)] ml-2">
+            ({item.amount})
+          </span>
+        </div>
+      </div>
+
+      <div className="h-3 rounded-full bg-[rgba(251,191,36,0.08)] overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          whileInView={{ width: `${item.percentage}%` }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 1.2, delay: 0.2 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="h-full rounded-full"
+          style={{
+            background: `linear-gradient(90deg, ${item.color}CC, ${item.color})`,
+            boxShadow: `0 0 15px ${item.color}40`,
+          }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Donut chart ── */
+function DonutChart() {
+  const total = TOKENOMICS.reduce((sum, t) => sum + t.percentage, 0);
+  const segments: { path: string; color: string; percentage: number; label: string }[] = [];
+  let currentAngle = -90;
+
+  for (const item of TOKENOMICS) {
+    const angle = (item.percentage / total) * 360;
+    const startRad = (currentAngle * Math.PI) / 180;
+    const endRad = ((currentAngle + angle) * Math.PI) / 180;
+    const x1 = 100 + 80 * Math.cos(startRad);
+    const y1 = 100 + 80 * Math.sin(startRad);
+    const x2 = 100 + 80 * Math.cos(endRad);
+    const y2 = 100 + 80 * Math.sin(endRad);
+    const largeArc = angle > 180 ? 1 : 0;
+    segments.push({
+      path: `M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArc} 1 ${x2} ${y2} Z`,
+      color: item.color,
+      percentage: item.percentage,
+      label: item.label,
+    });
+    currentAngle += angle;
+  }
+
+  return (
+    <div className="relative w-64 h-64 mx-auto">
+      <svg
+        viewBox="0 0 200 200"
+        className="w-full h-full"
+        role="img"
+        aria-label="Token distribution: 80% AMM Liquidity, 18% Community Nut Jar, 2% Founder"
+      >
+        <title>Tokenomics Distribution</title>
+        <motion.g
+          initial={{ rotate: -90, opacity: 0 }}
+          whileInView={{ rotate: 0, opacity: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          style={{ transformOrigin: "100px 100px" }}
+        >
+          {segments.map((seg, i) => (
+            <motion.path
+              key={seg.label}
+              d={seg.path}
+              fill={seg.color}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ delay: 0.3 + i * 0.15, duration: 0.5 }}
+              style={{ filter: `drop-shadow(0 0 10px ${seg.color}50)` }}
+            >
+              <title>{`${seg.label}: ${seg.percentage}%`}</title>
+            </motion.path>
+          ))}
+        </motion.g>
+        <circle cx="100" cy="100" r="45" fill="#0a0f0a" />
+        <text x="100" y="96" textAnchor="middle" fill="#FBBF24" fontSize="16" fontWeight="bold" fontFamily="Outfit, sans-serif">
+          321B
+        </text>
+        <text x="100" y="113" textAnchor="middle" fill="#b0a890" fontSize="9" fontFamily="Inter, sans-serif">
+          Fixed Supply
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+/* ── On-chain ledger entry ── */
+const LEDGER_ACCENTS: Record<string, string> = {
+  issuer: "#ef4444",
+  distributor: "#FBBF24",
+  amm: "#10B981",
+};
+
+function LedgerEntry({
+  index,
+  label,
+  tag,
+  address,
+  explorerUrl,
+  accentColor,
+  delay,
+}: {
+  index: number;
+  label: string;
+  tag?: string;
+  address: string;
+  explorerUrl: string;
+  accentColor: string;
+  delay: number;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(address);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = address;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [address]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ delay, duration: 0.4, ease: "easeOut" }}
+      className="ledger-entry group"
+      style={{ "--ledger-accent": accentColor } as React.CSSProperties}
+    >
+      <div className="ledger-entry__bar" style={{ background: accentColor }} />
+      <div className="flex-1 min-w-0 py-4 sm:py-5 pr-4 sm:pr-5 pl-5 sm:pl-6">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2.5 flex-wrap">
+          <span className="font-mono text-[10px] tabular-nums opacity-40 select-none" style={{ color: accentColor }}>
+            {String(index).padStart(2, "0")}
+          </span>
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+            {label}
+          </span>
+          {tag && (
+            <span
+              className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded"
+              style={{ color: accentColor, background: `color-mix(in srgb, ${accentColor} 10%, transparent)` }}
+            >
+              {tag}
+            </span>
+          )}
+          <div className="flex-1" />
+          <a
+            href={explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ledger-entry__link flex items-center gap-1 text-[10px] sm:text-xs font-medium opacity-50 hover:opacity-100 transition-opacity"
+          >
+            <ExternalLink size={11} />
+            <span className="hidden sm:inline">View on XRPScan</span>
+            <span className="sm:hidden">Explorer</span>
+          </a>
+        </div>
+        <div className="flex items-center gap-2">
+          <code className="ledger-entry__address flex-1 min-w-0 font-mono text-[11px] sm:text-[13px] tracking-wide break-all select-all leading-relaxed">
+            {address}
+          </code>
+          <motion.button
+            onClick={handleCopy}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="ledger-entry__copy shrink-0 p-1.5 sm:p-2 rounded-md transition-colors cursor-pointer"
+            aria-label={`Copy ${label} address`}
+          >
+            {copied ? (
+              <Check size={14} className="text-[var(--color-neon-green)]" />
+            ) : (
+              <Copy size={14} className="opacity-40 group-hover:opacity-70 transition-opacity" />
+            )}
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Trust chips rescued from the cut Features grid ── */
+const TRUST_CHIPS = [
+  {
+    icon: Bot,
+    title: "Anti-Bot Protection",
+    desc: "Score caps, minimum play durations, rate limits, and wallet verification keep the arcade fair.",
+    color: "#3B82F6",
+  },
+  {
+    icon: Users,
+    title: "Community-Governed",
+    desc: "18% Community Nut Jar funds airdrops, rewards, and what the community builds next.",
+    color: "#a855f7",
+  },
+];
+
+export function Trust() {
+  return (
+    <section id="tokenomics" className="py-16 md:py-20 relative overflow-hidden">
+      <div className="container-main relative z-10">
+        {/* ── Header ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          className="text-center mb-12 md:mb-16"
+        >
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
+            Don&apos;t Trust. Verify.
+          </h2>
+          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
+            321 billion $NUT, fixed forever, issuer blackholed. Here&apos;s the
+            receipts — every number is public on the XRP Ledger.
+          </p>
+        </motion.div>
+
+        {/* ── Distribution: donut + bars + key facts ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+          <div>
+            <DonutChart />
+          </div>
+
+          <div className="space-y-6">
+            {TOKENOMICS.map((item, i) => (
+              <AnimatedBar key={item.label} item={item} index={i} />
+            ))}
+
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-8"
+            >
+              <CyberCard accentColor="gold" className="p-5 space-y-3">
+                <h3 className="font-display font-bold text-[var(--color-brand-gold)] text-sm uppercase tracking-wider">
+                  Key Facts
+                </h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-[var(--color-cream-dim)]">Total Supply</p>
+                    <p className="font-bold text-[var(--color-cream)]">321,000,000,000</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--color-cream-dim)]">Trading Fee</p>
+                    <p className="font-bold text-[var(--color-cream)]">1%</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--color-cream-dim)]">Issuer Status</p>
+                    <p className="font-bold text-red-400">💀 Blackholed</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--color-cream-dim)]">DEX</p>
+                    <p className="font-bold text-neon-green">XRPL Native AMM</p>
+                  </div>
+                </div>
+              </CyberCard>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* ── On-chain ledger ── */}
+        <div className="max-w-2xl mx-auto mb-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.05, duration: 0.3 }}
+            className="ledger-terminal__header"
+          >
+            <div className="flex items-center gap-2">
+              <Terminal size={13} className="text-[var(--color-neon-green)] opacity-70" />
+              <span className="font-mono text-[10px] sm:text-xs text-[var(--color-cream-dim)] opacity-60 tracking-wider uppercase">
+                xrpl-ledger — $NUT on-chain records
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-[rgba(239,68,68,0.6)]" />
+              <div className="w-2 h-2 rounded-full bg-[rgba(251,191,36,0.6)]" />
+              <div className="w-2 h-2 rounded-full bg-[rgba(16,185,129,0.6)]" />
+            </div>
+          </motion.div>
+
+          <div className="ledger-terminal__body">
+            <LedgerEntry
+              index={1}
+              label="Issuer"
+              tag="Blackholed"
+              address={XRPL_CONFIG.issuer}
+              explorerUrl={`https://xrpscan.com/account/${XRPL_CONFIG.issuer}`}
+              accentColor={LEDGER_ACCENTS.issuer}
+              delay={0.1}
+            />
+            <LedgerEntry
+              index={2}
+              label="Distributor"
+              address={XRPL_CONFIG.distributor}
+              explorerUrl={`https://xrpscan.com/account/${XRPL_CONFIG.distributor}`}
+              accentColor={LEDGER_ACCENTS.distributor}
+              delay={0.18}
+            />
+            <LedgerEntry
+              index={3}
+              label="AMM Liquidity Pool"
+              address={XRPL_CONFIG.ammPool}
+              explorerUrl={`https://xrpscan.com/account/${XRPL_CONFIG.ammPool}`}
+              accentColor={LEDGER_ACCENTS.amm}
+              delay={0.26}
+            />
+          </div>
+        </div>
+
+        {/* ── Trust chips (rescued from Features) ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          {TRUST_CHIPS.map((chip, i) => (
+            <motion.div
+              key={chip.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: i * 0.08, duration: 0.4 }}
+              className="flex items-start gap-3 p-4 rounded-xl"
+              style={{ background: "rgba(1, 5, 8, 0.4)" }}
+            >
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: `color-mix(in srgb, ${chip.color} 12%, transparent)` }}
+              >
+                <chip.icon size={18} style={{ color: chip.color }} strokeWidth={2.5} />
+              </div>
+              <div>
+                <p className="font-display font-bold text-sm mb-1" style={{ color: chip.color }}>
+                  {chip.title}
+                </p>
+                <p className="text-xs text-[var(--color-cream-dim)] leading-relaxed">
+                  {chip.desc}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

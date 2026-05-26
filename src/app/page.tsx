@@ -23,29 +23,14 @@ const GamesShowcase = dynamic(() =>
     default: m.GamesShowcase,
   })),
 );
-const PrizeTiers = dynamic(() =>
-  import("@/components/sections/PrizeTiers").then((m) => ({
-    default: m.PrizeTiers,
+const Prizes = dynamic(() =>
+  import("@/components/sections/Prizes").then((m) => ({
+    default: m.Prizes,
   })),
 );
-const WalletCTA = dynamic(() =>
-  import("@/components/home/WalletCTA").then((m) => ({
-    default: m.WalletCTA,
-  })),
-);
-const Features = dynamic(() =>
-  import("@/components/sections/Features").then((m) => ({
-    default: m.Features,
-  })),
-);
-const Tokenomics = dynamic(() =>
-  import("@/components/sections/Tokenomics").then((m) => ({
-    default: m.Tokenomics,
-  })),
-);
-const OnChainVerification = dynamic(() =>
-  import("@/components/sections/OnChainVerification").then((m) => ({
-    default: m.OnChainVerification,
+const Trust = dynamic(() =>
+  import("@/components/sections/Trust").then((m) => ({
+    default: m.Trust,
   })),
 );
 const HowToGet = dynamic(() =>
@@ -76,11 +61,8 @@ export default function Home() {
       <main id="main-content" className="relative z-10">
         <Hero />
         <GamesShowcase />
-        <PrizeTiers />
-        <WalletCTA />
-        <Features />
-        <Tokenomics />
-        <OnChainVerification />
+        <Prizes />
+        <Trust />
       </main>
 
       {/* howto-bg.jpg + dark overlay removed — HowToGet and Footer

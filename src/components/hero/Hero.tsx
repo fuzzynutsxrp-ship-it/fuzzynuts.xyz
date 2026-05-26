@@ -108,9 +108,9 @@ export function Hero() {
           transition={{ delay: 0.7 }}
           className="text-sm sm:text-base md:text-lg text-[var(--color-cream)] max-w-2xl mx-auto mb-8 leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]"
         >
-          The nuttiest meme coin on the XRP Ledger. Play arcade games, earn real
-          $NUT, and join a community of degens who refuse to take crypto
-          seriously.
+          Free arcade games on the XRP Ledger that pay out real $NUT every week.
+          The nuttiest meme coin in crypto — built by degens who refuse to take
+          it seriously.
         </motion.p>
 
         {/* ── CTAs ── */}
