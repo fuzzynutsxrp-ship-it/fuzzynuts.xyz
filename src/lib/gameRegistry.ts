@@ -169,7 +169,7 @@ export const GAME_LIST: GameMetadata[] = [
     sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
     leaderboardEnabled: true,
     achievementsEnabled: false,
-    status: "live",
+    status: "coming-soon",
     scoreType: "high-score",
     loadingTips: [
       "Classified game — discover the mechanics yourself",
