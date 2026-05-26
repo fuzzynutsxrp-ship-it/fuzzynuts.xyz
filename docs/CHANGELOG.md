@@ -6,33 +6,6 @@ for env/security see `PRODUCTION_ENV.md`.
 
 ---
 
-## 2026-05-26 — Hero vertical-gap fix
-
-- **Closed the large empty band between the hero and `GamesShowcase`.**
-  The hero `<section>` is `min-h-[100svh]` (a full-screen hero by design),
-  but its content block was start-aligned — `flex flex-col items-center`
-  with `pt-24`, and the section itself was not a flex container — so the
-  content sat at the top and the entire lower ~40% of the viewport-height
-  section rendered as empty backdrop before "The Games."
-  - Made the section the flex container (`flex flex-col items-center
-    justify-center`) so the logo→stats→teaser stack is **vertically
-    centered** within the full-height hero.
-  - Pulled the "Explore Arcade ↓" scroll cue out of the centered stack and
-    **pinned it to the bottom edge** (`absolute bottom-6 left-1/2
-    -translate-x-1/2`) so it hugs the fold instead of leaving dead space
-    below it. Adjusted the stack padding to `pt-20 pb-24` (Navbar clearance
-    + room for the pinned cue).
-  - This is the canonical full-height-hero pattern (`display:flex` +
-    `flex-direction:column` + `justify-content:center` on the `100vh/svh`
-    container). Confirmed `100svh` is the *correct* unit and **not** the
-    cause: per web.dev, on desktop the small/large/dynamic viewports are
-    identical, so `svh` behaved exactly like `vh` here.
-  - Touch: `components/hero/Hero.tsx` only. No change to the `100svh` unit,
-    reduced-motion gating, or any other section. `eslint` + `tsc --noEmit`
-    clean.
-
----
-
 ## 2026-05-25 — Pre-launch hardening + front-page overhaul
 
 A large pass covering accessibility/perf hardening, a critical-customer

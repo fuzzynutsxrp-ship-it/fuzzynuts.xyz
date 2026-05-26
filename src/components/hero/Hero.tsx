@@ -28,13 +28,9 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full min-h-[100svh] overflow-hidden flex flex-col items-center justify-center"
+      className="relative w-full min-h-[100svh] overflow-hidden"
     >
-      {/* Main hero stack — vertically centered within the full-height
-          section (fixed Navbar floats over the top, so it costs no flow
-          space). pt-20 keeps the stack clear of the Navbar on shorter
-          viewports; pb-24 reserves room for the bottom-pinned scroll cue. */}
-      <div className="relative z-20 flex flex-col items-center text-center px-4 pt-20 pb-24">
+      <div className="relative z-20 flex flex-col items-center text-center px-4 pt-24 pb-12">
         {/* ── Logo ── */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
@@ -206,17 +202,14 @@ export function Hero() {
             className="text-[var(--color-gold)] opacity-70 transition-transform group-hover:translate-x-0.5"
           />
         </motion.a>
-      </div>
 
-      {/* ── Scroll cue — pinned to the bottom edge of the full-height hero
-            so it hugs the fold instead of floating in the dead space that
-            used to sit below the top-aligned content. ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20"
-      >
+        {/* ── Scroll cue ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          className="mt-8"
+        >
           <button
             type="button"
             onClick={() =>
@@ -242,6 +235,7 @@ export function Hero() {
             </motion.span>
           </button>
         </motion.div>
+      </div>
     </section>
   );
 }
