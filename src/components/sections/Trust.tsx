@@ -18,54 +18,46 @@ import { TOKENOMICS, XRPL_CONFIG } from "@/lib/utils";
    wordmark) for a consistent type scale + selectable/SEO text.
    ───────────────────────────────────────────────────────────── */
 
-/* ── Distribution bar ── */
-function AnimatedBar({
+/* ── Distribution legend row ──
+   Plain data row (dot · label · % · amount). No progress-bar track,
+   so a small allocation like the 2% founder slice reads as a real
+   line item instead of a broken/unfilled rail. The donut carries the
+   proportional visualization. */
+function LegendRow({
   item,
   index,
+  last,
 }: {
   item: (typeof TOKENOMICS)[number];
   index: number;
+  last: boolean;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -16 }}
       whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      className="space-y-2"
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
+      className={`flex items-center justify-between gap-4 py-4 ${
+        last ? "" : "border-b border-[var(--color-glass-border)]"
+      }`}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-3.5 h-3.5 rounded-full"
-            style={{ background: item.color, boxShadow: `0 0 12px ${item.color}50` }}
-          />
-          <span className="font-display font-semibold text-[var(--color-cream)]">
-            {item.label}
-          </span>
-        </div>
-        <div className="text-right">
-          <span className="font-bold text-[var(--color-gold)]">
-            {item.percentage}%
-          </span>
-          <span className="text-xs text-[var(--color-cream-dim)] ml-2">
-            ({item.amount})
-          </span>
-        </div>
-      </div>
-
-      <div className="h-3 rounded-full bg-[rgba(251,191,36,0.08)] overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${item.percentage}%` }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 1.2, delay: 0.2 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="h-full rounded-full"
-          style={{
-            background: `linear-gradient(90deg, ${item.color}CC, ${item.color})`,
-            boxShadow: `0 0 15px ${item.color}40`,
-          }}
+      <div className="flex items-center gap-3 min-w-0">
+        <span
+          className="w-3 h-3 rounded-full shrink-0"
+          style={{ background: item.color, boxShadow: `0 0 10px ${item.color}66` }}
         />
+        <span className="font-display font-semibold text-[var(--color-cream)] truncate">
+          {item.label}
+        </span>
+      </div>
+      <div className="flex items-baseline gap-2 shrink-0">
+        <span className="font-display font-black text-xl text-[var(--color-gold)] tabular-nums">
+          {item.percentage}%
+        </span>
+        <span className="text-xs text-[var(--color-cream-dim)] tabular-nums">
+          {item.amount}
+        </span>
       </div>
     </motion.div>
   );
@@ -278,16 +270,24 @@ export function Trust() {
           </p>
         </motion.div>
 
-        {/* ── Distribution: donut + bars + key facts ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-          <div>
+        {/* ── Distribution: donut hero + legend + key facts ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center mb-16">
+          <div className="flex justify-center">
             <DonutChart />
           </div>
 
-          <div className="space-y-6">
-            {TOKENOMICS.map((item, i) => (
-              <AnimatedBar key={item.label} item={item} index={i} />
-            ))}
+          <div>
+            {/* Legend — plain rows, no progress tracks */}
+            <div className="mb-2">
+              {TOKENOMICS.map((item, i) => (
+                <LegendRow
+                  key={item.label}
+                  item={item}
+                  index={i}
+                  last={i === TOKENOMICS.length - 1}
+                />
+              ))}
+            </div>
 
             <motion.div
               initial={{ opacity: 0, y: 15 }}
