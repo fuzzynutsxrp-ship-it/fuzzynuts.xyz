@@ -1,5 +1,10 @@
 import { create } from "zustand";
 import { getJoeyAdapter } from "@/lib/wallet/joeyAdapter";
+import {
+  connectXaman,
+  disconnectXaman,
+  tryRestoreXamanSession,
+} from "@/lib/wallet/xamanService";
 
 /* ═══════════════════════════════════════════════════════════════
    Encrypted Storage Utilities (AES-GCM via Web Crypto)
@@ -129,200 +134,6 @@ interface WalletState {
 
   /** Restore wallet session from encrypted localStorage on app mount */
   autoReconnect: () => Promise<void>;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Xaman SDK Loader + PKCE Connect
-   ═══════════════════════════════════════════════════════════════
-
-   The CDN script (`xumm.min.js`) exposes a `Xumm` class that
-   implements OAuth2 PKCE in the browser:
-     1. Load script (idempotent)
-     2. `new Xumm(apiKey)` — constructor, triggers PKCE retrieval
-     3. `.authorize()` — opens OAuth2 popup
-     4. Listen for `success` event to get the user's account
-
-   Previous code called `.authorize()` and then immediately read
-   `.user?.account`, which was always `undefined` because the SDK
-   resolves asynchronously via events.
-
-   This rewrite:
-   - Uses the correct event-driven flow
-   - Adds a 60s connection timeout
-   - Handles popup-blocked, user-rejected, and network errors
-   - Provides console.error breadcrumbs for debugging
-   ═══════════════════════════════════════════════════════════════ */
-
-/** Idempotent CDN script loader — resolves when script is ready */
-function loadXummScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const win = window as unknown as Record<string, unknown>;
-
-    // Already loaded
-    if (win.Xumm) {
-      resolve();
-      return;
-    }
-
-    // Check if script tag already exists (in-flight load)
-    const existing = document.querySelector(
-      'script[src*="xumm.min.js"], script[src*="xaman.app/assets/cdn"]'
-    );
-    if (existing) {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", () =>
-        reject(new Error("Failed to load Xaman SDK from CDN"))
-      );
-      // If it already loaded but Xumm isn't on window yet, wait a tick
-      if ((existing as HTMLScriptElement).dataset.loaded === "true") {
-        resolve();
-      }
-      return;
-    }
-
-    const script = document.createElement("script");
-    // Use the canonical CDN URL (xaman.app is the current domain per docs)
-    script.src = "https://xumm.app/assets/cdn/xumm.min.js";
-    script.async = true;
-
-    script.onload = () => {
-      script.dataset.loaded = "true";
-      // Small delay to ensure global `Xumm` is registered
-      setTimeout(() => {
-        if (win.Xumm) {
-          resolve();
-        } else {
-          reject(new Error("Xaman SDK loaded but Xumm class not found on window"));
-        }
-      }, 100);
-    };
-
-    script.onerror = () =>
-      reject(new Error("Failed to load Xaman SDK — check your internet connection"));
-
-    document.head.appendChild(script);
-  });
-}
-
-/** Mobile detection for deep link fallback */
-function isMobile(): boolean {
-  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
-    navigator.userAgent
-  );
-}
-
-/**
- * Connect via Xaman OAuth2 PKCE flow.
- * Returns the r-address on success, throws on failure.
- */
-async function connectXaman(apiKey: string): Promise<string> {
-  console.log("[Wallet] Starting Xaman PKCE connection flow…");
-
-  await loadXummScript();
-
-  const win = window as unknown as Record<string, unknown>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const XummClass = win.Xumm as any;
-
-  if (!XummClass) {
-    throw new Error("Xaman SDK failed to initialize after load");
-  }
-
-  // Create Xumm instance — the constructor triggers state retrieval
-  const xumm = new XummClass(apiKey);
-
-  return new Promise<string>((resolve, reject) => {
-    const CONNECTION_TIMEOUT_MS = 60_000;
-
-    const timeout = setTimeout(() => {
-      cleanup();
-      console.error("[Wallet] Xaman connection timed out after 60s");
-      reject(
-        new Error(
-          isMobile()
-            ? "Connection timed out. Make sure the Xaman app is installed and try again."
-            : "Connection timed out. Complete the sign-in in the Xaman popup, or check that pop-ups are allowed."
-        )
-      );
-    }, CONNECTION_TIMEOUT_MS);
-
-    const cleanup = () => {
-      clearTimeout(timeout);
-      try { xumm.off?.("success", onSuccess); } catch {}
-      try { xumm.off?.("error", onError); } catch {}
-      try { xumm.off?.("retrieved", onRetrieved); } catch {}
-    };
-
-    const resolveWithAccount = async () => {
-      try {
-        // The SDK resolves user info asynchronously
-        const account =
-          (await xumm?.user?.account) ||
-          xumm?.state?.account;
-
-        if (account && typeof account === "string" && account.startsWith("r")) {
-          cleanup();
-          console.log("[Wallet] ✅ Xaman connected:", account);
-          resolve(account);
-        } else {
-          cleanup();
-          console.error("[Wallet] Xaman returned no account after auth");
-          reject(new Error("Xaman returned no wallet address. Please try again."));
-        }
-      } catch (err) {
-        cleanup();
-        console.error("[Wallet] Error reading Xaman account:", err);
-        reject(new Error("Failed to read wallet address from Xaman."));
-      }
-    };
-
-    // Event: Previously stored JWT was retrieved (auto-login)
-    const onRetrieved = () => {
-      console.log("[Wallet] Xaman: existing session retrieved");
-      resolveWithAccount();
-    };
-
-    // Event: Fresh OAuth2 sign-in completed
-    const onSuccess = () => {
-      console.log("[Wallet] Xaman: OAuth2 PKCE success");
-      resolveWithAccount();
-    };
-
-    // Event: Error during auth
-    const onError = (err: Error | string) => {
-      cleanup();
-      const message = typeof err === "string" ? err : err?.message || "Unknown error";
-      console.error("[Wallet] Xaman auth error:", message);
-
-      if (message.includes("closed") || message.includes("rejected")) {
-        reject(new Error("Sign-in was cancelled. Click Connect to try again."));
-      } else if (message.includes("popup")) {
-        reject(
-          new Error(
-            "Pop-up was blocked by your browser. Allow pop-ups for fuzzynuts.xyz and try again."
-          )
-        );
-      } else {
-        reject(new Error(`Xaman error: ${message}`));
-      }
-    };
-
-    // Register event listeners
-    xumm.on?.("retrieved", onRetrieved);
-    xumm.on?.("success", onSuccess);
-    xumm.on?.("error", onError);
-
-    // Trigger the OAuth2 popup flow
-    console.log("[Wallet] Calling xumm.authorize()…");
-    const authPromise = xumm.authorize?.();
-
-    if (authPromise && typeof authPromise.catch === "function") {
-      authPromise.catch((err: Error) => {
-        // Don't double-reject if events already fired
-        console.error("[Wallet] xumm.authorize() rejected:", err?.message);
-      });
-    }
-  });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -479,17 +290,8 @@ export const useWalletStore = create<WalletState>((set) => ({
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(ENCRYPTED_KEY);
 
-      // Also logout from Xumm SDK to clear OAuth2 session
-      try {
-        const win = window as unknown as Record<string, unknown>;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const XummInstance = win._XummPkce as any;
-        if (XummInstance?.logout) {
-          XummInstance.logout();
-        }
-      } catch {
-        // Non-critical: Xumm session cleanup failed silently
-      }
+      // Clear the Xumm SDK's OAuth2 session (no-op if it was never used).
+      void disconnectXaman();
     }
   },
 
@@ -548,7 +350,7 @@ export const useWalletStore = create<WalletState>((set) => ({
         return;
       }
 
-      // Restore session (does NOT re-auth — just restores cached state)
+      // Fast path: restore cached state immediately for all providers.
       set({
         address: stored.address,
         provider: stored.provider as WalletProvider,
@@ -558,6 +360,26 @@ export const useWalletStore = create<WalletState>((set) => ({
       });
 
       console.log(`[Wallet] autoReconnect: restored ${stored.provider} session for ${stored.address.slice(0, 8)}...`);
+
+      // Xaman: silently re-validate the SDK session in the background using
+      // the cached OAuth2 JWT. If it resolves an account we refresh state;
+      // if it fails we keep the cached state above (no disconnect). Only
+      // attempted for returning Xaman users so the SDK isn't loaded for
+      // everyone on every page load.
+      if (stored.provider === "xaman") {
+        const apiKey = process.env.NEXT_PUBLIC_XAMAN_API_KEY;
+        if (apiKey) {
+          tryRestoreXamanSession(apiKey)
+            .then((account) => {
+              if (account && account !== useWalletStore.getState().address) {
+                useWalletStore.getState().setConnectedFromAdapter(account, "xaman");
+              }
+            })
+            .catch(() => {
+              // Keep the cached session — silent refresh is best-effort.
+            });
+        }
+      }
     } catch (err) {
       console.warn("[Wallet] autoReconnect failed:", err);
     }
