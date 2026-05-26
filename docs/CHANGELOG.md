@@ -6,6 +6,25 @@ for env/security see `PRODUCTION_ENV.md`.
 
 ---
 
+## 2026-05-26 — Hero no longer viewport-locked (fixes header/body separation)
+
+- **Root cause of the "huge gap" between the hero and the rest of the
+  page:** the hero `<section>` was `min-h-[100svh]`, forcing it to be one
+  full viewport tall. Viewport units scale with browser zoom, so at low
+  zoom (e.g. 25%) the hero ballooned to several screens tall while every
+  other (content-sized) section stayed compact — the header floated off on
+  its own, separated from the body.
+- **Fix:** dropped `min-h-[100svh]`; the hero now sizes to its content
+  like every other section, so the header stays packed with the page at
+  all zoom levels. `pt-24` still clears the fixed Navbar; bumped the
+  bottom padding `pb-12 → pb-16` for breathing room before `GamesShowcase`.
+- A prior attempt (vertically centering the content + pinning the scroll
+  cue) was reverted — it redistributed the empty space but left the
+  section viewport-locked, so it didn't fix the zoom-out separation.
+- Touch: `components/hero/Hero.tsx` only. `eslint` + `tsc --noEmit` clean.
+
+---
+
 ## 2026-05-25 — Pre-launch hardening + front-page overhaul
 
 A large pass covering accessibility/perf hardening, a critical-customer

@@ -28,9 +28,16 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full min-h-[100svh] overflow-hidden"
+      className="relative w-full overflow-hidden"
     >
-      <div className="relative z-20 flex flex-col items-center text-center px-4 pt-24 pb-12">
+      {/* Hero sizes to its content (no forced viewport height). A
+          `min-h-[100svh]` here used to lock the section to one viewport
+          tall; because viewport units scale with browser zoom, at low
+          zoom (e.g. 25%) the hero ballooned to several screens tall and
+          the header floated far away from the rest of the page. Content
+          height keeps the header packed with everything below it at every
+          zoom level. pt-24 clears the fixed Navbar. */}
+      <div className="relative z-20 flex flex-col items-center text-center px-4 pt-24 pb-16">
         {/* ── Logo ── */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
