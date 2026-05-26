@@ -10,14 +10,13 @@
 
 ## ✨ Features
 
-- **5 Play-to-Earn Games** — MMORPG, Platformer, Survivors, Mini Golf, Racing (coming soon)
-- **XRPL Wallet Integration** — Xaman (Xumm), GemWallet, Crossmark
+- **6 Play-to-Earn Games** — MMORPG, Platformer, Survivors, Mini Golf, Racing (live) + Top Secret (coming soon)
+- **XRPL Wallet Integration** — Xaman (Xumm), GemWallet, Crossmark, Joey/WalletConnect
 - **321 Billion Fixed Supply** — Blackholed issuer, 80% in AMM liquidity
-- **Buttery Smooth Animations** — Framer Motion 12, 3D tilt cards, particle system
+- **Buttery Smooth Animations** — Framer Motion 12, arcade-cabinet cards, particle system (all reduced-motion aware)
 - **Falling Nuts Background** — Canvas-based particle system with golden acorns
 - **Mobile-First Design** — Fully responsive, touch-optimized
-- **Perfect Lighthouse Scores** — Performance, Accessibility, Best Practices, SEO
-- **Static Export** — Deploy anywhere: Vercel, Netlify, GitHub Pages, Cloudflare
+- **Deployed on Vercel** — App Router runtime with an edge lockdown + security headers (see `docs/`)
 
 ## 🛠 Tech Stack
 

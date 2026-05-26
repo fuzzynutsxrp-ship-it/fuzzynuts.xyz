@@ -1,15 +1,25 @@
 # Fuzzynuts.xyz — Project Structure
 
-> Last updated: 2026-05-25
+> Last updated: 2026-05-25 (post front-page overhaul)
 
 ## Architecture
 
-- **Framework**: Next.js 15 (App Router, `output: "export"`, static site)
-- **Styling**: Tailwind CSS v3 + Vanilla CSS design tokens in `globals.css`
-- **Animation**: Framer Motion
-- **State**: Zustand (wallet store)
-- **Deploy**: Vercel (static) + Railway (API backend at `world.fuzzynuts.xyz`)
-- **Brand**: Dark enchanted forest theme, glowing gold `#f5c442` accents, "Fuzz" the red squirrel mascot
+- **Framework**: Next.js 15 (App Router) on **Vercel runtime** — _not_ a static export anymore (custom security headers + an edge middleware lockdown rule that out).
+- **Edge middleware**: `src/middleware.ts` — fail-closed HTTP Basic Auth gate for the pre-launch lockdown (see `PRODUCTION_ENV.md`).
+- **Styling**: Tailwind CSS v3 + vanilla CSS design tokens in `globals.css`
+- **Animation**: Framer Motion, wrapped globally by `providers/MotionProvider.tsx` (`<MotionConfig reducedMotion="user">`)
+- **State**: Zustand wallet store (`src/store/wallet.ts`)
+- **Wallets**: Xaman (`lib/wallet/xamanService.ts`), GemWallet, Crossmark, and Joey/WalletConnect (`providers/JoeyProvider.tsx` + `lib/wallet/joey*`)
+- **Deploy**: Vercel + Railway (API backend at `world.fuzzynuts.xyz`)
+- **Brand**: Dark enchanted-forest theme, glowing gold `#FBBF24` accents, "Fuzz" the red-squirrel mascot
+
+### Front-page composition (`src/app/page.tsx`)
+
+`Hero → GamesShowcase → Prizes → Trust → HowToGet → Footer`, over a fixed
+`HeroBackground` and the `FallingNuts` canvas, with a `FloatingMascot` in the
+corner. The May-2026 overhaul merged the old `PrizeTiers` + `WalletCTA` into
+**`Prizes`**, merged `Tokenomics` + `OnChainVerification` (+ two rescued
+feature chips) into **`Trust`**, and cut the standalone `Features` section.
 
 ---
 
@@ -34,39 +44,60 @@ fuzzynuts-optimized/
 │   │       └── client.tsx          # Client boundary (ssr: false)
 │   │
 │   ├── components/
-│   │   ├── layout/                 # App shell components
-│   │   │   ├── Navbar.tsx          # Top navigation + wallet connection
-│   │   │   └── Footer.tsx          # Footer with quick links + social
-│   │   ├── sections/               # Homepage sections (one per scroll block)
-│   │   │   ├── Hero.tsx            # Hero with video background
-│   │   │   ├── GamesShowcase.tsx   # Arcade game cards
-│   │   │   ├── Features.tsx        # 6-feature grid with icons
-│   │   │   ├── Tokenomics.tsx      # Pie chart + supply breakdown
-│   │   │   ├── OnChainVerification.tsx  # Live XRPL data verification
-│   │   │   ├── HowToGet.tsx        # Step-by-step $NUT guide
-│   │   │   ├── Leaderboard.tsx     # Client-side global leaderboard
-│   │   │   ├── ClaimRewards.tsx    # $NUT rewards claim interface
-│   │   │   └── UserProfile.tsx     # User profile stats display
-│   │   ├── game/                   # Game wrapper infrastructure
-│   │   │   ├── GameWrapper.tsx     # Iframe sandbox + fullscreen + mute
-│   │   │   ├── LoadingOverlay.tsx  # Branded loading animation
-│   │   │   └── ErrorBoundary.tsx   # Game error recovery UI
-│   │   ├── ui/                     # Reusable design primitives
-│   │   │   └── CyberCard.tsx       # Glassmorphism card component
-│   │   ├── ClientFallingNuts.tsx   # Dynamic import wrapper (ssr: false)
-│   │   └── FallingNuts.tsx         # Canvas particle effect
+│   │   ├── layout/                 # App shell
+│   │   │   ├── Navbar.tsx          # Top nav + wallet-connect dropdown
+│   │   │   └── Footer.tsx          # Footer links + social
+│   │   ├── hero/
+│   │   │   ├── Hero.tsx            # Mascot, CTAs, stats, compact prize teaser → #prizes
+│   │   │   └── HeroBackground.tsx # Fixed page-level forest backdrop
+│   │   ├── sections/               # Homepage body sections
+│   │   │   ├── GamesShowcase.tsx   # Arcade-cabinet cards (marquee/bezel/CRT/control deck)
+│   │   │   ├── Prizes.tsx          # MERGED: prize tiers + single connect CTA
+│   │   │   ├── Trust.tsx           # MERGED: tokenomics donut + on-chain ledger + trust chips
+│   │   │   ├── HowToGet.tsx        # 4-step "get $NUT" guide
+│   │   │   ├── Leaderboard.tsx     # /leaderboard board
+│   │   │   ├── ClaimRewards.tsx    # /profile rewards claim
+│   │   │   └── UserProfile.tsx     # /profile stats
+│   │   │   #  Removed in the overhaul: Features, Tokenomics,
+│   │   │   #  OnChainVerification, PrizeTiers, WalletCTA
+│   │   ├── home/                   # Hero-adjacent
+│   │   │   ├── FloatingMascot.tsx  # Looping corner squirrel (hidden < 640px)
+│   │   │   ├── HeroPrizeTeaser.tsx # (currently unused)
+│   │   │   ├── WeeklyPrizes.tsx
+│   │   │   └── SectionTransition.tsx
+│   │   ├── providers/
+│   │   │   ├── MotionProvider.tsx  # Global reduced-motion gate
+│   │   │   ├── JoeyProvider.tsx    # WalletConnect/Joey bridge → wallet store
+│   │   │   └── AppMount.tsx        # mount hooks (wallet autoReconnect)
+│   │   ├── game/                   # /games/[slug] runtime
+│   │   │   ├── GamePage.tsx        # Iframe host + leaderboard + sidebar
+│   │   │   ├── ComingSoonGamePage.tsx # Rendered when game.status === "coming-soon"
+│   │   │   ├── GameViewport / GameMenu / GameSidebar / GameControls / GameHeader
+│   │   │   ├── ScoreSubmissionPanel.tsx / GameScoreHistory.tsx / TouchControlsHint.tsx
+│   │   │   ├── LoadingOverlay.tsx
+│   │   │   └── ErrorBoundary.tsx
+│   │   ├── ui/                     # Primitives (CyberCard, etc.)
+│   │   ├── errors/                 # Route error boundaries
+│   │   ├── ClientFallingNuts.tsx   # ssr:false wrapper
+│   │   └── FallingNuts.tsx         # Canvas particle effect (reduced-motion aware)
+│   │
+│   ├── features/arcade/            # Arcade domain (leaderboard + scoring)
+│   │   ├── hooks/                  # useLeaderboard, useLeaderboardSSE
+│   │   ├── utils/                  # scoreHelpers (mergeScores), week-key calc
+│   │   ├── validation/             # Zod score schema + middleware
+│   │   ├── constants/ types/ components/ __tests__/
+│   │   └── slugAliases.ts          # canonical ↔ backend game-slug translation
 │   │
 │   ├── lib/
-│   │   └── utils.ts                # XRPL config, GAMES registry, FEATURES data
+│   │   ├── utils.ts                # XRPL_CONFIG, GAMES, TOKENOMICS, HOW_TO_STEPS
+│   │   ├── gameRegistry.ts         # Per-game metadata (status, scoreCap, iframe path…)
+│   │   └── wallet/                 # joeyAdapter, joeyConfig, xamanService, verifySignature
 │   │
+│   ├── middleware.ts               # Edge lockdown (HTTP Basic Auth, fail-closed)
 │   ├── store/
-│   │   └── wallet.ts               # Zustand wallet connection state
-│   │
-│   ├── hooks/                      # Custom React hooks (add as needed)
-│   │   └── .gitkeep
-│   │
-│   └── types/                      # Shared TypeScript type definitions
-│       └── .gitkeep
+│   │   └── wallet.ts               # Zustand wallet state + connect/disconnect/autoReconnect
+│   ├── hooks/                      # Shared React hooks
+│   └── types/                      # Shared TS types
 │
 ├── public/
 │   ├── images/
@@ -163,7 +194,7 @@ fuzzynuts-optimized/
 1. **Images**: Always provide desktop + mobile variants for section backgrounds. Use WebP for UI elements, PNG only for OG/schema references.
 2. **Components**: Named exports (`export function Hero()`), not default exports.
 3. **Dynamic imports**: Use `dynamic()` with `.then(m => ({ default: m.ComponentName }))` for named exports.
-4. **Static export**: No API routes, no SSR, no middleware. All data fetching is client-side.
+4. **Rendering**: Client-heavy App Router on the Vercel runtime (no longer a static export). One edge middleware exists — `src/middleware.ts`, the pre-launch lockdown. Leaderboard/rewards data is fetched client-side from `world.fuzzynuts.xyz`.
 5. **Games**: `public/games/` is a **read-only artifact repository**. Never edit game files directly here — use the isolated dev workspace instead (see below).
 6. **Naming**: Components use PascalCase (`Hero.tsx`). Assets use kebab-case (`hero-bg.jpg`). Documentation uses UPPER_SNAKE_CASE (`DEPLOY_STEPS.md`).
 7. **Brand colors**: Primary gold `#f5c442`, dark forest backgrounds, glassmorphism cards. See `tailwind.config.ts` for full palette.
