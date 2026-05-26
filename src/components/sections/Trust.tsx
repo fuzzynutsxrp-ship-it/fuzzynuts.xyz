@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Copy, Check, ExternalLink, Terminal, Bot, Users } from "lucide-react";
 import { useState, useCallback } from "react";
 import { CyberCard } from "@/components/ui/CyberCard";
@@ -161,15 +162,28 @@ function DonutChart({
           })}
         </motion.g>
 
-        {/* Center hole + anchor */}
+        {/* Center hole — content (mascot + supply label) is an HTML overlay below */}
         <circle cx="100" cy="100" r="45" fill="#0a0f0a" />
-        <text x="100" y="96" textAnchor="middle" fill="#FBBF24" fontSize="16" fontWeight="bold" fontFamily="Outfit, sans-serif">
-          321B
-        </text>
-        <text x="100" y="113" textAnchor="middle" fill="#b0a890" fontSize="9" fontFamily="Inter, sans-serif">
-          Fixed Supply
-        </text>
       </svg>
+
+      {/* Center overlay: on-brand mascot + fixed-supply label. pointer-events
+          off so hovering a donut slice underneath still works. */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
+        <Image
+          src="/images/branding/logo_512.png"
+          alt=""
+          width={64}
+          height={64}
+          className="w-12 lg:w-16 h-auto -mb-1 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+          style={{ imageRendering: "pixelated" }}
+        />
+        <span className="font-display font-black text-2xl lg:text-3xl text-[var(--color-gold)] leading-none">
+          321B
+        </span>
+        <span className="mt-0.5 text-[10px] lg:text-xs text-[var(--color-cream-dim)] tracking-wide">
+          Fixed Supply
+        </span>
+      </div>
     </div>
   );
 }
