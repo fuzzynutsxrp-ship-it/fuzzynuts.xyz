@@ -1,6 +1,6 @@
 # 🔐 Production Environment Variables
 
-> **Last Updated:** May 18, 2026
+> **Last Updated:** May 26, 2026
 > **Project:** Fuzzynuts Arcade — Full Stack Deployment
 
 ---
@@ -86,6 +86,51 @@ These are set in the Railway dashboard under **Fuzzynuts World service → Varia
 
 ---
 
+## 🆕 Dynamic USD-Valued Rewards (May 2026)
+
+Weekly prizes are announced in **USD** (1st $250 / 2nd $150 / 3rd $100). At the
+Monday-UTC announcement the NUT/USD price is snapshotted **once** and the exact
+NUT amounts for that week are stored. Eligibility and claims read those
+pre-calculated amounts — **price is never fetched at claim time**.
+
+### New Railway env vars (Rewards API)
+
+| Variable | Required | Default | Purpose |
+|----------|----------|---------|---------|
+| `REWARDS_ADMIN_SECRET` | **✅ CRITICAL** | _(none)_ | Shared secret for `POST /api/rewards/snapshot`. If unset, the snapshot endpoint returns 401 and no week can be announced. |
+| `PRIZE_USD_1` / `PRIZE_USD_2` / `PRIZE_USD_3` | Optional | `250` / `150` / `100` | Announced USD value per tier. |
+| `MAX_WEEKLY_NUT_EMISSION` | Optional | `1000000` | Soft cap on total NUT emitted per week (2× the legacy 500k). If USD tiers would exceed it, all tiers scale down proportionally and `cap_applied:true` is recorded. |
+| `NUT_AMM_COUNTER_IS_XRP` | Optional | `true` | `true` = NUT pool is paired with XRP (price = NUT/XRP × XRP/USD). `false` = NUT paired directly with a USD stable. |
+| `NUT_AMM_COUNTER_CURRENCY` / `NUT_AMM_COUNTER_ISSUER` | If `…IS_XRP=false` | _(none)_ | The USD-stable counter asset when NUT is not XRP-paired. |
+| `USD_REF_CURRENCY` / `USD_REF_ISSUER` | Optional | `RLUSD` / `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De` | On-chain XRP→USD reference AMM (only used when NUT is XRP-paired). Human codes like `RLUSD` are auto-encoded to their 160-bit hex form. |
+| `NUT_USD_PRICE_FALLBACK` | **Recommended at launch** | _(none)_ | USD-per-NUT fallback used **only** if the on-chain AMM query fails. Without it, a failed snapshot throws. |
+| `NUT_ISSUER` / `XRPL_SERVER` | Optional | `rpL6…xMP7` / `wss://xrplcluster.com` | Overridable; defaults match production. |
+
+### Announcement cron (every Monday 00:00 UTC)
+
+A scheduler must call the snapshot endpoint once at each weekly reset:
+
+```
+curl -X POST https://world.fuzzynuts.xyz/api/rewards/snapshot \
+  -H "x-admin-secret: $REWARDS_ADMIN_SECRET" \
+  -H "content-type: application/json" -d '{}'
+```
+
+Run it once immediately at cutover to backfill the current week (otherwise
+eligibility shows `announced:false` and claims return 409 "not announced yet").
+Recommended: a Railway cron service or a scheduled GitHub Action.
+
+> [!CAUTION]
+> **On-chain price source not yet present (verified 2026-05-26 against mainnet).**
+> `$NUT` is live and issued (~320B), but **no AMM pool was found for `NUT/XRP` or
+> `NUT/RLUSD`**, and the configured AMM pool address `r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg`
+> returns `actNotFound`. Until the real NUT AMM (pair **and** pool account) is
+> confirmed and `NUT_AMM_COUNTER_*` is set to match, the Monday snapshot's primary
+> on-chain query will fail — so **set `NUT_USD_PRICE_FALLBACK` before announcing any
+> week**, or the snapshot throws. (RLUSD currency-code encoding is already handled in code.)
+
+---
+
 ## MongoDB Collections
 
 These collections are used by the rewards system (auto-created on first write):
@@ -94,6 +139,7 @@ These collections are used by the rewards system (auto-created on first write):
 |------------|---------|------------|
 | `arcade_scores` | Weekly game scores (wallet, game, score, weekKey) | `scores.ts` (POST /api/scores) |
 | `prize_distributions` | Claim records (prevents double-claiming) | `rewards-api` (POST /api/rewards/claim) |
+| `weekly_prize_tiers` | Per-week USD tiers + NUT/USD snapshot + calculated NUT amounts. Unique index on `weekKey` is auto-created. | `rewards-api` (POST /api/rewards/snapshot) |
 | `reward_queue` | Achievement reward queue | `distribute-achievements.js` |
 
 ---
@@ -138,6 +184,8 @@ These collections are used by the rewards system (auto-created on first write):
 | `/api/rewards/eligibility` | GET | Check top-3 eligibility (query: `?wallet=rXXX&week=2026-W20`) |
 | `/api/rewards/claim` | POST | Execute prize claim (body: `{ wallet, week }`) |
 | `/api/rewards/claim/status` | GET | Poll claim transaction status (query: `?wallet=rXXX&week=2026-W20`) |
+| `/api/rewards/snapshot` | POST | **Admin** (`x-admin-secret`). Lock the week's NUT/USD price + amounts. Body: `{ week?, force? }` |
+| `/api/rewards/tiers` | GET | Public weekly prize tiers (query: `?week=2026-W20`) — USD value + calculated NUT |
 | `/api/rewards/health` | GET | Service health check (MongoDB + XRPL connectivity) |
 | `/api/rewards` | GET | Achievement rewards for a wallet (query: `?wallet=rXXX`) |
 

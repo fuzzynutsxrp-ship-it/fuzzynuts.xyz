@@ -94,6 +94,15 @@ function isValidWeekKey(key) {
    Price snapshot (announcement-time only)
    ═══════════════════════════════════════════════════════════════ */
 
+/** XRPL currency code normalizer: 'XRP' and standard 3-char codes pass through;
+ *  longer human codes (e.g. 'RLUSD') become their 160-bit hex form, which is
+ *  what rippled requires (ASCII 'RLUSD' returns issueMalformed). */
+function xrplCurrency(code) {
+  if (!code || code === 'XRP' || code.length === 3) return code;
+  if (/^[0-9A-Fa-f]{40}$/.test(code)) return code.toUpperCase();
+  return Buffer.from(code, 'ascii').toString('hex').toUpperCase().padEnd(40, '0');
+}
+
 /** Price of `base` denominated in `counter` from an XRPL AMM pool.
  *  XRP assets are passed as { currency: 'XRP' } (no issuer). */
 async function ammPrice(client, base, counter) {
@@ -121,15 +130,15 @@ async function fetchNutUsdPrice() {
   const client = new xrpl.Client(XRPL_SERVER);
   try {
     await client.connect();
-    const NUT = { currency: NUT_CURRENCY, issuer: NUT_ISSUER };
+    const NUT = { currency: xrplCurrency(NUT_CURRENCY), issuer: NUT_ISSUER };
     if (NUT_AMM_COUNTER_IS_XRP) {
       const nutInXrp = await ammPrice(client, NUT, { currency: 'XRP' });               // XRP per NUT
       const xrpInUsd = await ammPrice(client, { currency: 'XRP' },
-        { currency: USD_REF_CURRENCY, issuer: USD_REF_ISSUER });                        // USD per XRP
+        { currency: xrplCurrency(USD_REF_CURRENCY), issuer: USD_REF_ISSUER });          // USD per XRP
       return { price: nutInXrp * xrpInUsd, source: `amm:NUT/XRP*XRP/${USD_REF_CURRENCY}` };
     }
     const nutInUsd = await ammPrice(client, NUT,
-      { currency: NUT_AMM_COUNTER_CURRENCY, issuer: NUT_AMM_COUNTER_ISSUER });          // USD per NUT
+      { currency: xrplCurrency(NUT_AMM_COUNTER_CURRENCY), issuer: NUT_AMM_COUNTER_ISSUER }); // USD per NUT
     return { price: nutInUsd, source: `amm:NUT/${NUT_AMM_COUNTER_CURRENCY}` };
   } finally {
     try { await client.disconnect(); } catch {}
@@ -154,6 +163,7 @@ function computeNutAmounts(priceUsd) {
 async function createWeeklySnapshot(weekKey, { force = false } = {}) {
   const db = await getDb();
   const col = db.collection('weekly_prize_tiers');
+  await col.createIndex({ weekKey: 1 }, { unique: true }); // idempotent; guarantees one snapshot/week
 
   if (!force) {
     const existing = await col.findOne({ weekKey });
