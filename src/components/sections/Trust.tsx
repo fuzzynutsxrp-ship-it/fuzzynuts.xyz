@@ -169,12 +169,15 @@ function DonutChart({
       {/* Center overlay: on-brand mascot + fixed-supply label. pointer-events
           off so hovering a donut slice underneath still works. */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
+        {/* translate-x nudges the squirrel right so its feet/body sit on the
+            centerline — the bushy tail otherwise pushes the box-centered image
+            visually left. % translate scales the nudge with the responsive size. */}
         <Image
           src="/images/branding/logo_512.png"
           alt=""
-          width={64}
-          height={64}
-          className="w-12 lg:w-16 h-auto -mb-1 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+          width={80}
+          height={80}
+          className="w-16 lg:w-20 h-auto mb-0.5 translate-x-[13%] drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
           style={{ imageRendering: "pixelated" }}
         />
         <span className="font-display font-black text-2xl lg:text-3xl text-[var(--color-gold)] leading-none">
