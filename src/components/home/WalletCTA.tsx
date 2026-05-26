@@ -127,23 +127,6 @@ export function WalletCTA() {
             <div className="relative z-10 p-5 sm:p-8 md:p-12 lg:p-14">
               {/* ── Header ── */}
               <div className="text-center mb-8 sm:mb-10">
-                {/* Simple urgency line — no animation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-                  style={{
-                    background: "rgba(251,191,36,0.06)",
-                  }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
-                  <span className="text-xs font-bold tracking-widest uppercase text-[var(--color-gold)]">
-                    This week&apos;s prizes are live
-                  </span>
-                </motion.div>
-
                 <motion.h3
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -162,8 +145,7 @@ export function WalletCTA() {
                   transition={{ delay: 0.2 }}
                   className="text-[var(--color-cream-dim)] text-sm sm:text-base md:text-lg max-w-lg mx-auto leading-relaxed"
                 >
-                  Connect your wallet to see your rank and claim your share
-                  of{" "}
+                  Connect your wallet to see your rank and claim your share of{" "}
                   <span className="text-[var(--color-gold)] font-semibold">
                     500,000 $NUT
                   </span>{" "}
@@ -224,17 +206,14 @@ export function WalletCTA() {
                   disabled={isConnecting}
                   whileHover={{
                     scale: 1.03,
-                    boxShadow:
-                      "0 0 30px rgba(251,191,36,0.35)",
+                    boxShadow: "0 0 30px rgba(251,191,36,0.35)",
                   }}
                   whileTap={{ scale: 0.97 }}
                   className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 md:px-14 md:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-brand-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-display font-black text-base sm:text-lg md:text-xl tracking-wide transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <Wallet size={22} strokeWidth={2.5} />
                   <span>
-                    {isConnecting
-                      ? "Connecting…"
-                      : "See If I'm in the Top 3"}
+                    {isConnecting ? "Connecting…" : "See If I'm in the Top 3"}
                   </span>
                   <ArrowRight size={18} strokeWidth={2.5} />
                 </motion.button>

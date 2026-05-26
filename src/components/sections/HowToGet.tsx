@@ -36,12 +36,6 @@ export function HowToGet() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="section-badge mb-4"
-          >
-            🌰 Get Started
-          </motion.span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
             How to Get $NUT
           </h2>

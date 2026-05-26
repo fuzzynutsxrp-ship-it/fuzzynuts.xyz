@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Copy, ExternalLink, Check, ShieldCheck, Terminal } from "lucide-react";
+import { Copy, ExternalLink, Check, Terminal } from "lucide-react";
 import { XRPL_CONFIG } from "@/lib/utils";
 import { useState, useCallback } from "react";
 
@@ -160,13 +160,6 @@ export function OnChainVerification() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-10 sm:mb-14"
         >
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="section-badge mb-4"
-          >
-            <ShieldCheck size={14} />
-            On-Chain Verification
-          </motion.span>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black gradient-text-gold mb-3 sm:mb-4">
             Verify Everything
           </h2>
