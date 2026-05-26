@@ -80,10 +80,9 @@ function LegendRow({
 /* ── Donut chart ──
    Donut is the right tool here: 3 segments, part-to-whole, dominant
    80% share (perceptual studies show donut ≈ pie accuracy and that it
-   handles a dominant slice well). The fixes that matter for a donut
-   are: distinct high-contrast colors, dark separator strokes so the
-   tiny 2% slice is delineated, and a direct leader-line callout so the
-   small slice isn't lost. Hover ties a slice to its legend row. */
+   handles a dominant slice well). The fixes that matter for a donut are
+   distinct high-contrast colors and dark separator strokes so the tiny
+   2% slice stays delineated. Hover ties a slice to its legend row. */
 function DonutChart({
   active,
   onHover,
@@ -97,7 +96,6 @@ function DonutChart({
     color: string;
     percentage: number;
     label: string;
-    midAngle: number;
   }[] = [];
   let currentAngle = -90;
 
@@ -115,27 +113,12 @@ function DonutChart({
       color: item.color,
       percentage: item.percentage,
       label: item.label,
-      midAngle: currentAngle + angle / 2,
     });
     currentAngle += angle;
   }
 
-  // Smallest slice gets a direct leader-line callout — donut best practice
-  // for any segment under ~3% (otherwise it's too thin to read).
-  const smallIdx = segments.reduce(
-    (min, s, i) => (s.percentage < segments[min].percentage ? i : min),
-    0,
-  );
-  const small = segments[smallIdx];
-  const mRad = (small.midAngle * Math.PI) / 180;
-  const lx1 = 100 + 78 * Math.cos(mRad);
-  const ly1 = 100 + 78 * Math.sin(mRad);
-  const lx2 = 100 + 104 * Math.cos(mRad);
-  const ly2 = 100 + 104 * Math.sin(mRad);
-  const anchor = lx2 < 96 ? "end" : lx2 > 104 ? "start" : "middle";
-
   return (
-    <div className="relative w-64 h-64 mx-auto">
+    <div className="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 mx-auto">
       <svg
         viewBox="0 0 200 200"
         className="w-full h-full overflow-visible"
@@ -186,28 +169,6 @@ function DonutChart({
         <text x="100" y="113" textAnchor="middle" fill="#b0a890" fontSize="9" fontFamily="Inter, sans-serif">
           Fixed Supply
         </text>
-
-        {/* Direct callout for the smallest slice so 2% isn't lost */}
-        <motion.g
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 1, duration: 0.4 }}
-        >
-          <circle cx={lx1} cy={ly1} r={1.6} fill={small.color} />
-          <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={small.color} strokeWidth={1.25} />
-          <text
-            x={anchor === "end" ? lx2 - 3 : anchor === "start" ? lx2 + 3 : lx2}
-            y={ly2 + 3}
-            textAnchor={anchor}
-            fill={small.color}
-            fontSize="11"
-            fontWeight="bold"
-            fontFamily="Outfit, sans-serif"
-          >
-            {small.percentage}%
-          </text>
-        </motion.g>
       </svg>
     </div>
   );
