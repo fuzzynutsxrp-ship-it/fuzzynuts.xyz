@@ -38,7 +38,7 @@ export const TOKENOMICS = [
     label: "Squirrel's Pile (Founder)",
     percentage: 2,
     amount: "6.42B NUT",
-    color: "#8B6914",
+    color: "#a855f7",
   },
 ];
 

@@ -27,25 +27,39 @@ function LegendRow({
   item,
   index,
   last,
+  active,
+  onHover,
 }: {
   item: (typeof TOKENOMICS)[number];
   index: number;
   last: boolean;
+  active: number | null;
+  onHover: (i: number | null) => void;
 }) {
+  const isActive = active === index;
+  const dimmed = active !== null && !isActive;
   return (
     <motion.div
       initial={{ opacity: 0, x: -16 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
-      className={`flex items-center justify-between gap-4 py-4 ${
+      onMouseEnter={() => onHover(index)}
+      onMouseLeave={() => onHover(null)}
+      className={`flex items-center justify-between gap-4 -mx-3 px-3 py-4 rounded-lg cursor-default transition-colors ${
         last ? "" : "border-b border-[var(--color-glass-border)]"
-      }`}
+      } ${isActive ? "bg-[var(--color-glass-hover)]" : ""}`}
+      style={{ opacity: dimmed ? 0.45 : 1, transition: "opacity 0.2s ease" }}
     >
       <div className="flex items-center gap-3 min-w-0">
         <span
-          className="w-3 h-3 rounded-full shrink-0"
-          style={{ background: item.color, boxShadow: `0 0 10px ${item.color}66` }}
+          className="rounded-full shrink-0 transition-all"
+          style={{
+            width: isActive ? 14 : 12,
+            height: isActive ? 14 : 12,
+            background: item.color,
+            boxShadow: `0 0 ${isActive ? 16 : 10}px ${item.color}${isActive ? "99" : "66"}`,
+          }}
         />
         <span className="font-display font-semibold text-[var(--color-cream)] truncate">
           {item.label}
@@ -63,10 +77,28 @@ function LegendRow({
   );
 }
 
-/* ── Donut chart ── */
-function DonutChart() {
+/* ── Donut chart ──
+   Donut is the right tool here: 3 segments, part-to-whole, dominant
+   80% share (perceptual studies show donut ≈ pie accuracy and that it
+   handles a dominant slice well). The fixes that matter for a donut
+   are: distinct high-contrast colors, dark separator strokes so the
+   tiny 2% slice is delineated, and a direct leader-line callout so the
+   small slice isn't lost. Hover ties a slice to its legend row. */
+function DonutChart({
+  active,
+  onHover,
+}: {
+  active: number | null;
+  onHover: (i: number | null) => void;
+}) {
   const total = TOKENOMICS.reduce((sum, t) => sum + t.percentage, 0);
-  const segments: { path: string; color: string; percentage: number; label: string }[] = [];
+  const segments: {
+    path: string;
+    color: string;
+    percentage: number;
+    label: string;
+    midAngle: number;
+  }[] = [];
   let currentAngle = -90;
 
   for (const item of TOKENOMICS) {
@@ -83,15 +115,30 @@ function DonutChart() {
       color: item.color,
       percentage: item.percentage,
       label: item.label,
+      midAngle: currentAngle + angle / 2,
     });
     currentAngle += angle;
   }
+
+  // Smallest slice gets a direct leader-line callout — donut best practice
+  // for any segment under ~3% (otherwise it's too thin to read).
+  const smallIdx = segments.reduce(
+    (min, s, i) => (s.percentage < segments[min].percentage ? i : min),
+    0,
+  );
+  const small = segments[smallIdx];
+  const mRad = (small.midAngle * Math.PI) / 180;
+  const lx1 = 100 + 78 * Math.cos(mRad);
+  const ly1 = 100 + 78 * Math.sin(mRad);
+  const lx2 = 100 + 104 * Math.cos(mRad);
+  const ly2 = 100 + 104 * Math.sin(mRad);
+  const anchor = lx2 < 96 ? "end" : lx2 > 104 ? "start" : "middle";
 
   return (
     <div className="relative w-64 h-64 mx-auto">
       <svg
         viewBox="0 0 200 200"
-        className="w-full h-full"
+        className="w-full h-full overflow-visible"
         role="img"
         aria-label="Token distribution: 80% AMM Liquidity, 18% Community Nut Jar, 2% Founder"
       >
@@ -103,21 +150,35 @@ function DonutChart() {
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           style={{ transformOrigin: "100px 100px" }}
         >
-          {segments.map((seg, i) => (
-            <motion.path
-              key={seg.label}
-              d={seg.path}
-              fill={seg.color}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: 0.3 + i * 0.15, duration: 0.5 }}
-              style={{ filter: `drop-shadow(0 0 10px ${seg.color}50)` }}
-            >
-              <title>{`${seg.label}: ${seg.percentage}%`}</title>
-            </motion.path>
-          ))}
+          {segments.map((seg, i) => {
+            const dimmed = active !== null && active !== i;
+            return (
+              <path
+                key={seg.label}
+                d={seg.path}
+                fill={seg.color}
+                stroke="#0a0f0a"
+                strokeWidth={2.5}
+                strokeLinejoin="round"
+                onMouseEnter={() => onHover(i)}
+                onMouseLeave={() => onHover(null)}
+                style={{
+                  cursor: "pointer",
+                  opacity: dimmed ? 0.32 : 1,
+                  filter:
+                    active === i
+                      ? `drop-shadow(0 0 14px ${seg.color})`
+                      : `drop-shadow(0 0 8px ${seg.color}50)`,
+                  transition: "opacity 0.2s ease, filter 0.2s ease",
+                }}
+              >
+                <title>{`${seg.label}: ${seg.percentage}%`}</title>
+              </path>
+            );
+          })}
         </motion.g>
+
+        {/* Center hole + anchor */}
         <circle cx="100" cy="100" r="45" fill="#0a0f0a" />
         <text x="100" y="96" textAnchor="middle" fill="#FBBF24" fontSize="16" fontWeight="bold" fontFamily="Outfit, sans-serif">
           321B
@@ -125,6 +186,28 @@ function DonutChart() {
         <text x="100" y="113" textAnchor="middle" fill="#b0a890" fontSize="9" fontFamily="Inter, sans-serif">
           Fixed Supply
         </text>
+
+        {/* Direct callout for the smallest slice so 2% isn't lost */}
+        <motion.g
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 1, duration: 0.4 }}
+        >
+          <circle cx={lx1} cy={ly1} r={1.6} fill={small.color} />
+          <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={small.color} strokeWidth={1.25} />
+          <text
+            x={anchor === "end" ? lx2 - 3 : anchor === "start" ? lx2 + 3 : lx2}
+            y={ly2 + 3}
+            textAnchor={anchor}
+            fill={small.color}
+            fontSize="11"
+            fontWeight="bold"
+            fontFamily="Outfit, sans-serif"
+          >
+            {small.percentage}%
+          </text>
+        </motion.g>
       </svg>
     </div>
   );
@@ -251,6 +334,9 @@ const TRUST_CHIPS = [
 ];
 
 export function Trust() {
+  // Shared hover state so a donut slice and its legend row highlight together.
+  const [activeSlice, setActiveSlice] = useState<number | null>(null);
+
   return (
     <section id="tokenomics" className="py-16 md:py-20 relative overflow-hidden">
       <div className="container-main relative z-10">
@@ -273,7 +359,7 @@ export function Trust() {
         {/* ── Distribution: donut hero + legend + key facts ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center mb-16">
           <div className="flex justify-center">
-            <DonutChart />
+            <DonutChart active={activeSlice} onHover={setActiveSlice} />
           </div>
 
           <div>
@@ -285,6 +371,8 @@ export function Trust() {
                   item={item}
                   index={i}
                   last={i === TOKENOMICS.length - 1}
+                  active={activeSlice}
+                  onHover={setActiveSlice}
                 />
               ))}
             </div>
