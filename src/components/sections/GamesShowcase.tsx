@@ -336,8 +336,8 @@ export function GamesShowcase() {
             Arcade
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
-            Six hand-tuned games, one weekly leaderboard, real $NUT on the line.
-            Pick a cabinet and start climbing.
+            Five games live, one more in the vault — real $NUT on the line every
+            week. Pick a cabinet, climb the leaderboard, get paid.
           </p>
         </motion.div>
 

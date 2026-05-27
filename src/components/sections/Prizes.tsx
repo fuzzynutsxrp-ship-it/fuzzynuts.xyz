@@ -14,6 +14,7 @@ import { useWalletStore } from "@/store/wallet";
 import { formatNumber } from "@/lib/utils";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
+import { useWeeklyCountdown } from "@/features/arcade";
 
 /* ─────────────────────────────────────────────────────────────
    Prizes — the weekly $NUT hoard + connect CTA, merged.
@@ -91,6 +92,8 @@ export function Prizes() {
     ? `${formatNumber(tiers.reduce((s, t) => s + (t.nut_amount != null ? Number(t.nut_amount) : 0), 0))} NUT`
     : "—";
 
+  const countdown = useWeeklyCountdown();
+
   return (
     <section id="prizes" className="py-16 md:py-20 relative overflow-hidden">
       {/* Single soft glow — replaces the old multi-layer star/ring stack */}
@@ -118,11 +121,18 @@ export function Prizes() {
             </span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold mb-4">
-            {totalUsdLabel}, Split Every Week
+            {totalNutLabel}, Split Every Week
           </h2>
           <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
             Crack the weekly leaderboard&apos;s top 3 and split the hoard. Free
             to play — no buy-in, no catch.
+          </p>
+          <p className="text-xs sm:text-sm font-mono mt-3 text-[var(--color-cream-dim)]">
+            ⏱ Resets in{" "}
+            <span className="font-semibold text-[var(--color-neon-green)]">
+              {countdown.short}
+            </span>{" "}
+            · Monday 00:00 UTC
           </p>
         </motion.div>
 
@@ -160,10 +170,10 @@ export function Prizes() {
                 className="font-display text-3xl font-black"
                 style={{ color: tier.color }}
               >
-                {tierUsdLabel(i + 1)}
+                {tierNutLabel(i + 1)}
               </p>
               <p className="text-xs text-[var(--color-cream-dim)] mt-1">
-                ({tierNutLabel(i + 1)} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot)
+                {tierUsdLabel(i + 1)} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot
               </p>
             </motion.div>
           ))}
@@ -172,10 +182,10 @@ export function Prizes() {
         {/* ── Total pool line ── */}
         <p className="text-center text-sm text-[var(--color-cream-dim)] mb-12">
           <span className="opacity-60">Total weekly pool: </span>
-          <span className="font-bold text-[var(--color-gold)]">{totalUsdLabel}</span>
+          <span className="font-bold text-[var(--color-gold)]">{totalNutLabel}</span>
           <span className="opacity-60">
             {" "}
-            ({totalNutLabel} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot)
+            ({totalUsdLabel} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot)
           </span>
         </p>
 

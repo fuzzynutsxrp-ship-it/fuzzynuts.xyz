@@ -167,7 +167,7 @@ export const HOW_TO_STEPS = [
     step: 1,
     title: "Get a Wallet",
     description:
-      "Download Xaman (formerly Xumm) from your app store. It's the most trusted XRPL wallet.",
+      "Grab Xaman (formerly Xumm) or Joey — the XRPL wallets we support. Xaman works on mobile and desktop.",
     icon: "Wallet",
   },
   {

@@ -1,9 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Gamepad2, Globe } from "lucide-react";
 import Image from "next/image";
 import { gameRegistry } from "@/lib/gameRegistry";
+import { formatNumber } from "@/lib/utils";
+import { API_REWARDS } from "@/features/arcade/constants";
+import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 
 /* ─────────────────────────────────────────────────────────────
    Hero — Foreground content only.
@@ -25,6 +29,23 @@ const FLOAT_ANIMATION = {
 };
 
 export function Hero() {
+  // Live weekly prize pool from the Monday snapshot (keeps the pill in sync
+  // with the Prizes section instead of a hardcoded number).
+  const [weekTiers, setWeekTiers] = useState<WeeklyTiersResponse | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_REWARDS}/tiers`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled) setWeekTiers(d); })
+      .catch(() => { if (!cancelled) setWeekTiers(null); });
+    return () => { cancelled = true; };
+  }, []);
+  const poolNut = (weekTiers?.tiers ?? []).reduce(
+    (s, t) => s + (t.nut_amount != null ? Number(t.nut_amount) : 0),
+    0,
+  );
+  const poolLabel = weekTiers?.tiers ? `${formatNumber(poolNut)} $NUT` : "$NUT";
+
   return (
     <section
       id="hero"
@@ -95,7 +116,7 @@ export function Hero() {
           transition={{ delay: 0.6 }}
           className="text-lg sm:text-2xl md:text-3xl font-display font-semibold text-[var(--color-gold)] mb-3"
         >
-          Play. Earn. Own.
+          Go Nuts. Get Paid.
         </motion.p>
 
         {/* ── Description ── */}
@@ -201,7 +222,7 @@ export function Hero() {
         >
           <span className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
           <span className="text-[var(--color-cream)]">
-            <span className="font-bold text-[var(--color-gold)]">500K $NUT</span>{" "}
+            <span className="font-bold text-[var(--color-gold)]">{poolLabel}</span>{" "}
             in weekly prizes — top 3 split the pool
           </span>
           <ArrowRight

@@ -30,6 +30,11 @@
   NUT/XRP **AMM pool exists** (seeded ~12 XRP : 16.2M NUT, **thin — already sniped**; payouts do NOT rely on it, see guard).
 - XRP→USD reference: on-chain **XRP/RLUSD** AMM (RLUSD issuer `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De`).
 
+> **$NUT is a TEST token pre-launch.** Liquidity %, AMM pool depth/address, the
+> "80% In Liquidity" stat, and any on-chain price are **inconsequential right
+> now** — do NOT flag them as rug risks or "claim vs on-chain mismatches."
+> Real liquidity/economics get set at the real launch.
+
 ## Environment variables — where & status
 
 **Frontend (Vercel, baked at build time — `NEXT_PUBLIC_*`):**
