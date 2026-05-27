@@ -193,6 +193,16 @@ export const HOW_TO_STEPS = [
   },
 ];
 
+/** Format a USD amount as proper currency: "$0.10", "$30.00", "$1,234.56". */
+export function formatUsd(num: number): string {
+  return num.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export function truncateAddress(address: string, start = 6, end = 4): string {
   if (address.length <= start + end) return address;
   return `${address.slice(0, start)}...${address.slice(-end)}`;

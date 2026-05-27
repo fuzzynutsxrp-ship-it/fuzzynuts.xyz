@@ -11,7 +11,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, formatUsd } from "@/lib/utils";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import { useWeeklyCountdown } from "@/features/arcade";
@@ -83,11 +83,11 @@ export function Prizes() {
     const n = weekTiers?.tiers?.[rank - 1]?.nut_amount;
     return n != null ? Number(n) : null;
   };
-  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? `$${u}` : "—"; };
+  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? formatUsd(u) : "—"; };
   const tierNutLabel = (rank: number) => { const n = tierNut(rank); return n != null ? `${formatNumber(n)} NUT` : "TBA"; };
 
   const tiers = weekTiers?.tiers ?? null;
-  const totalUsdLabel = tiers ? `$${tiers.reduce((s, t) => s + (t.usd_value || 0), 0)}` : "—";
+  const totalUsdLabel = tiers ? formatUsd(tiers.reduce((s, t) => s + (t.usd_value || 0), 0)) : "—";
   const totalNutLabel = tiers
     ? `${formatNumber(tiers.reduce((s, t) => s + (t.nut_amount != null ? Number(t.nut_amount) : 0), 0))} NUT`
     : "—";

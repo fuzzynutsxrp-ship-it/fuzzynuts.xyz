@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Gamepad2, Globe } from "lucide-react";
 import Image from "next/image";
 import { gameRegistry } from "@/lib/gameRegistry";
+import { formatUsd } from "@/lib/utils";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import { PriceTicker } from "@/components/home/PriceTicker";
@@ -43,7 +44,7 @@ export function Hero() {
   // USD-fixed pool (the NUT amount is recalculated weekly from the snapshot,
   // so the pill must show the USD value, not a "fixed NUT" number).
   const poolUsd = (weekTiers?.tiers ?? []).reduce((s, t) => s + (t.usd_value || 0), 0);
-  const poolLabel = weekTiers?.tiers ? `$${poolUsd}` : "Real $NUT";
+  const poolLabel = weekTiers?.tiers ? formatUsd(poolUsd) : "Real $NUT";
 
   return (
     <section
