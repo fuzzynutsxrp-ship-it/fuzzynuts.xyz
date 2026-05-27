@@ -121,7 +121,7 @@ export function Prizes() {
             </span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold mb-4">
-            {totalNutLabel}, Split Every Week
+            {totalUsdLabel}, Split Every Week
           </h2>
           <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
             Crack the weekly leaderboard&apos;s top 3 and split the hoard. Free
@@ -170,10 +170,10 @@ export function Prizes() {
                 className="font-display text-3xl font-black"
                 style={{ color: tier.color }}
               >
-                {tierNutLabel(i + 1)}
+                {tierUsdLabel(i + 1)}
               </p>
               <p className="text-xs text-[var(--color-cream-dim)] mt-1">
-                {tierUsdLabel(i + 1)} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot
+                ≈ {tierNutLabel(i + 1)} this week @ {fmtSnapshotPrice(weekTiers?.snapshot_price)}
               </p>
             </motion.div>
           ))}
@@ -182,10 +182,10 @@ export function Prizes() {
         {/* ── Total pool line ── */}
         <p className="text-center text-sm text-[var(--color-cream-dim)] mb-12">
           <span className="opacity-60">Total weekly pool: </span>
-          <span className="font-bold text-[var(--color-gold)]">{totalNutLabel}</span>
+          <span className="font-bold text-[var(--color-gold)]">{totalUsdLabel}</span>
           <span className="opacity-60">
             {" "}
-            ({totalUsdLabel} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot)
+            (≈ {totalNutLabel} this week @ {fmtSnapshotPrice(weekTiers?.snapshot_price)})
           </span>
         </p>
 
