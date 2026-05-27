@@ -8,6 +8,7 @@ import { gameRegistry } from "@/lib/gameRegistry";
 import { formatNumber } from "@/lib/utils";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
+import { PriceTicker } from "@/components/home/PriceTicker";
 
 /* ─────────────────────────────────────────────────────────────
    Hero — Foreground content only.
@@ -208,6 +209,9 @@ export function Hero() {
             </div>
           ))}
         </motion.div>
+
+        {/* ── Live price / market cap + Chart & Buy CTAs ── */}
+        <PriceTicker />
 
         {/* ── Prize teaser (compact) ── the full Top-3 pitch + connect CTA
               live in the Prizes section; the hero just points there. */}
