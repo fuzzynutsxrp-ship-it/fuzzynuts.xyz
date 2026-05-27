@@ -77,5 +77,5 @@
 - [ ] Switch TEST prize values → real USD values; size `MAX_WEEKLY_NUT_EMISSION` to match (at low NUT price, small USD = millions of NUT).
 - [ ] AMM pool: deepen or retire (currently thin & getting sniped).
 - [ ] Reconcile minigolf score cap (client/registry 10,500 vs server 100,000).
-- [ ] Clean up: delete the stale stash + the stray `create-nut-amm.cjs` in the frontend repo root.
+- [x] Clean up: stale stash dropped + stray `create-nut-amm.cjs` removed (2026-05-27).
 - [ ] Launch: drop the password lockdown + set `NEXT_PUBLIC_ALLOW_INDEXING=true` (runbook in `CHANGELOG.md`).
