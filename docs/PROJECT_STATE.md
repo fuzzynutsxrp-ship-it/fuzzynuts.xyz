@@ -79,7 +79,7 @@
 ## Open decisions / launch checklist
 
 - [ ] Set `NEXT_PUBLIC_PROJECT_ID` in Vercel + redeploy, then test the Joey button.
-- [ ] Switch TEST prize values → real USD values; size `MAX_WEEKLY_NUT_EMISSION` to match (at low NUT price, small USD = millions of NUT).
+- **Prize values: stay on TEST amounts ($0.05/$0.03/$0.02). DO NOT set real values** — this is a live *test* wallet (owner's decision). Real values + `MAX_WEEKLY_NUT_EMISSION` sizing are a **launch-day-only** task; don't propose them before then. No need to test higher amounts: display, XRPL precision, and the claim path all work identically at small amounts (the cap-scale-down path is tested by lowering the cap, not raising prizes).
 - [ ] AMM pool: deepen or retire (currently thin & getting sniped).
 - [ ] Reconcile minigolf score cap (client/registry 10,500 vs server 100,000).
 - [x] Clean up: stale stash dropped + stray `create-nut-amm.cjs` removed (2026-05-27).
