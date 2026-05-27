@@ -199,8 +199,10 @@ export function truncateAddress(address: string, start = 6, end = 4): string {
 }
 
 export function formatNumber(num: number): string {
-  if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(1)}B`;
-  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
-  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
+  // Number(...) strips a trailing ".0" so round values read "50K", not "50.0K",
+  // while keeping a real decimal when it matters (e.g. "1.5K", "124.9K").
+  if (num >= 1_000_000_000) return `${Number((num / 1_000_000_000).toFixed(1))}B`;
+  if (num >= 1_000_000) return `${Number((num / 1_000_000).toFixed(1))}M`;
+  if (num >= 1_000) return `${Number((num / 1_000).toFixed(1))}K`;
   return num.toString();
 }
