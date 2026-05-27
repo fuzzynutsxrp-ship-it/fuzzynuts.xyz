@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Trophy,
@@ -10,6 +11,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
+import { formatNumber } from "@/lib/utils";
+import { API_REWARDS } from "@/features/arcade/constants";
+import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 
 /* ─────────────────────────────────────────────────────────────
    Prizes — the weekly $NUT hoard + connect CTA, merged.
@@ -23,10 +27,16 @@ import { useWalletStore } from "@/store/wallet";
    Degen-skinned (it's a nut hoard), one soft glow, light entrances.
    ───────────────────────────────────────────────────────────── */
 
+/** Sub-cent price formatter — matches Leaderboard.tsx / ClaimRewards.tsx. */
+function fmtSnapshotPrice(p?: number | null): string {
+  if (!p || !isFinite(p)) return "—";
+  return `$${Number(p).toPrecision(4)}`;
+}
+
 const TIERS = [
-  { rank: "1st", amount: "250K", medal: "🥇", color: "#FBBF24" },
-  { rank: "2nd", amount: "150K", medal: "🥈", color: "#C0C0C0" },
-  { rank: "3rd", amount: "100K", medal: "🥉", color: "#CD7F32" },
+  { rank: "1st", medal: "🥇", color: "#FBBF24" },
+  { rank: "2nd", medal: "🥈", color: "#C0C0C0" },
+  { rank: "3rd", medal: "🥉", color: "#CD7F32" },
 ];
 
 const PERKS = [
@@ -38,7 +48,7 @@ const PERKS = [
   },
   {
     icon: Gift,
-    title: "500K $NUT, every week",
+    title: "Fresh pool, every week",
     desc: "The pool resets every Monday. New week, new shot.",
     color: "#10B981",
   },
@@ -53,6 +63,33 @@ const PERKS = [
 export function Prizes() {
   const { isConnected, isConnecting, connect, address } = useWalletStore();
   const connected = isConnected && Boolean(address);
+
+  // Weekly prize tiers from the Monday snapshot (USD-announced, NUT @ snapshot
+  // price). Static for the whole week — fetched once on mount, same pattern as
+  // Leaderboard.tsx.
+  const [weekTiers, setWeekTiers] = useState<WeeklyTiersResponse | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_REWARDS}/tiers`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled) setWeekTiers(d); })
+      .catch(() => { if (!cancelled) setWeekTiers(null); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const tierUsd = (rank: number) => weekTiers?.tiers?.[rank - 1]?.usd_value ?? null;
+  const tierNut = (rank: number) => {
+    const n = weekTiers?.tiers?.[rank - 1]?.nut_amount;
+    return n != null ? Number(n) : null;
+  };
+  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? `$${u}` : "—"; };
+  const tierNutLabel = (rank: number) => { const n = tierNut(rank); return n != null ? `${formatNumber(n)} NUT` : "TBA"; };
+
+  const tiers = weekTiers?.tiers ?? null;
+  const totalUsdLabel = tiers ? `$${tiers.reduce((s, t) => s + (t.usd_value || 0), 0)}` : "—";
+  const totalNutLabel = tiers
+    ? `${formatNumber(tiers.reduce((s, t) => s + (t.nut_amount != null ? Number(t.nut_amount) : 0), 0))} NUT`
+    : "—";
 
   return (
     <section id="prizes" className="py-16 md:py-20 relative overflow-hidden">
@@ -81,7 +118,7 @@ export function Prizes() {
             </span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold mb-4">
-            500K $NUT, Split Every Week
+            {totalUsdLabel}, Split Every Week
           </h2>
           <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
             Crack the weekly leaderboard&apos;s top 3 and split the hoard. Free
@@ -123,9 +160,11 @@ export function Prizes() {
                 className="font-display text-3xl font-black"
                 style={{ color: tier.color }}
               >
-                {tier.amount}
+                {tierUsdLabel(i + 1)}
               </p>
-              <p className="text-xs text-[var(--color-cream-dim)] mt-1">$NUT</p>
+              <p className="text-xs text-[var(--color-cream-dim)] mt-1">
+                ({tierNutLabel(i + 1)} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot)
+              </p>
             </motion.div>
           ))}
         </div>
@@ -133,8 +172,10 @@ export function Prizes() {
         {/* ── Total pool line ── */}
         <p className="text-center text-sm text-[var(--color-cream-dim)] mb-12">
           <span className="opacity-60">Total weekly pool: </span>
-          <span className="font-bold text-[var(--color-gold)]">
-            500,000 $NUT
+          <span className="font-bold text-[var(--color-gold)]">{totalUsdLabel}</span>
+          <span className="opacity-60">
+            {" "}
+            ({totalNutLabel} @ {fmtSnapshotPrice(weekTiers?.snapshot_price)} snapshot)
           </span>
         </p>
 
