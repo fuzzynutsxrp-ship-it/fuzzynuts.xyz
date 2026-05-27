@@ -168,8 +168,7 @@ function ConnectPrompt() {
       <div className="flex flex-col sm:flex-row gap-3">
         {[
           { id: "xaman" as const, label: "Xaman", icon: "📱" },
-          { id: "gemwallet" as const, label: "GemWallet", icon: "💎" },
-          { id: "crossmark" as const, label: "Crossmark", icon: "✖️" },
+          { id: "joey" as const, label: "Joey", icon: "🦘" },
         ].map((w) => (
           <motion.button
             key={w.id}

@@ -114,7 +114,7 @@ export function Navbar() {
   }, [error, setError]);
 
   const handleConnect = useCallback(
-    async (prov: "xaman" | "gemwallet" | "crossmark") => {
+    async (prov: "xaman" | "joey") => {
       setWalletMenuOpen(false);
       setError(null); // Clear any previous error
       await connect(prov);
@@ -387,16 +387,10 @@ export function Navbar() {
                             desc: "Mobile / Desktop",
                           },
                           {
-                            id: "gemwallet" as const,
-                            name: "GemWallet",
-                            icon: "💎",
-                            desc: "Browser Extension",
-                          },
-                          {
-                            id: "crossmark" as const,
-                            name: "Crossmark",
-                            icon: "✖️",
-                            desc: "Browser Extension",
+                            id: "joey" as const,
+                            name: "Joey Wallet",
+                            icon: "🦘",
+                            desc: "Mobile / WalletConnect",
                           },
                         ].map((w) => (
                           <motion.button
