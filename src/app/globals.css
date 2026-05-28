@@ -1210,11 +1210,15 @@ body {
   filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
 }
 
-/* Hidden on small screens — a persistent floating mascot shouldn't risk
-   covering content or CTAs on phones. */
+/* DEGEN OVERHAUL — mobile mascot enabled.
+   Was: hidden under 640 px to avoid covering content/CTAs on phones.
+   Now: visible at a tighter size (70 px wide, smaller corner offset)
+   so the FuzzyBear tucks into the bottom-right without overlapping
+   the LiveWinsTicker or Connect CTA on phones. */
 @media (max-width: 639px) {
   .floating-mascot {
-    display: none;
+    bottom: 12px;
+    right: 12px;
   }
 }
 
@@ -1264,9 +1268,12 @@ body {
   justify-content: center;
 }
 
-/* ── Image sizing — responsive ── */
+/* ── Image sizing — responsive ──
+   DEGEN OVERHAUL — mobile default shrunk from 100 px → 70 px so the
+   newly-visible mobile mascot stays out of the way of the LiveWinsTicker
+   and Connect CTA. ≥ 640 px and ≥ 1024 px sizes unchanged. */
 .floating-mascot__img {
-  width: 100px;
+  width: 70px;
   height: auto;
   object-fit: contain;
   user-select: none;
