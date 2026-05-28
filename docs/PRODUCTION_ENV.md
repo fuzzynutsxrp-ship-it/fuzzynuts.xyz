@@ -7,7 +7,7 @@
 
 ## Frontend — Vercel
 
-The frontend is a **static export** (`output: "export"`). It has **no server-side runtime**, so environment variables are baked in at build time.
+The frontend is a **runtime build on Vercel** (`.next`), with **edge middleware active** (`src/middleware.ts` — the pre-launch Basic-Auth lockdown) — it is **NOT a static export**. `NEXT_PUBLIC_*` env vars are still baked in at build time (client-side), while server/edge vars (e.g. `SITE_LOCKDOWN_PASSWORD`) are read at request time by the middleware.
 
 | Variable | Required | Value | Notes |
 |----------|----------|-------|-------|
@@ -23,7 +23,7 @@ The frontend is a **static export** (`output: "export"`). It has **no server-sid
 |---------|-------|
 | **Framework Preset** | Next.js |
 | **Build Command** | `npm run build` |
-| **Output Directory** | `out` |
+| **Output Directory** | _(framework default — `.next`; do NOT set `out`, that's static-export only)_ |
 | **Node.js Version** | 20.x |
 | **Root Directory** | `.` (project root) |
 
