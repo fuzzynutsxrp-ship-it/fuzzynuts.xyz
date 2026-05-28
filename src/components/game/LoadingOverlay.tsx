@@ -18,13 +18,15 @@ interface LoadingOverlayProps {
   loadingTips?: string[];
 }
 
+// DEGEN OVERHAUL — degen "nut factory" loading copy
 const DEFAULT_LOADING_TIPS = [
-  "Gathering acorns…",
-  "Shaking the trees…",
-  "Waking up the squirrels…",
-  "Polishing the leaderboard…",
-  "Loading nut physics…",
-  "Calibrating tail fluffiness…",
+  "🥜 Cracking the nut factory open…",
+  "🐿️ Bribing the squirrels…",
+  "⚡ Loading degen physics…",
+  "🎰 Spinning up the cabinet…",
+  "🚀 Warming the leaderboard…",
+  "🔥 Calibrating tail fluffiness…",
+  "💰 Counting the hoard…",
 ];
 
 /**
@@ -122,12 +124,13 @@ export function LoadingOverlay({
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[var(--color-forest-dark)]"
+          // DEGEN OVERHAUL — degen-black/purple loading surface with subtle mesh
+          className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-degen-mesh"
           role="status"
           aria-label={`Loading ${gameTitle}`}
           aria-live="polite"
         >
-          {/* Animated acorn spinner */}
+          {/* DEGEN OVERHAUL — acorn spinner now wears a hot-pink neon halo */}
           <motion.div
             animate={{
               y: [0, -18, 0],
@@ -137,18 +140,18 @@ export function LoadingOverlay({
               y: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
               rotate: { duration: 2, repeat: Infinity, ease: "easeInOut" },
             }}
-            className="text-6xl sm:text-7xl mb-6 select-none"
+            className="text-6xl sm:text-7xl mb-6 select-none drop-shadow-[0_0_18px_rgba(255,46,136,0.65)] [filter:drop-shadow(0_0_36px_rgba(251,191,36,0.45))]"
             aria-hidden="true"
           >
             🌰
           </motion.div>
 
-          {/* Game title */}
+          {/* DEGEN OVERHAUL — title goes gradient-gold + text-hero-glow */}
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="font-display text-2xl sm:text-3xl font-bold gradient-text-gold mb-2"
+            className="font-display text-2xl sm:text-3xl font-black gradient-text-gold text-hero-glow mb-2"
           >
             {gameTitle}
           </motion.h2>
@@ -173,14 +176,15 @@ export function LoadingOverlay({
             aria-valuemin={0}
             aria-valuemax={100}
           >
+            {/* DEGEN OVERHAUL — accent → hot-pink degen ramp with neon glow */}
             <motion.div
               className="h-full rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               style={{
-                background: `linear-gradient(90deg, ${accentColor}, var(--color-neon-green))`,
-                boxShadow: `0 0 12px ${accentColor}`,
+                background: `linear-gradient(90deg, ${accentColor}, var(--color-hot-pink))`,
+                boxShadow: `0 0 14px ${accentColor}, 0 0 28px rgba(255, 46, 136, 0.45)`,
               }}
             />
           </div>

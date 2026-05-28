@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useDragControls, type PanInfo } from "framer-motion";
 import {
   Trophy,
@@ -18,8 +18,13 @@ import {
   GripHorizontal,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
+import { API_REWARDS } from "@/features/arcade";
 import type { ScoreEntry, EligibilityData } from "@/features/arcade";
+import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import type { GameMetadata } from "@/lib/gameRegistry";
+// DEGEN OVERHAUL — formatNumber from the lean @/lib/format module so this
+// component doesn't drag TOKENOMICS/GAMES/HOW_TO_STEPS into the game route
+import { formatNumber } from "@/lib/format";
 
 /* ═══════════════════════════════════════════════════════════════
    GameSidebar — Live leaderboard preview, reward tracker, game info
@@ -63,6 +68,28 @@ export function GameSidebar({
   const [expandedSection, setExpandedSection] = useState<string | null>(
     "leaderboard"
   );
+
+  // DEGEN OVERHAUL START — live weekly hoard from GET /api/rewards/tiers.
+  // Same pattern as Prizes.tsx / ClaimRewards.tsx / Leaderboard.tsx.
+  // Pre-launch the snapshot may be empty/missing → falls back to "—".
+  const [weekTiers, setWeekTiers] = useState<WeeklyTiersResponse | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_REWARDS}/tiers`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled) setWeekTiers(d); })
+      .catch(() => { if (!cancelled) setWeekTiers(null); });
+    return () => { cancelled = true; };
+  }, []);
+  const totalNut = weekTiers?.tiers
+    ? weekTiers.tiers.reduce(
+        (s, t) => s + (t.nut_amount != null ? Number(t.nut_amount) : 0),
+        0,
+      )
+    : null;
+  const hoardLabel =
+    totalNut != null && totalNut > 0 ? `${formatNumber(totalNut)} NUT` : "—";
+  // DEGEN OVERHAUL END
 
   const top5 = scores.slice(0, 5);
   const userEntry = address
@@ -185,13 +212,14 @@ export function GameSidebar({
         onToggle={() => toggleSection("rewards")}
         accentColor="#FBBF24"
       >
-        {/* Prize pool */}
-        <div className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-brand-gold/5 border border-gold-dim">
-          <span className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)] font-medium">
-            Weekly Prize Pool
+        {/* DEGEN OVERHAUL — neon-ringed prize pool pill, now wired to the
+            live weekly_prize_tiers API (computed above as hoardLabel). */}
+        <div className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-degen-950/60 neon-ring-pink">
+          <span className="text-[10px] uppercase tracking-wider text-[var(--color-hot-pink)] font-bold tracking-[0.18em]">
+            🥜 Weekly Hoard
           </span>
-          <span className="text-xs font-bold text-[var(--color-brand-gold)] font-mono">
-            500K $NUT
+          <span className="text-xs font-black text-[var(--color-gold)] font-mono tabular-nums">
+            {hoardLabel}
           </span>
         </div>
 
@@ -302,11 +330,11 @@ export function GameSidebar({
         {isOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
       </button>
 
-      {/* Desktop: always-visible panel */}
+      {/* DEGEN OVERHAUL — degen panel surface + hot-pink edge */}
       <aside
-        className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-glass overflow-y-auto"
+        className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-hot-pink/15 overflow-y-auto"
         style={{
-          background: "rgba(6, 10, 6, 0.6)",
+          background: "rgba(10, 6, 19, 0.72)",
           backdropFilter: "blur(8px)",
         }}
         id="game-sidebar-desktop"
@@ -337,9 +365,10 @@ export function GameSidebar({
               dragElastic={0.2}
               onDragEnd={handleDragEnd}
               transition={{ type: "spring", damping: 28, stiffness: 350 }}
-              className="fixed bottom-0 left-0 right-0 z-50 flex flex-col max-h-[65vh] border-t border-[var(--color-glass-border-strong)] rounded-t-2xl overflow-hidden md:hidden"
+              // DEGEN OVERHAUL — degen mobile bottom sheet
+              className="fixed bottom-0 left-0 right-0 z-50 flex flex-col max-h-[65vh] border-t border-hot-pink/25 rounded-t-2xl overflow-hidden md:hidden"
               style={{
-                background: "rgba(6, 10, 6, 0.97)",
+                background: "rgba(10, 6, 19, 0.97)",
                 backdropFilter: "blur(16px)",
                 WebkitBackdropFilter: "blur(16px)",
               }}
@@ -376,9 +405,10 @@ export function GameSidebar({
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 z-50 w-[300px] max-w-[85vw] flex-col border-l border-glass-strong overflow-y-auto hidden md:flex lg:hidden"
+              // DEGEN OVERHAUL — degen tablet drawer
+              className="fixed right-0 top-0 bottom-0 z-50 w-[300px] max-w-[85vw] flex-col border-l border-hot-pink/20 overflow-y-auto hidden md:flex lg:hidden"
               style={{
-                background: "rgba(6, 10, 6, 0.95)",
+                background: "rgba(10, 6, 19, 0.95)",
                 backdropFilter: "blur(16px)",
               }}
               id="game-sidebar-tablet"

@@ -172,14 +172,22 @@ function DonutChart({
         {/* translate-x nudges the squirrel right so its feet/body sit on the
             centerline — the bushy tail otherwise pushes the box-centered image
             visually left. % translate scales the nudge with the responsive size. */}
-        <Image
-          src="/images/branding/logo_512.png"
-          alt=""
-          width={80}
-          height={80}
-          className="w-16 lg:w-20 h-auto mb-0.5 translate-x-[13%] drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
-          style={{ imageRendering: "pixelated" }}
-        />
+        {/* DEGEN OVERHAUL START — interactive mascot in the donut core.
+            Wrapper carries logo-degen (idle bounce + hover neon glow);
+            inner image keeps its translate-x centering nudge so the bounce
+            transform on the wrapper never disturbs it. pointer-events-auto
+            sits over the empty donut hole, so donut-slice hovers still work. */}
+        <span className="logo-degen pointer-events-auto inline-block mb-0.5">
+          <Image
+            src="/images/branding/logo_512.png"
+            alt=""
+            width={80}
+            height={80}
+            className="w-16 lg:w-20 h-auto translate-x-[13%]"
+            style={{ imageRendering: "pixelated" }}
+          />
+        </span>
+        {/* DEGEN OVERHAUL END */}
         <span className="font-display font-black text-2xl lg:text-3xl text-[var(--color-gold)] leading-none">
           321B
         </span>
@@ -296,20 +304,22 @@ function LedgerEntry({
 }
 
 /* ── Trust chips rescued from the cut Features grid ── */
+// DEGEN OVERHAUL START — irreverent titles, every fact intact
 const TRUST_CHIPS = [
   {
     icon: Bot,
-    title: "Anti-Bot Protection",
-    desc: "Score caps, minimum play durations, rate limits, and wallet verification keep the arcade fair.",
+    title: "Bots Get Rekt",
+    desc: "Score caps, minimum play durations, rate limits, and wallet verification keep the arcade fair — no scripts, no cheese.",
     color: "#3B82F6",
   },
   {
     icon: Users,
-    title: "Community-Governed",
-    desc: "18% Community Nut Jar funds airdrops, rewards, and what the community builds next.",
+    title: "Degen-Governed",
+    desc: "The 18% Community Nut Jar funds airdrops, rewards, and whatever the degens build next.",
     color: "#a855f7",
   },
 ];
+// DEGEN OVERHAUL END
 
 export function Trust() {
   // Shared hover state so a donut slice and its legend row highlight together.
@@ -335,13 +345,16 @@ export function Trust() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-12 md:mb-16"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
+          {/* DEGEN OVERHAUL START — same facts, zero corporate tone */}
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow mb-4">
             Don&apos;t Trust. Verify.
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            321 billion $NUT, fixed forever, issuer blackholed. Here&apos;s the
-            receipts — every number is public on the XRP Ledger.
+            321 billion $NUT. Fixed forever. Issuer blackholed — nobody mints
+            more, not even us. Don&apos;t take our word for it: every number is
+            public on the XRP Ledger. Receipts below. 🐿️
           </p>
+          {/* DEGEN OVERHAUL END */}
         </motion.div>
 
         {/* ── Distribution: donut hero + legend + key facts ── */}
@@ -373,8 +386,9 @@ export function Trust() {
               className="mt-8"
             >
               <CyberCard accentColor="gold" className="p-5 space-y-3">
+                {/* DEGEN OVERHAUL — same facts, degen label */}
                 <h3 className="font-display font-bold text-[var(--color-brand-gold)] text-sm uppercase tracking-wider">
-                  Key Facts
+                  The Receipts 🧾
                 </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>

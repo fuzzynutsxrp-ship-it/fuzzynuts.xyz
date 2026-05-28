@@ -332,13 +332,17 @@ export function GamesShowcase() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-16"
         >
+          {/* DEGEN OVERHAUL START — neon badge + edgier copy */}
+          <span className="neon-chip mb-4 animate-glitch-skew">🎰 Pick your poison</span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-4">
-            Arcade
+            The Arcade
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
-            Five games live, one more in the vault — real $NUT on the line every
-            week. Pick a cabinet, climb the leaderboard, get paid.
+            Five cabinets live, one locked in the vault — real $NUT on the line
+            every single week. Slam a coin, top the board, bag the bag. No house,
+            no croupier, just you vs. the leaderboard.
           </p>
+          {/* DEGEN OVERHAUL END */}
         </motion.div>
 
         {/* 3×2 grid — shared perspective so hover tilts feel coordinated */}

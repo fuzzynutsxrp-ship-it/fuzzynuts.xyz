@@ -39,6 +39,33 @@ const config: Config = {
           DEFAULT: "#CD7F32",
           dim: "rgba(205, 127, 50, 0.12)",
         },
+        // DEGEN OVERHAUL START — degen-chaos palette (additive; existing
+        // forest/gold tokens untouched). Deep black+purple base + neon accents.
+        degen: {
+          black: "#050309",
+          950: "#0a0613",
+          900: "#120a22",
+          800: "#1c0f33",
+          700: "#2d1b4e",
+          600: "#4c1d95",
+          violet: "#7c3aed",
+        },
+        "hot-pink": {
+          DEFAULT: "#ff2e88",
+          light: "#ff5fa2",
+          deep: "#ff007a",
+          dim: "rgba(255, 46, 136, 0.12)",
+        },
+        acid: {
+          DEFAULT: "#39ff14",
+          soft: "#00ffa3",
+          dim: "rgba(57, 255, 20, 0.12)",
+        },
+        cyan: {
+          DEFAULT: "#22d3ee",
+          dim: "rgba(34, 211, 238, 0.12)",
+        },
+        // DEGEN OVERHAUL END
         "glass-bg": "rgba(1, 5, 8, 0.85)",
         glass: {
           DEFAULT: "var(--color-glass-border)",
@@ -102,6 +129,12 @@ const config: Config = {
         "hero-mesh": "hero-mesh 22s ease-in-out infinite",
         "cabinet-shine": "cabinet-shine 1.6s ease-out",
         "neon-flicker": "neon-flicker 2.5s ease-in-out infinite",
+        // DEGEN OVERHAUL START — new degen motion (all reduced-motion gated in globals.css)
+        "degen-bounce": "degen-bounce 2.2s ease-in-out infinite",
+        "pulse-pink": "pulse-pink 2.4s ease-in-out infinite",
+        "nut-spin": "nut-spin 6s linear infinite",
+        "glitch-skew": "glitch-skew 4s steps(2,end) infinite",
+        // DEGEN OVERHAUL END
       },
       keyframes: {
         float: {
@@ -140,6 +173,26 @@ const config: Config = {
           "0%, 100%": { opacity: "0.85" },
           "50%": { opacity: "1" },
         },
+        // DEGEN OVERHAUL START
+        "degen-bounce": {
+          "0%, 100%": { transform: "translateY(0) scale(1)" },
+          "50%": { transform: "translateY(-6px) scale(1.015)" },
+        },
+        "pulse-pink": {
+          "0%, 100%": { boxShadow: "0 0 18px rgba(255,46,136,0.25)" },
+          "50%": { boxShadow: "0 0 42px rgba(255,46,136,0.6)" },
+        },
+        "nut-spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "glitch-skew": {
+          "0%, 92%, 100%": { transform: "skewX(0deg)" },
+          "94%": { transform: "skewX(3deg)" },
+          "96%": { transform: "skewX(-2deg)" },
+          "98%": { transform: "skewX(1deg)" },
+        },
+        // DEGEN OVERHAUL END
       },
     },
   },
@@ -179,6 +232,50 @@ const config: Config = {
             "0 1px 2px rgba(0,0,0,0.85)",
           ].join(", "),
         },
+        /* DEGEN OVERHAUL START — degen utility classes */
+        /* Deep black+purple animated mesh; degen counterpart to .bg-hero-gradient */
+        ".bg-degen-mesh": {
+          background: [
+            "radial-gradient(ellipse 55% 40% at 8% 0%, rgba(255,46,136,0.16) 0%, transparent 60%)",
+            "radial-gradient(ellipse 60% 45% at 100% 20%, rgba(124,58,237,0.20) 0%, transparent 62%)",
+            "radial-gradient(ellipse 55% 45% at 50% 100%, rgba(34,211,238,0.12) 0%, transparent 65%)",
+            "linear-gradient(to bottom, #0a0613 0%, #050309 100%)",
+          ].join(", "),
+          "background-size": "180% 180%, 180% 180%, 200% 200%, 100% 100%",
+          animation: "hero-mesh 22s ease-in-out infinite",
+        },
+        /* Hot-pink neon text halo */
+        ".text-pink-glow": {
+          "text-shadow": [
+            "0 0 10px rgba(255,46,136,0.7)",
+            "0 0 24px rgba(255,46,136,0.4)",
+            "0 1px 2px rgba(0,0,0,0.85)",
+          ].join(", "),
+        },
+        /* Acid-green neon text halo */
+        ".text-acid-glow": {
+          "text-shadow": [
+            "0 0 10px rgba(57,255,20,0.7)",
+            "0 0 24px rgba(57,255,20,0.4)",
+            "0 1px 2px rgba(0,0,0,0.85)",
+          ].join(", "),
+        },
+        /* Neon outline for cards/chips — pink→cyan double ring */
+        ".neon-ring-pink": {
+          "box-shadow": [
+            "0 0 0 1px rgba(255,46,136,0.5)",
+            "0 0 18px rgba(255,46,136,0.35)",
+            "inset 0 0 14px rgba(124,58,237,0.18)",
+          ].join(", "),
+        },
+        ".neon-ring-acid": {
+          "box-shadow": [
+            "0 0 0 1px rgba(57,255,20,0.45)",
+            "0 0 18px rgba(57,255,20,0.3)",
+            "inset 0 0 14px rgba(34,211,238,0.15)",
+          ].join(", "),
+        },
+        /* DEGEN OVERHAUL END */
       });
     },
   ],

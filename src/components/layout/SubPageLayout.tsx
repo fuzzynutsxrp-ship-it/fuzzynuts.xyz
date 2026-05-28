@@ -55,7 +55,11 @@ export function SubPageLayout({
   showFooter = true,
 }: SubPageLayoutProps) {
   return (
-    <div className="relative min-h-screen" data-navbar-transparent={navbarTransparent || undefined}>
+    // DEGEN OVERHAUL — animated degen mesh on the page chrome (matches
+    // GamePage). When showVideoBg is true the fixed video layer above
+    // covers it; when false (or while the video loads), the mesh shows
+    // through so /leaderboard and /profile read as one degen surface.
+    <div className="relative min-h-screen bg-degen-mesh" data-navbar-transparent={navbarTransparent || undefined}>
       {/* ── Background Layer ── */}
       {showVideoBg && (
         <div className="fixed inset-0 z-0">
@@ -85,15 +89,17 @@ export function SubPageLayout({
             aria-hidden="true"
           />
 
-          {/* Combined overlay for text legibility */}
+          {/* DEGEN OVERHAUL — overlay tint shifts from forest-dark to
+              degen-950, with hot-pink + violet radial accents replacing
+              the muted neon-green/gold spots. Video underneath unchanged. */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background: [
-                "linear-gradient(to bottom, rgba(1,5,8,0.92) 0%, rgba(1,5,8,0.78) 20%, rgba(1,5,8,0.65) 50%, rgba(1,5,8,0.78) 80%, rgba(1,5,8,0.96) 100%)",
-                "linear-gradient(to right, rgba(1,5,8,0.5) 0%, transparent 15%, transparent 85%, rgba(1,5,8,0.5) 100%)",
-                "radial-gradient(ellipse 60% 40% at 50% 30%, rgba(16,185,129,0.05) 0%, transparent 70%)",
-                "radial-gradient(ellipse 50% 50% at 50% 70%, rgba(251,191,36,0.03) 0%, transparent 60%)",
+                "linear-gradient(to bottom, rgba(10,6,19,0.92) 0%, rgba(10,6,19,0.78) 20%, rgba(10,6,19,0.65) 50%, rgba(10,6,19,0.78) 80%, rgba(10,6,19,0.96) 100%)",
+                "linear-gradient(to right, rgba(10,6,19,0.5) 0%, transparent 15%, transparent 85%, rgba(10,6,19,0.5) 100%)",
+                "radial-gradient(ellipse 60% 40% at 50% 30%, rgba(255,46,136,0.07) 0%, transparent 70%)",
+                "radial-gradient(ellipse 50% 50% at 50% 70%, rgba(124,58,237,0.06) 0%, transparent 60%)",
               ].join(", "),
             }}
           />

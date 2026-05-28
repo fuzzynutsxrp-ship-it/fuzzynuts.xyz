@@ -86,23 +86,27 @@ export function GameHeader({
 
   return (
     <header
-      className="sticky top-0 z-40 flex items-center justify-between px-3 py-2 sm:px-5 sm:py-3 border-b"
+      // DEGEN OVERHAUL START — degen black/purple bar; per-game accent kept,
+      // plus a hot-pink underglow line so it reads degen on every cabinet.
+      className="sticky top-0 z-40 flex items-center justify-between px-3 py-2 sm:px-5 sm:py-3 border-b shadow-[0_1px_0_rgba(255,46,136,0.35)]"
       style={{
-        background: "rgba(10, 15, 10, 0.92)",
+        background: "rgba(10, 6, 19, 0.92)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        borderColor: `${game.color}20`,
+        borderColor: `${game.color}33`,
         height: "64px",
       }}
+      // DEGEN OVERHAUL END
       id="game-header"
     >
       {/* ── Left: Back + Badge + Title ── */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {/* DEGEN OVERHAUL — hot-pink hover on Back */}
         <motion.a
           href="/#games"
           whileHover={{ scale: 1.06, x: -2 }}
           whileTap={{ scale: 0.94 }}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-cream)] hover:bg-glass transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-hot-pink)] hover:bg-[rgba(255,46,136,0.08)] transition-colors shrink-0"
           aria-label="Back to Arcade"
           id="game-back-button"
         >
@@ -232,16 +236,12 @@ export function GameHeader({
             <span className="font-mono">{truncateAddress(address)}</span>
           </div>
         ) : (
+          // DEGEN OVERHAUL — gold→hot-pink Connect chip (handler unchanged)
           <motion.button
             onClick={handleConnect}
-            whileHover={{ scale: 1.04 }}
+            whileHover={{ scale: 1.04, boxShadow: "0 0 18px rgba(255,46,136,0.5)" }}
             whileTap={{ scale: 0.96 }}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-            style={{
-              background: "rgba(251, 191, 36, 0.12)",
-              border: "1px solid rgba(251, 191, 36, 0.25)",
-              color: "var(--color-brand-gold)",
-            }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)]"
             id="game-connect-wallet"
           >
             <Wallet size={12} />

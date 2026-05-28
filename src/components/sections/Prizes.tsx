@@ -11,7 +11,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
-import { formatNumber, formatUsd } from "@/lib/utils";
+// DEGEN OVERHAUL — formatters from the lean @/lib/format module
+import { formatNumber, formatUsd } from "@/lib/format";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import { useWeeklyCountdown } from "@/features/arcade";
@@ -114,19 +115,16 @@ export function Prizes() {
           viewport={{ once: true, amount: 0.2 }}
           className="text-center mb-12 md:mb-14"
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Trophy size={15} className="text-[var(--color-gold)] opacity-70" />
-            <span className="text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[var(--color-gold)] opacity-70">
-              The Weekly Nut Hoard
-            </span>
-          </div>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold mb-4">
-            {totalUsdLabel}, Split Every Week
+          {/* DEGEN OVERHAUL START — neon FOMO header */}
+          <span className="neon-chip mb-4 animate-glitch-skew">🥜 The Weekly Nut Hoard 🐿️</span>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold text-hero-glow mb-4">
+            {totalUsdLabel} Hoard, Split Every Week
           </h2>
           <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
             Crack the weekly leaderboard&apos;s top 3 and split the hoard. Free
-            to play — no buy-in, no catch.
+            to play — no buy-in, no catch, no cap. Skill in, $NUT out. 🥜
           </p>
+          {/* DEGEN OVERHAUL END */}
           <p className="text-xs sm:text-sm font-mono mt-3 text-[var(--color-cream-dim)]">
             ⏱ Resets in{" "}
             <span className="font-semibold text-[var(--color-neon-green)]">
@@ -145,17 +143,20 @@ export function Prizes() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: i * 0.08, duration: 0.45, ease: "easeOut" }}
-              className={`relative rounded-2xl p-6 text-center ${
-                tier.rank === "1st" ? "sm:-translate-y-3" : ""
+              // DEGEN OVERHAUL START — hover lift + pink-pulsing throne on 1st
+              whileHover={{ scale: 1.05, y: tier.rank === "1st" ? -18 : -6 }}
+              className={`group relative rounded-2xl p-6 text-center prize-banger ${
+                tier.rank === "1st" ? "sm:-translate-y-3 animate-pulse-pink" : ""
               }`}
               style={{
-                background: "rgba(1, 5, 8, 0.55)",
-                border: `1px solid color-mix(in srgb, ${tier.color} 28%, transparent)`,
+                background: "rgba(10, 6, 19, 0.7)",
+                border: `1px solid color-mix(in srgb, ${tier.color} 45%, transparent)`,
                 boxShadow:
                   tier.rank === "1st"
-                    ? `0 0 28px color-mix(in srgb, ${tier.color} 18%, transparent)`
-                    : "0 2px 16px rgba(0,0,0,0.4)",
+                    ? `0 0 36px color-mix(in srgb, ${tier.color} 30%, transparent)`
+                    : "0 2px 16px rgba(0,0,0,0.5)",
               }}
+              // DEGEN OVERHAUL END
             >
               <div className="text-3xl mb-2" aria-hidden="true">
                 {tier.medal}
@@ -264,19 +265,21 @@ export function Prizes() {
               <motion.button
                 onClick={() => connect("xaman")}
                 disabled={isConnecting}
+                // DEGEN OVERHAUL START — gold→hot-pink banger CTA (flow unchanged)
                 whileHover={{
                   scale: 1.03,
-                  boxShadow: "0 0 30px rgba(251,191,36,0.35)",
+                  boxShadow: "0 0 34px rgba(255,46,136,0.55)",
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-brand-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-display font-black text-base sm:text-lg tracking-wide transition-all disabled:opacity-50 cursor-pointer"
+                className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-display font-black text-base sm:text-lg tracking-wide transition-all disabled:opacity-50 cursor-pointer"
               >
                 <Wallet size={22} strokeWidth={2.5} />
                 <span>
-                  {isConnecting ? "Connecting…" : "See If You're in the Top 3"}
+                  {isConnecting ? "Connecting…" : "Bag the Bag — Am I Top 3? 🥜"}
                 </span>
                 <ArrowRight size={18} strokeWidth={2.5} />
               </motion.button>
+              {/* DEGEN OVERHAUL END */}
 
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4">
                 <div className="flex items-center gap-1.5 text-[var(--color-cream-dim)]">
@@ -288,8 +291,10 @@ export function Prizes() {
                     Free · read-only · no transactions
                   </span>
                 </div>
+                {/* DEGEN OVERHAUL — stale wallet list (GemWallet/Crossmark are
+                    LEGACY per CLAUDE.md); live providers are Xaman + Joey. */}
                 <span className="text-xs text-[var(--color-cream-dim)] opacity-50">
-                  Xaman · GemWallet · Crossmark
+                  Xaman · Joey
                 </span>
               </div>
             </>

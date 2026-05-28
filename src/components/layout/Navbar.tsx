@@ -16,7 +16,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
-import { truncateAddress } from "@/lib/utils";
+// DEGEN OVERHAUL — formatter from the lean @/lib/format module
+import { truncateAddress } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -130,7 +131,9 @@ export function Navbar() {
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-forest-900/90 backdrop-blur-xl border-b border-gold-dim shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+            ? // DEGEN OVERHAUL START — black/purple bar w/ hot-pink underglow
+              "bg-degen-950/90 backdrop-blur-xl border-b border-hot-pink/25 shadow-[0_4px_30px_rgba(0,0,0,0.5),0_1px_0_rgba(255,46,136,0.4)]"
+              // DEGEN OVERHAUL END
             : "bg-transparent"
         }`}
         role="navigation"
@@ -148,14 +151,16 @@ export function Navbar() {
               transition={{ duration: 0.3 }}
               className="flex items-center gap-2"
             >
+              {/* DEGEN OVERHAUL START — interactive mascot: idle bounce + hover neon glow */}
               <Image
                 src="/images/branding/logo-nav.webp"
                 alt=""
                 width={54}
                 height={36}
-                className="rounded-md"
+                className="logo-degen rounded-md"
                 priority
               />
+              {/* DEGEN OVERHAUL END */}
               <Image
                 src="/images/branding/wordmarks/text_logo.png"
                 alt="Fuzzynuts"
@@ -173,7 +178,9 @@ export function Navbar() {
               const isRoute =
                 link.href.startsWith("/") && !link.href.startsWith("/#");
               const isLeaderboard = link.icon === "trophy";
-              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors rounded-lg hover:bg-[rgba(245,196,66,0.05)] flex items-center gap-1.5 relative`;
+              // DEGEN OVERHAUL START — hot-pink link hover
+              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-hot-pink)] transition-colors rounded-lg hover:bg-[rgba(255,46,136,0.07)] flex items-center gap-1.5 relative`;
+              // DEGEN OVERHAUL END
 
               if (isRoute) {
                 return (
@@ -253,17 +260,19 @@ export function Navbar() {
                 <motion.button
                   onClick={() => setWalletMenuOpen(!walletMenuOpen)}
                   disabled={isConnecting}
+                  // DEGEN OVERHAUL START — pink neon glow on the gold CTA (flow unchanged)
                   whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 0 25px rgba(245,196,66,0.4)",
+                    boxShadow: "0 0 28px rgba(255,46,136,0.55)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-sm transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-black text-sm transition-all disabled:opacity-50 cursor-pointer"
                   style={{
                     animation: !isConnecting
-                      ? "pulse-gold 3s ease-in-out infinite"
+                      ? "pulse-pink 2.6s ease-in-out infinite"
                       : "none",
                   }}
+                  // DEGEN OVERHAUL END
                 >
                   <Wallet size={16} />
                   <span className="hidden sm:inline">

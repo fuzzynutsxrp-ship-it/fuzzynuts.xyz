@@ -34,7 +34,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fuzzynuts.xyz";
 const ALLOW_INDEXING = process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true";
 
 export const viewport: Viewport = {
-  themeColor: "#010508",
+  // DEGEN OVERHAUL — deep degen black/purple chrome tint
+  themeColor: "#0a0613",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -125,9 +126,14 @@ export const metadata: Metadata = {
         },
       },
   icons: {
+    // DEGEN OVERHAUL START — promote the mascot emblem to the favicon slot
+    // (modern browsers prefer the webp mascot; favicon.ico stays as fallback)
     icon: [
+      { url: "/images/branding/logo-nav.webp", type: "image/webp" },
       { url: "/favicon.ico", sizes: "any" },
     ],
+    shortcut: "/images/branding/logo-nav.webp",
+    // DEGEN OVERHAUL END
     apple: "/images/og/og-image.png",
   },
   category: "Gaming",
