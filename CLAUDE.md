@@ -1,4 +1,4 @@
-# CLAUDE.md — FUZZYNUTS-CTX v0.1.1
+# CLAUDE.md — FUZZYNUTS-CTX v0.1.2
 
 > **Auto-loaded by Claude Code / Cowork every session.** This is the compressed,
 > session-priming context. The **human-maintained source of truth is
@@ -28,7 +28,7 @@ Hard constraints: edge password lockdown is FAIL-CLOSED (no `SITE_LOCKDOWN_PASSW
 
 **ON-CHAIN (XRPL mainnet — no VM/Solidity/gas)** — Issued currency `NUT`. Issuer `rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7` (**blackholed**, fixed supply 321,000,000,000). Distributor/Community Jar `rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh`. NUT/XRP AMM `r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg` (thin/sniped — payouts do NOT depend on it). Tokenomics 80% AMM / 18% Jar / 2% Founder (`src/lib/utils.ts`). Price ref: on-chain XRP/RLUSD AMM (RLUSD issuer `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De`). Upgradeability N/A (immutable issued token).
 
-**INFRA/SYNC** — Backend `fuzzynuts-world` (Kaetram MMORPG fork), repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world`, `develop` → Railway (project `efficient-tenderness`, US-West) + MongoDB. API base **hardcoded** `https://world.fuzzynuts.xyz` (`src/features/arcade/constants/index.ts` `API_SCORES`/`API_REWARDS`; also inline in `Navbar.tsx`, `UserProfile.tsx`). Leaderboard: `EventSource('/api/scores/stream')` → `vercel.json` rewrite → backend SSE; poll fallback. Balance: direct XRPL **WebSocket** `wss://xrplcluster.com` (`NEXT_PUBLIC_XRPL_NODE`) via `src/hooks/useBalanceStream.ts`, HTTP `account_info`/`account_lines` fallback @30 s. Cache: `vercel.json` immutable 1-yr on assets — **nullified by middleware `no-store` until launch**. Mongo: `weekly_prize_tiers` (unique `weekKey`), `prize_distributions`, `arcade_scores`. Frontend repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz`, `main` → Vercel auto.
+**INFRA/SYNC** — Backend `fuzzynuts-world` (Kaetram MMORPG fork), repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world`, `develop` → Railway (project `efficient-tenderness`, US-West) + MongoDB. API base **hardcoded** `https://world.fuzzynuts.xyz` (`src/features/arcade/constants/index.ts` `API_SCORES`/`API_REWARDS`; also inline in `Navbar.tsx`, `UserProfile.tsx`). Leaderboard: `EventSource('/api/scores/stream')` → `vercel.json` rewrite → backend SSE; poll fallback. Balance: direct XRPL **WebSocket** `wss://xrplcluster.com` (`NEXT_PUBLIC_XRPL_NODE`) via `src/hooks/useBalanceStream.ts`, HTTP `account_info`/`account_lines` fallback @30 s. Cache: `vercel.json` immutable 1-yr on assets — **nullified by middleware `no-store` until launch**. Mongo (driver `mongodb` ^6.0.0, no mongoose; `packages/server/src/api/{scores,rewards}.ts`): `arcade_scores` [idx `{wallet:1,game:1,weekKey:1}` uniq · `{weekKey:1,game:1,score:-1}` · `{weekKey:1,score:-1}`], `weekly_prize_tiers` [idx `{weekKey:1}` uniq], `prize_distributions` [idx `{weekKey:1,wallet:1,type:1}` uniq, partial `type='individual_claim'`], plus `reward_queue`, `achievement_rewards` (no explicit idx). Frontend repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz`, `main` → Vercel auto.
 
 **DATA FLOW**
 - Scores: game iframe → `public/games/fuzzy-score.js` (client cap) → `POST /api/scores` (server `SCORE_CAPS` authoritative). Read: `GET /api/scores` (s-maxage 10 / SWR 30) + SSE `/api/scores/stream` (no-store). ⚠ minigolf cap mismatch: client 10,500 vs server 100,000 — unresolved.
@@ -51,8 +51,8 @@ Hard constraints: edge password lockdown is FAIL-CLOSED (no `SITE_LOCKDOWN_PASSW
 - three + @react-three/fiber | 0.184.0 / 9.6.1 | PROVEN (lib) | ~96 kB for decorative nut → replace w/ CSS/SVG/Lottie
 - lucide-react | 1.16.0 (decl `^1.14.0`) | PROVEN | tree-shaken; fine
 - XRPL node `xrplcluster.com` | n/a | PROVEN (public cluster) | rate-limit risk at scale → dedicated node provider
-- MongoDB (Railway) | UNVERIFIED ver | PROVEN | confirm major version + index list
-- Kaetram backend fork | UNVERIFIED ver | EXPERIMENTAL (fork) | confirm fork base commit/tag
+- MongoDB driver `mongodb` | ^6.0.0 (installed 6.0.0, no mongoose) | PROVEN | declared in fuzzynuts-world `packages/server`+`hub`; indexes locked (see Infra). Running server version on Railway = [declared 6.x | runtime: UNVERIFIED — requires Railway]
+- Kaetram backend fork | base `4bdbd6d50` (2024-01-14), v0.5.5, 45 ahead, HEAD `bd6445fd0` | EXPERIMENTAL (fork) | fork of `Kaetram/Kaetram-Open` off `upstream/develop`; app submodule `Kaetram/Kaetram-App`. Drift mgmt: re-base/cherry-pick from upstream/develop
 - GemWallet / Crossmark | n/a | LEGACY | dead in UI, live in `store/wallet.ts` switch → remove dead `case` arms
 
 ## DECISION LOG (shipped patterns only)
@@ -71,8 +71,8 @@ Hard constraints: edge password lockdown is FAIL-CLOSED (no `SITE_LOCKDOWN_PASSW
 - Versioning: `FUZZYNUTS-CTX vMAJOR.MINOR.PATCH` — PATCH = dep/version, MINOR = data-flow/infra, MAJOR = chain/launch state.
 
 ## OPEN UNVERIFIED (locked items removed)
-- ~~#1 static-export vs runtime~~ → RESOLVED: runtime build (this commit).
-- ~~#5 Xaman CDN version~~ → RESOLVED: unversioned always-latest, no SRI (see Risk Map).
-- #2 Token audit status: auditor + report URL, or explicit "none".
-- #3 MongoDB version + index inventory on Railway.
-- #4 Kaetram fork base commit/tag vs upstream.
+- ~~#1 static-export vs runtime~~ → RESOLVED v0.1.1: runtime build.
+- ~~#5 Xaman CDN version~~ → RESOLVED v0.1.1: unversioned always-latest, no SRI (see Risk Map).
+- ~~#3 Mongo declared surface~~ → RESOLVED v0.1.2: `mongodb` ^6.0.0 + index inventory (see Infra/Risk Map). **Residual:** runtime server version on Railway still UNVERIFIED (declared vs runtime).
+- ~~#4 Kaetram fork base~~ → RESOLVED v0.1.2: `upstream/develop`@`4bdbd6d50`, v0.5.5, 45 ahead (see Risk Map).
+- #2 Token audit status: **still open (external)** — auditor + report URL, or explicit "none".
