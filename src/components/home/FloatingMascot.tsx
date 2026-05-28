@@ -139,7 +139,12 @@ export function FloatingMascot() {
               alt=""
               width={150}
               height={200}
-              className="floating-mascot__img"
+              // DEGEN OVERHAUL — gold-idle / hot-pink-hover glow on the bear,
+              // same language as the central squirrel mascot. Applied to the
+              // <Image> (renders as <img>) so the glow + hover scale compose
+              // with Framer's parent slide-up + idle-float instead of
+              // fighting them on the same element.
+              className="floating-mascot__img cursor-pointer transition-[filter,transform] duration-300 [filter:drop-shadow(0_0_12px_rgba(251,191,36,0.5))] hover:scale-110 hover:[filter:drop-shadow(0_0_20px_rgba(255,46,136,0.75))_drop-shadow(0_0_36px_rgba(251,191,36,0.4))]"
               priority={false}
               draggable={false}
             />
@@ -223,7 +228,12 @@ export function FloatingMascot() {
               alt=""
               width={150}
               height={200}
-              className="floating-mascot__img"
+              // DEGEN OVERHAUL — gold-idle / hot-pink-hover glow on the bear,
+              // same language as the central squirrel mascot. Applied to the
+              // <Image> (renders as <img>) so the glow + hover scale compose
+              // with Framer's parent slide-up + idle-float instead of
+              // fighting them on the same element.
+              className="floating-mascot__img cursor-pointer transition-[filter,transform] duration-300 [filter:drop-shadow(0_0_12px_rgba(251,191,36,0.5))] hover:scale-110 hover:[filter:drop-shadow(0_0_20px_rgba(255,46,136,0.75))_drop-shadow(0_0_36px_rgba(251,191,36,0.4))]"
               priority={false}
               draggable={false}
             />
