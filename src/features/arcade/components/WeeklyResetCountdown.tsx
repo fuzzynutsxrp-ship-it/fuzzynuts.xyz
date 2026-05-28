@@ -204,8 +204,11 @@ export function WeeklyResetCountdown({
         <span className="text-[10px] font-mono text-cream-dim/40">
           {Math.round(countdown.weekProgress * 100)}% elapsed
         </span>
+        {/* DEGEN OVERHAUL — stale "500K $NUT" literal softened. This component
+            is currently unused; if resurrected, wire it to the live
+            weekly_prize_tiers API the way GameSidebar.tsx now does. */}
         <span className="text-[10px] font-mono text-cream-dim/40">
-          500K $NUT
+          🥜 Weekly $NUT
         </span>
       </div>
 

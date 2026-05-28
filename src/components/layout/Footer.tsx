@@ -42,12 +42,13 @@ export function Footer() {
             viewport={{ once: true, amount: 0.1 }}
           >
             <div className="flex items-center gap-3 mb-4">
+              {/* DEGEN OVERHAUL — interactive footer mascot */}
               <Image
                 src="/images/branding/logo-nav.webp"
                 alt=""
                 width={48}
                 height={32}
-                className="rounded-md"
+                className="logo-degen rounded-md"
                 loading="lazy"
               />
               <Image
@@ -160,15 +161,18 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-cream-dim)]">
+          {/* DEGEN OVERHAUL — degen sign-off, disclaimer kept */}
           <p className="flex items-center gap-1">
-            © {new Date().getFullYear()} Fuzzynuts. Built with
+            © {new Date().getFullYear()} Fuzzynuts. Degenerate responsibly… nah.
+            Built with
             <Heart
               size={12}
-              className="text-red-400 inline"
+              className="text-[var(--color-hot-pink)] inline"
               fill="currentColor"
             />
             not financial advice.
           </p>
+          {/* DEGEN OVERHAUL END */}
           <p className="flex items-center gap-1">
             Powered by
             <a

@@ -326,7 +326,10 @@ export function GamePage({ game }: GamePageProps) {
 
   return (
     <GameErrorBoundary gameTitle={game.title} onRetry={handleRetry}>
-      <div className="h-screen flex flex-col bg-[var(--color-forest-dark)] overflow-hidden">
+      {/* DEGEN OVERHAUL — animated degen mesh as the page chrome, unifying
+          GameHeader → GameViewport → GameSidebar → ScoreSubmissionPanel
+          into one degen surface. Every composed child below stays untouched. */}
+      <div className="h-screen flex flex-col bg-degen-mesh overflow-hidden">
         {/* ── Header ── */}
         <GameHeader
           game={game}

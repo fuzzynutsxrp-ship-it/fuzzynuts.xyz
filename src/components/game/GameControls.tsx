@@ -84,13 +84,13 @@ export function GameControls({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* DEGEN OVERHAUL — degen-black/purple backdrop matches GameMenu */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-degen-950/80 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -108,10 +108,11 @@ export function GameControls({
             transition={{ type: "spring", damping: 28, stiffness: 350 }}
             className="fixed z-[61] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md outline-none"
           >
+            {/* DEGEN OVERHAUL — degen-card surface w/ hot-pink ring (parity with GameMenu) */}
             <div
-              className="rounded-2xl border border-glass-strong overflow-hidden shadow-2xl"
+              className="rounded-2xl border border-hot-pink/25 overflow-hidden shadow-[0_0_40px_rgba(255,46,136,0.18),0_20px_60px_rgba(0,0,0,0.6)]"
               style={{
-                background: "rgba(6, 10, 6, 0.92)",
+                background: "rgba(10, 6, 19, 0.95)",
                 backdropFilter: "blur(24px)",
                 WebkitBackdropFilter: "blur(24px)",
               }}
@@ -131,14 +132,15 @@ export function GameControls({
                   >
                     <Gamepad2 size={16} style={{ color: accentColor }} />
                   </div>
+                  {/* DEGEN OVERHAUL — degen title, per-game accent kept on subtitle */}
                   <div>
-                    <h3
-                      className="font-display text-sm font-bold"
+                    <h3 className="font-display text-sm font-black gradient-text-gold text-hero-glow">
+                      🥜 Controls
+                    </h3>
+                    <p
+                      className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-90"
                       style={{ color: accentColor }}
                     >
-                      Controls
-                    </h3>
-                    <p className="text-[10px] text-[var(--color-cream-dim)] opacity-70">
                       {gameTitle}
                     </p>
                   </div>
@@ -155,18 +157,13 @@ export function GameControls({
 
               {/* Controls List */}
               <div className="px-5 py-4 space-y-2">
+                {/* DEGEN OVERHAUL — numbered chip gets a hot-pink edge */}
                 {controls.map((ctrl, i) => (
                   <div
                     key={ctrl}
-                    className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--color-glass-hover)] transition-colors"
+                    className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[rgba(255,46,136,0.06)] transition-colors"
                   >
-                    <div
-                      className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold font-mono"
-                      style={{
-                        background: "var(--color-glass-border-faint)",
-                        color: "var(--color-cream-dim)",
-                      }}
-                    >
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black font-mono bg-[rgba(255,46,136,0.08)] text-[var(--color-hot-pink)] border border-hot-pink/25">
                       {i + 1}
                     </div>
                     <span className="text-sm text-[var(--color-cream)] leading-snug">

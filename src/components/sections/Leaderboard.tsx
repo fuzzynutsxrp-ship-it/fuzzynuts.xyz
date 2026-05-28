@@ -187,18 +187,21 @@ export function Leaderboard() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-10"
         >
+          {/* DEGEN OVERHAUL START — neon badge + degen subcopy */}
           <motion.span
             whileHover={{ scale: 1.05 }}
-            className="section-badge mb-4"
+            className="neon-chip mb-4"
           >
-            🏆 Global Rankings
+            🏆 Hall of Degens
           </motion.span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-3">
             Leaderboard
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-xl mx-auto">
-            Top scores reset every Monday. Climb the ranks, earn $NUT.
+            Boards wipe every Monday 00:00 UTC. Climb the ranks, bag real $NUT,
+            flex on the timeline. Paper hands need not apply.
           </p>
+          {/* DEGEN OVERHAUL END */}
           {isCurrentWeek && (
             <p className={`text-xs font-mono mt-2 ${countdown.isCritical ? "text-red-400 animate-pulse" : countdown.isUrgent ? "text-orange" : "text-cream-dim/60"} countdown-pulse`}>
               ⏱ Resets in <span className={`font-semibold ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>{countdown.display}</span> · Monday 00:00 UTC

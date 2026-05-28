@@ -14,8 +14,11 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
-import { formatNumber } from "@/lib/utils";
+// DEGEN OVERHAUL — formatter from the lean @/lib/format module
+import { formatNumber } from "@/lib/format";
 import { CyberCard } from "@/components/ui/CyberCard";
+// DEGEN OVERHAUL — shared degen confetti (was a local function below)
+import { ConfettiBurst } from "@/components/ui/ConfettiBurst";
 import {
   usePayoutEligibility,
   getCurrentWeekKey,
@@ -38,45 +41,9 @@ function fmtSnapshotPrice(p?: number | null): string {
   return `$${Number(p).toPrecision(4)}`;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Confetti Burst — Lightweight CSS-only confetti animation
-   ═══════════════════════════════════════════════════════════════ */
-
-function ConfettiBurst() {
-  const particles = Array.from({ length: 36 }, (_, i) => ({
-    id: i,
-    angle: (i / 36) * 360,
-    distance: 50 + Math.random() * 120,
-    size: 3 + Math.random() * 8,
-    color: ["#FBBF24", "#10B981", "#f59e0b", "#4ade80", "#22d3ee", "#a855f7", "#ffe066", "#ef4444"][
-      i % 8
-    ],
-    delay: Math.random() * 0.4,
-  }));
-
-  return (
-    <div className="confetti-container absolute inset-0 pointer-events-none z-50 overflow-hidden" aria-hidden="true">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="confetti-particle"
-          style={{
-            left: "50%",
-            top: "50%",
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            backgroundColor: p.color,
-            borderRadius: p.id % 3 === 0 ? "50%" : "2px",
-            animationDelay: `${p.delay}s`,
-            // Use CSS custom properties for the animation
-            "--confetti-x": `${Math.cos((p.angle * Math.PI) / 180) * p.distance}px`,
-            "--confetti-y": `${Math.sin((p.angle * Math.PI) / 180) * p.distance - 40}px`,
-          } as React.CSSProperties}
-        />
-      ))}
-    </div>
-  );
-}
+/* DEGEN OVERHAUL — local ConfettiBurst removed; now imported from
+   @/components/ui/ConfettiBurst (extracted for reuse across claim
+   success + score submission success + any future $NUT moment). */
 
 /* ═══════════════════════════════════════════════════════════════
    Confirmation Modal
@@ -244,7 +211,8 @@ export function ClaimRewards() {
         case "polling":
           return "Confirming transaction…";
         default:
-          return usdValue != null ? `Claim ${usdLabel} in NUT` : "Claim Prize";
+          // DEGEN OVERHAUL — bag-the-bag copy, same dynamic value
+          return usdValue != null ? `Bag ${usdLabel} in $NUT 🥜` : "Bag the Bag";
       }
     },
     [usdValue, usdLabel]
@@ -260,12 +228,13 @@ export function ClaimRewards() {
           <div className="w-14 h-14 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center shrink-0">
             <Gift size={28} className="text-brand-gold" />
           </div>
+          {/* DEGEN OVERHAUL START — degen copy + gold→hot-pink CTA (flow unchanged) */}
           <div className="flex-1 text-center sm:text-left">
             <h3 className="font-display text-lg font-bold text-cream mb-1">
-              Weekly Prize Pool
+              The Weekly Nut Hoard 🥜
             </h3>
             <p className="text-sm text-cream-dim">
-              Connect your wallet to check if you&apos;ve won $NUT prizes this week.
+              Connect your wallet and see if you bagged $NUT this week. Read-only — we can&apos;t touch your bag.
             </p>
           </div>
           <motion.button
@@ -274,15 +243,16 @@ export function ClaimRewards() {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl
-                       bg-gradient-to-r from-brand-gold to-yellow-500
-                       text-forest-dark font-bold text-sm shrink-0
-                       hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
+                       bg-gradient-to-r from-brand-gold to-hot-pink
+                       text-[var(--color-degen-black)] font-black text-sm shrink-0
+                       hover:shadow-[0_0_28px_rgba(255,46,136,0.5)]
                        transition-all min-h-[44px] cursor-pointer
                        disabled:opacity-50"
           >
             <Wallet size={16} />
-            {isConnecting ? "Connecting…" : "Connect"}
+            {isConnecting ? "Connecting…" : "Connect & Check"}
           </motion.button>
+          {/* DEGEN OVERHAUL END */}
         </div>
       </CyberCard>
     );
@@ -410,18 +380,20 @@ export function ClaimRewards() {
           <div className="w-14 h-14 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center shrink-0">
             <Trophy size={28} className="text-brand-gold opacity-50" />
           </div>
+          {/* DEGEN OVERHAUL START — bagless-for-now copy */}
           <div className="flex-1 text-center sm:text-left">
             <h3 className="font-display text-lg font-bold text-cream mb-1">
-              No Prize This Week
+              Bagless… For Now 🥜
             </h3>
             <p className="text-sm text-cream-dim">
-              You didn&apos;t place in the Top 3 for {weekKey}. Keep playing to climb the{" "}
+              No Top 3 finish for {weekKey} — it happens. Get back on the{" "}
               <a href="/leaderboard/" className="text-neon-green hover:underline font-semibold">
                 leaderboard
               </a>{" "}
-              and win next week!
+              and run it back next week.
             </p>
           </div>
+          {/* DEGEN OVERHAUL END */}
           <button
             onClick={checkEligibility}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold
@@ -502,17 +474,18 @@ export function ClaimRewards() {
             </AnimatePresence>
 
             {/* Claim button */}
+            {/* DEGEN OVERHAUL START — gold→hot-pink claim banger; payout-claim-pulse + click handlers unchanged */}
             <motion.button
               onClick={startClaim}
               disabled={status !== "eligible" && status !== "idle" && status !== "error"}
-              whileHover={{ scale: 1.04, boxShadow: "0 0 35px rgba(245,196,66,0.5)" }}
+              whileHover={{ scale: 1.04, boxShadow: "0 0 38px rgba(255,46,136,0.55)" }}
               whileTap={{ scale: 0.96 }}
               className="w-full max-w-xs px-8 py-4 rounded-xl
-                         bg-gradient-to-r from-brand-gold to-yellow-500
-                         text-forest-dark font-bold text-base
-                         hover:shadow-[0_0_30px_rgba(245,196,66,0.5)]
+                         bg-gradient-to-r from-brand-gold to-hot-pink
+                         text-[var(--color-degen-black)] font-black text-base
+                         hover:shadow-[0_0_32px_rgba(255,46,136,0.55)]
                          transition-all disabled:opacity-60 cursor-pointer
-                         payout-claim-pulse"
+                         payout-claim-pulse prize-banger"
             >
               <span className="flex items-center justify-center gap-2">
                 {status === "claiming" || status === "polling" ? (
@@ -528,6 +501,7 @@ export function ClaimRewards() {
                 )}
               </span>
             </motion.button>
+            {/* DEGEN OVERHAUL END */}
 
             <p className="text-[11px] text-cream-dim/50 mt-3">
               Prize is sent directly to your connected wallet via XRPL.

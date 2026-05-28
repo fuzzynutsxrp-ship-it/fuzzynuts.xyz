@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle,
@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { timeAgo } from "@/features/arcade";
 import type { GameMetadata } from "@/lib/gameRegistry";
+// DEGEN OVERHAUL — shared degen confetti for score submission success
+import { ConfettiBurst } from "@/components/ui/ConfettiBurst";
 
 /* ═══════════════════════════════════════════════════════════════
    ScoreSubmissionPanel — Bottom bar showing score history + status
@@ -79,6 +81,30 @@ export function ScoreSubmissionPanel({
 }: ScoreSubmissionPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // DEGEN OVERHAUL START — edge-triggered degen confetti on score submission.
+  // Watches submissionStatus for any transition INTO "success" and fires the
+  // shared <ConfettiBurst/> for ~1500ms. Doesn't touch the useScoreSubmission
+  // hook or its state machine — purely a visual side-effect on the prop.
+  const [confettiKey, setConfettiKey] = useState(0); // remount → re-runs CSS anim
+  const prevStatusRef = useRef(submissionStatus);
+  useEffect(() => {
+    if (
+      prevStatusRef.current !== "success" &&
+      submissionStatus === "success"
+    ) {
+      setConfettiKey((k) => k + 1);
+    }
+    prevStatusRef.current = submissionStatus;
+  }, [submissionStatus]);
+  // Clear the burst after the CSS animation finishes (confetti-burst is 1s;
+  // a touch of buffer for the staggered delays).
+  useEffect(() => {
+    if (confettiKey === 0) return;
+    const t = setTimeout(() => setConfettiKey(0), 1600);
+    return () => clearTimeout(t);
+  }, [confettiKey]);
+  // DEGEN OVERHAUL END
+
   // No panel if nothing to show
   if (!lastSubmission && !bestScore && history.length === 0) {
     return null;
@@ -96,13 +122,18 @@ export function ScoreSubmissionPanel({
 
   return (
     <div
-      className="border-t border-glass"
+      // DEGEN OVERHAUL — `relative` so the score-success confetti can overlay
+      className="relative border-t border-glass"
       style={{
         background: "rgba(6, 10, 6, 0.8)",
         backdropFilter: "blur(8px)",
       }}
       id="score-submission-panel"
     >
+      {/* DEGEN OVERHAUL START — score-success neon explosion */}
+      {confettiKey > 0 && <ConfettiBurst key={confettiKey} intensity="high" />}
+      {/* DEGEN OVERHAUL END */}
+
       {/* ── Main bar (always visible) ── */}
       <div className="flex items-center justify-between px-3 sm:px-5 py-2.5">
         {/* Left: Last submission */}

@@ -121,13 +121,13 @@ export function GameMenu({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* DEGEN OVERHAUL — degen-black/purple pause backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[70] bg-[var(--color-forest-900)]/90 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] bg-degen-950/90 backdrop-blur-sm"
             onClick={onResume}
             aria-hidden="true"
           />
@@ -146,55 +146,65 @@ export function GameMenu({
             className="fixed z-[71] inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-1/2 -translate-y-1/2 sm:w-full sm:max-w-md outline-none"
           >
             <div
-              className="rounded-2xl border border-[var(--color-glass-border-strong)] overflow-hidden shadow-2xl"
+              // DEGEN OVERHAUL — degen-card surface w/ hot-pink ring
+              className="rounded-2xl border border-hot-pink/25 overflow-hidden shadow-[0_0_40px_rgba(255,46,136,0.18),0_20px_60px_rgba(0,0,0,0.6)]"
               style={{
-                background: "rgba(6, 10, 6, 0.95)",
+                background: "rgba(10, 6, 19, 0.95)",
                 backdropFilter: "blur(24px)",
                 WebkitBackdropFilter: "blur(24px)",
               }}
             >
-              {/* Header */}
+              {/* DEGEN OVERHAUL START — acorn-on-pause with neon halo
+                  (mirrors LoadingOverlay), title goes gradient gold + glow.
+                  "Paused" text kept verbatim for a11y + the existing
+                  aria-label on the dialog. */}
               <div className="px-6 pt-6 pb-4 text-center">
-                <div className="text-3xl mb-2" aria-hidden="true">
-                  ⏸️
+                <div
+                  className="text-3xl mb-2 select-none drop-shadow-[0_0_16px_rgba(255,46,136,0.55)] [filter:drop-shadow(0_0_30px_rgba(251,191,36,0.4))]"
+                  aria-hidden="true"
+                >
+                  🌰
                 </div>
-                <h2 className="font-display text-xl font-bold text-[var(--color-cream)]">
+                <h2 className="font-display text-xl font-black gradient-text-gold text-hero-glow">
                   Paused
                 </h2>
                 <p
-                  className="text-xs mt-1 font-medium"
+                  className="text-xs mt-1 font-mono uppercase tracking-[0.18em]"
                   style={{ color: game.color }}
                 >
                   {game.title}
                 </p>
               </div>
+              {/* DEGEN OVERHAUL END */}
 
-              {/* Score display */}
+              {/* DEGEN OVERHAUL START — score cards: hot-pink edge on Current,
+                  gold neon-ring on Best, gradient on the Best number */}
               {(currentScore != null || bestScore != null) && (
                 <div className="mx-6 mb-4 flex gap-3">
                   {currentScore != null && (
-                    <div className="flex-1 rounded-xl border border-[var(--color-glass-border)] p-3 text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)] mb-0.5">
-                        Current
+                    <div className="flex-1 rounded-xl border border-hot-pink/25 bg-[rgba(255,46,136,0.04)] p-3 text-center">
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-hot-pink)] font-bold mb-0.5">
+                        🥜 Current
                       </p>
-                      <p className="font-mono text-lg font-bold text-[var(--color-cream)]">
+                      <p className="font-mono text-lg font-black text-[var(--color-cream)] tabular-nums">
                         {formatScore(currentScore)}
                       </p>
                     </div>
                   )}
                   {bestScore != null && (
-                    <div className="flex-1 rounded-xl border border-[var(--color-glass-border)] p-3 text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)] mb-0.5">
-                        Best
+                    <div className="flex-1 rounded-xl bg-[rgba(251,191,36,0.05)] p-3 text-center neon-ring-pink">
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-gold)] font-bold mb-0.5">
+                        🏆 Best
                       </p>
-                      <p className="font-mono text-lg font-bold text-[var(--color-brand-gold)]">
-                        <Trophy size={14} className="inline mr-1 -mt-0.5" />
+                      <p className="font-mono text-lg font-black gradient-text-gold tabular-nums">
+                        <Trophy size={14} className="inline mr-1 -mt-0.5 text-[var(--color-brand-gold)]" />
                         {formatScore(bestScore)}
                       </p>
                     </div>
                   )}
                 </div>
               )}
+              {/* DEGEN OVERHAUL END */}
 
               {/* Action buttons */}
               <div className="px-6 space-y-2">
@@ -208,11 +218,13 @@ export function GameMenu({
                       onMouseEnter={() => setFocusedAction(i)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.97 }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all outline-none ${
+                      // DEGEN OVERHAUL START — primary action goes gold→hot-pink, hot-pink focus ring
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none ${
                         action.primary
-                          ? "bg-[var(--color-neon-green)] text-[var(--color-forest-dark)] hover:brightness-110"
+                          ? "bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-black hover:shadow-[0_0_22px_rgba(255,46,136,0.5)]"
                           : "border border-[var(--color-glass-border)] text-[var(--color-cream)] hover:bg-[var(--color-glass-hover)]"
-                      } ${isFocused ? "ring-2 ring-[var(--color-neon-green)]/50" : ""}`}
+                      } ${isFocused ? "ring-2 ring-[var(--color-hot-pink)]/60" : ""}`}
+                      // DEGEN OVERHAUL END
                       id={`game-menu-${action.label.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <Icon size={16} />

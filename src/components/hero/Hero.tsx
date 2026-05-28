@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { ArrowRight, Gamepad2, Globe } from "lucide-react";
 import Image from "next/image";
 import { gameRegistry } from "@/lib/gameRegistry";
-import { formatUsd } from "@/lib/utils";
+// DEGEN OVERHAUL — formatter from the lean @/lib/format module
+import { formatUsd } from "@/lib/format";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import { PriceTicker } from "@/components/home/PriceTicker";
@@ -71,10 +72,19 @@ export function Hero() {
           }}
           className="mb-4"
         >
+          {/* DEGEN OVERHAUL START — central mascot: keep the framer float,
+              add hover neon-pink glow + tap squish, make it tap-to-play.
+              (Glow via CSS filter so it never fights the framer transform.) */}
           <motion.div
             animate={FLOAT_ANIMATION}
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="inline-block drop-shadow-[0_0_30px_rgba(245,196,66,0.5)]"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.94 }}
+            onClick={() => { window.location.href = "/games/fuzzynuts-world/"; }}
+            role="button"
+            tabIndex={0}
+            aria-label="Enter the FuzzyNuts arcade"
+            className="inline-block cursor-pointer drop-shadow-[0_0_30px_rgba(245,196,66,0.5)] transition-[filter] duration-300 hover:drop-shadow-[0_0_44px_rgba(255,46,136,0.75)]"
           >
             <Image
               src="/images/branding/logo.webp"
@@ -85,6 +95,7 @@ export function Hero() {
               priority
             />
           </motion.div>
+          {/* DEGEN OVERHAUL END */}
         </motion.div>
 
         {/* ── Title — text_logo.png wordmark sized at ~25% of the
@@ -110,14 +121,24 @@ export function Hero() {
         </motion.div>
 
         {/* ── Tagline ── */}
+        {/* DEGEN OVERHAUL START — gradient tagline + degen kicker */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-lg sm:text-2xl md:text-3xl font-display font-semibold text-[var(--color-gold)] mb-3"
+          className="text-lg sm:text-2xl md:text-3xl font-display font-black gradient-text-gold mb-1"
         >
           Go Nuts. Get Paid.
         </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.65 }}
+          className="font-mono text-[11px] sm:text-sm uppercase tracking-[0.35em] text-[var(--color-hot-pink)] text-pink-glow mb-3"
+        >
+          Nut up or shut up
+        </motion.p>
+        {/* DEGEN OVERHAUL END */}
 
         {/* ── Description ── */}
         <motion.p
@@ -126,9 +147,10 @@ export function Hero() {
           transition={{ delay: 0.7 }}
           className="text-sm sm:text-base md:text-lg text-[var(--color-cream)] max-w-2xl mx-auto mb-8 leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]"
         >
-          Free arcade games on the XRP Ledger that pay out real $NUT every week.
-          The nuttiest meme coin in crypto — built by degens who refuse to take
-          it seriously.
+          {/* DEGEN OVERHAUL — edgier copy, same facts (free arcade, XRPL, weekly $NUT) */}
+          Free-to-play arcade on the XRP Ledger that pays out real $NUT every
+          single week. The nuttiest coin in crypto, built by degens who refuse
+          to take it seriously. Top the board, bag the bag.
         </motion.p>
 
         {/* ── CTAs ── */}
@@ -144,12 +166,14 @@ export function Hero() {
               e.preventDefault();
               window.location.href = "/games/fuzzynuts-world/";
             }}
+            // DEGEN OVERHAUL START — gold→hot-pink CTA, pink hover bloom
             whileHover={{
               scale: 1.06,
-              boxShadow: "0 0 40px rgba(245,196,66,0.55)",
+              boxShadow: "0 0 44px rgba(255,46,136,0.6)",
             }}
             whileTap={{ scale: 0.97 }}
-            className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] text-[var(--color-forest-900)] font-bold text-base sm:text-lg transition-all shadow-[0_8px_30px_rgba(245,196,66,0.35)] animate-float"
+            className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-black text-base sm:text-lg transition-all shadow-[0_8px_30px_rgba(255,46,136,0.35)] animate-float"
+            // DEGEN OVERHAUL END
           >
             <Globe size={18} />
             Enter World

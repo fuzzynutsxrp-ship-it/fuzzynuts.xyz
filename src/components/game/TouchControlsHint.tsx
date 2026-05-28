@@ -63,10 +63,11 @@ export function TouchControlsHint({
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[55] max-w-xs w-[calc(100%-2rem)]"
         >
+          {/* DEGEN OVERHAUL — degen surface + hot-pink ring; per-game Hand color preserved */}
           <div
-            className="rounded-xl border border-[var(--color-glass-border-strong)] px-4 py-3 flex items-center gap-3 shadow-xl"
+            className="rounded-xl border border-hot-pink/25 px-4 py-3 flex items-center gap-3 shadow-[0_0_24px_rgba(255,46,136,0.18),0_10px_30px_rgba(0,0,0,0.55)]"
             style={{
-              background: "rgba(6, 10, 6, 0.92)",
+              background: "rgba(10, 6, 19, 0.92)",
               backdropFilter: "blur(16px)",
               WebkitBackdropFilter: "blur(16px)",
             }}

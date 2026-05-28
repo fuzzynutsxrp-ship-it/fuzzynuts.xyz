@@ -130,7 +130,11 @@ export const FEATURES = [
     featIcon: "/images/features/feat-arcade.webp",
     title: "Play-to-Earn Arcade",
     description:
-      "6 hand-tuned games with real $NUT prizes. Compete on the weekly leaderboard for 500K NUT.",
+      // DEGEN OVERHAUL — stale "500K NUT" stripped. Real weekly hoard is
+      // computed live from weekly_prize_tiers (see GameSidebar.tsx pattern);
+      // this FEATURES const is currently not imported anywhere, but the
+      // description stays accurate either way.
+      "6 hand-tuned games with real $NUT prizes — bag the bag every week on the leaderboard.",
   },
   {
     icon: "Lock",
@@ -193,26 +197,8 @@ export const HOW_TO_STEPS = [
   },
 ];
 
-/** Format a USD amount as proper currency: "$0.10", "$30.00", "$1,234.56". */
-export function formatUsd(num: number): string {
-  return num.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-export function truncateAddress(address: string, start = 6, end = 4): string {
-  if (address.length <= start + end) return address;
-  return `${address.slice(0, start)}...${address.slice(-end)}`;
-}
-
-export function formatNumber(num: number): string {
-  // Number(...) strips a trailing ".0" so round values read "50K", not "50.0K",
-  // while keeping a real decimal when it matters (e.g. "1.5K", "124.9K").
-  if (num >= 1_000_000_000) return `${Number((num / 1_000_000_000).toFixed(1))}B`;
-  if (num >= 1_000_000) return `${Number((num / 1_000_000).toFixed(1))}M`;
-  if (num >= 1_000) return `${Number((num / 1_000).toFixed(1))}K`;
-  return num.toString();
-}
+// DEGEN OVERHAUL — formatters extracted to @/lib/format so hot-path consumers
+// (GameSidebar etc.) can avoid pulling TOKENOMICS/GAMES/HOW_TO_STEPS/FEATURES
+// into their bundle. Re-exports kept here for backward compatibility — every
+// existing `import { formatNumber } from "@/lib/utils"` keeps working.
+export { formatUsd, truncateAddress, formatNumber } from "./format";

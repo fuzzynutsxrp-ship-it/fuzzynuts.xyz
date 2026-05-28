@@ -117,31 +117,32 @@ export function GameViewport({
         />
 
         {/* Error state */}
+        {/* DEGEN OVERHAUL START — error state goes degen; iframe + handlers unchanged */}
         <AnimatePresence>
           {hasError && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-20 flex items-center justify-center bg-[var(--color-forest-dark)]"
+              className="absolute inset-0 z-20 flex items-center justify-center bg-degen-mesh"
             >
-              <div className="glass-card-elevated p-8 max-w-sm text-center">
-                <div className="text-5xl mb-4" aria-hidden="true">
-                  ⚠️
+              <div className="glass-card-elevated p-8 max-w-sm text-center border border-hot-pink/25 shadow-[0_0_40px_rgba(255,46,136,0.18)]">
+                <div className="text-5xl mb-4 drop-shadow-[0_0_14px_rgba(255,46,136,0.55)]" aria-hidden="true">
+                  💀
                 </div>
-                <h2 className="font-display text-xl font-bold text-[var(--color-cream)] mb-2">
-                  Failed to Load
+                <h2 className="font-display text-xl font-black gradient-text-gold text-hero-glow mb-2">
+                  Cabinet Jammed 🥜
                 </h2>
                 <p className="text-sm text-[var(--color-cream-dim)] mb-5">
-                  {game.title} couldn&apos;t be loaded. Check your
-                  connection and try again.
+                  {game.title} couldn&apos;t boot. Check your connection
+                  and slam the coin slot again.
                 </p>
                 <div className="flex gap-3 justify-center">
                   <motion.button
                     onClick={onRetry}
-                    whileHover={{ scale: 1.04 }}
+                    whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(255,46,136,0.5)" }}
                     whileTap={{ scale: 0.96 }}
-                    className="btn-primary px-5 py-2 text-sm"
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-black bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] transition-all"
                     id="game-iframe-retry"
                   >
                     🔄 Retry
@@ -160,6 +161,7 @@ export function GameViewport({
             </motion.div>
           )}
         </AnimatePresence>
+        {/* DEGEN OVERHAUL END */}
 
         {/* The iframe */}
         <iframe

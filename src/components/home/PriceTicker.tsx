@@ -54,19 +54,21 @@ export function PriceTicker() {
       transition={{ delay: 1.1, duration: 0.5 }}
       className="mt-6 flex flex-wrap items-center justify-center gap-2.5"
     >
-      <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-[rgba(1,5,8,0.55)] backdrop-blur-md border border-[var(--color-glass-border-faint)]">
+      {/* DEGEN OVERHAUL START — neon-ringed price pill */}
+      <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-degen-950/70 backdrop-blur-md neon-ring-pink">
         <div className="text-left">
           <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Price</p>
           <p className="font-mono font-bold text-sm text-[var(--color-gold)] tabular-nums">{fmtPrice(priceUsd)}</p>
         </div>
-        <div className="w-px h-7 bg-[var(--color-glass-border-faint)]" aria-hidden="true" />
+        <div className="w-px h-7 bg-hot-pink/30" aria-hidden="true" />
         <div className="text-left">
           <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Market Cap</p>
-          <p className="font-mono font-bold text-sm text-[var(--color-cream)] tabular-nums">
+          <p className="font-mono font-bold text-sm text-[var(--color-acid)] tabular-nums">
             {mcap != null ? `$${formatNumber(mcap)}` : "—"}
           </p>
         </div>
       </div>
+      {/* DEGEN OVERHAUL END */}
 
       <a
         href={CHART_URL}
@@ -81,7 +83,8 @@ export function PriceTicker() {
         href={BUY_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-black text-[var(--color-forest-900)] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-orange)] hover:shadow-[0_0_25px_rgba(245,196,66,0.45)] transition-all"
+        // DEGEN OVERHAUL — gold→hot-pink Buy button with pink bloom
+        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-black text-[var(--color-degen-black)] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] hover:shadow-[0_0_28px_rgba(255,46,136,0.55)] transition-all"
       >
         <ShoppingCart size={16} />
         Buy $NUT

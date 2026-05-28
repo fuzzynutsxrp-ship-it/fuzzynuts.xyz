@@ -3,6 +3,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/hero/Hero";
 import { HeroBackground } from "@/components/hero/HeroBackground";
 import { ClientFallingNuts } from "@/components/ClientFallingNuts";
+// DEGEN OVERHAUL — live wins ticker (SSRs hype fallback, hydrates to live SSE)
+import { LiveWinsTicker } from "@/components/home/LiveWinsTicker";
 
 /* ═══════════════════════════════════════════════════════════════
    Homepage — `herobackground3.jpg` is now the fixed page-level
@@ -60,6 +62,8 @@ export default function Home() {
       <Navbar />
       <main id="main-content" className="relative z-10">
         <Hero />
+        {/* DEGEN OVERHAUL — live wins ticker below the hero */}
+        <LiveWinsTicker />
         <GamesShowcase />
         <Prizes />
         <Trust />

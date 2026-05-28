@@ -15,11 +15,11 @@
 | Piece | Repo | Branch → Deploy | Local path |
 |---|---|---|---|
 | **Frontend** (marketing + arcade UI) | `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz` | `main` → **Vercel** (auto) | `…/AI Tools/FuzzyNuts Optimized/fuzzynuts-optimized` |
-| **Backend** (Fuzzynuts World server, Kaetram fork; also serves `/api/scores` + `/api/rewards`) | `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world` | `develop` → **Railway** (auto) | `…/AI Tools/Fuzzynuts/kaetram` |
+| **Backend** (Fuzzynuts World server, Kaetram fork; also serves `/api/scores` + `/api/rewards`) | `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world` (fork of `Kaetram/Kaetram-Open`, off `upstream/develop` @ base `4bdbd6d50` 2024-01-14, v0.5.5, ~45 ahead) | `develop` → **Railway** (auto) | `…/AI Tools/Fuzzynuts/kaetram` |
 | Backend reference mirror (READ-ONLY, stale, NOT deployed) | — | — | `…/AI Tools/FuzzyNuts Optimized/backend-reference` |
 
 - **API base:** `https://world.fuzzynuts.xyz` (hardcoded in the frontend).
-- Railway project: **efficient-tenderness** (US West) — service `world.fuzzynuts.xyz` + MongoDB.
+- Railway project: **brilliant-nurturing** (`production` env, US West) — service **efficient-tenderness** (`world.fuzzynuts.xyz`) + MongoDB service (`mongo:8.3.1`, proxy `tramway.proxy.rlwy.net`).
 
 ## Accounts & services
 
@@ -63,7 +63,13 @@
 - Snapshot trigger: GitHub Action `weekly-prize-snapshot.yml` (cron + manual `workflow_dispatch`, with a `force` input to overwrite a locked week).
 - **Price deviation guard:** the snapshot uses the on-chain AMM price only if within `MAX_PRICE_DEVIATION` of `NUT_USD_PRICE_FALLBACK`; otherwise it uses the fallback (protects payouts from the thin/sniped pool).
 - Endpoints: `GET /api/rewards/tiers` (public, drives homepage Prizes + leaderboard + profile), `GET /eligibility`, `POST /claim`, `POST /snapshot` (admin), `GET /claim/status`, `GET /health`.
-- Mongo: `weekly_prize_tiers` (one doc/week, unique index on `weekKey`), `prize_distributions`, `arcade_scores`.
+- Mongo (driver `mongodb` ^6.0.0, no mongoose; defined in `packages/server/src/api/{scores,rewards}.ts`):
+  - `weekly_prize_tiers` — one doc/week, unique idx `{weekKey:1}`.
+  - `prize_distributions` — unique idx `{weekKey:1, wallet:1, type:1}`, partial on `type='individual_claim'`.
+  - `arcade_scores` — unique idx `{wallet:1, game:1, weekKey:1}`; leaderboard idx `{weekKey:1, game:1, score:-1}` and `{weekKey:1, score:-1}`.
+  - also: `reward_queue`, `achievement_rewards` (no explicit indexes).
+  - Running server: **MongoDB 8.3.1** (Railway Docker `mongo:8.3.1`, US-West, 1 replica). ⚠ Code's driver is `mongodb` 6.0.0 — predates server 8.x; bump driver to ≥6.12 (or 7.x) before launch.
+  - **Token audit ($NUT):** none on file — no third-party security review. Revisit at launch (test token pre-launch).
 
 ## Wallet connect
 

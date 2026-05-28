@@ -44,6 +44,19 @@
   --font-display: "Outfit", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+
+  /* DEGEN OVERHAUL START — degen-chaos tokens (additive) */
+  --color-degen-black: #050309;
+  --color-degen-950: #0a0613;
+  --color-degen-900: #120a22;
+  --color-degen-purple: #2d1b4e;
+  --color-degen-violet: #7c3aed;
+  --color-hot-pink: #ff2e88;
+  --color-hot-pink-light: #ff5fa2;
+  --color-acid: #39ff14;
+  --color-acid-soft: #00ffa3;
+  --color-cyan: #22d3ee;
+  /* DEGEN OVERHAUL END */
 }
 
 /* ──────────────────────────────────────────
@@ -1289,3 +1302,142 @@ body {
   );
   opacity: 0.3;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   DEGEN OVERHAUL START — global degen-chaos layer
+   Appended last so it wins the cascade. Recolors the base, adds the
+   live-wins marquee, neon chips, interactive-logo glow, and confetti.
+   Every animation here is disabled under prefers-reduced-motion at the
+   bottom of this block.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Base recolor: deep black + purple instead of muted forest ── */
+html,
+body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124, 58, 237, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 100% 110%, rgba(255, 46, 136, 0.08) 0%, transparent 55%),
+    var(--color-degen-black);
+}
+
+/* Hot-pink text selection */
+::selection {
+  background: var(--color-hot-pink);
+  color: #0a0613;
+}
+
+/* Neon scrollbar */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--color-hot-pink), var(--color-degen-violet));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-acid);
+}
+
+/* ── Interactive logo / mascot — hover glow + subtle idle bounce ──
+   Add `logo-degen` to any wrapper around the FuzzyNuts logo/mascot. */
+.logo-degen {
+  animation: degen-bounce 2.2s ease-in-out infinite;
+  transition: filter 0.3s ease, transform 0.3s ease;
+  filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.45));
+  will-change: transform, filter;
+}
+.logo-degen:hover {
+  transform: scale(1.06);
+  filter:
+    drop-shadow(0 0 18px rgba(255, 46, 136, 0.65))
+    drop-shadow(0 0 36px rgba(251, 191, 36, 0.45));
+}
+
+/* ── Live Wins Ticker — seamless CSS marquee ──
+   Track renders the item set TWICE; -50% = exactly one set, so the
+   loop is seamless. Pauses on hover for readability. */
+.degen-marquee {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.degen-marquee__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+  will-change: transform;
+  animation: degen-marquee var(--marquee-duration, 34s) linear infinite;
+}
+.degen-marquee:hover .degen-marquee__track {
+  animation-play-state: paused;
+}
+@keyframes degen-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Keyframes referenced from raw CSS / inline styles (not via animate-*
+   utilities), so they must live here — Tailwind only emits keyframes for
+   animate-* classes it finds in markup. */
+@keyframes degen-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.015); }
+}
+@keyframes pulse-pink {
+  0%, 100% { box-shadow: 0 0 18px rgba(255, 46, 136, 0.25); }
+  50% { box-shadow: 0 0 42px rgba(255, 46, 136, 0.6); }
+}
+
+/* ── Neon chip — pill used in ticker + tags ── */
+.neon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-acid);
+  background: rgba(57, 255, 20, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.25);
+}
+
+/* ── Degen divider — pink→cyan neon line ── */
+.degen-divider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--color-hot-pink) 30%,
+    var(--color-cyan) 50%,
+    var(--color-hot-pink) 70%,
+    transparent 100%);
+  opacity: 0.45;
+}
+
+/* ── Win confetti — reuses existing .confetti-particle / confetti-burst.
+   This adds a degen palette helper for the burst colors. ── */
+.confetti-degen :nth-child(3n) { color: var(--color-hot-pink); }
+.confetti-degen :nth-child(3n + 1) { color: var(--color-acid); }
+.confetti-degen :nth-child(3n + 2) { color: var(--color-gold); }
+
+/* ── Prize / claim banger — neon bloom on hover (confetti-ready container) ── */
+.prize-banger {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.prize-banger:hover {
+  box-shadow:
+    0 0 40px rgba(255, 46, 136, 0.3),
+    inset 0 0 22px rgba(124, 58, 237, 0.18) !important;
+}
+
+/* ── Reduced-motion: kill the new degen motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .logo-degen,
+  .degen-marquee__track {
+    animation: none !important;
+  }
+  .logo-degen {
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4));
+  }
+}
+/* DEGEN OVERHAUL END */
