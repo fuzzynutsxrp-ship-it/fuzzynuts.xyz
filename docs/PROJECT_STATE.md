@@ -19,7 +19,7 @@
 | Backend reference mirror (READ-ONLY, stale, NOT deployed) | — | — | `…/AI Tools/FuzzyNuts Optimized/backend-reference` |
 
 - **API base:** `https://world.fuzzynuts.xyz` (hardcoded in the frontend).
-- Railway project: **efficient-tenderness** (US West) — service `world.fuzzynuts.xyz` + MongoDB.
+- Railway project: **brilliant-nurturing** (`production` env, US West) — service **efficient-tenderness** (`world.fuzzynuts.xyz`) + MongoDB service (`mongo:8.3.1`, proxy `tramway.proxy.rlwy.net`).
 
 ## Accounts & services
 
@@ -68,7 +68,8 @@
   - `prize_distributions` — unique idx `{weekKey:1, wallet:1, type:1}`, partial on `type='individual_claim'`.
   - `arcade_scores` — unique idx `{wallet:1, game:1, weekKey:1}`; leaderboard idx `{weekKey:1, game:1, score:-1}` and `{weekKey:1, score:-1}`.
   - also: `reward_queue`, `achievement_rewards` (no explicit indexes).
-  - Running server Mongo version on Railway: declared 6.x driver; **runtime version UNVERIFIED** (needs Railway).
+  - Running server: **MongoDB 8.3.1** (Railway Docker `mongo:8.3.1`, US-West, 1 replica). ⚠ Code's driver is `mongodb` 6.0.0 — predates server 8.x; bump driver to ≥6.12 (or 7.x) before launch.
+  - **Token audit ($NUT):** none on file — no third-party security review. Revisit at launch (test token pre-launch).
 
 ## Wallet connect
 

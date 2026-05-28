@@ -1,4 +1,4 @@
-# CLAUDE.md — FUZZYNUTS-CTX v0.1.2
+# CLAUDE.md — FUZZYNUTS-CTX v0.1.3
 
 > **Auto-loaded by Claude Code / Cowork every session.** This is the compressed,
 > session-priming context. The **human-maintained source of truth is
@@ -28,7 +28,7 @@ Hard constraints: edge password lockdown is FAIL-CLOSED (no `SITE_LOCKDOWN_PASSW
 
 **ON-CHAIN (XRPL mainnet — no VM/Solidity/gas)** — Issued currency `NUT`. Issuer `rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7` (**blackholed**, fixed supply 321,000,000,000). Distributor/Community Jar `rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh`. NUT/XRP AMM `r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg` (thin/sniped — payouts do NOT depend on it). Tokenomics 80% AMM / 18% Jar / 2% Founder (`src/lib/utils.ts`). Price ref: on-chain XRP/RLUSD AMM (RLUSD issuer `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De`). Upgradeability N/A (immutable issued token).
 
-**INFRA/SYNC** — Backend `fuzzynuts-world` (Kaetram MMORPG fork), repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world`, `develop` → Railway (project `efficient-tenderness`, US-West) + MongoDB. API base **hardcoded** `https://world.fuzzynuts.xyz` (`src/features/arcade/constants/index.ts` `API_SCORES`/`API_REWARDS`; also inline in `Navbar.tsx`, `UserProfile.tsx`). Leaderboard: `EventSource('/api/scores/stream')` → `vercel.json` rewrite → backend SSE; poll fallback. Balance: direct XRPL **WebSocket** `wss://xrplcluster.com` (`NEXT_PUBLIC_XRPL_NODE`) via `src/hooks/useBalanceStream.ts`, HTTP `account_info`/`account_lines` fallback @30 s. Cache: `vercel.json` immutable 1-yr on assets — **nullified by middleware `no-store` until launch**. Mongo (driver `mongodb` ^6.0.0, no mongoose; `packages/server/src/api/{scores,rewards}.ts`): `arcade_scores` [idx `{wallet:1,game:1,weekKey:1}` uniq · `{weekKey:1,game:1,score:-1}` · `{weekKey:1,score:-1}`], `weekly_prize_tiers` [idx `{weekKey:1}` uniq], `prize_distributions` [idx `{weekKey:1,wallet:1,type:1}` uniq, partial `type='individual_claim'`], plus `reward_queue`, `achievement_rewards` (no explicit idx). Frontend repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz`, `main` → Vercel auto.
+**INFRA/SYNC** — Backend `fuzzynuts-world` (Kaetram MMORPG fork), repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world`, `develop` → Railway (project `brilliant-nurturing` / `production` env; service `efficient-tenderness`, US-West) + MongoDB server `mongo:8.3.1` (proxy `tramway.proxy.rlwy.net`, 1 replica). API base **hardcoded** `https://world.fuzzynuts.xyz` (`src/features/arcade/constants/index.ts` `API_SCORES`/`API_REWARDS`; also inline in `Navbar.tsx`, `UserProfile.tsx`). Leaderboard: `EventSource('/api/scores/stream')` → `vercel.json` rewrite → backend SSE; poll fallback. Balance: direct XRPL **WebSocket** `wss://xrplcluster.com` (`NEXT_PUBLIC_XRPL_NODE`) via `src/hooks/useBalanceStream.ts`, HTTP `account_info`/`account_lines` fallback @30 s. Cache: `vercel.json` immutable 1-yr on assets — **nullified by middleware `no-store` until launch**. Mongo (driver `mongodb` ^6.0.0, no mongoose; `packages/server/src/api/{scores,rewards}.ts`): `arcade_scores` [idx `{wallet:1,game:1,weekKey:1}` uniq · `{weekKey:1,game:1,score:-1}` · `{weekKey:1,score:-1}`], `weekly_prize_tiers` [idx `{weekKey:1}` uniq], `prize_distributions` [idx `{weekKey:1,wallet:1,type:1}` uniq, partial `type='individual_claim'`], plus `reward_queue`, `achievement_rewards` (no explicit idx). Frontend repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz`, `main` → Vercel auto.
 
 **DATA FLOW**
 - Scores: game iframe → `public/games/fuzzy-score.js` (client cap) → `POST /api/scores` (server `SCORE_CAPS` authoritative). Read: `GET /api/scores` (s-maxage 10 / SWR 30) + SSE `/api/scores/stream` (no-store). ⚠ minigolf cap mismatch: client 10,500 vs server 100,000 — unresolved.
@@ -51,7 +51,7 @@ Hard constraints: edge password lockdown is FAIL-CLOSED (no `SITE_LOCKDOWN_PASSW
 - three + @react-three/fiber | 0.184.0 / 9.6.1 | PROVEN (lib) | ~96 kB for decorative nut → replace w/ CSS/SVG/Lottie
 - lucide-react | 1.16.0 (decl `^1.14.0`) | PROVEN | tree-shaken; fine
 - XRPL node `xrplcluster.com` | n/a | PROVEN (public cluster) | rate-limit risk at scale → dedicated node provider
-- MongoDB driver `mongodb` | ^6.0.0 (installed 6.0.0, no mongoose) | PROVEN | declared in fuzzynuts-world `packages/server`+`hub`; indexes locked (see Infra). Running server version on Railway = [declared 6.x | runtime: UNVERIFIED — requires Railway]
+- MongoDB | driver `mongodb` ^6.0.0 (installed 6.0.0, no mongoose) · **server `mongo:8.3.1`** (Railway) | PROVEN | ⚠ **version gap**: driver 6.0.0 predates server 8.x — bump driver to ≥6.12 (or 7.x) before launch for supported compat. Indexes locked (see Infra).
 - Kaetram backend fork | base `4bdbd6d50` (2024-01-14), v0.5.5, 45 ahead, HEAD `bd6445fd0` | EXPERIMENTAL (fork) | fork of `Kaetram/Kaetram-Open` off `upstream/develop`; app submodule `Kaetram/Kaetram-App`. Drift mgmt: re-base/cherry-pick from upstream/develop
 - GemWallet / Crossmark | n/a | LEGACY | dead in UI, live in `store/wallet.ts` switch → remove dead `case` arms
 
@@ -73,6 +73,8 @@ Hard constraints: edge password lockdown is FAIL-CLOSED (no `SITE_LOCKDOWN_PASSW
 ## OPEN UNVERIFIED (locked items removed)
 - ~~#1 static-export vs runtime~~ → RESOLVED v0.1.1: runtime build.
 - ~~#5 Xaman CDN version~~ → RESOLVED v0.1.1: unversioned always-latest, no SRI (see Risk Map).
-- ~~#3 Mongo declared surface~~ → RESOLVED v0.1.2: `mongodb` ^6.0.0 + index inventory (see Infra/Risk Map). **Residual:** runtime server version on Railway still UNVERIFIED (declared vs runtime).
+- ~~#3 Mongo declared surface~~ → RESOLVED v0.1.2: `mongodb` ^6.0.0 + index inventory (see Infra/Risk Map).
+- ~~#3 residual runtime Mongo~~ → RESOLVED v0.1.3: server **MongoDB 8.3.1** (Railway, `mongo:8.3.1`). ⚠ driver 6.0.0 ≪ server 8.3.1 — bump driver before launch.
 - ~~#4 Kaetram fork base~~ → RESOLVED v0.1.2: `upstream/develop`@`4bdbd6d50`, v0.5.5, 45 ahead (see Risk Map).
-- #2 Token audit status: **still open (external)** — auditor + report URL, or explicit "none".
+- ~~#2 Token audit status~~ → RESOLVED v0.1.3: **none** (no third-party review on file; revisit at launch).
+- **All anchor blockers closed.** Pre-launch checklist lives in `docs/PROJECT_STATE.md`.
