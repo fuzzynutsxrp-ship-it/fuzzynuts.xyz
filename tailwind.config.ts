@@ -275,6 +275,26 @@ const config: Config = {
             "inset 0 0 14px rgba(34,211,238,0.15)",
           ].join(", "),
         },
+        /* Razor-sharp text rendering pass for the big neon headers.
+           Antialiasing + paint-order. No text-shadow override — pair
+           with .text-hero-glow-crisp (below) for the tighter halo. */
+        ".text-degen-crisp": {
+          "text-rendering": "optimizeLegibility",
+          "-webkit-font-smoothing": "antialiased",
+          "-moz-osx-font-smoothing": "grayscale",
+          "paint-order": "stroke fill",
+        },
+        /* Tighter variant of .text-hero-glow — same gold halo language
+           but blur cut from 12+28 px → 10+22 px and the near-shadow
+           sharpened. Pair with .text-degen-crisp + .gradient-text-gold
+           on the big section headings (Prizes / Trust). */
+        ".text-hero-glow-crisp": {
+          "text-shadow": [
+            "0 0 10px rgba(251,191,36,0.55)",
+            "0 0 22px rgba(245,196,66,0.35)",
+            "0 1px 2px rgba(0,0,0,0.9)",
+          ].join(", "),
+        },
         /* DEGEN OVERHAUL END */
       });
     },
