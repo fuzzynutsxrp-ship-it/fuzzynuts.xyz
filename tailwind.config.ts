@@ -284,24 +284,26 @@ const config: Config = {
           "-moz-osx-font-smoothing": "grayscale",
           "paint-order": "stroke fill",
         },
-        /* Crisp variant of .text-hero-glow — v2 because the v1 cut
-           (12+28 → 10+22 px) was visually imperceptible: the 22 px
-           outer halo still bled into the letter edges, which is what
-           reads as "soft" on gradient-clip text.
-           v2 strategy: add a 1 px sharp dark outline for letter
-           definition, then a tight gold inner glow + a much smaller
-           outer halo. Net result: razor-sharp letters with the same
-           gold neon language, just trimmed. */
+        /* Crisp variant of .text-hero-glow — v3.
+           v2 added a 1 px dark outline that worked for sharpness but
+           made the gold gradient text read muted/dark, which doesn't
+           serve a header's job (be prominent).
+           v3 strategy: no dark outline. Crispness comes from the
+           font-smoothing in .text-degen-crisp plus tight (not heavy)
+           glow layers. Brighter gold alphas (0.8 / 0.5 / 0.25) than
+           the original 0.55 / 0.35 so the gold POPS instead of just
+           glowing soft. Depth shadow is offset (0 2px) instead of
+           centered, so it adds depth without darkening letter edges. */
         ".text-hero-glow-crisp": {
           "text-shadow": [
-            // sharp 1 px dark outline → letter edge definition
-            "0 0 1px rgba(0,0,0,0.95)",
-            // tight dark near-shadow → depth without bleed
-            "0 1px 1px rgba(0,0,0,0.85)",
-            // tight gold inner glow (was 10 px, now 6 px)
-            "0 0 6px rgba(251,191,36,0.55)",
-            // smaller outer gold halo (was 22 px, now 14 px)
-            "0 0 14px rgba(245,196,66,0.32)",
+            // tight bright gold inner glow (was muted 0.55, now 0.8)
+            "0 0 7px rgba(251,191,36,0.8)",
+            // mid gold halo (was 0.35 @ 28 px, now 0.5 @ 16 px)
+            "0 0 16px rgba(251,191,36,0.5)",
+            // soft outer gold bloom (subtle, doesn't bleed)
+            "0 0 28px rgba(251,191,36,0.25)",
+            // offset depth shadow (no edge darkening)
+            "0 2px 3px rgba(0,0,0,0.55)",
           ].join(", "),
         },
         /* DEGEN OVERHAUL END */
