@@ -50,9 +50,9 @@ function ArcadeCabinet({
 }) {
   const isComingSoon = game.id === "top-secret";
 
-  // Graceful fallback: try new /images/games/<id>.jpg cabinet art,
+  // Graceful fallback: try new /images/games/<id>.png cabinet art,
   // fall back to the existing /icons/icon-*-pop.webp on error.
-  const [artSrc, setArtSrc] = useState(`/images/games/${game.id}.jpg`);
+  const [artSrc, setArtSrc] = useState(`/images/games/${game.id}.png`);
   const handleArtError = () => {
     if (artSrc !== game.icon) setArtSrc(game.icon);
   };
