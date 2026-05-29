@@ -67,7 +67,11 @@ export function LiveWinsTicker({ game = TICKER_GAME }: { game?: string }) {
 
   return (
     <div
-      className="relative z-20 w-full border-y border-hot-pink/20 bg-degen-950/70 backdrop-blur-sm py-2"
+      // DEGEN OVERHAUL — kill glass on the ticker strip: solid degen-950
+      // (no backdrop-blur), thick 2 px hot-pink top/bottom borders,
+      // outer pink glow so the strip reads as a hard neon band, not a
+      // frosted overlay.
+      className="relative z-20 w-full border-y-2 border-hot-pink bg-degen-950 py-2 shadow-[0_0_24px_rgba(255,46,136,0.28)]"
       role="marquee"
       aria-label="Live wins ticker"
     >

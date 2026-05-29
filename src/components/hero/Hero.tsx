@@ -197,7 +197,8 @@ export function Hero() {
               backgroundColor: "rgba(245,196,66,0.18)",
             }}
             whileTap={{ scale: 0.97 }}
-            className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl text-[var(--color-gold)] font-bold text-base sm:text-lg border border-[rgba(251,191,36,0.35)] backdrop-blur-sm bg-[rgba(1,5,8,0.35)]"
+            // DEGEN OVERHAUL — Play Arcade: kill glass. Solid degen-950, thick 2 px gold border, sharp 6 px corners, outer gold glow
+            className="group flex items-center gap-2 px-7 py-3.5 rounded-md text-[var(--color-gold)] font-black text-base sm:text-lg border-2 border-[var(--color-gold)] bg-degen-950 shadow-[0_0_14px_rgba(251,191,36,0.3)]"
           >
             <Gamepad2 size={18} />
             Play Arcade
@@ -221,7 +222,8 @@ export function Hero() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="text-center rounded-xl px-2 py-2 bg-[rgba(1,5,8,0.35)] backdrop-blur-sm border border-[var(--color-glass-border-faint)]"
+              // DEGEN OVERHAUL — stats boxes: solid degen-950, thick 2 px subtle hot-pink border, sharp 6 px corners
+              className="text-center rounded-md px-2 py-2 bg-degen-950 border-2 border-hot-pink/40 shadow-[0_0_10px_rgba(255,46,136,0.22)]"
             >
               <p className="text-xl sm:text-2xl md:text-3xl font-display font-black gradient-text-gold">
                 {stat.value}
@@ -245,7 +247,9 @@ export function Hero() {
           transition={{ delay: 1.2, duration: 0.6 }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          className="group mt-9 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[rgba(1,5,8,0.55)] backdrop-blur-md border border-[rgba(251,191,36,0.25)] text-sm sm:text-base"
+          // DEGEN OVERHAUL — weekly prize teaser ("$0.10 in weekly prizes — top 3 split the pool"):
+          // kill glass pill. Solid degen-950, thick 2 px gold border, sharp 6 px corners, outer gold glow.
+          className="group mt-9 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-md bg-degen-950 border-2 border-[var(--color-gold)] text-sm sm:text-base shadow-[0_0_18px_rgba(251,191,36,0.35)]"
         >
           <span className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
           <span className="text-[var(--color-cream)]">

@@ -54,8 +54,10 @@ export function PriceTicker() {
       transition={{ delay: 1.1, duration: 0.5 }}
       className="mt-6 flex flex-wrap items-center justify-center gap-2.5"
     >
-      {/* DEGEN OVERHAUL START — neon-ringed price pill */}
-      <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-degen-950/70 backdrop-blur-md neon-ring-pink">
+      {/* DEGEN OVERHAUL START — kill glassmorphism: solid bg, thick
+          hot-pink border, sharp corners, outer glow (no backdrop-blur,
+          no rounded-xl pill, no neon-ring soft inset). */}
+      <div className="flex items-center gap-4 px-4 py-2 rounded-md bg-degen-950 border-2 border-hot-pink shadow-[0_0_20px_rgba(255,46,136,0.45)]">
         <div className="text-left">
           <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Price</p>
           <p className="font-mono font-bold text-sm text-[var(--color-gold)] tabular-nums">{fmtPrice(priceUsd)}</p>
@@ -74,7 +76,8 @@ export function PriceTicker() {
         href={CHART_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-[var(--color-gold)] border border-[rgba(251,191,36,0.35)] bg-[rgba(1,5,8,0.35)] backdrop-blur-sm hover:bg-[rgba(251,191,36,0.1)] transition-colors"
+        // DEGEN OVERHAUL — Chart button: solid degen-950, thick 2 px gold border, sharp 6 px corners, outer gold glow
+        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-bold text-[var(--color-gold)] border-2 border-[var(--color-gold)] bg-degen-950 hover:bg-[rgba(251,191,36,0.12)] transition-all shadow-[0_0_12px_rgba(251,191,36,0.35)]"
       >
         <LineChart size={16} />
         Chart
@@ -83,12 +86,13 @@ export function PriceTicker() {
         href={BUY_URL}
         target="_blank"
         rel="noopener noreferrer"
-        // DEGEN OVERHAUL — gold→hot-pink Buy button with pink bloom
-        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-black text-[var(--color-degen-black)] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] hover:shadow-[0_0_28px_rgba(255,46,136,0.55)] transition-all"
+        // DEGEN OVERHAUL — Buy button: same gradient, just sharp 6 px corners (was 12 px rounded-xl)
+        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-black text-[var(--color-degen-black)] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] hover:shadow-[0_0_28px_rgba(255,46,136,0.55)] transition-all"
       >
         <ShoppingCart size={16} />
         Buy $NUT
       </a>
+      {/* DEGEN OVERHAUL END */}
     </motion.div>
   );
 }
