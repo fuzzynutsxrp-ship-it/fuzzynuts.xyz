@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════
  * Tiny format helpers — extracted from @/lib/utils so consumers can
  * import these without pulling the big const arrays (TOKENOMICS,
- * GAMES, HOW_TO_STEPS, FEATURES) along for the ride.
+ * GAMES, HOW_TO_STEPS) along for the ride.
  *
  * Hot path: GameSidebar imports formatNumber from here to keep the
  * /games/[slug] route's First Load JS lean (round 5 wired the

@@ -117,55 +117,6 @@ export const GAMES = [
   },
 ];
 
-export const FEATURES = [
-  {
-    icon: "Shield",
-    featIcon: "/images/features/feat-rewards.webp",
-    title: "100% On-Chain Rewards",
-    description:
-      "Every $NUT prize is verified on the XRP Ledger. No off-chain IOUs, no trust required.",
-  },
-  {
-    icon: "Gamepad2",
-    featIcon: "/images/features/feat-arcade.webp",
-    title: "Play-to-Earn Arcade",
-    description:
-      // DEGEN OVERHAUL — stale "500K NUT" stripped. Real weekly hoard is
-      // computed live from weekly_prize_tiers (see GameSidebar.tsx pattern);
-      // this FEATURES const is currently not imported anywhere, but the
-      // description stays accurate either way.
-      "6 hand-tuned games with real $NUT prizes — bag the bag every week on the leaderboard.",
-  },
-  {
-    icon: "Lock",
-    featIcon: "/images/features/feat-blackhole.webp",
-    title: "Blackholed Issuer",
-    description:
-      "The issuer wallet is permanently disabled. Nobody can ever mint more tokens. Supply is forever fixed.",
-  },
-  {
-    icon: "Trophy",
-    featIcon: "/images/features/feat-leaderboard.webp",
-    title: "Weekly Leaderboards",
-    description:
-      "Compete for top scores each week. Prizes reset every Monday. Climb the ranks, earn more NUT.",
-  },
-  {
-    icon: "Bot",
-    featIcon: "/images/features/feat-antibot.webp",
-    title: "Anti-Bot Protection",
-    description:
-      "Score caps, minimum play durations, rate limits, and wallet verification keep the arcade fair.",
-  },
-  {
-    icon: "Users",
-    featIcon: "/images/features/feat-community.webp",
-    title: "Community-Governed Future",
-    description:
-      "18% Community Nut Jar for airdrops, rewards, and ecosystem growth. The community decides what comes next.",
-  },
-];
-
 export const HOW_TO_STEPS = [
   {
     step: 1,
@@ -198,7 +149,7 @@ export const HOW_TO_STEPS = [
 ];
 
 // DEGEN OVERHAUL — formatters extracted to @/lib/format so hot-path consumers
-// (GameSidebar etc.) can avoid pulling TOKENOMICS/GAMES/HOW_TO_STEPS/FEATURES
+// (GameSidebar etc.) can avoid pulling TOKENOMICS/GAMES/HOW_TO_STEPS
 // into their bundle. Re-exports kept here for backward compatibility — every
 // existing `import { formatNumber } from "@/lib/utils"` keeps working.
 export { formatUsd, truncateAddress, formatNumber } from "./format";
