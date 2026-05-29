@@ -345,8 +345,11 @@ export function Trust() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-12 md:mb-16"
         >
-          {/* DEGEN OVERHAUL START — same facts, zero corporate tone */}
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow mb-4">
+          {/* DEGEN OVERHAUL START — same facts, zero corporate tone (crisp pass:
+              text-hero-glow → text-hero-glow-crisp tightens the blur 12+28 px →
+              10+22 px; text-degen-crisp adds antialiasing + paint-order so the
+              gold gradient-clip text stays razor sharp under the halo.) */}
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             Don&apos;t Trust. Verify.
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">

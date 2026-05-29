@@ -115,9 +115,13 @@ export function Prizes() {
           viewport={{ once: true, amount: 0.2 }}
           className="text-center mb-12 md:mb-14"
         >
-          {/* DEGEN OVERHAUL START — neon FOMO header */}
-          <span className="neon-chip mb-4 animate-glitch-skew">🥜 The Weekly Nut Hoard 🐿️</span>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold text-hero-glow mb-4">
+          {/* DEGEN OVERHAUL START — neon FOMO header (crisp pass: text-degen-crisp
+              on the pill kills aliasing under the glitch-skew animation; the h2
+              swaps text-hero-glow → text-hero-glow-crisp for tighter 10+22 px
+              blur + text-degen-crisp for antialiasing on the gradient-clip text.
+              Glow language and colour identical, just sharp. */}
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🥜 The Weekly Nut Hoard 🐿️</span>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             {totalUsdLabel} Hoard, Split Every Week
           </h2>
           <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
