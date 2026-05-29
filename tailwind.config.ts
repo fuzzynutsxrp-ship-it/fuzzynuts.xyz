@@ -284,15 +284,24 @@ const config: Config = {
           "-moz-osx-font-smoothing": "grayscale",
           "paint-order": "stroke fill",
         },
-        /* Tighter variant of .text-hero-glow — same gold halo language
-           but blur cut from 12+28 px → 10+22 px and the near-shadow
-           sharpened. Pair with .text-degen-crisp + .gradient-text-gold
-           on the big section headings (Prizes / Trust). */
+        /* Crisp variant of .text-hero-glow — v2 because the v1 cut
+           (12+28 → 10+22 px) was visually imperceptible: the 22 px
+           outer halo still bled into the letter edges, which is what
+           reads as "soft" on gradient-clip text.
+           v2 strategy: add a 1 px sharp dark outline for letter
+           definition, then a tight gold inner glow + a much smaller
+           outer halo. Net result: razor-sharp letters with the same
+           gold neon language, just trimmed. */
         ".text-hero-glow-crisp": {
           "text-shadow": [
-            "0 0 10px rgba(251,191,36,0.55)",
-            "0 0 22px rgba(245,196,66,0.35)",
-            "0 1px 2px rgba(0,0,0,0.9)",
+            // sharp 1 px dark outline → letter edge definition
+            "0 0 1px rgba(0,0,0,0.95)",
+            // tight dark near-shadow → depth without bleed
+            "0 1px 1px rgba(0,0,0,0.85)",
+            // tight gold inner glow (was 10 px, now 6 px)
+            "0 0 6px rgba(251,191,36,0.55)",
+            // smaller outer gold halo (was 22 px, now 14 px)
+            "0 0 14px rgba(245,196,66,0.32)",
           ].join(", "),
         },
         /* DEGEN OVERHAUL END */
