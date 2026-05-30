@@ -32,7 +32,7 @@ import { GAMES } from "@/lib/utils";
 const CARD_CLASSES =
   "arcade-card group relative flex flex-col rounded-2xl " +
   "border-2 border-hot-pink neon-ring-pink " +
-  "bg-[rgba(10,6,19,0.45)] backdrop-blur-[8px] " +
+  "bg-[rgba(10,6,19,0.15)] backdrop-blur-[6px] " +
   "transition-all duration-300 ease-out " +
   "hover:scale-[1.03] hover:shadow-[0_0_48px_rgba(255,46,136,0.5)] " +
   "focus-within:scale-[1.03] focus-within:shadow-[0_0_48px_rgba(255,46,136,0.5)]";
@@ -76,7 +76,7 @@ function ArcadeCabinet({
       {/* DEGEN OVERHAUL START — clear plastic inner panel
           Semi-transparent so the mesh background bleeds through.
           Glossy plastic sheen overlay adds the N64 controller shine. */}
-      <div className="relative rounded-xl overflow-hidden flex flex-col flex-1 bg-[rgba(8,8,10,0.35)]">
+      <div className="relative rounded-xl overflow-hidden flex flex-col flex-1 bg-[rgba(8,8,10,0.12)]">
         {/* Glossy plastic highlight — top-left to bottom-right sheen */}
         <div
           aria-hidden="true"
@@ -201,7 +201,7 @@ function ArcadeCabinet({
           className="relative flex flex-col flex-1 px-5 pt-4 pb-5 gap-3"
           style={{
             background:
-              "linear-gradient(180deg, rgba(16,16,19,0.45) 0%, rgba(10,10,12,0.4) 55%, rgba(5,5,6,0.35) 100%)",
+              "linear-gradient(180deg, rgba(16,16,19,0.18) 0%, rgba(10,10,12,0.15) 55%, rgba(5,5,6,0.12) 100%)",
           }}
         >
           {/* DEGEN OVERHAUL END */}
