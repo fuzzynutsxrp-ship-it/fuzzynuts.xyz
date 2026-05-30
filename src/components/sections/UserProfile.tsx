@@ -154,7 +154,15 @@ function ConnectPrompt() {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-20 px-6 text-center"
     >
-      <div className="w-24 h-24 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(251,191,36,0.15)]">
+      {/* Floating nuts around connect prompt */}
+      <span className="absolute top-8 left-1/4 text-xl float-nut-1 opacity-50 pointer-events-none">🥜</span>
+      <span className="absolute top-12 right-1/4 text-lg float-nut-2 opacity-40 pointer-events-none">🥜</span>
+      <span className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-35 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
+
+      <div
+        className="w-24 h-24 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center mb-6"
+        style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
+      >
         <Wallet size={40} className="text-brand-gold" />
       </div>
       <h2 className="font-display text-2xl font-bold text-cream mb-3">
@@ -173,7 +181,7 @@ function ConnectPrompt() {
             key={w.id}
             onClick={() => connect(w.id)}
             disabled={isConnecting}
-            whileHover={{ scale: 1.04 }}
+            whileHover={{ scale: 1.04, boxShadow: "0 0 30px rgba(251,191,36,0.4)" }}
             whileTap={{ scale: 0.96 }}
             className="flex items-center gap-2 px-5 py-3 rounded-xl
                        bg-gradient-to-r from-brand-gold to-yellow-500
@@ -291,8 +299,11 @@ export function UserProfile() {
     return (
       <section id="user-profile" className="py-16 relative">
         <div className="container-main">
-          <div className="bg-[#0a0a0a] border-2 border-brand-gold/30 rounded-2xl overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-brand-gold via-neon-green to-brand-gold" />
+          <div
+            className="bg-[#0a0a0a] border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
+            style={{ boxShadow: "0 0 40px rgba(251,191,36,0.08), 0 0 80px rgba(251,191,36,0.04)" }}
+          >
+            <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
             <ConnectPrompt />
           </div>
         </div>
@@ -330,14 +341,25 @@ export function UserProfile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="bg-[#0a0a0a] border-2 border-brand-gold/30 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(251,191,36,0.08)]">
+          <div
+            className="bg-[#0a0a0a] border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
+            style={{ boxShadow: "0 0 40px rgba(251,191,36,0.1), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)" }}
+          >
+            {/* Floating nuts around header */}
+            <span className="absolute top-4 right-8 text-lg float-nut-1 opacity-60 pointer-events-none z-10">🥜</span>
+            <span className="absolute bottom-6 left-12 text-base float-nut-2 opacity-45 pointer-events-none z-10">🥜</span>
+            <span className="absolute top-1/2 right-1/4 text-sm float-nut-3 opacity-40 pointer-events-none z-10" style={{ animationDelay: "1.1s" }}>🥜</span>
+
             {/* Gold accent stripe */}
-            <div className="h-1 bg-gradient-to-r from-brand-gold via-neon-green to-brand-gold" />
+            <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
             <div className="p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   {/* Avatar — Fuzzynuts logo */}
-                  <div className="w-20 h-20 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(251,191,36,0.2)]">
+                  <div
+                    className="w-20 h-20 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center shrink-0"
+                    style={{ boxShadow: "0 0 24px rgba(251,191,36,0.2), 0 0 48px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
+                  >
                     <img
                       src="/images/branding/logo.webp"
                       alt="Fuzzynuts"
@@ -357,7 +379,7 @@ export function UserProfile() {
                     <div className="mt-2 flex items-center gap-2">
                       <div className="w-24 h-1.5 rounded-full bg-[#111] overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-brand-gold to-neon-green"
+                          className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-500"
                           style={{ width: `${xpProgress}%` }}
                         />
                       </div>
@@ -378,7 +400,7 @@ export function UserProfile() {
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs
                                font-semibold text-cream-dim hover:text-cream
                                bg-[#111] hover:bg-[#1a1a1a]
-                               border border-white/[0.08] hover:border-neon-green/20
+                               border border-white/[0.08] hover:border-brand-gold/30
                                transition-all min-h-[40px]
                                disabled:opacity-40 cursor-pointer"
                     title="Refresh scores"
@@ -427,27 +449,31 @@ export function UserProfile() {
               label: "Total Plays",
               value: totalGames,
               icon: <Gamepad2 size={20} className="text-neon-green" />,
-              borderColor: "border-neon-green/30",
-              glowColor: "shadow-[0_0_20px_rgba(16,185,129,0.08)]",
+              borderColor: "border-neon-green/40",
+              glowColor: "shadow-[0_0_20px_rgba(16,185,129,0.12)]",
+              bg: "bg-[#0a0a0a]",
             },
             {
               label: "Games Played",
               value: uniqueGames,
               icon: <Trophy size={20} className="text-brand-gold" />,
-              borderColor: "border-brand-gold/30",
-              glowColor: "shadow-[0_0_20px_rgba(251,191,36,0.08)]",
+              borderColor: "border-brand-gold/40",
+              glowColor: "shadow-[0_0_20px_rgba(251,191,36,0.12)]",
+              bg: "bg-[#0f0a00]",
             },
             {
               label: "Best Score",
               value: topScore > 0 ? formatNumber(topScore) : "—",
-              icon: <TrendingUp size={20} className="text-cyan-400" />,
-              borderColor: "border-cyan-400/30",
-              glowColor: "shadow-[0_0_20px_rgba(34,211,238,0.08)]",
+              icon: <TrendingUp size={20} className="text-amber-500" />,
+              borderColor: "border-amber-500/40",
+              glowColor: "shadow-[0_0_20px_rgba(245,158,11,0.12)]",
+              bg: "bg-[#0f0a00]",
             },
           ].map((stat) => (
             <div
               key={stat.label}
-              className={`bg-[#0a0a0a] border ${stat.borderColor} rounded-xl ${stat.glowColor} p-4 sm:p-5 text-center`}
+              className={`${stat.bg} border-2 ${stat.borderColor} rounded-xl ${stat.glowColor} p-4 sm:p-5 text-center`}
+              style={{ boxShadow: stat.label === "Best Score" ? "0 0 25px rgba(245,158,11,0.15), 0 0 50px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.15)" : stat.label === "Games Played" ? "0 0 25px rgba(251,191,36,0.15), 0 0 50px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)" : "0 0 25px rgba(16,185,129,0.15), 0 0 50px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.15)" }}
             >
               <div className="flex justify-center mb-2">{stat.icon}</div>
               <p className="font-display text-xl sm:text-2xl font-bold text-cream">
@@ -475,7 +501,8 @@ export function UserProfile() {
               {Object.entries(bestByGame).map(([gameId, entry]) => (
                 <div
                   key={gameId}
-                  className="bg-[#0a0a0a] border border-white/[0.08] rounded-xl p-4 flex items-center gap-3"
+                  className="bg-[#0a0a0a] border-2 border-white/[0.08] hover:border-brand-gold/30 rounded-xl p-4 flex items-center gap-3 transition-all"
+                  style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 >
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
@@ -518,7 +545,10 @@ export function UserProfile() {
           </h3>
 
           {/* XP Progress Bar */}
-          <div className="mb-4 bg-[#0a0a0a] border border-white/[0.08] rounded-xl p-4">
+          <div
+            className="mb-4 bg-[#0a0a0a] border-2 border-brand-gold/30 rounded-xl p-4"
+            style={{ boxShadow: "0 0 20px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" }}
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-semibold text-cream">
                 Achievement Progress
@@ -529,7 +559,7 @@ export function UserProfile() {
             </div>
             <div className="h-2.5 rounded-full bg-[#111] overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-brand-gold to-neon-green transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-500 transition-all duration-500"
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
@@ -547,11 +577,12 @@ export function UserProfile() {
               return (
                 <div key={achievement.id} className="group relative">
                   <div
-                    className={`p-4 flex items-center gap-3 rounded-xl border transition-all ${
+                    className={`p-4 flex items-center gap-3 rounded-xl border-2 transition-all ${
                       isUnlocked
-                        ? "bg-[#0f0a00] border-brand-gold/30 shadow-[0_0_15px_rgba(251,191,36,0.08)]"
+                        ? "bg-[#0f0a00] border-brand-gold/40"
                         : "bg-[#0a0a0a] border-white/[0.06] opacity-50"
                     }`}
+                    style={isUnlocked ? { boxShadow: "0 0 20px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.12)" } : undefined}
                   >
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 ${
@@ -597,7 +628,10 @@ export function UserProfile() {
             <Calendar size={16} className="text-neon-green" />
             Score History
           </h3>
-          <div className="bg-[#0a0a0a] border border-white/[0.08] rounded-2xl overflow-hidden">
+          <div
+            className="bg-[#0a0a0a] border-2 border-white/[0.08] rounded-2xl overflow-hidden"
+            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+          >
             {/* Loading */}
             {state.loading && <div className="p-4 sm:p-5"><SkeletonRows /></div>}
 
@@ -629,7 +663,12 @@ export function UserProfile() {
 
             {/* Empty */}
             {!state.loading && !state.error && state.scores.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+              <div className="flex flex-col items-center justify-center py-16 px-6 text-center relative">
+                {/* Floating nuts */}
+                <span className="absolute top-10 left-1/4 text-xl float-nut-1 opacity-40 pointer-events-none">🥜</span>
+                <span className="absolute top-8 right-1/4 text-lg float-nut-2 opacity-30 pointer-events-none">🥜</span>
+                <span className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-25 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
+
                 <Gamepad2
                   size={32}
                   className="text-neon-green mb-4 opacity-40"
@@ -683,11 +722,12 @@ export function UserProfile() {
 
                         {/* Entry card */}
                         <div
-                          className={`bg-[#0d0d0d] border rounded-xl p-3 sm:p-4 ${
+                          className={`bg-[#0d0d0d] border-2 rounded-xl p-3 sm:p-4 transition-all ${
                             isRecent
-                              ? "border-white/[0.08]"
-                              : "border-white/[0.04]"
+                              ? "border-brand-gold/30"
+                              : "border-white/[0.04] hover:border-white/[0.08]"
                           }`}
+                          style={isRecent ? { boxShadow: "0 0 15px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" } : undefined}
                         >
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-base">

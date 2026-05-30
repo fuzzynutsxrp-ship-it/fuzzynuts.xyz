@@ -133,16 +133,24 @@ export function Navbar() {
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? // DEGEN OVERHAUL START — black/purple bar w/ hot-pink underglow
-              "bg-degen-950/90 backdrop-blur-xl border-b border-hot-pink/25 shadow-[0_4px_30px_rgba(0,0,0,0.5),0_1px_0_rgba(255,46,136,0.4)]"
-              // DEGEN OVERHAUL END
-            : "bg-transparent"
+            ? // Solid dark bar with intense warm neon underglow — matches Leaderboard prize cards
+              "bg-[#0a0a0a] border-b-2 border-brand-gold/40 shadow-[0_4px_30px_rgba(0,0,0,0.5),0_0_30px_rgba(251,191,36,0.15),0_0_60px_rgba(251,191,36,0.08),0_1px_0_rgba(251,191,36,0.2)]"
+            : "bg-[#0a0a0a]/80"
         }`}
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="container-main flex items-center justify-between h-16 md:h-[72px]">
-          {/* Logo — squirrel emblem + text_logo.png wordmark */}
+        <div className="container-main flex items-center justify-between h-16 md:h-[72px] relative">
+          {/* Floating nut particles — subtle, only when scrolled */}
+          {scrolled && (
+            <>
+              <span className="absolute -top-1 left-[15%] text-xs float-nut-1 opacity-40 pointer-events-none hidden md:block">🥜</span>
+              <span className="absolute top-2 right-[20%] text-[10px] float-nut-2 opacity-30 pointer-events-none hidden md:block" style={{ animationDelay: "0.9s" }}>🥜</span>
+              <span className="absolute -bottom-1 left-[55%] text-[10px] float-nut-3 opacity-25 pointer-events-none hidden md:block" style={{ animationDelay: "1.7s" }}>🥜</span>
+            </>
+          )}
+
+          {/* Logo — squirrel emblem + wordmark with warm neon glow */}
           <Link
             href="/"
             className="flex items-center gap-2 group shrink-0"
@@ -153,7 +161,6 @@ export function Navbar() {
               transition={{ duration: 0.3 }}
               className="flex items-center gap-2"
             >
-              {/* DEGEN OVERHAUL START — interactive mascot: idle bounce + hover neon glow */}
               <Image
                 src="/images/branding/logo-nav.webp"
                 alt=""
@@ -162,7 +169,6 @@ export function Navbar() {
                 className="logo-degen rounded-md"
                 priority
               />
-              {/* DEGEN OVERHAUL END */}
               <Image
                 src="/images/branding/wordmarks/text_logo.png"
                 alt="Fuzzynuts"
@@ -180,9 +186,7 @@ export function Navbar() {
               const isRoute =
                 link.href.startsWith("/") && !link.href.startsWith("/#");
               const isLeaderboard = link.icon === "trophy";
-              // DEGEN OVERHAUL START — hot-pink link hover
-              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-hot-pink)] transition-colors rounded-lg hover:bg-[rgba(255,46,136,0.07)] flex items-center gap-1.5 relative`;
-              // DEGEN OVERHAUL END
+              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-brand-gold transition-colors rounded-lg hover:bg-[rgba(251,191,36,0.07)] flex items-center gap-1.5 relative`;
 
               if (isRoute && isLeaderboard) {
                 return (
@@ -226,7 +230,7 @@ export function Navbar() {
             {isConnected && (
               <Link
                 href="/profile/"
-                className="relative px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-neon-green)] transition-colors rounded-lg hover:bg-[rgba(16,185,129,0.05)] flex items-center gap-1.5"
+                className="relative px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-neon-green transition-colors rounded-lg hover:bg-[rgba(16,185,129,0.07)] flex items-center gap-1.5"
               >
                 {hasClaimable ? (
                   <Gift size={14} className="text-brand-gold" />
@@ -252,7 +256,8 @@ export function Navbar() {
                   onClick={() => setWalletMenuOpen(!walletMenuOpen)}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[rgba(245,196,66,0.1)] border border-[rgba(245,196,66,0.2)] text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.15)] transition-all text-sm font-medium"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0f0a00] border-2 border-brand-gold/30 text-brand-gold hover:border-brand-gold/50 transition-all text-sm font-medium"
+                  style={{ boxShadow: "0 0 15px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.1)" }}
                 >
                   <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
                   <span className="hidden sm:inline">
@@ -270,19 +275,17 @@ export function Navbar() {
                 <motion.button
                   onClick={() => setWalletMenuOpen(!walletMenuOpen)}
                   disabled={isConnecting}
-                  // DEGEN OVERHAUL START — pink neon glow on the gold CTA (flow unchanged)
                   whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 0 28px rgba(255,46,136,0.55)",
+                    boxShadow: "0 0 30px rgba(251,191,36,0.45), 0 0 60px rgba(251,191,36,0.2)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-black text-sm transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold to-amber-500 text-forest-dark font-black text-sm transition-all disabled:opacity-50 cursor-pointer"
                   style={{
                     animation: !isConnecting
-                      ? "pulse-pink 2.6s ease-in-out infinite"
+                      ? "pulse-gold 2.6s ease-in-out infinite"
                       : "none",
                   }}
-                  // DEGEN OVERHAUL END
                 >
                   <Wallet size={16} />
                   <span className="hidden sm:inline">
@@ -302,35 +305,35 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-72 rounded-xl glass-card p-3 shadow-2xl"
+                    className="absolute right-0 top-full mt-2 w-72 rounded-xl bg-[#0a0a0a] border-2 border-brand-gold/30 p-3 shadow-[0_0_30px_rgba(251,191,36,0.1),0_0_60px_rgba(251,191,36,0.05),0_8px_32px_rgba(0,0,0,0.6)]"
                   >
                     {isConnected ? (
                       <div className="space-y-2">
                         {/* Address display */}
-                        <div className="px-3 py-2.5 rounded-lg bg-[rgba(245,196,66,0.05)] border border-[rgba(245,196,66,0.08)]">
+                        <div className="px-3 py-2.5 rounded-lg bg-[#0f0a00] border border-brand-gold/20">
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-xs text-[var(--color-cream-dim)] capitalize">
                               Connected via {provider}
                             </p>
                             <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)]" />
                           </div>
-                          <p className="text-xs font-mono text-[var(--color-gold)] break-all leading-relaxed">
+                          <p className="text-xs font-mono text-brand-gold break-all leading-relaxed">
                             {address}
                           </p>
                         </div>
 
                         {/* NUT Balance */}
-                        <div className="px-3 py-2 rounded-lg bg-[rgba(245,196,66,0.03)] flex items-center justify-between">
+                        <div className="px-3 py-2 rounded-lg bg-[#0f0a00]/50 flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Coins
                               size={14}
-                              className="text-[var(--color-gold)]"
+                              className="text-brand-gold"
                             />
                             <span className="text-xs text-[var(--color-cream-dim)]">
                               $NUT Balance
                             </span>
                           </div>
-                          <span className="text-sm font-bold text-[var(--color-gold)]">
+                          <span className="text-sm font-bold text-brand-gold">
                             {nutBalance || "—"}
                           </span>
                         </div>
@@ -339,7 +342,7 @@ export function Navbar() {
                         <Link
                           href="/profile/"
                           onClick={() => setWalletMenuOpen(false)}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--color-accent-green)] hover:bg-[rgba(74,222,128,0.08)] rounded-lg transition-colors cursor-pointer"
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neon-green hover:bg-[rgba(16,185,129,0.08)] rounded-lg transition-colors cursor-pointer"
                         >
                           <Gift size={14} />
                           {hasClaimable ? "Claim Rewards 🔔" : "Claim Rewards"}
@@ -348,12 +351,12 @@ export function Navbar() {
                           href={`https://xrpscan.com/account/${address}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.05)] rounded-lg transition-colors"
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-brand-gold hover:bg-[rgba(251,191,36,0.05)] rounded-lg transition-colors"
                         >
                           <ExternalLink size={14} />
                           View on XRPScan
                         </a>
-                        <div className="h-px bg-[rgba(245,196,66,0.08)] mx-1" />
+                        <div className="h-px bg-brand-gold/10 mx-1" />
                         <button
                           onClick={() => {
                             disconnect();
@@ -388,7 +391,7 @@ export function Navbar() {
                                     href="https://xaman.app"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="underline text-brand-gold hover:text-[var(--color-gold)] font-semibold"
+                                    className="underline text-brand-gold hover:text-gold-light font-semibold"
                                   >
                                     Get Xaman →
                                   </a>
@@ -417,7 +420,7 @@ export function Navbar() {
                             onClick={() => handleConnect(w.id)}
                             disabled={isConnecting}
                             whileHover={{ x: 4 }}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-[var(--color-cream)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.08)] rounded-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-[var(--color-cream)] hover:text-brand-gold hover:bg-[rgba(251,191,36,0.08)] rounded-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <span className="text-xl w-8 text-center">
                               {w.icon}
@@ -440,7 +443,7 @@ export function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 text-[var(--color-cream)] hover:text-[var(--color-gold)] cursor-pointer"
+              className="md:hidden p-2 text-[var(--color-cream)] hover:text-brand-gold cursor-pointer"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               <AnimatePresence mode="wait">
@@ -478,14 +481,19 @@ export function Navbar() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden bg-forest-900/95 backdrop-blur-xl border-b border-gold-dim"
+              className="md:hidden overflow-hidden bg-[#0a0a0a] border-b-2 border-brand-gold/30"
+              style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.5), 0 0 20px rgba(251,191,36,0.08)" }}
             >
               <div className="container-main py-4 space-y-1">
+                {/* Floating nuts in mobile menu */}
+                <span className="absolute top-4 right-8 text-sm float-nut-1 opacity-30 pointer-events-none">🥜</span>
+                <span className="absolute bottom-6 left-12 text-xs float-nut-2 opacity-20 pointer-events-none" style={{ animationDelay: "1.2s" }}>🥜</span>
+
                 {NAV_LINKS.map((link, i) => {
                   const isRoute =
                     link.href.startsWith("/") && !link.href.startsWith("/#");
                   const classes =
-                    "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.05)] rounded-lg transition-colors min-h-[44px]";
+                    "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-brand-gold hover:bg-[rgba(251,191,36,0.07)] rounded-lg transition-colors min-h-[44px]";
 
                   if (isRoute && link.icon === "trophy") {
                     return (
@@ -554,7 +562,7 @@ export function Navbar() {
                     <Link
                       href="/profile/"
                       onClick={() => setMobileOpen(false)}
-                      className="relative flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-neon-green)] hover:bg-[rgba(16,185,129,0.05)] rounded-lg transition-colors min-h-[44px]"
+                      className="relative flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-neon-green hover:bg-[rgba(16,185,129,0.07)] rounded-lg transition-colors min-h-[44px]"
                     >
                       {hasClaimable ? (
                         <Gift size={16} className="text-brand-gold" />

@@ -1,0 +1,73 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+
+/**
+ * Thin Client Component wrapper for the prizes page.
+ * Background, navbar, and footer are provided by layout.tsx
+ * via SubPageLayout — this component only renders content.
+ */
+const PrizesPageContent = dynamic(
+  () =>
+    import("@/components/sections/PrizesPageContent").then(
+      (mod) => mod.PrizesPageContent,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center py-32">
+        <p className="text-neon-green animate-pulse font-display text-lg">
+          Loading prizes…
+        </p>
+      </div>
+    ),
+  },
+);
+
+export function PrizesClient() {
+  return (
+    <div className="relative z-10">
+      {/* ── Back to Home ── */}
+      <div className="container-main pt-6">
+        <motion.div
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl
+                       bg-gradient-to-r from-brand-gold to-yellow-500
+                       text-forest-dark font-bold text-sm
+                       hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
+                       active:scale-95 transition-all min-h-[44px]"
+          >
+            <ArrowLeft
+              size={16}
+              className="transition-transform group-hover:-translate-x-1"
+            />
+            Back to Home
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* ── Prizes Content ── */}
+      <div className="container-main py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="rounded-2xl border border-white/[0.08]
+                     bg-[rgba(1,5,8,0.55)] backdrop-blur-xl
+                     shadow-[0_8px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(251,191,36,0.04)]
+                     overflow-hidden"
+        >
+          <PrizesPageContent />
+        </motion.div>
+      </div>
+    </div>
+  );
+}
