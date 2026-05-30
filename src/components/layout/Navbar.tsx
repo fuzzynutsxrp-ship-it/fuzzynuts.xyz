@@ -21,6 +21,7 @@ import { truncateAddress } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
 import { LeaderboardModal } from "@/components/game/LeaderboardModal";
+import { ProfileModal } from "@/components/game/ProfileModal";
 
 const NAV_LINKS = [
   { href: "/#games", label: "Arcade" },
@@ -35,6 +36,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const {
     address,
     isConnected,
@@ -228,8 +230,8 @@ export function Navbar() {
 
             {/* Profile link — only visible when wallet is connected */}
             {isConnected && (
-              <Link
-                href="/profile/"
+              <button
+                onClick={() => setProfileOpen(true)}
                 className="relative px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-neon-green transition-colors rounded-lg hover:bg-[rgba(16,185,129,0.07)] flex items-center gap-1.5"
               >
                 {hasClaimable ? (
@@ -243,7 +245,7 @@ export function Navbar() {
                     $NUT
                   </span>
                 )}
-              </Link>
+              </button>
             )}
           </div>
 
@@ -339,14 +341,13 @@ export function Navbar() {
                         </div>
 
                         {/* Actions */}
-                        <Link
-                          href="/profile/"
-                          onClick={() => setWalletMenuOpen(false)}
+                        <button
+                          onClick={() => { setWalletMenuOpen(false); setProfileOpen(true); }}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neon-green hover:bg-[rgba(16,185,129,0.08)] rounded-lg transition-colors cursor-pointer"
                         >
                           <Gift size={14} />
                           {hasClaimable ? "Claim Rewards 🔔" : "Claim Rewards"}
-                        </Link>
+                        </button>
                         <a
                           href={`https://xrpscan.com/account/${address}`}
                           target="_blank"
@@ -559,9 +560,8 @@ export function Navbar() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: NAV_LINKS.length * 0.05 }}
                   >
-                    <Link
-                      href="/profile/"
-                      onClick={() => setMobileOpen(false)}
+                    <button
+                      onClick={() => { setMobileOpen(false); setProfileOpen(true); }}
                       className="relative flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-neon-green hover:bg-[rgba(16,185,129,0.07)] rounded-lg transition-colors min-h-[44px]"
                     >
                       {hasClaimable ? (
@@ -578,7 +578,7 @@ export function Navbar() {
                           $NUT
                         </span>
                       )}
-                    </Link>
+                    </button>
                   </motion.div>
                 )}
               </div>
@@ -591,6 +591,12 @@ export function Navbar() {
       <LeaderboardModal
         isOpen={leaderboardOpen}
         onClose={() => setLeaderboardOpen(false)}
+      />
+
+      {/* Profile modal — opens from nav "Profile" button */}
+      <ProfileModal
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
       />
     </>
   );
