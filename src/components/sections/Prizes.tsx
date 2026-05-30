@@ -112,8 +112,8 @@ export function Prizes() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          className="text-center mb-12 md:mb-14"
+          viewport={{ once: true, amount: 0.1 }}
+          className="text-center mb-12 md:mb-16"
         >
           {/* DEGEN OVERHAUL START — neon FOMO header (crisp pass: text-degen-crisp
               on the pill kills aliasing under the glitch-skew animation; the h2
@@ -124,7 +124,7 @@ export function Prizes() {
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             {totalUsdLabel} Hoard, Split Every Week
           </h2>
-          <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
             Crack the weekly leaderboard&apos;s top 3 and split the hoard. Free
             to play — no buy-in, no catch, no cap. Skill in, $NUT out. 🥜
           </p>

@@ -34,14 +34,14 @@ export function HowToGet() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
-          className="text-center mb-16"
+          className="text-center mb-12 md:mb-16"
         >
           {/* DEGEN OVERHAUL START — neon header, irreverent subcopy */}
-          <span className="neon-chip mb-4">🐿️ Zero to degen</span>
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow mb-4">
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🐿️ Zero to degen</span>
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             How to Get $NUT
           </h2>
-          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto">
+          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
             4 steps. No sign-ups, no nonsense, no cap. Ape into the nuttiest
             community on XRPL. 🥜
           </p>

@@ -185,19 +185,18 @@ export function Leaderboard() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
-          className="text-center mb-10"
+          className="text-center mb-12 md:mb-16"
         >
           {/* DEGEN OVERHAUL START — neon badge + degen subcopy */}
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="neon-chip mb-4"
+          <span
+            className="neon-chip text-degen-crisp mb-4 animate-glitch-skew"
           >
             🏆 Hall of Degens
-          </motion.span>
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold mb-3">
+          </span>
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             Leaderboard
           </h2>
-          <p className="text-[var(--color-cream-dim)] text-lg max-w-xl mx-auto">
+          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
             Boards wipe every Monday 00:00 UTC. Climb the ranks, bag real $NUT,
             flex on the timeline. Paper hands need not apply.
           </p>
