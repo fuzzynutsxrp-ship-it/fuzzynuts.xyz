@@ -221,10 +221,9 @@ export function Leaderboard() {
               transition={{ type: "spring", damping: 15, stiffness: 200 }}
               className="mb-8"
             >
-              <div className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/40 prize-shimmer"
+              <div className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/50 prize-shimmer bg-[#0f0a00]"
                 style={{
-                  background: "linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(1,5,8,0.95) 40%, rgba(16,185,129,0.05) 100%)",
-                  boxShadow: "0 0 40px rgba(251,191,36,0.15), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)"
+                  boxShadow: "0 0 40px rgba(251,191,36,0.2), 0 0 80px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)"
                 }}
               >
                 <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5 p-6 sm:p-8">
@@ -286,7 +285,7 @@ export function Leaderboard() {
           className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6"
         >
           {/* Game Selector — Desktop Tabs */}
-          <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-[var(--color-card)] border border-[var(--color-glass-border)]">
+          <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-[#0a0a0a] border border-white/[0.08]">
             {GAMES.map((game) => (
               <button
                 key={game.id}
@@ -296,8 +295,8 @@ export function Leaderboard() {
                   transition-all duration-200 min-h-[44px]
                   ${
                     selectedGame === game.id
-                      ? "bg-neon-green/20 text-neon-green border border-neon-green/40 shadow-[0_0_20px_rgba(16,185,129,0.25),0_0_40px_rgba(16,185,129,0.1)]"
-                      : "text-cream-dim hover:text-cream hover:bg-white/[0.04] border border-transparent"
+                      ? "bg-[#0a1a0f] text-neon-green border border-neon-green/40 shadow-[0_0_20px_rgba(16,185,129,0.25),0_0_40px_rgba(16,185,129,0.1)]"
+                      : "text-cream-dim hover:text-cream hover:bg-[#111] border border-transparent"
                   }
                 `}
                 aria-pressed={selectedGame === game.id}
@@ -313,7 +312,7 @@ export function Leaderboard() {
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl
-                         bg-[var(--color-card)] border border-[var(--color-glass-border)]
+                         bg-[#0a0a0a] border border-white/[0.08]
                          text-cream font-semibold text-sm min-h-[44px]"
               aria-expanded={dropdownOpen}
               aria-haspopup="listbox"
@@ -336,8 +335,8 @@ export function Leaderboard() {
                   exit={{ opacity: 0, y: -4, scale: 0.98 }}
                   transition={{ duration: 0.15 }}
                   className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden
-                             bg-[rgba(1,5,8,0.96)] border border-[var(--color-glass-border)]
-                             backdrop-blur-xl shadow-2xl"
+                             bg-[#0a0a0a] border border-white/[0.08]
+                             shadow-2xl"
                   role="listbox"
                 >
                   {GAMES.map((game) => (
@@ -354,8 +353,8 @@ export function Leaderboard() {
                         transition-colors min-h-[44px]
                         ${
                           selectedGame === game.id
-                            ? "bg-neon-green/10 text-neon-green"
-                            : "text-cream-dim hover:text-cream hover:bg-white/[0.04]"
+                            ? "bg-[#0a1a0f] text-neon-green"
+                            : "text-cream-dim hover:text-cream hover:bg-[#111]"
                         }
                       `}
                     >
@@ -376,8 +375,8 @@ export function Leaderboard() {
               <button
                 onClick={() => setWeekDropdownOpen(!weekDropdownOpen)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold
-                           text-cream-dim hover:text-cream bg-white/[0.04] hover:bg-white/[0.08]
-                           border border-white/[0.06] hover:border-neon-green/20
+                           text-cream-dim hover:text-cream bg-[#111] hover:bg-[#1a1a1a]
+                           border border-white/[0.08] hover:border-neon-green/20
                            transition-all duration-200 min-h-[44px]"
                 aria-expanded={weekDropdownOpen}
                 aria-haspopup="listbox"
@@ -398,8 +397,8 @@ export function Leaderboard() {
                     exit={{ opacity: 0, y: -4, scale: 0.98 }}
                     transition={{ duration: 0.15 }}
                     className="absolute z-30 top-full right-0 mt-2 rounded-xl overflow-hidden w-44
-                               bg-[rgba(1,5,8,0.96)] border border-[var(--color-glass-border)]
-                               backdrop-blur-xl shadow-2xl"
+                               bg-[#0a0a0a] border border-white/[0.08]
+                               shadow-2xl"
                     role="listbox"
                   >
                     {WEEK_OPTIONS.map((opt) => {
@@ -418,8 +417,8 @@ export function Leaderboard() {
                             transition-colors min-h-[44px]
                             ${
                               weekOffset === opt.offset
-                                ? "bg-neon-green/10 text-neon-green"
-                                : "text-cream-dim hover:text-cream hover:bg-white/[0.04]"
+                                ? "bg-[#0a1a0f] text-neon-green"
+                                : "text-cream-dim hover:text-cream hover:bg-[#111]"
                             }
                           `}
                         >
@@ -455,8 +454,8 @@ export function Leaderboard() {
               onClick={manualRefresh}
               disabled={isRefreshing}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold
-                         text-cream-dim hover:text-cream bg-white/[0.04] hover:bg-white/[0.08]
-                         border border-white/[0.06] hover:border-neon-green/20
+                         text-cream-dim hover:text-cream bg-[#111] hover:bg-[#1a1a1a]
+                         border border-white/[0.08] hover:border-neon-green/20
                          transition-all duration-200 min-h-[44px] min-w-[44px]
                          disabled:opacity-40 disabled:cursor-not-allowed"
               title="Refresh leaderboard"
@@ -482,7 +481,7 @@ export function Leaderboard() {
             >
               <div
                 className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl
-                            bg-brand-gold/[0.06] border border-brand-gold/20"
+                            bg-[#0f0a00] border border-brand-gold/30"
               >
                 <span className="text-sm text-cream-dim flex items-center gap-2">
                   <Trophy size={14} className="text-brand-gold" />
@@ -510,8 +509,8 @@ export function Leaderboard() {
             className="mb-8 grid grid-cols-3 gap-3 sm:gap-5"
           >
             {/* 1st Place Pedestal */}
-            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/30 bg-gradient-to-b from-brand-gold/[0.08] to-transparent py-6 sm:py-8 px-3 text-center"
-              style={{ boxShadow: "0 0 30px rgba(251,191,36,0.15), 0 0 60px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)" }}
+            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/40 bg-[#0f0a00] py-6 sm:py-8 px-3 text-center"
+              style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
             >
               <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">🥜</span>
               <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">🥜</span>
@@ -523,8 +522,8 @@ export function Leaderboard() {
             </div>
 
             {/* 2nd Place Pedestal */}
-            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/30 bg-gradient-to-b from-gray-400/[0.06] to-transparent py-6 sm:py-8 px-3 text-center"
-              style={{ boxShadow: "0 0 25px rgba(192,192,192,0.12), 0 0 50px rgba(192,192,192,0.06), inset 0 1px 0 rgba(192,192,192,0.12)" }}
+            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/40 bg-[#0a0a0a] py-6 sm:py-8 px-3 text-center"
+              style={{ boxShadow: "0 0 25px rgba(192,192,192,0.15), 0 0 50px rgba(192,192,192,0.08), inset 0 1px 0 rgba(192,192,192,0.15)" }}
             >
               <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">🥜</span>
               <span className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none" style={{ animationDelay: "0.3s" }}>🥜</span>
@@ -536,8 +535,8 @@ export function Leaderboard() {
             </div>
 
             {/* 3rd Place Pedestal */}
-            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/30 bg-gradient-to-b from-amber-700/[0.06] to-transparent py-6 sm:py-8 px-3 text-center"
-              style={{ boxShadow: "0 0 25px rgba(180,83,9,0.12), 0 0 50px rgba(180,83,9,0.06), inset 0 1px 0 rgba(180,83,9,0.12)" }}
+            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/40 bg-[#0f0800] py-6 sm:py-8 px-3 text-center"
+              style={{ boxShadow: "0 0 25px rgba(180,83,9,0.15), 0 0 50px rgba(180,83,9,0.08), inset 0 1px 0 rgba(180,83,9,0.15)" }}
             >
               <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">🥜</span>
               <span className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
@@ -557,11 +556,11 @@ export function Leaderboard() {
           viewport={{ once: true }}
           transition={{ delay: 0.15 }}
         >
-          <CyberCard accentColor={accent} className="overflow-hidden bg-[rgba(1,5,8,0.97)]">
+          <CyberCard accentColor={accent} className="overflow-hidden bg-[#0a0a0a]">
             {/* Table Header */}
             <div
               className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider
-                          text-cream-dim border-b border-white/[0.08] bg-white/[0.02]"
+                          text-cream-dim border-b border-white/[0.08] bg-[#0d0d0d]"
             >
               <span className="w-8 text-center">Rank</span>
               <span className="flex-1">Player</span>
@@ -670,10 +669,10 @@ export function Leaderboard() {
                         transition-all duration-150
                         ${
                           isCurrentUser
-                            ? `bg-brand-gold/[0.08] border-l-2 border-l-brand-gold ${rowPrize?.glow ?? ""}`
+                            ? `bg-[#0f0a00] border-l-2 border-l-brand-gold ${rowPrize?.glow ?? ""}`
                             : rank <= 3
-                            ? `bg-white/[0.015] ${rankBorderGlow} ${rowPrize?.glow ?? ""}`
-                            : "hover:bg-white/[0.03] hover:shadow-[inset_0_0_20px_rgba(16,185,129,0.03)]"
+                            ? `bg-[#0d0d0d] ${rankBorderGlow} ${rowPrize?.glow ?? ""}`
+                            : "hover:bg-[#111] hover:shadow-[inset_0_0_20px_rgba(16,185,129,0.03)]"
                         }
                       `}
                     >
@@ -698,7 +697,7 @@ export function Leaderboard() {
                         >
                           {displayName}
                           {isCurrentUser && (
-                            <span className="ml-1.5 text-[10px] font-mono text-brand-gold/80 bg-brand-gold/10 px-1.5 py-0.5 rounded-full">
+                            <span className="ml-1.5 text-[10px] font-mono text-brand-gold/80 bg-[#0f0a00] border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
                               you
                             </span>
                           )}
@@ -710,10 +709,10 @@ export function Leaderboard() {
                         <div className="hidden sm:flex items-center gap-1 shrink-0">
                           <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border
                             ${rank === 1
-                              ? "bg-brand-gold/10 border-brand-gold/30 text-brand-gold"
+                              ? "bg-[#0f0a00] border-brand-gold/40 text-brand-gold"
                               : rank === 2
-                              ? "bg-silver/10 border-silver/30 text-silver"
-                              : "bg-bronze/10 border-bronze/30 text-bronze"
+                              ? "bg-[#0a0a0a] border-silver/40 text-silver"
+                              : "bg-[#0f0800] border-bronze/40 text-bronze"
                             }`}
                             title={`${tierNutLabel(rank)} @ ${fmtPrice(weekTiers?.snapshot_price)} snapshot`}
                           >
@@ -754,7 +753,7 @@ export function Leaderboard() {
 
             {/* ── Soft Warning Banner (partial error — showing cached data) ── */}
             {error && scores.length > 0 && (
-              <div className="px-4 py-2 bg-orange/[0.06] border-t border-orange/20 text-xs text-orange flex items-center gap-2">
+              <div className="px-4 py-2 bg-[#0f0800] border-t border-orange/30 text-xs text-orange flex items-center gap-2">
                 <WifiOff size={12} />
                 {error}
               </div>
