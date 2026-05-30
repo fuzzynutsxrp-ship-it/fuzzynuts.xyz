@@ -332,210 +332,46 @@ export function GamesShowcase() {
   return (
     <section id="games" className="py-12 relative overflow-hidden">
       {/* ── DEGEN OVERHAUL START — Retro Arcade Room Background ──
-          Deep moody atmosphere with vintage game posters, CRT scanlines,
-          vignette, and film grain. The transparent N64 plastic cards sit
-          on top like you're looking through clear controller shells into
-          a dimly-lit 90s arcade. */}
+          Real AI-generated arcade room image with FuzzyNuts game posters,
+          neon signs, and arcade cabinets. Dark overlay keeps the transparent
+          N64 plastic cards and neon borders as the clear focal point.
+          degen-mesh is the fallback if the image fails to load. */}
 
-      {/* Layer 1: Deep dark arcade room base */}
+      {/* Fallback: animated degen-mesh (loads instantly, no network) */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 pointer-events-none z-0"
+        className="absolute inset-0 pointer-events-none z-0 bg-degen-mesh"
+      />
+
+      {/* Background image: retro arcade room */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none z-[1]"
         style={{
-          background: `
-            radial-gradient(ellipse 80% 60% at 50% 30%, rgba(45,27,78,0.4) 0%, transparent 70%),
-            radial-gradient(ellipse 60% 50% at 20% 80%, rgba(255,46,136,0.08) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 50% at 80% 80%, rgba(124,58,237,0.1) 0%, transparent 60%),
-            linear-gradient(180deg, #050309 0%, #0a0613 40%, #120a22 100%)
-          `,
+          backgroundImage: "url('/images/arcade-background.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       />
 
-      {/* Layer 2: Retro game posters — faded arcade wall art */}
-      {/* Poster 1: Fuzzynuts World — Zelda-style adventure (top-left) */}
+      {/* Dark overlay: keeps cards + text readable over the image */}
       <div
         aria-hidden="true"
-        className="absolute pointer-events-none z-[1] select-none"
+        className="absolute inset-0 pointer-events-none z-[2]"
         style={{
-          top: "8%", left: "2%", width: "220px", height: "300px",
-          transform: "rotate(-6deg)",
-          background: "linear-gradient(160deg, #1a0f2e 0%, #0d0820 40%, #2d1b4e 100%)",
-          border: "2px solid rgba(251,191,36,0.2)",
-          borderRadius: "4px",
-          boxShadow: "0 0 40px rgba(251,191,36,0.08), inset 0 0 60px rgba(0,0,0,0.6)",
-          opacity: 0.35,
+          background:
+            "linear-gradient(180deg, rgba(10,6,19,0.72) 0%, rgba(10,6,19,0.55) 40%, rgba(10,6,19,0.60) 70%, rgba(10,6,19,0.75) 100%)",
         }}
-      >
-        <div className="p-4 text-center">
-          <div className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#FBBF24] mb-2 opacity-60">Nintendo 64 · RPG Adventure</div>
-          <div className="font-display text-2xl font-black uppercase leading-tight" style={{ color: "#FBBF24", textShadow: "0 0 20px rgba(251,191,36,0.5)" }}>
-            FUZZYNUTS<br/>WORLD
-          </div>
-          <div className="mt-3 font-mono text-[7px] tracking-[0.2em] uppercase text-[#b0a890]">Explore the Kingdom · Collect $NUT · Defeat the Boss</div>
-          <div className="mt-4 mx-auto w-16 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(251,191,36,0.3) 0%, transparent 70%)", border: "1px solid rgba(251,191,36,0.15)" }} />
-          <div className="mt-2 font-display text-xs font-bold text-[#FBBF24] opacity-50">★ LEGENDARY ★</div>
-        </div>
-      </div>
-
-      {/* Poster 2: Super FuzzyNuts — Mario-style platformer (top-center-right) */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none z-[1] select-none"
-        style={{
-          top: "5%", right: "8%", width: "200px", height: "280px",
-          transform: "rotate(4deg)",
-          background: "linear-gradient(160deg, #1a2e0f 0%, #0d2008 40%, #1b4e2d 100%)",
-          border: "2px solid rgba(74,222,128,0.25)",
-          borderRadius: "4px",
-          boxShadow: "0 0 40px rgba(74,222,128,0.08), inset 0 0 60px rgba(0,0,0,0.6)",
-          opacity: 0.3,
-        }}
-      >
-        <div className="p-4 text-center">
-          <div className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#4ade80] mb-2 opacity-60">Platformer · 2D Action</div>
-          <div className="font-display text-2xl font-black uppercase leading-tight" style={{ color: "#4ade80", textShadow: "0 0 20px rgba(74,222,128,0.5)" }}>
-            SUPER<br/>FUZZYNUTS
-          </div>
-          <div className="mt-3 font-mono text-[7px] tracking-[0.2em] uppercase text-[#b0a890]">Jump · Run · Collect Nuts · Save the Forest</div>
-          <div className="mt-4 mx-auto w-16 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(74,222,128,0.3) 0%, transparent 70%)", border: "1px solid rgba(74,222,128,0.15)" }} />
-          <div className="mt-2 font-display text-xs font-bold text-[#4ade80] opacity-50">★ POWER UP ★</div>
-        </div>
-      </div>
-
-      {/* Poster 3: Fuzzy Survivors — action/shooter (bottom-left) */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none z-[1] select-none"
-        style={{
-          bottom: "12%", left: "5%", width: "210px", height: "290px",
-          transform: "rotate(3deg)",
-          background: "linear-gradient(160deg, #2e0f0f 0%, #200808 40%, #4e1b1b 100%)",
-          border: "2px solid rgba(239,68,68,0.25)",
-          borderRadius: "4px",
-          boxShadow: "0 0 40px rgba(239,68,68,0.08), inset 0 0 60px rgba(0,0,0,0.6)",
-          opacity: 0.3,
-        }}
-      >
-        <div className="p-4 text-center">
-          <div className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#ef4444] mb-2 opacity-60">Action · Survival Shooter</div>
-          <div className="font-display text-2xl font-black uppercase leading-tight" style={{ color: "#ef4444", textShadow: "0 0 20px rgba(239,68,68,0.5)" }}>
-            FUZZY<br/>SURVIVORS
-          </div>
-          <div className="mt-3 font-mono text-[7px] tracking-[0.2em] uppercase text-[#b0a890]">Survive the Horde · Loot the Nuts · Last One Standing</div>
-          <div className="mt-4 mx-auto w-16 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(239,68,68,0.3) 0%, transparent 70%)", border: "1px solid rgba(239,68,68,0.15)" }} />
-          <div className="mt-2 font-display text-xs font-bold text-[#ef4444] opacity-50">★ SURVIVE ★</div>
-        </div>
-      </div>
-
-      {/* Poster 4: Nut Racer — classic racing (bottom-center-right) */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none z-[1] select-none"
-        style={{
-          bottom: "8%", right: "3%", width: "195px", height: "270px",
-          transform: "rotate(-5deg)",
-          background: "linear-gradient(160deg, #0f2e2e 0%, #082020 40%, #1b4e4e 100%)",
-          border: "2px solid rgba(34,211,238,0.25)",
-          borderRadius: "4px",
-          boxShadow: "0 0 40px rgba(34,211,238,0.08), inset 0 0 60px rgba(0,0,0,0.6)",
-          opacity: 0.28,
-        }}
-      >
-        <div className="p-4 text-center">
-          <div className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#22d3ee] mb-2 opacity-60">Racing · Arcade Speed</div>
-          <div className="font-display text-2xl font-black uppercase leading-tight" style={{ color: "#22d3ee", textShadow: "0 0 20px rgba(34,211,238,0.5)" }}>
-            NUT<br/>RACER
-          </div>
-          <div className="mt-3 font-mono text-[7px] tracking-[0.2em] uppercase text-[#b0a890]">Burn Rubber · Drift Corners · First to the Finish</div>
-          <div className="mt-4 mx-auto w-16 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(34,211,238,0.3) 0%, transparent 70%)", border: "1px solid rgba(34,211,238,0.15)" }} />
-          <div className="mt-2 font-display text-xs font-bold text-[#22d3ee] opacity-50">★ TURBO ★</div>
-        </div>
-      </div>
-
-      {/* Poster 5: Fuzzy Putt — retro mini-golf (mid-right, partially behind cards) */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none z-[1] select-none hidden lg:block"
-        style={{
-          top: "45%", right: "-2%", width: "180px", height: "250px",
-          transform: "rotate(7deg)",
-          background: "linear-gradient(160deg, #2e1a0f 0%, #201208 40%, #4e2d1b 100%)",
-          border: "2px solid rgba(249,115,22,0.25)",
-          borderRadius: "4px",
-          boxShadow: "0 0 40px rgba(249,115,22,0.08), inset 0 0 60px rgba(0,0,0,0.6)",
-          opacity: 0.25,
-        }}
-      >
-        <div className="p-4 text-center">
-          <div className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#f97316] mb-2 opacity-60">Sports · Mini Golf</div>
-          <div className="font-display text-2xl font-black uppercase leading-tight" style={{ color: "#f97316", textShadow: "0 0 20px rgba(249,115,22,0.5)" }}>
-            FUZZY<br/>PUTT
-          </div>
-          <div className="mt-3 font-mono text-[7px] tracking-[0.2em] uppercase text-[#b0a890]">Putt the Nut · Sink the Hole · Ace the Course</div>
-          <div className="mt-4 mx-auto w-16 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%)", border: "1px solid rgba(249,115,22,0.15)" }} />
-          <div className="mt-2 font-display text-xs font-bold text-[#f97316] opacity-50">★ HOLE IN ONE ★</div>
-        </div>
-      </div>
-
-      {/* Poster 6: Top Secret — mysterious classified teaser (mid-left) */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none z-[1] select-none hidden lg:block"
-        style={{
-          top: "50%", left: "-1%", width: "175px", height: "245px",
-          transform: "rotate(-3deg)",
-          background: "linear-gradient(160deg, #1a1a2e 0%, #0d0d20 40%, #2d2d4e 100%)",
-          border: "2px solid rgba(168,85,247,0.25)",
-          borderRadius: "4px",
-          boxShadow: "0 0 40px rgba(168,85,247,0.08), inset 0 0 60px rgba(0,0,0,0.6)",
-          opacity: 0.22,
-        }}
-      >
-        <div className="p-4 text-center">
-          <div className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#a855f7] mb-2 opacity-60">??? · CLASSIFIED</div>
-          <div className="font-display text-2xl font-black uppercase leading-tight" style={{ color: "#a855f7", textShadow: "0 0 20px rgba(168,85,247,0.5)" }}>
-            TOP<br/>SECRET
-          </div>
-          <div className="mt-3 font-mono text-[7px] tracking-[0.2em] uppercase text-[#b0a890]">Clearance Level: NUT · Contents Unknown · Coming Soon</div>
-          <div className="mt-4 mx-auto w-16 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.3) 0%, transparent 70%)", border: "1px solid rgba(168,85,247,0.15)" }} />
-          <div className="mt-2 font-display text-xs font-bold text-[#a855f7] opacity-50">🔒 CLASSIFIED 🔒</div>
-        </div>
-      </div>
-
-      {/* Layer 3: Animated degen mesh — the purple/pink/cyan glow that moves */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none z-[2] bg-degen-mesh opacity-50"
       />
 
-      {/* Layer 4: CRT scanlines over everything */}
+      {/* Subtle CRT scanlines over the image */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none z-[3] opacity-[0.04]"
         style={{
           backgroundImage:
             "repeating-linear-gradient(0deg, rgba(0,0,0,0.3) 0 1px, transparent 1px 3px)",
-        }}
-      />
-
-      {/* Layer 5: Deep vignette — darkens edges like a CRT / arcade room */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none z-[3]"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 60% at 50% 45%, transparent 40%, rgba(5,3,9,0.7) 100%)",
-        }}
-      />
-
-      {/* Layer 6: Film grain noise (desktop only for perf) */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none z-[3] opacity-[0.03] hidden sm:block"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat",
-          backgroundSize: "200px 200px",
         }}
       />
 
