@@ -1997,10 +1997,95 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Hall of Degens — Prize Pedestals + Empty State Animations
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Floating nut particles — gentle drift with rotation */
+@keyframes float-nut-1 {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.55; }
+  25% { transform: translateY(-14px) translateX(6px) rotate(12deg); opacity: 0.85; }
+  50% { transform: translateY(-22px) translateX(-4px) rotate(-8deg); opacity: 0.65; }
+  75% { transform: translateY(-8px) translateX(10px) rotate(18deg); opacity: 0.9; }
+}
+@keyframes float-nut-2 {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.45; }
+  33% { transform: translateY(-18px) translateX(-10px) rotate(-15deg); opacity: 0.75; }
+  66% { transform: translateY(-28px) translateX(6px) rotate(10deg); opacity: 0.55; }
+}
+@keyframes float-nut-3 {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.6; }
+  50% { transform: translateY(-16px) translateX(12px) rotate(22deg); opacity: 0.95; }
+}
+
+.float-nut-1 { animation: float-nut-1 3.2s ease-in-out infinite; }
+.float-nut-2 { animation: float-nut-2 4.0s ease-in-out infinite; }
+.float-nut-3 { animation: float-nut-3 2.8s ease-in-out infinite; }
+
+/* Prize pedestal pulsing glow */
+@keyframes prize-pedestal-glow {
+  0%, 100% { box-shadow: 0 0 20px var(--pedestal-glow, rgba(251,191,36,0.15)), inset 0 1px 0 rgba(255,255,255,0.04); }
+  50% { box-shadow: 0 0 40px var(--pedestal-glow, rgba(251,191,36,0.3)), 0 0 80px var(--pedestal-glow-outer, rgba(251,191,36,0.08)), inset 0 1px 0 rgba(255,255,255,0.06); }
+}
+.prize-pedestal-glow { animation: prize-pedestal-glow 2.6s ease-in-out infinite; }
+
+/* Empty state squirrel bounce */
+@keyframes empty-squirrel-bounce {
+  0%, 100% { transform: translateY(0) rotate(-6deg) scale(1); }
+  30% { transform: translateY(-14px) rotate(4deg) scale(1.05); }
+  60% { transform: translateY(-6px) rotate(-2deg) scale(0.98); }
+}
+.empty-squirrel-bounce { animation: empty-squirrel-bounce 2.2s ease-in-out infinite; display: inline-block; }
+
+/* Nut scatter — 5 variants for the empty state */
+@keyframes nut-scatter-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.6; }
+  25% { transform: translate(-18px, -22px) rotate(-25deg) scale(1.15); opacity: 1; }
+  50% { transform: translate(12px, -38px) rotate(18deg) scale(0.85); opacity: 0.5; }
+  75% { transform: translate(-6px, -14px) rotate(-12deg) scale(1.08); opacity: 0.75; }
+}
+@keyframes nut-scatter-2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.5; }
+  33% { transform: translate(22px, -28px) rotate(30deg) scale(1.2); opacity: 0.9; }
+  66% { transform: translate(-14px, -42px) rotate(-18deg) scale(0.8); opacity: 0.4; }
+}
+@keyframes nut-scatter-3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.7; }
+  50% { transform: translate(16px, -32px) rotate(35deg) scale(1.25); opacity: 1; }
+}
+@keyframes nut-scatter-4 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.55; }
+  40% { transform: translate(-20px, -18px) rotate(-30deg) scale(1.1); opacity: 0.85; }
+  80% { transform: translate(8px, -36px) rotate(20deg) scale(0.9); opacity: 0.45; }
+}
+@keyframes nut-scatter-5 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.65; }
+  35% { transform: translate(10px, -24px) rotate(28deg) scale(1.18); opacity: 0.95; }
+  70% { transform: translate(-16px, -40px) rotate(-22deg) scale(0.82); opacity: 0.35; }
+}
+
+.nut-scatter-1 { animation: nut-scatter-1 3.6s ease-in-out infinite; }
+.nut-scatter-2 { animation: nut-scatter-2 4.2s ease-in-out infinite; }
+.nut-scatter-3 { animation: nut-scatter-3 2.9s ease-in-out infinite; }
+.nut-scatter-4 { animation: nut-scatter-4 3.8s ease-in-out infinite; }
+.nut-scatter-5 { animation: nut-scatter-5 4.5s ease-in-out infinite; }
+
+/* CTA button neon pulse */
+@keyframes cta-nut-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(16,185,129,0.25), 0 0 40px rgba(16,185,129,0.08); }
+  50% { box-shadow: 0 0 32px rgba(16,185,129,0.45), 0 0 70px rgba(16,185,129,0.15); }
+}
+.cta-nut-pulse { animation: cta-nut-pulse 2.4s ease-in-out infinite; }
+
 /* ── Reduced-motion: kill the new degen motion ── */
 @media (prefers-reduced-motion: reduce) {
   .logo-degen,
-  .degen-marquee__track {
+  .degen-marquee__track,
+  .float-nut-1, .float-nut-2, .float-nut-3,
+  .nut-scatter-1, .nut-scatter-2, .nut-scatter-3, .nut-scatter-4, .nut-scatter-5,
+  .empty-squirrel-bounce,
+  .prize-pedestal-glow,
+  .cta-nut-pulse {
     animation: none !important;
   }
   .logo-degen {

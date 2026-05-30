@@ -185,9 +185,13 @@ export function Leaderboard() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-12 md:mb-16 relative"
         >
-          {/* DEGEN OVERHAUL START — neon badge + degen subcopy */}
+          {/* Floating nut particles around header */}
+          <span className="absolute -top-4 left-1/4 text-2xl float-nut-1 opacity-60 pointer-events-none" style={{ animationDelay: "0s" }}>🥜</span>
+          <span className="absolute top-2 right-1/4 text-xl float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "0.7s" }}>🥜</span>
+          <span className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none" style={{ animationDelay: "1.4s" }}>🥜</span>
+
           <span
             className="neon-chip text-degen-crisp mb-4 animate-glitch-skew"
           >
@@ -200,10 +204,9 @@ export function Leaderboard() {
             Boards wipe every Monday 00:00 UTC. Climb the ranks, bag real $NUT,
             flex on the timeline. Paper hands need not apply.
           </p>
-          {/* DEGEN OVERHAUL END */}
           {isCurrentWeek && (
-            <p className={`text-xs font-mono mt-2 ${countdown.isCritical ? "text-red-400 animate-pulse" : countdown.isUrgent ? "text-orange" : "text-cream-dim/60"} countdown-pulse`}>
-              ⏱ Resets in <span className={`font-semibold ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>{countdown.display}</span> · Monday 00:00 UTC
+            <p className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-cream-dim/80"} countdown-pulse`}>
+              ⏱ Resets in <span className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>{countdown.display}</span> · Monday 00:00 UTC
             </p>
           )}
         </motion.div>
@@ -283,24 +286,24 @@ export function Leaderboard() {
           className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6"
         >
           {/* Game Selector — Desktop Tabs */}
-          <div className="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-[var(--color-card)] border border-[var(--color-glass-border)]">
+          <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-[var(--color-card)] border border-[var(--color-glass-border)]">
             {GAMES.map((game) => (
               <button
                 key={game.id}
                 onClick={() => setSelectedGame(game.id)}
                 className={`
-                  flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold
+                  flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
                   transition-all duration-200 min-h-[44px]
                   ${
                     selectedGame === game.id
-                      ? "bg-neon-green/15 text-neon-green border border-neon-green/30 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+                      ? "bg-neon-green/20 text-neon-green border border-neon-green/40 shadow-[0_0_20px_rgba(16,185,129,0.25),0_0_40px_rgba(16,185,129,0.1)]"
                       : "text-cream-dim hover:text-cream hover:bg-white/[0.04] border border-transparent"
                   }
                 `}
                 aria-pressed={selectedGame === game.id}
               >
                 <span className="text-base">{GAME_EMOJIS[game.id]}</span>
-                <span className="hidden lg:inline">{game.title}</span>
+                <span>{game.title}</span>
               </button>
             ))}
           </div>
@@ -498,40 +501,51 @@ export function Leaderboard() {
           )}
         </AnimatePresence>
 
-        {/* ── Weekly Prize Pool Strip ── */}
+        {/* ── Weekly Prize Pool — Hero Pedestals ── */}
         {isCurrentWeek && (
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mb-4 grid grid-cols-3 gap-2 sm:gap-3"
+            className="mb-8 grid grid-cols-3 gap-3 sm:gap-5"
           >
-            {/* 1st Place */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-brand-gold/20 text-center">
-              <span className="text-lg">🥇</span>
-              <div className="text-left">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-gold/70">1st</p>
-                <p className="text-sm sm:text-base font-black font-mono text-brand-gold">{tierUsdLabel(1)}</p>
-              </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">{tierNutLabel(1)}</span>
+            {/* 1st Place Pedestal */}
+            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/30 bg-gradient-to-b from-brand-gold/[0.08] to-transparent py-6 sm:py-8 px-3 text-center"
+              style={{ boxShadow: "0 0 30px rgba(251,191,36,0.15), 0 0 60px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)" }}
+            >
+              <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">🥜</span>
+              <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">🥜</span>
+              <span className="absolute -bottom-2 left-1/3 text-sm float-nut-3 opacity-60 pointer-events-none" style={{ animationDelay: "0.5s" }}>🥜</span>
+              <div className="text-4xl sm:text-5xl mb-2">🥇</div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-gold/70 mb-1">1st Place</p>
+              <p className="font-display text-2xl sm:text-3xl font-black text-brand-gold">{tierUsdLabel(1)}</p>
+              <p className="text-xs font-mono text-cream-dim/60 mt-1">{tierNutLabel(1)}</p>
             </div>
-            {/* 2nd Place */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-gray-400/20 text-center">
-              <span className="text-lg">🥈</span>
-              <div className="text-left">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400/70">2nd</p>
-                <p className="text-sm sm:text-base font-black font-mono text-gray-300">{tierUsdLabel(2)}</p>
-              </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">{tierNutLabel(2)}</span>
+
+            {/* 2nd Place Pedestal */}
+            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/30 bg-gradient-to-b from-gray-400/[0.06] to-transparent py-6 sm:py-8 px-3 text-center"
+              style={{ boxShadow: "0 0 25px rgba(192,192,192,0.12), 0 0 50px rgba(192,192,192,0.06), inset 0 1px 0 rgba(192,192,192,0.12)" }}
+            >
+              <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">🥜</span>
+              <span className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none" style={{ animationDelay: "0.3s" }}>🥜</span>
+              <span className="absolute -bottom-1 right-1/4 text-sm float-nut-1 opacity-55 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
+              <div className="text-4xl sm:text-5xl mb-2">🥈</div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400/70 mb-1">2nd Place</p>
+              <p className="font-display text-2xl sm:text-3xl font-black text-gray-300">{tierUsdLabel(2)}</p>
+              <p className="text-xs font-mono text-cream-dim/60 mt-1">{tierNutLabel(2)}</p>
             </div>
-            {/* 3rd Place */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2 py-2.5 rounded-xl bg-white/[0.02] border border-amber-700/20 text-center">
-              <span className="text-lg">🥉</span>
-              <div className="text-left">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600/70">3rd</p>
-                <p className="text-sm sm:text-base font-black font-mono text-amber-600">{tierUsdLabel(3)}</p>
-              </div>
-              <span className="text-[9px] font-mono text-cream-dim/50 hidden sm:inline">{tierNutLabel(3)}</span>
+
+            {/* 3rd Place Pedestal */}
+            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/30 bg-gradient-to-b from-amber-700/[0.06] to-transparent py-6 sm:py-8 px-3 text-center"
+              style={{ boxShadow: "0 0 25px rgba(180,83,9,0.12), 0 0 50px rgba(180,83,9,0.06), inset 0 1px 0 rgba(180,83,9,0.12)" }}
+            >
+              <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">🥜</span>
+              <span className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
+              <span className="absolute -bottom-2 left-1/2 text-sm float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "1.1s" }}>🥜</span>
+              <div className="text-4xl sm:text-5xl mb-2">🥉</div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600/70 mb-1">3rd Place</p>
+              <p className="font-display text-2xl sm:text-3xl font-black text-amber-600">{tierUsdLabel(3)}</p>
+              <p className="text-xs font-mono text-cream-dim/60 mt-1">{tierNutLabel(3)}</p>
             </div>
           </motion.div>
         )}
@@ -543,7 +557,7 @@ export function Leaderboard() {
           viewport={{ once: true }}
           transition={{ delay: 0.15 }}
         >
-          <CyberCard accentColor={accent} className="overflow-hidden">
+          <CyberCard accentColor={accent} className="overflow-hidden bg-[rgba(1,5,8,0.97)]">
             {/* Table Header */}
             <div
               className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider
@@ -582,12 +596,20 @@ export function Leaderboard() {
 
             {/* ── Empty State ── */}
             {!loading && !error && scores.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <Trophy size={32} className="text-brand-gold mb-4 opacity-40" />
-                <p className="font-display text-lg font-bold text-cream mb-2">
+              <div className="flex flex-col items-center justify-center py-20 px-6 text-center relative">
+                {/* Animated squirrel */}
+                <div className="empty-squirrel-bounce text-6xl sm:text-7xl mb-4">🐿️</div>
+                {/* Scattered nuts around squirrel */}
+                <span className="absolute top-12 left-1/4 text-2xl nut-scatter-1 pointer-events-none">🥜</span>
+                <span className="absolute top-8 right-1/4 text-xl nut-scatter-2 pointer-events-none">🥜</span>
+                <span className="absolute bottom-20 left-1/3 text-lg nut-scatter-3 pointer-events-none">🥜</span>
+                <span className="absolute bottom-16 right-1/3 text-2xl nut-scatter-4 pointer-events-none">🥜</span>
+                <span className="absolute top-1/2 left-1/5 text-base nut-scatter-5 pointer-events-none">🥜</span>
+
+                <p className="font-display text-xl font-bold text-cream mb-3">
                   No scores yet
                 </p>
-                <p className="text-sm text-cream-dim max-w-sm">
+                <p className="text-sm text-cream-dim max-w-sm mb-6">
                   {isCurrentWeek ? (
                     <>
                       Be the first to set a record in{" "}
@@ -600,6 +622,11 @@ export function Leaderboard() {
                     <>No scores recorded for {selectedWeek}.</>
                   )}
                 </p>
+                {isCurrentWeek && (
+                  <button className="cta-nut-pulse px-8 py-3 rounded-xl font-display font-black text-forest-dark text-base bg-gradient-to-r from-neon-green to-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.4),0_0_60px_rgba(16,185,129,0.15)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6),0_0_80px_rgba(16,185,129,0.2)] transition-shadow">
+                    🐿️ NUT UP — PLAY NOW
+                  </button>
+                )}
               </div>
             )}
 
@@ -618,6 +645,12 @@ export function Leaderboard() {
                       : "Anonymous");
                   const rowPrize = isCurrentWeek ? PRIZE_LABELS[rank] : null;
 
+                  const rankBorderGlow =
+                    rank === 1 ? "border-l-2 border-l-brand-gold shadow-[inset_4px_0_12px_-4px_rgba(251,191,36,0.3)]" :
+                    rank === 2 ? "border-l-2 border-l-gray-400 shadow-[inset_4px_0_12px_-4px_rgba(192,192,192,0.2)]" :
+                    rank === 3 ? "border-l-2 border-l-amber-700 shadow-[inset_4px_0_12px_-4px_rgba(180,83,9,0.2)]" :
+                    "";
+
                   return (
                     <motion.div
                       key={`${entry.wallet || entry.session || index}-${entry.score}`}
@@ -627,13 +660,13 @@ export function Leaderboard() {
                       className={`
                         flex items-center gap-3 px-4 py-3
                         border-b border-white/[0.04] last:border-0
-                        transition-colors duration-150
+                        transition-all duration-150
                         ${
                           isCurrentUser
                             ? `bg-brand-gold/[0.08] border-l-2 border-l-brand-gold ${rowPrize?.glow ?? ""}`
                             : rank <= 3
-                            ? `bg-white/[0.015] ${rowPrize?.glow ?? ""}`
-                            : "hover:bg-white/[0.02]"
+                            ? `bg-white/[0.015] ${rankBorderGlow} ${rowPrize?.glow ?? ""}`
+                            : "hover:bg-white/[0.03] hover:shadow-[inset_0_0_20px_rgba(16,185,129,0.03)]"
                         }
                       `}
                     >
