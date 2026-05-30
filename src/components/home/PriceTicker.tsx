@@ -1,14 +1,7 @@
 "use client";
 
 /**
- * ═══════════════════════════════════════════════════════════════
  * PriceTicker — live $NUT price + market cap, plus Chart / Buy CTAs.
- *
- * Price comes from the backend (GET /api/rewards/price), which computes
- * it from the on-chain AMM and caches it. No client-side xrpl (keeps the
- * bundle small and avoids a hard dependency). If the fetch fails, price/
- * mcap fall back to "—" and the Chart/Buy links still work.
- * ═══════════════════════════════════════════════════════════════
  */
 
 import { useState, useEffect } from "react";
@@ -54,30 +47,29 @@ export function PriceTicker() {
       transition={{ delay: 1.1, duration: 0.5 }}
       className="mt-6 flex flex-wrap items-center justify-center gap-2.5"
     >
-      {/* DEGEN OVERHAUL START — kill glassmorphism: solid bg, thick
-          hot-pink border, sharp corners, outer glow (no backdrop-blur,
-          no rounded-xl pill, no neon-ring soft inset). */}
-      <div className="flex items-center gap-4 px-4 py-2 rounded-md bg-degen-950 border-2 border-hot-pink shadow-[0_0_20px_rgba(255,46,136,0.45)]">
+      {/* Price / Market Cap — solid dark, warm gold border */}
+      <div
+        className="flex items-center gap-4 px-4 py-2 rounded-md bg-[#0a0a0a] border-2 border-brand-gold/30"
+        style={{ boxShadow: "0 0 20px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.1)" }}
+      >
         <div className="text-left">
           <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Price</p>
-          <p className="font-mono font-bold text-sm text-[var(--color-gold)] tabular-nums">{fmtPrice(priceUsd)}</p>
+          <p className="font-mono font-bold text-sm text-brand-gold tabular-nums">{fmtPrice(priceUsd)}</p>
         </div>
-        <div className="w-px h-7 bg-hot-pink/30" aria-hidden="true" />
+        <div className="w-px h-7 bg-brand-gold/20" aria-hidden="true" />
         <div className="text-left">
           <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Market Cap</p>
-          <p className="font-mono font-bold text-sm text-[var(--color-acid)] tabular-nums">
+          <p className="font-mono font-bold text-sm text-amber-500 tabular-nums">
             {mcap != null ? `$${formatNumber(mcap)}` : "—"}
           </p>
         </div>
       </div>
-      {/* DEGEN OVERHAUL END */}
 
       <a
         href={CHART_URL}
         target="_blank"
         rel="noopener noreferrer"
-        // DEGEN OVERHAUL — Chart button: solid degen-950, thick 2 px gold border, sharp 6 px corners, outer gold glow
-        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-bold text-[var(--color-gold)] border-2 border-[var(--color-gold)] bg-degen-950 hover:bg-[rgba(251,191,36,0.12)] transition-all shadow-[0_0_12px_rgba(251,191,36,0.35)]"
+        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-bold text-brand-gold border-2 border-brand-gold/40 bg-[#0a0a0a] hover:bg-[rgba(251,191,36,0.08)] transition-all shadow-[0_0_12px_rgba(251,191,36,0.15),inset_0_1px_0_rgba(251,191,36,0.1)]"
       >
         <LineChart size={16} />
         Chart
@@ -86,13 +78,11 @@ export function PriceTicker() {
         href={BUY_URL}
         target="_blank"
         rel="noopener noreferrer"
-        // DEGEN OVERHAUL — Buy button: same gradient, just sharp 6 px corners (was 12 px rounded-xl)
-        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-black text-[var(--color-degen-black)] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] hover:shadow-[0_0_28px_rgba(255,46,136,0.55)] transition-all"
+        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-black text-forest-dark bg-gradient-to-r from-brand-gold to-amber-500 hover:shadow-[0_0_28px_rgba(251,191,36,0.45)] transition-all"
       >
         <ShoppingCart size={16} />
         Buy $NUT
       </a>
-      {/* DEGEN OVERHAUL END */}
     </motion.div>
   );
 }
