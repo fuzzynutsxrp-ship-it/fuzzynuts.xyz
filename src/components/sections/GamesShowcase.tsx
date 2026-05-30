@@ -93,15 +93,7 @@ function ArcadeCabinet({
         />
       </div>
 
-      {/* ── Title — 1 line, that's it ── */}
-      <div className="px-3 py-2 text-center">
-        <h3
-          className="font-display text-sm font-black uppercase tracking-wide leading-none text-[var(--color-cream)]"
-          style={{ textShadow: `0 0 8px ${game.color}66` }}
-        >
-          {isComingSoon ? "🔒 " : ""}{game.title}
-        </h3>
-      </div>
+
     </motion.a>
   );
 }
