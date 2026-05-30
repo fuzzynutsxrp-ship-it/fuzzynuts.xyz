@@ -121,7 +121,7 @@ export function Prizes() {
               blur + text-degen-crisp for antialiasing on the gradient-clip text.
               Glow language and colour identical, just sharp. */}
           <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🥜 The Weekly Nut Hoard 🐿️</span>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             {totalUsdLabel} Hoard, Split Every Week
           </h2>
           <p className="text-[var(--color-cream-dim)] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
