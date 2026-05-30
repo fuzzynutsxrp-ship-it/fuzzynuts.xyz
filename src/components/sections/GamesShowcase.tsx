@@ -6,29 +6,33 @@ import { useState } from "react";
 import { GAMES } from "@/lib/utils";
 
 /* ─────────────────────────────────────────────────────────────
-   GamesShowcase — DEGEN OVERHAUL (v2)
+   GamesShowcase — DEGEN OVERHAUL (v3 — clear plastic shells)
 
-   Strips the old "retro 3D arcade cabinet" polish (rounded-3xl,
-   brushed-metal textures, translucent T-molding, glass glare,
-   vignette overlays, old gold radial PLAY button) and replaces
-   with the raw degen neon system used everywhere else:
+   The 6 game card backgrounds are now semi-transparent dark
+   purple/black (rgba 10,6,19 @ 0.75) with backdrop-blur so the
+   bg-degen-mesh section background shines through — like looking
+   inside a clear N64 controller / transparent iMac G3 shell.
 
-     • Solid bg-degen-950 body (no translucent glass, no blur)
+   A subtle glossy plastic sheen (linear-gradient 135deg) and
+   inner edge highlights sell the "see-through plastic" depth
+   without bringing back the old soft glassmorphic style.
+
+   Everything else is sacred and untouched:
      • Thick 2px border-hot-pink + neon-ring-pink glow
-     • Sharp rounded-2xl corners (not rounded-3xl)
-     • gold→hot-pink gradient PLAY button (same as Hero CTAs,
-       "Bag the Bag", Connect Wallet)
+     • Sharp rounded-2xl corners
+     • gold→hot-pink gradient PLAY button
      • Per-game accent preserved on marquee + CRT bezel
-     • CRT scanlines kept (on-brand, not glassmorphic)
-
-   All game data (thumbnails, descriptions, genre tags,
-   "INSERT COIN — FREE TO PLAY") is 100% untouched.
+     • CRT scanlines, vignette, all game data
    ───────────────────────────────────────────────────────────── */
 
-// DEGEN OVERHAUL START — card shell classes
+// DEGEN OVERHAUL START — clear N64 transparent plastic shell
+// Semi-translucent dark purple/black so bg-degen-mesh shines through.
+// backdrop-blur sells the "looking through plastic" depth.
+// neon-ring-pink + border-hot-pink = colored plastic edge trim.
 const CARD_CLASSES =
   "arcade-card group relative flex flex-col rounded-2xl " +
-  "bg-degen-950 border-2 border-hot-pink neon-ring-pink " +
+  "border-2 border-hot-pink neon-ring-pink " +
+  "bg-[rgba(10,6,19,0.75)] backdrop-blur-[10px] " +
   "transition-all duration-300 ease-out " +
   "hover:scale-[1.03] hover:shadow-[0_0_48px_rgba(255,46,136,0.5)] " +
   "focus-within:scale-[1.03] focus-within:shadow-[0_0_48px_rgba(255,46,136,0.5)]";
@@ -69,11 +73,28 @@ function ArcadeCabinet({
       aria-label={`${game.title} — ${game.type}`}
     >
       {/* ── Inner panel (marquee + screen + control deck) ── */}
-      {/* DEGEN OVERHAUL START — kill the old cabinet body layers
-          (beveled metal gradient, brushed-metal texture, T-molding
-          box-shadow border, shine sweep). Solid degen-950 comes
-          from the card shell bg-degen-950 class. */}
-      <div className="relative rounded-xl overflow-hidden flex flex-col flex-1 bg-[#08080a]">
+      {/* DEGEN OVERHAUL START — clear plastic inner panel
+          Semi-transparent so the mesh background bleeds through.
+          Glossy plastic sheen overlay adds the N64 controller shine. */}
+      <div className="relative rounded-xl overflow-hidden flex flex-col flex-1 bg-[rgba(8,8,10,0.6)]">
+        {/* Glossy plastic highlight — top-left to bottom-right sheen */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 rounded-xl pointer-events-none z-30 opacity-[0.07]"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 20%, transparent 45%, rgba(255,255,255,0.03) 70%, rgba(255,255,255,0.12) 100%)",
+          }}
+        />
+        {/* Inner glow — subtle light edge to sell the plastic depth */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 rounded-xl pointer-events-none z-30"
+          style={{
+            boxShadow:
+              "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(255,255,255,0.03)",
+          }}
+        />
         {/* DEGEN OVERHAUL END */}
 
         {/* ── MARQUEE — backlit header carrying the game name ── */}
@@ -175,12 +196,12 @@ function ArcadeCabinet({
         </div>
 
         {/* ── Control deck ── */}
-        {/* DEGEN OVERHAUL START — solid dark gradient, no translucent glass */}
+        {/* DEGEN OVERHAUL START — semi-transparent dark gradient for plastic shell continuity */}
         <div
           className="relative flex flex-col flex-1 px-5 pt-4 pb-5 gap-3"
           style={{
             background:
-              "linear-gradient(180deg, #101013 0%, #0a0a0c 55%, #050506 100%)",
+              "linear-gradient(180deg, rgba(16,16,19,0.7) 0%, rgba(10,10,12,0.65) 55%, rgba(5,5,6,0.6) 100%)",
           }}
         >
           {/* DEGEN OVERHAUL END */}
@@ -309,7 +330,7 @@ function ArcadeCabinet({
 
 export function GamesShowcase() {
   return (
-    <section id="games" className="py-12 relative overflow-hidden">
+    <section id="games" className="py-12 relative overflow-hidden bg-degen-mesh">
       <div className="container-main relative z-10">
         {/* Section header */}
         <motion.div
