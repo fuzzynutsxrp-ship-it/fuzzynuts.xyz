@@ -10,11 +10,8 @@ import { GameModal } from "@/components/game/GameModal";
    GamesShowcase — DEGEN OVERHAUL (v6 — modal launch)
 
    v5: Thumbnail + title. Whole card clickable. Nothing else.
-   v6: Cards open a CrazyGames-style lightbox modal instead of
-       navigating to /games/[slug]. Preserves scroll position,
-       instant game switching, no full-page reload.
-
-   /games/[slug] routes still work for SEO + deep links.
+   v6: Cards open a CrazyGames-style lightbox modal. Preserves scroll
+       position, instant game switching, no full-page reload.
    ───────────────────────────────────────────────────────────── */
 
 // Card = clickable button, no navigation

@@ -72,7 +72,8 @@ function applySecurityHeaders(response: NextResponse, pathname: string): NextRes
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
 
   // Frame headers: game pages need SAME-ORIGIN so the React shell at
-  // /games/[slug]/ can embed the static iframe asset at the same path.
+  // Static game assets at /games/*/index.html need SAME-ORIGIN so the
+  // iframe inside the modal can load them.
   // Everything else stays unframable.
   if (pathname.startsWith("/games/")) {
     response.headers.set("X-Frame-Options", "SAMEORIGIN");

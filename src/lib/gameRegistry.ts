@@ -2,8 +2,7 @@
    FUZZYNUTS ARCADE — Centralized Game Registry
 
    Single source of truth for all game metadata.
-   Used by: GamePage, GameHeader, GameSidebar, ScoreSubmissionPanel,
-   page.tsx (generateStaticParams, generateMetadata), GamesShowcase.
+   * Used by: GameModal, GamesShowcase, and other components.
 
    To add a new game:
    1. Add an entry here

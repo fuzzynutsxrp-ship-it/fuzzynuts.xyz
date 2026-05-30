@@ -5,7 +5,7 @@
  * SubPageLayout — Shared layout wrapper for all sub-pages
  *
  * Provides consistent background, overlay, and spacing for
- * /leaderboard, /profile, and /games/[slug] routes.
+ * /leaderboard and /profile routes.
  *
  * Props control:
  *   - showVideoBg: immersive video background (leaderboard, profile)
@@ -40,7 +40,7 @@ interface SubPageLayoutProps {
   showFallingNuts?: boolean;
   /** Make navbar transparent / overlay mode (default: false) */
   navbarTransparent?: boolean;
-  /** Show the main Navbar (default: true) — set false on game pages where GameHeader replaces it */
+  /** Show the main Navbar (default: true) */
   showNavbar?: boolean;
   /** Show the Footer (default: true) — set false on full-viewport game pages */
   showFooter?: boolean;

@@ -1,8 +1,7 @@
 /**
  * Shared status badge class definitions — single source of truth.
  *
- * Use these across GamePage and any future toast/badge UIs
- * to prevent cross-route style drift.
+ * Use these across toast/badge UIs to prevent style drift.
  *
  * @example
  * ```tsx

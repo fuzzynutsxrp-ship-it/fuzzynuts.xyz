@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
   useCallback,
-  type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,7 +15,6 @@ import {
   RotateCcw,
   Volume2,
   VolumeX,
-  ExternalLink,
   Loader2,
 } from "lucide-react";
 import { gameRegistry } from "@/lib/gameRegistry";
@@ -28,15 +26,12 @@ import type { GameMetadata } from "@/lib/gameRegistry";
    Battle-tested patterns:
    • React Portal → renders at document.body (no z-index wars)
    • <dialog> native element → ESC-to-close, focus trap, inert bg
-   • iframe sandbox + allow → same security model as /games/[slug]
+   • iframe sandbox + allow → sandboxed game embedding
    • FUZZY_CONFIG postMessage → nav suppression inside iframe
    • LoadingOverlay reuse → branded spinner while iframe boots
    • Fullscreen API → same toggle as the full game page
 
-   This is a LIGHTWEIGHT game shell. No sidebar, no score panel,
-   no pause menu. Just the iframe + chrome controls. Players who
-   want the full experience can hit "Open Full Page" to get the
-   complete GamePage layout at /games/[slug].
+   This is the ONLY game shell. Just the iframe + chrome controls.
    ═══════════════════════════════════════════════════════════════ */
 
 // ── GAMES id → gameRegistry slug bridge ──
@@ -271,18 +266,6 @@ export function GameModal({ gameId, onClose }: GameModalProps) {
         </div>
 
         <div className="game-modal__header-right">
-          {/* Full Page link */}
-          <motion.a
-            href={`/games/${game.slug}/`}
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.94 }}
-            className="game-modal__control-btn hidden sm:flex"
-            title="Open full page"
-            aria-label="Open full page"
-          >
-            <ExternalLink size={16} />
-          </motion.a>
-
           {/* Mute */}
           <motion.button
             onClick={toggleMute}

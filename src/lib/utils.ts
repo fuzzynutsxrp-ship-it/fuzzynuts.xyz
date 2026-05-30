@@ -49,7 +49,6 @@ export const GAMES = [
     type: "MMORPG",
     description:
       "Explore a massive open world, complete quests, craft items, and compete with players worldwide. The flagship Fuzzynuts experience.",
-    href: "/games/fuzzynuts-world/",
     icon: "/icons/icon-world-pop.webp",
     image: "🌍",
     color: "#4ade80",
@@ -61,7 +60,6 @@ export const GAMES = [
     type: "Platformer",
     description:
       "Classic side-scrolling action with all 32 original levels, random map generator, and level editor. Jump, stomp, collect nuts!",
-    href: "/games/mario/",
     icon: "/icons/icon-super-pop.webp",
     image: "🍄",
     color: "#ef4444",
@@ -73,7 +71,6 @@ export const GAMES = [
     type: "Horde Survival",
     description:
       "Survive endless waves of enemies with auto-attack combat. Upgrade weapons, unlock abilities, and see how long you last.",
-    href: "/games/fuzzy-survivors/",
     icon: "/icons/icon-survivors-pop.webp",
     image: "⚔️",
     color: "#a855f7",
@@ -85,7 +82,6 @@ export const GAMES = [
     type: "Mini Golf",
     description:
       "3D mini-golf with physics-based putting. Navigate tricky courses and aim for hole-in-one on every shot.",
-    href: "/games/minigolf/",
     icon: "/icons/icon-putt-pop.webp",
     image: "⛳",
     color: "#22d3ee",
@@ -97,7 +93,6 @@ export const GAMES = [
     type: "Racing",
     description:
       "High-speed racing through forest tracks. Collect acorns for boost, dodge obstacles, and race to the finish!",
-    href: "/games/nut-racer/",
     icon: "/icons/icon-racer-pop.webp",
     image: "🏎️",
     color: "#f97316",
@@ -109,7 +104,6 @@ export const GAMES = [
     type: "??? Classified",
     description:
       "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
-    href: "/games/top-secret/",
     icon: "/icons/icon-top-secret-pop.webp",
     image: "🕵️",
     color: "#8B5CF6",

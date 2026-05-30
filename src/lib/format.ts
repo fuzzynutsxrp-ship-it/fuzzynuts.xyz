@@ -4,10 +4,8 @@
  * import these without pulling the big const arrays (TOKENOMICS,
  * GAMES, HOW_TO_STEPS) along for the ride.
  *
- * Hot path: GameSidebar imports formatNumber from here to keep the
- * /games/[slug] route's First Load JS lean (round 5 wired the
- * Weekly Hoard to the live tiers API, which incurred ~10 kB on the
- * game route because of imperfect tree-shaking against utils.ts).
+ * Hot path: GameModal imports formatNumber from here to keep the
+ * main bundle lean.
  *
  * @/lib/utils still re-exports these for backward compatibility, so
  * existing call sites work unchanged. New code should import from

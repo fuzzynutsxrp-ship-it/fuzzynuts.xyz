@@ -80,7 +80,7 @@ export function Hero() {
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.94 }}
-            onClick={() => { window.location.href = "/games/fuzzynuts-world/"; }}
+            onClick={() => { document.getElementById("games")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
             role="button"
             tabIndex={0}
             aria-label="Enter the FuzzyNuts arcade"
@@ -161,10 +161,10 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-3"
         >
           <motion.a
-            href="/games/fuzzynuts-world/"
+            href="#games"
             onClick={(e) => {
               e.preventDefault();
-              window.location.href = "/games/fuzzynuts-world/";
+              document.getElementById("games")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             // DEGEN OVERHAUL START — gold→hot-pink CTA, pink hover bloom
             whileHover={{
