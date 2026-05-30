@@ -129,8 +129,8 @@ export function GamesShowcase() {
           viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-8"
         >
-          <span className="neon-chip mb-3 animate-glitch-skew">🎰 Pick your poison</span>
-          <h2 className="font-display text-3xl md:text-4xl font-black gradient-text-gold">
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🎰 Pick your poison</span>
+          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             The Arcade
           </h2>
         </motion.div>
