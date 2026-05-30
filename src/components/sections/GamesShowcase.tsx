@@ -32,7 +32,7 @@ import { GAMES } from "@/lib/utils";
 const CARD_CLASSES =
   "arcade-card group relative flex flex-col rounded-2xl " +
   "border-2 border-hot-pink neon-ring-pink " +
-  "bg-[rgba(10,6,19,0.15)] backdrop-blur-[6px] " +
+  "bg-[rgba(10,6,19,0.65)] backdrop-blur-[8px] " +
   "transition-all duration-300 ease-out " +
   "hover:scale-[1.03] hover:shadow-[0_0_48px_rgba(255,46,136,0.5)] " +
   "focus-within:scale-[1.03] focus-within:shadow-[0_0_48px_rgba(255,46,136,0.5)]";
@@ -76,14 +76,14 @@ function ArcadeCabinet({
       {/* DEGEN OVERHAUL START — clear plastic inner panel
           Semi-transparent so the mesh background bleeds through.
           Glossy plastic sheen overlay adds the N64 controller shine. */}
-      <div className="relative rounded-xl overflow-hidden flex flex-col flex-1 bg-[rgba(8,8,10,0.12)]">
-        {/* Glossy plastic highlight — top-left to bottom-right sheen */}
+      <div className="relative rounded-xl overflow-hidden flex flex-col flex-1 bg-[rgba(8,8,10,0.45)]">
+        {/* Glossy plastic highlight — strong N64 controller sheen */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 rounded-xl pointer-events-none z-30 opacity-[0.10]"
+          className="absolute inset-0 rounded-xl pointer-events-none z-30"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 20%, transparent 45%, rgba(255,255,255,0.03) 70%, rgba(255,255,255,0.12) 100%)",
+              "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 25%, transparent 50%, rgba(255,255,255,0.02) 75%, rgba(255,255,255,0.08) 100%)",
           }}
         />
         {/* Inner glow — subtle light edge to sell the plastic depth */}
@@ -201,7 +201,7 @@ function ArcadeCabinet({
           className="relative flex flex-col flex-1 px-5 pt-4 pb-5 gap-3"
           style={{
             background:
-              "linear-gradient(180deg, rgba(16,16,19,0.18) 0%, rgba(10,10,12,0.15) 55%, rgba(5,5,6,0.12) 100%)",
+              "linear-gradient(180deg, rgba(16,16,19,0.55) 0%, rgba(10,10,12,0.50) 55%, rgba(5,5,6,0.45) 100%)",
           }}
         >
           {/* DEGEN OVERHAUL END */}
