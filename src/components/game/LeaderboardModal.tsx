@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import dynamic from "next/dynamic";
+import { PlayNowSidebar } from "@/components/game/PlayNowSidebar";
 
 /* ═══════════════════════════════════════════════════════════════
    LeaderboardModal — CrazyGames-style full-screen modal
@@ -37,9 +38,11 @@ const Leaderboard = dynamic(
 interface LeaderboardModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Called when user clicks a game in the sidebar */
+  onGameSelect?: (gamesId: string) => void;
 }
 
-export function LeaderboardModal({ isOpen, onClose }: LeaderboardModalProps) {
+export function LeaderboardModal({ isOpen, onClose, onGameSelect }: LeaderboardModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -142,9 +145,12 @@ export function LeaderboardModal({ isOpen, onClose }: LeaderboardModalProps) {
         </div>
       </div>
 
-      {/* ── Scrollable body — full Leaderboard component ── */}
-      <div className="game-modal__body-scroll">
-        <Leaderboard />
+      {/* ── Body: content + sidebar ── */}
+      <div className="game-modal__body">
+        <div className="game-modal__body-scroll">
+          <Leaderboard />
+        </div>
+        <PlayNowSidebar onGameSelect={onGameSelect} />
       </div>
 
       {/* DEGEN OVERHAUL END */}

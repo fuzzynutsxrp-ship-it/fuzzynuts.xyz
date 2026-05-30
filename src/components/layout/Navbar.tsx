@@ -591,12 +591,20 @@ export function Navbar() {
       <LeaderboardModal
         isOpen={leaderboardOpen}
         onClose={() => setLeaderboardOpen(false)}
+        onGameSelect={() => {
+          setLeaderboardOpen(false);
+          window.location.href = "/#games";
+        }}
       />
 
       {/* Profile modal — opens from nav "Profile" button */}
       <ProfileModal
         isOpen={profileOpen}
         onClose={() => setProfileOpen(false)}
+        onGameSelect={() => {
+          setProfileOpen(false);
+          window.location.href = "/#games";
+        }}
       />
     </>
   );
