@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +17,7 @@ import {
   Volume2,
   VolumeX,
   Loader2,
+  Gamepad2,
 } from "lucide-react";
 import { gameRegistry } from "@/lib/gameRegistry";
 import type { GameMetadata } from "@/lib/gameRegistry";
@@ -30,6 +32,7 @@ import type { GameMetadata } from "@/lib/gameRegistry";
    • FUZZY_CONFIG postMessage → nav suppression inside iframe
    • LoadingOverlay reuse → branded spinner while iframe boots
    • Fullscreen API → same toggle as the full game page
+   • Play Next sidebar → CrazyGames-style game switching
 
    This is the ONLY game shell. Just the iframe + chrome controls.
    ═══════════════════════════════════════════════════════════════ */
@@ -40,6 +43,15 @@ const ID_TO_SLUG: Record<string, string> = {
   survivors: "fuzzy-survivors",
   racer: "nut-racer",
 };
+
+// Reverse: slug → GAMES[].id  (for sidebar card clicks)
+const SLUG_TO_ID: Record<string, string> = Object.fromEntries(
+  Object.entries(ID_TO_SLUG).map(([id, slug]) => [slug, id])
+);
+
+function slugToGamesId(slug: string): string {
+  return SLUG_TO_ID[slug] || slug;
+}
 
 function resolveGameMetadata(gamesId: string): GameMetadata | undefined {
   const slug = ID_TO_SLUG[gamesId] || gamesId;
@@ -53,11 +65,13 @@ interface GameModalProps {
   gameId: string | null;
   /** Called when user closes the modal */
   onClose: () => void;
+  /** Called when user clicks a Play Next card — switches game in-place */
+  onGameSwitch?: (gameId: string) => void;
 }
 
 // ── Component ──
 
-export function GameModal({ gameId, onClose }: GameModalProps) {
+export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   const isOpen = gameId !== null;
   const game = gameId ? resolveGameMetadata(gameId) : undefined;
 
@@ -76,6 +90,18 @@ export function GameModal({ gameId, onClose }: GameModalProps) {
     }
     return false;
   });
+
+  // ── Play Next recommendations (all live games except current) ──
+  const recommendations = useMemo(() => {
+    if (!game) return [];
+    return gameRegistry
+      .getAllLive()
+      .filter((g) => g.slug !== game.slug)
+      .map((g) => ({
+        ...g,
+        gamesId: slugToGamesId(g.slug),
+      }));
+  }, [game]);
 
   // ── Open / close <dialog> ──
   useEffect(() => {
@@ -212,6 +238,13 @@ export function GameModal({ gameId, onClose }: GameModalProps) {
     );
   }, [isMuted]);
 
+  const handleGameSwitch = useCallback(
+    (newGamesId: string) => {
+      onGameSwitch?.(newGamesId);
+    },
+    [onGameSwitch]
+  );
+
   // Don't render anything if no game
   if (!game) return null;
 
@@ -235,7 +268,7 @@ export function GameModal({ gameId, onClose }: GameModalProps) {
         }
       }}
     >
-      {/* DEGEN OVERHAUL START — game modal chrome */}
+      {/* DEGEN OVERHAUL START — game modal chrome + Play Next sidebar */}
 
       {/* ── Header bar ── */}
       <div className="game-modal__header">
@@ -317,70 +350,126 @@ export function GameModal({ gameId, onClose }: GameModalProps) {
         </div>
       </div>
 
-      {/* ── Game viewport ── */}
-      <div
-        ref={containerRef}
-        className="game-modal__viewport"
-        style={{
-          touchAction: "none",
-          userSelect: "none",
-          WebkitUserSelect: "none",
-        }}
-      >
-        {/* Loading state */}
-        <AnimatePresence>
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="game-modal__loading"
-              role="status"
-              aria-label={`Loading ${game.title}`}
-            >
+      {/* ── Body: viewport + sidebar ── */}
+      <div className="game-modal__body">
+        {/* Game viewport */}
+        <div
+          ref={containerRef}
+          className="game-modal__viewport"
+          style={{
+            touchAction: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+        >
+          {/* Loading state */}
+          <AnimatePresence>
+            {isLoading && (
               <motion.div
-                animate={{
-                  y: [0, -14, 0],
-                  rotate: [0, 12, -12, 0],
-                }}
-                transition={{
-                  y: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
-                  rotate: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                }}
-                className="text-5xl sm:text-6xl mb-4 select-none drop-shadow-[0_0_18px_rgba(255,46,136,0.65)]"
-                aria-hidden="true"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                className="game-modal__loading"
+                role="status"
+                aria-label={`Loading ${game.title}`}
               >
-                🌰
+                <motion.div
+                  animate={{
+                    y: [0, -14, 0],
+                    rotate: [0, 12, -12, 0],
+                  }}
+                  transition={{
+                    y: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
+                    rotate: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                  }}
+                  className="text-5xl sm:text-6xl mb-4 select-none drop-shadow-[0_0_18px_rgba(255,46,136,0.65)]"
+                  aria-hidden="true"
+                >
+                  🌰
+                </motion.div>
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="font-display text-xl sm:text-2xl font-black gradient-text-gold text-hero-glow mb-2"
+                >
+                  {game.title}
+                </motion.h2>
+                <div className="flex items-center gap-2 text-sm text-[var(--color-cream-dim)]">
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Booting cabinet…</span>
+                </div>
               </motion.div>
-              <motion.h2
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="font-display text-xl sm:text-2xl font-black gradient-text-gold text-hero-glow mb-2"
-              >
-                {game.title}
-              </motion.h2>
-              <div className="flex items-center gap-2 text-sm text-[var(--color-cream-dim)]">
-                <Loader2 size={16} className="animate-spin" />
-                <span>Booting cabinet…</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
 
-        {/* The iframe */}
-        <iframe
-          ref={iframeRef}
-          key={iframeKey}
-          src={game.iframePath}
-          title={`Play ${game.title}`}
-          sandbox={game.sandbox || defaultSandbox}
-          loading="eager"
-          allow="autoplay; fullscreen; gamepad"
-          onLoad={handleIframeLoad}
-          className="game-modal__iframe"
-          aria-label={`${game.title} game window`}
-        />
+          {/* The iframe */}
+          <iframe
+            ref={iframeRef}
+            key={iframeKey}
+            src={game.iframePath}
+            title={`Play ${game.title}`}
+            sandbox={game.sandbox || defaultSandbox}
+            loading="eager"
+            allow="autoplay; fullscreen; gamepad"
+            onLoad={handleIframeLoad}
+            className="game-modal__iframe"
+            aria-label={`${game.title} game window`}
+          />
+        </div>
+
+        {/* ── Play Next sidebar (CrazyGames pattern) ── */}
+        <aside className="game-modal__sidebar" aria-label="More games">
+          <div className="game-modal__sidebar-header">
+            <Gamepad2 size={14} className="game-modal__sidebar-icon" />
+            <span className="game-modal__sidebar-title">Play Next</span>
+          </div>
+          <div className="game-modal__sidebar-list">
+            {recommendations.map((rec, i) => (
+              <motion.button
+                key={rec.slug}
+                className="play-next-card"
+                onClick={() => handleGameSwitch(rec.gamesId)}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05, duration: 0.25 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                aria-label={`Switch to ${rec.title}`}
+              >
+                {/* Thumbnail */}
+                <div className="play-next-card__thumb">
+                  <img
+                    src={rec.iconPath}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    draggable={false}
+                  />
+                </div>
+                {/* Info */}
+                <div className="play-next-card__info">
+                  <span className="play-next-card__title">{rec.title}</span>
+                  <span
+                    className="play-next-card__genre"
+                    style={{ color: rec.color }}
+                  >
+                    {rec.genre}
+                  </span>
+                </div>
+                {/* Play button */}
+                <span
+                  className="play-next-card__play"
+                  style={{
+                    background: `linear-gradient(135deg, ${rec.color}, ${rec.color}cc)`,
+                  }}
+                >
+                  PLAY
+                </span>
+              </motion.button>
+            ))}
+          </div>
+        </aside>
       </div>
       {/* DEGEN OVERHAUL END */}
     </dialog>,

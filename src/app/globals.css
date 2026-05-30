@@ -1665,6 +1665,287 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Play Next Sidebar — CrazyGames-style game switching panel
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Body wrapper — flex row: viewport + sidebar side-by-side */
+.game-modal__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Sidebar container */
+.game-modal__sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 6, 19, 0.96);
+  border-left: 1px solid rgba(255, 46, 136, 0.12);
+  overflow: hidden;
+  animation: sidebar-slide-in 0.35s ease-out;
+}
+
+@keyframes sidebar-slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.game-modal__sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(255, 46, 136, 0.1);
+  flex-shrink: 0;
+}
+
+.game-modal__sidebar-icon {
+  color: var(--color-hot-pink);
+  opacity: 0.8;
+}
+
+.game-modal__sidebar-title {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-cream);
+  background: linear-gradient(135deg, var(--color-hot-pink), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollable card list */
+.game-modal__sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  /* Thin scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 46, 136, 0.2) transparent;
+}
+
+.game-modal__sidebar-list::-webkit-scrollbar {
+  width: 4px;
+}
+.game-modal__sidebar-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.game-modal__sidebar-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 46, 136, 0.25);
+  border-radius: 4px;
+}
+.game-modal__sidebar-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 46, 136, 0.4);
+}
+
+/* ── Play Next card — compact horizontal, N64 transparent plastic ── */
+.play-next-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 46, 136, 0.15);
+  background: rgba(10, 6, 19, 0.58);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glossy plastic sheen overlay */
+.play-next-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.play-next-card:hover {
+  border-color: rgba(255, 46, 136, 0.45);
+  background: rgba(255, 46, 136, 0.06);
+  box-shadow: 0 0 20px rgba(255, 46, 136, 0.12), inset 0 0 30px rgba(255, 46, 136, 0.03);
+}
+
+.play-next-card__thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.play-next-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.play-next-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.play-next-card__title {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.play-next-card__genre {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  line-height: 1.2;
+}
+
+.play-next-card__play {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #000;
+  position: relative;
+  z-index: 2;
+  transition: box-shadow 0.2s ease;
+}
+
+.play-next-card:hover .play-next-card__play {
+  box-shadow: 0 0 14px rgba(255, 46, 136, 0.4);
+}
+
+/* ── Mobile: sidebar becomes horizontal scroll at bottom ── */
+@media (max-width: 767px) {
+  .game-modal__body {
+    flex-direction: column;
+  }
+
+  .game-modal__sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 120px;
+    flex-shrink: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 46, 136, 0.12);
+    animation: sidebar-slide-up 0.3s ease-out;
+  }
+
+  @keyframes sidebar-slide-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .game-modal__sidebar-header {
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255, 46, 136, 0.08);
+  }
+
+  .game-modal__sidebar-title {
+    font-size: 0.7rem;
+  }
+
+  .game-modal__sidebar-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 10px 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .game-modal__sidebar-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .play-next-card {
+    flex-direction: column;
+    min-width: 72px;
+    max-width: 80px;
+    padding: 6px;
+    gap: 4px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .play-next-card__info {
+    align-items: center;
+  }
+
+  .play-next-card__title {
+    font-size: 0.62rem;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .play-next-card__genre {
+    display: none;
+  }
+
+  .play-next-card__play {
+    font-size: 0.55rem;
+    padding: 3px 8px;
+  }
+}
+
+/* ── Fullscreen: sidebar hides (viewport goes solo) ── */
+.game-modal__viewport:fullscreen {
+  flex: 1;
+}
+.game-modal__body:has(.game-modal__viewport:fullscreen) .game-modal__sidebar {
+  display: none;
+}
+
+/* ── Reduced-motion: kill sidebar animations ── */
+@media (prefers-reduced-motion: reduce) {
+  .game-modal__sidebar,
+  .game-modal__sidebar .play-next-card {
+    animation: none !important;
+  }
+}
+
 /* ── Reduced-motion: kill the new degen motion ── */
 @media (prefers-reduced-motion: reduce) {
   .logo-degen,

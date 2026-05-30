@@ -154,10 +154,11 @@ export function GamesShowcase() {
         </div>
       </div>
 
-      {/* DEGEN OVERHAUL — CrazyGames-style lightbox modal */}
+      {/* DEGEN OVERHAUL — CrazyGames-style lightbox modal + Play Next sidebar */}
       <GameModal
         gameId={activeGameId}
         onClose={() => setActiveGameId(null)}
+        onGameSwitch={setActiveGameId}
       />
     </section>
   );
