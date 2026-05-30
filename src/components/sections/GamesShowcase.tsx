@@ -73,6 +73,7 @@ function ArcadeCabinet({
         }
       }}
     >
+      {/* DEGEN CARD FIX START */}
       {/* Glossy plastic sheen */}
       <div
         aria-hidden="true"
@@ -83,9 +84,8 @@ function ArcadeCabinet({
         }}
       />
 
-      {/* ── Thumbnail — square, dominant, 80% of card ── */}
-      {/* DEGEN FLUID SCALING START */}
-      <div className="relative overflow-hidden rounded-t-xl">
+      {/* ── Thumbnail — top 55% of card ── */}
+      <div className="relative w-full" style={{ flex: "0 0 55%" }}>
         <Image
           src={artSrc}
           alt={game.title}
@@ -95,8 +95,75 @@ function ArcadeCabinet({
           onError={handleArtError}
           className="object-cover p-4 transition-transform duration-300 ease-out group-hover:scale-110"
         />
+        {/* Coming Soon overlay */}
+        {isComingSoon && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-t-xl z-10">
+            <span className="text-cream/80 font-display text-sm font-bold tracking-wider uppercase">
+              Coming Soon
+            </span>
+          </div>
+        )}
       </div>
-      {/* DEGEN FLUID SCALING END */}
+
+      {/* ── Card body — bottom 45% ── */}
+      <div className="flex flex-col flex-1 px-4 pb-4 pt-2 min-h-0">
+        {/* Genre tags */}
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {game.tags?.slice(0, 3).map((tag) => (
+            <span
+              key={tag}
+              className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-hot-pink/30 text-hot-pink/80 bg-hot-pink/5"
+            >
+              {tag}
+            </span>
+          ))}
+          <span
+            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-accent-purple/30 text-accent-purple/80 bg-accent-purple/5"
+          >
+            {game.type}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3 className="font-display text-base font-black text-cream truncate mb-1">
+          {game.title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-xs text-cream-dim/70 line-clamp-2 leading-relaxed mb-3 flex-1">
+          {game.description}
+        </p>
+
+        {/* PLAY button */}
+        <button
+          type="button"
+          tabIndex={-1}
+          className={`
+            w-full py-2 rounded-lg font-display text-xs font-black uppercase tracking-widest
+            transition-all duration-200
+            ${
+              isComingSoon
+                ? "bg-degen-900 text-cream/30 cursor-not-allowed border border-cream/5"
+                : "bg-hot-pink/90 text-white hover:bg-hot-pink hover:shadow-[0_0_24px_rgba(255,46,136,0.5)] active:scale-95 border border-hot-pink/50"
+            }
+          `}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isComingSoon) onPlay(game.id);
+          }}
+          disabled={isComingSoon}
+        >
+          {isComingSoon ? "🔒 Locked" : "🕹️ PLAY"}
+        </button>
+
+        {/* Insert coin footer */}
+        {!isComingSoon && (
+          <p className="text-center text-[9px] font-mono text-acid/50 uppercase tracking-[0.2em] mt-1.5 animate-pulse">
+            Insert Coin — Free to Play
+          </p>
+        )}
+      </div>
+      {/* DEGEN CARD FIX END */}
     </motion.div>
   );
 }
