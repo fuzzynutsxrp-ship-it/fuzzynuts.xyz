@@ -713,12 +713,12 @@ body {
 
 /* 1. Outer Section Wrapper — owns its own max-width, portable module */
 .arcade-section {
-  --grid-max: 1280px;
+  --grid-max: 80rem;
   --grid-gutter: clamp(1rem, 2vw, 1.5rem);
 
   width: min(var(--grid-max), 100%);
   margin-inline: auto;
-  padding-block: 2.5rem;
+  padding-block: 4rem;
   padding-inline: clamp(1rem, 4vw, 2rem);
 }
 
@@ -727,7 +727,7 @@ body {
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(clamp(280px, 32vw, 380px), 1fr)
+    minmax(clamp(17.5rem, 32vw, 23.75rem), 1fr)
   );
   gap: var(--grid-gutter);
   width: 100%;
@@ -741,7 +741,7 @@ body {
   flex-direction: column;
   contain: layout style;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 1rem;
   background: #0a0613;
   border: 2px solid rgba(255,46,136,0.4);
   transition: box-shadow 0.3s ease;
