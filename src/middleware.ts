@@ -89,12 +89,9 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const LOCKDOWN_PASSWORD = process.env.SITE_LOCKDOWN_PASSWORD;
 
-  // If no password is configured, BLOCK EVERYTHING (fail-closed)
+  // If no password is configured, allow all requests through (open site)
   if (!LOCKDOWN_PASSWORD) {
-    const response = new NextResponse(
-      "Site is in maintenance mode.",
-      { status: 503, headers: { "Content-Type": "text/plain", "Retry-After": "3600" } }
-    );
+    const response = NextResponse.next();
     return applySecurityHeaders(response, pathname);
   }
 
