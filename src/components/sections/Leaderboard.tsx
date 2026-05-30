@@ -597,8 +597,15 @@ export function Leaderboard() {
             {/* ── Empty State ── */}
             {!loading && !error && scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 px-6 text-center relative">
-                {/* Animated squirrel */}
-                <div className="empty-squirrel-bounce text-6xl sm:text-7xl mb-4">🐿️</div>
+                {/* Fuzzynuts logo — centerpiece */}
+                <div className="empty-squirrel-bounce mb-5">
+                  <img
+                    src="/images/branding/logo.webp"
+                    alt="Fuzzynuts"
+                    className="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_28px_rgba(251,191,36,0.5)]"
+                    draggable={false}
+                  />
+                </div>
                 {/* Scattered nuts around squirrel */}
                 <span className="absolute top-12 left-1/4 text-2xl nut-scatter-1 pointer-events-none">🥜</span>
                 <span className="absolute top-8 right-1/4 text-xl nut-scatter-2 pointer-events-none">🥜</span>
