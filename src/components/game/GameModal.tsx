@@ -240,6 +240,8 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
   const handleGameSwitch = useCallback(
     (newGamesId: string) => {
+      // Kill any accidental text selection from the sidebar click
+      try { window.getSelection()?.removeAllRanges(); } catch { /* noop */ }
       onGameSwitch?.(newGamesId);
     },
     [onGameSwitch]
@@ -273,8 +275,9 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
       {/* ── Header bar ── */}
       <div className="game-modal__header">
         <div className="game-modal__header-left">
-          {/* Genre badge */}
+          {/* Genre badge — keyed to game slug for clean remount on switch */}
           <span
+            key={`badge-${game.slug}`}
             className="game-modal__genre-badge"
             style={{
               background: `${game.color}15`,
@@ -284,8 +287,9 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
           >
             {game.genre}
           </span>
-          {/* Title */}
+          {/* Title — keyed to game slug so CSS animation replays on switch */}
           <h2
+            key={game.slug}
             className="game-modal__title"
             style={{
               background: `linear-gradient(135deg, ${game.color}, ${game.color}cc)`,
