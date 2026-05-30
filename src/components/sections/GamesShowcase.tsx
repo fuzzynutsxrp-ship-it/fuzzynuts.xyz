@@ -43,7 +43,10 @@ function ArcadeCabinet({
 }) {
   const isComingSoon = game.id === "top-secret";
 
-  const [artSrc, setArtSrc] = useState(`/images/games/${game.id}.png`);
+  // Try PNG first, fall back to webp for top-secret, then icon
+  const [artSrc, setArtSrc] = useState(
+    game.id === "top-secret" ? `/images/games/top-secret.webp` : `/images/games/${game.id}.png`
+  );
   const handleArtError = () => {
     if (artSrc !== game.icon) setArtSrc(game.icon);
   };
