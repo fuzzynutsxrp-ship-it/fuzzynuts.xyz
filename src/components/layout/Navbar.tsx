@@ -20,6 +20,7 @@ import { useWalletStore } from "@/store/wallet";
 import { truncateAddress } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
+import { LeaderboardModal } from "@/components/game/LeaderboardModal";
 
 const NAV_LINKS = [
   { href: "/#games", label: "Arcade" },
@@ -33,6 +34,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const {
     address,
     isConnected,
@@ -182,26 +184,34 @@ export function Navbar() {
               const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-hot-pink)] transition-colors rounded-lg hover:bg-[rgba(255,46,136,0.07)] flex items-center gap-1.5 relative`;
               // DEGEN OVERHAUL END
 
-              if (isRoute) {
+              if (isRoute && isLeaderboard) {
                 return (
-                  <Link key={link.href} href={link.href} className={classes}>
-                    {isLeaderboard && (
-                      <Trophy
-                        size={14}
-                        className={
-                          hasClaimable
-                            ? "text-brand-gold"
-                            : "text-brand-gold opacity-70"
-                        }
-                      />
-                    )}
+                  <button
+                    key={link.href}
+                    onClick={() => setLeaderboardOpen(true)}
+                    className={classes}
+                  >
+                    <Trophy
+                      size={14}
+                      className={
+                        hasClaimable
+                          ? "text-brand-gold"
+                          : "text-brand-gold opacity-70"
+                      }
+                    />
                     {link.label}
-                    {/* Prize badge on Leaderboard link */}
-                    {isLeaderboard && hasClaimable && (
+                    {hasClaimable && (
                       <span className="ml-1 text-[9px] font-black uppercase tracking-wider bg-brand-gold/15 text-brand-gold border border-brand-gold/30 px-1.5 py-0.5 rounded-full animate-pulse">
                         Top 3!
                       </span>
                     )}
+                  </button>
+                );
+              }
+              if (isRoute) {
+                return (
+                  <Link key={link.href} href={link.href} className={classes}>
+                    {link.label}
                   </Link>
                 );
               }
@@ -477,6 +487,27 @@ export function Navbar() {
                   const classes =
                     "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] hover:bg-[rgba(245,196,66,0.05)] rounded-lg transition-colors min-h-[44px]";
 
+                  if (isRoute && link.icon === "trophy") {
+                    return (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                      >
+                        <button
+                          onClick={() => { setMobileOpen(false); setLeaderboardOpen(true); }}
+                          className={classes}
+                        >
+                          <Trophy
+                            size={16}
+                            className="text-brand-gold opacity-70"
+                          />
+                          {link.label}
+                        </button>
+                      </motion.div>
+                    );
+                  }
                   if (isRoute) {
                     return (
                       <motion.div
@@ -490,12 +521,6 @@ export function Navbar() {
                           onClick={() => setMobileOpen(false)}
                           className={classes}
                         >
-                          {link.icon === "trophy" && (
-                            <Trophy
-                              size={16}
-                              className="text-brand-gold opacity-70"
-                            />
-                          )}
                           {link.label}
                         </Link>
                       </motion.div>
@@ -553,6 +578,12 @@ export function Navbar() {
           )}
         </AnimatePresence>
       </motion.nav>
+
+      {/* Leaderboard modal — opens from nav "Leaderboard" button */}
+      <LeaderboardModal
+        isOpen={leaderboardOpen}
+        onClose={() => setLeaderboardOpen(false)}
+      />
     </>
   );
 }

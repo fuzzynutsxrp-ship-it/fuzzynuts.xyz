@@ -1675,6 +1675,45 @@ body {
   }
 }
 
+/* ── Scrollable body — for content modals (leaderboard, etc.) ── */
+.game-modal__body-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--color-degen-950, #0a0613);
+  min-height: 0;
+  /* Thin pink scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 46, 136, 0.2) transparent;
+}
+.game-modal__body-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.game-modal__body-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.game-modal__body-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 46, 136, 0.25);
+  border-radius: 4px;
+}
+.game-modal__body-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 46, 136, 0.4);
+}
+
+/* Override Leaderboard section padding inside the modal */
+.game-modal__body-scroll section#leaderboard {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* ── Mobile: tighter padding for leaderboard in modal ── */
+@media (max-width: 639px) {
+  .game-modal__body-scroll section#leaderboard {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Play Next Sidebar — CrazyGames-style game switching panel
    ═══════════════════════════════════════════════════════════════ */
