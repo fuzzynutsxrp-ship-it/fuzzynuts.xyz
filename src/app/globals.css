@@ -707,15 +707,14 @@ body {
 }
 
 /* ──────────────────────────────────────────
-   Arcade Grid — DEGEN SCALING (2026 fluid auto-fit)
-   repeat(auto-fit, minmax(clamp(280px, 32vw, 380px), 1fr))
-   gives perfect 3→2→1 column transitions with zero CLS.
-   aspect-ratio: 4/5 on cards locks proportions at every width.
+   Arcade Grid — DEGEN FLUID SCALING (2026)
    ────────────────────────────────────────── */
+/* DEGEN FLUID SCALING START */
 .arcade-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 32vw, 380px), 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .arcade-card {
@@ -725,17 +724,12 @@ body {
   contain: layout style paint;
 }
 
-.arcade-card .arcade-card__thumb {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-}
-
-.arcade-card .arcade-card__thumb img,
-.arcade-card .arcade-card__thumb [data-next-image] {
+.arcade-card img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
+/* DEGEN FLUID SCALING END */
 
 /* ──────────────────────────────────────────
    Pixel art rendering — crisp edges at any size
