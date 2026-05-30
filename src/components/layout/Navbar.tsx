@@ -20,7 +20,7 @@ import { useWalletStore } from "@/store/wallet";
 import { truncateAddress } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
-
+import { LeaderboardModal } from "@/components/game/LeaderboardModal";
 
 const NAV_LINKS = [
   { href: "/#games", label: "Arcade" },
@@ -34,7 +34,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
-
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const {
     address,
     isConnected,
@@ -190,9 +190,9 @@ export function Navbar() {
 
               if (isRoute && isLeaderboard) {
                 return (
-                  <Link
+                  <button
                     key={link.href}
-                    href={link.href}
+                    onClick={() => setLeaderboardOpen(true)}
                     className={classes}
                   >
                     <Trophy
@@ -209,7 +209,7 @@ export function Navbar() {
                         Top 3!
                       </span>
                     )}
-                  </Link>
+                  </button>
                 );
               }
               if (isRoute) {
@@ -503,9 +503,8 @@ export function Navbar() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.05 }}
                       >
-                        <Link
-                          href={link.href}
-                          onClick={() => setMobileOpen(false)}
+                        <button
+                          onClick={() => { setMobileOpen(false); setLeaderboardOpen(true); }}
                           className={classes}
                         >
                           <Trophy
@@ -513,7 +512,7 @@ export function Navbar() {
                             className="text-brand-gold opacity-70"
                           />
                           {link.label}
-                        </Link>
+                        </button>
                       </motion.div>
                     );
                   }
@@ -588,6 +587,11 @@ export function Navbar() {
         </AnimatePresence>
       </motion.nav>
 
+      {/* Leaderboard modal — opens from nav "Leaderboard" button */}
+      <LeaderboardModal
+        isOpen={leaderboardOpen}
+        onClose={() => setLeaderboardOpen(false)}
+      />
     </>
   );
 }
