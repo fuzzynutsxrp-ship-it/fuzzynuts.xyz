@@ -330,7 +330,32 @@ function ArcadeCabinet({
 
 export function GamesShowcase() {
   return (
-    <section id="games" className="py-12 relative overflow-hidden bg-degen-mesh">
+    <section id="games" className="py-12 relative overflow-hidden">
+      {/* TEMPORARY — visible background with game images to test transparency.
+          Remove this block once the plastic shell opacity is finalized. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none z-0 opacity-40"
+        style={{
+          backgroundImage: `
+            url('/images/games/fuzzynuts-world.png'),
+            url('/images/games/mario.png'),
+            url('/images/games/survivors.png'),
+            url('/images/games/minigolf.png'),
+            url('/images/games/racer.png'),
+            url('/images/games/top-secret.png')
+          `,
+          backgroundPosition:
+            "10% 15%, 50% 10%, 90% 20%, 15% 75%, 55% 80%, 85% 70%",
+          backgroundSize: "180px, 160px, 170px, 150px, 165px, 155px",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      {/* The animated degen mesh on top of the images */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none z-[1] bg-degen-mesh opacity-60"
+      />
       <div className="container-main relative z-10">
         {/* Section header */}
         <motion.div
