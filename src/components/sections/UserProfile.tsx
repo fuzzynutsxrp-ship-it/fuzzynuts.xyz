@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
-import { CyberCard } from "@/components/ui/CyberCard";
 import { ClaimRewards } from "@/components/sections/ClaimRewards";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -143,7 +142,7 @@ function getGameColor(gameId: string): string {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Not Connected State
+   Connect Prompt — Not Connected State
    ═══════════════════════════════════════════════════════════════ */
 
 function ConnectPrompt() {
@@ -155,8 +154,8 @@ function ConnectPrompt() {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-20 px-6 text-center"
     >
-      <div className="w-20 h-20 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center mb-6">
-        <Wallet size={32} className="text-brand-gold" />
+      <div className="w-24 h-24 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(251,191,36,0.15)]">
+        <Wallet size={40} className="text-brand-gold" />
       </div>
       <h2 className="font-display text-2xl font-bold text-cream mb-3">
         Connect Your Wallet
@@ -193,24 +192,24 @@ function ConnectPrompt() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Skeleton Loader
+   Skeleton Loader — Timeline Style
    ═══════════════════════════════════════════════════════════════ */
 
 function SkeletonRows() {
   return (
-    <div className="space-y-0">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 px-4 py-4 border-b border-white/[0.04]"
-          style={{ animationDelay: `${i * 80}ms` }}
-        >
-          <div className="w-8 h-8 rounded-lg bg-white/[0.06] animate-pulse" />
-          <div className="flex-1 space-y-2">
-            <div className="w-28 h-4 rounded bg-white/[0.06] animate-pulse" />
-            <div className="w-20 h-3 rounded bg-white/[0.04] animate-pulse" />
+    <div className="relative pl-8">
+      <div className="absolute left-3 top-0 bottom-0 w-px bg-white/[0.04]" />
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="relative mb-4 last:mb-0" style={{ animationDelay: `${i * 80}ms` }}>
+          <div className="absolute -left-5 top-3.5 w-3 h-3 rounded-full bg-[#111] animate-pulse" />
+          <div className="bg-[#0d0d0d] border border-white/[0.04] rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-6 h-6 rounded bg-[#111] animate-pulse" />
+              <div className="w-24 h-4 rounded bg-[#111] animate-pulse" />
+              <div className="ml-auto w-16 h-4 rounded bg-[#111] animate-pulse" />
+            </div>
+            <div className="w-20 h-3 rounded bg-[#111] animate-pulse" />
           </div>
-          <div className="w-16 h-5 rounded bg-white/[0.06] animate-pulse" />
         </div>
       ))}
     </div>
@@ -292,9 +291,10 @@ export function UserProfile() {
     return (
       <section id="user-profile" className="py-16 relative">
         <div className="container-main">
-          <CyberCard accentColor="gold">
+          <div className="bg-[#0a0a0a] border-2 border-brand-gold/30 rounded-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-brand-gold via-neon-green to-brand-gold" />
             <ConnectPrompt />
-          </CyberCard>
+          </div>
         </div>
       </section>
     );
@@ -318,29 +318,53 @@ export function UserProfile() {
     {}
   );
 
+  // XP progress
+  const xpProgress = (unlockedAchievements.size / ACHIEVEMENTS.length) * 100;
+
   return (
     <section id="user-profile" className="py-16 relative">
       <div className="container-main space-y-6">
-        {/* ── Profile Header ── */}
+
+        {/* ═══ PROFILE HEADER — Squirrel Profile Card ═══ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <CyberCard accentColor="gold">
+          <div className="bg-[#0a0a0a] border-2 border-brand-gold/30 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(251,191,36,0.08)]">
+            {/* Gold accent stripe */}
+            <div className="h-1 bg-gradient-to-r from-brand-gold via-neon-green to-brand-gold" />
             <div className="p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  {/* Avatar */}
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-gold/20 to-neon-green/10 border border-brand-gold/30 flex items-center justify-center shrink-0">
-                    <span className="text-2xl">🐿️</span>
+                  {/* Avatar — Fuzzynuts logo */}
+                  <div className="w-20 h-20 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(251,191,36,0.2)]">
+                    <img
+                      src="/images/branding/logo.webp"
+                      alt="Fuzzynuts"
+                      className="w-14 h-14 object-contain"
+                      draggable={false}
+                    />
                   </div>
                   <div>
-                    <h2 className="font-display text-xl font-bold text-cream">
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-cream">
                       {truncateAddress(address)}
                     </h2>
-                    <p className="text-xs text-cream-dim font-mono mt-0.5">
+                    <p className="text-xs text-cream-dim font-mono mt-0.5 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
                       XRPL Player Profile
                     </p>
+                    {/* XP mini bar */}
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="w-24 h-1.5 rounded-full bg-[#111] overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-brand-gold to-neon-green"
+                          style={{ width: `${xpProgress}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-mono text-cream-dim">
+                        {unlockedAchievements.size}/{ACHIEVEMENTS.length} XP
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -353,8 +377,8 @@ export function UserProfile() {
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs
                                font-semibold text-cream-dim hover:text-cream
-                               bg-white/[0.04] hover:bg-white/[0.08]
-                               border border-white/[0.06] hover:border-neon-green/20
+                               bg-[#111] hover:bg-[#1a1a1a]
+                               border border-white/[0.08] hover:border-neon-green/20
                                transition-all min-h-[40px]
                                disabled:opacity-40 cursor-pointer"
                     title="Refresh scores"
@@ -370,7 +394,7 @@ export function UserProfile() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs
-                               font-semibold text-red-400 hover:bg-red-400/10
+                               font-semibold text-red-400 hover:bg-[#1a0a0a]
                                border border-red-400/20 hover:border-red-400/40
                                transition-all min-h-[40px] cursor-pointer"
                   >
@@ -379,10 +403,10 @@ export function UserProfile() {
                 </div>
               </div>
             </div>
-          </CyberCard>
+          </div>
         </motion.div>
 
-        {/* ── Prize Claiming ── */}
+        {/* ═══ PRIZE CLAIMING ═══ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -391,7 +415,7 @@ export function UserProfile() {
           <ClaimRewards />
         </motion.div>
 
-        {/* ── Stats Summary ── */}
+        {/* ═══ STATS SUMMARY ═══ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -402,34 +426,41 @@ export function UserProfile() {
             {
               label: "Total Plays",
               value: totalGames,
-              icon: <Gamepad2 size={18} className="text-neon-green" />,
+              icon: <Gamepad2 size={20} className="text-neon-green" />,
+              borderColor: "border-neon-green/30",
+              glowColor: "shadow-[0_0_20px_rgba(16,185,129,0.08)]",
             },
             {
               label: "Games Played",
               value: uniqueGames,
-              icon: <Trophy size={18} className="text-brand-gold" />,
+              icon: <Trophy size={20} className="text-brand-gold" />,
+              borderColor: "border-brand-gold/30",
+              glowColor: "shadow-[0_0_20px_rgba(251,191,36,0.08)]",
             },
             {
               label: "Best Score",
               value: topScore > 0 ? formatNumber(topScore) : "—",
-              icon: <TrendingUp size={18} className="text-cyan-400" />,
+              icon: <TrendingUp size={20} className="text-cyan-400" />,
+              borderColor: "border-cyan-400/30",
+              glowColor: "shadow-[0_0_20px_rgba(34,211,238,0.08)]",
             },
           ].map((stat) => (
-            <CyberCard key={stat.label} accentColor="green">
-              <div className="p-4 sm:p-5 text-center">
-                <div className="flex justify-center mb-2">{stat.icon}</div>
-                <p className="font-display text-xl sm:text-2xl font-bold text-cream">
-                  {stat.value}
-                </p>
-                <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
-                  {stat.label}
-                </p>
-              </div>
-            </CyberCard>
+            <div
+              key={stat.label}
+              className={`bg-[#0a0a0a] border ${stat.borderColor} rounded-xl ${stat.glowColor} p-4 sm:p-5 text-center`}
+            >
+              <div className="flex justify-center mb-2">{stat.icon}</div>
+              <p className="font-display text-xl sm:text-2xl font-bold text-cream">
+                {stat.value}
+              </p>
+              <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
+                {stat.label}
+              </p>
+            </div>
           ))}
         </motion.div>
 
-        {/* ── Personal Bests by Game ── */}
+        {/* ═══ PERSONAL BESTS BY GAME ═══ */}
         {Object.keys(bestByGame).length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -442,39 +473,40 @@ export function UserProfile() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(bestByGame).map(([gameId, entry]) => (
-                <CyberCard key={gameId} accentColor="gold">
-                  <div className="p-4 flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
-                      style={{
-                        background: `${getGameColor(gameId)}15`,
-                        border: `1px solid ${getGameColor(gameId)}30`,
-                      }}
-                    >
-                      {GAME_EMOJIS[gameId] || "🎮"}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-sm font-bold truncate"
-                        style={{ color: getGameColor(gameId) }}
-                      >
-                        {getGameTitle(gameId)}
-                      </p>
-                      <p className="text-[11px] text-cream-dim">
-                        {entry.ts ? formatDate(entry.ts) : "—"}
-                      </p>
-                    </div>
-                    <span className="font-mono text-sm font-bold text-brand-gold tabular-nums">
-                      {formatNumber(entry.score)}
-                    </span>
+                <div
+                  key={gameId}
+                  className="bg-[#0a0a0a] border border-white/[0.08] rounded-xl p-4 flex items-center gap-3"
+                >
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
+                    style={{
+                      background: `${getGameColor(gameId)}15`,
+                      border: `1px solid ${getGameColor(gameId)}30`,
+                    }}
+                  >
+                    {GAME_EMOJIS[gameId] || "🎮"}
                   </div>
-                </CyberCard>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm font-bold truncate"
+                      style={{ color: getGameColor(gameId) }}
+                    >
+                      {getGameTitle(gameId)}
+                    </p>
+                    <p className="text-[11px] text-cream-dim">
+                      {entry.ts ? formatDate(entry.ts) : "—"}
+                    </p>
+                  </div>
+                  <span className="font-mono text-sm font-bold text-brand-gold tabular-nums">
+                    {formatNumber(entry.score)}
+                  </span>
+                </div>
               ))}
             </div>
           </motion.div>
         )}
 
-        {/* ── Achievements ── */}
+        {/* ═══ ACHIEVEMENTS + XP BAR ═══ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -484,24 +516,48 @@ export function UserProfile() {
             <Award size={16} className="text-brand-gold" />
             Achievements
           </h3>
+
+          {/* XP Progress Bar */}
+          <div className="mb-4 bg-[#0a0a0a] border border-white/[0.08] rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-cream">
+                Achievement Progress
+              </span>
+              <span className="text-sm font-mono text-brand-gold">
+                {unlockedAchievements.size}/{ACHIEVEMENTS.length}
+              </span>
+            </div>
+            <div className="h-2.5 rounded-full bg-[#111] overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-brand-gold to-neon-green transition-all duration-500"
+                style={{ width: `${xpProgress}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-cream-dim mt-2">
+              {unlockedAchievements.size === ACHIEVEMENTS.length
+                ? "All achievements unlocked! You're a true degen."
+                : `${ACHIEVEMENTS.length - unlockedAchievements.size} more to unlock — keep playing!`}
+            </p>
+          </div>
+
+          {/* Achievement Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {ACHIEVEMENTS.map((achievement) => {
               const isUnlocked = unlockedAchievements.has(achievement.id);
               return (
-                <CyberCard
-                  key={achievement.id}
-                  accentColor={isUnlocked ? "gold" : "green"}
-                >
+                <div key={achievement.id} className="group relative">
                   <div
-                    className={`p-4 flex items-center gap-3 transition-opacity ${
-                      isUnlocked ? "opacity-100" : "opacity-40"
+                    className={`p-4 flex items-center gap-3 rounded-xl border transition-all ${
+                      isUnlocked
+                        ? "bg-[#0f0a00] border-brand-gold/30 shadow-[0_0_15px_rgba(251,191,36,0.08)]"
+                        : "bg-[#0a0a0a] border-white/[0.06] opacity-50"
                     }`}
                   >
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 ${
                         isUnlocked
-                          ? "bg-brand-gold/15 border border-brand-gold/30"
-                          : "bg-white/[0.04] border border-white/[0.08]"
+                          ? "bg-[#0f0a00] border border-brand-gold/30"
+                          : "bg-[#111] border border-white/[0.06]"
                       }`}
                     >
                       {isUnlocked ? achievement.icon : "🔒"}
@@ -519,13 +575,19 @@ export function UserProfile() {
                       </p>
                     </div>
                   </div>
-                </CyberCard>
+                  {/* Tooltip for locked achievements */}
+                  {!isUnlocked && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-[#0a0a0a] border border-white/[0.08] text-xs text-cream-dim whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                      Play {getGameTitle(achievement.game)} to unlock
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
         </motion.div>
 
-        {/* ── Score History Table ── */}
+        {/* ═══ SCORE HISTORY — VERTICAL TIMELINE ═══ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -535,20 +597,9 @@ export function UserProfile() {
             <Calendar size={16} className="text-neon-green" />
             Score History
           </h3>
-          <CyberCard accentColor="green" className="overflow-hidden">
-            {/* Header */}
-            <div
-              className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider
-                          text-cream-dim border-b border-white/[0.08] bg-white/[0.02]"
-            >
-              <span className="w-10">Game</span>
-              <span className="flex-1">Title</span>
-              <span className="w-20 text-right">Score</span>
-              <span className="w-28 text-right hidden sm:block">Date</span>
-            </div>
-
+          <div className="bg-[#0a0a0a] border border-white/[0.08] rounded-2xl overflow-hidden">
             {/* Loading */}
-            {state.loading && <SkeletonRows />}
+            {state.loading && <div className="p-4 sm:p-5"><SkeletonRows /></div>}
 
             {/* Error */}
             <AnimatePresence>
@@ -599,54 +650,70 @@ export function UserProfile() {
               </div>
             )}
 
-            {/* Score rows */}
+            {/* Timeline */}
             {!state.loading && state.scores.length > 0 && (
-              <div>
-                {state.scores.map((entry, index) => (
-                  <motion.div
-                    key={`${entry.game}-${entry.ts}-${index}`}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.03, duration: 0.2 }}
-                    className="flex items-center gap-3 px-4 py-3.5
-                               border-b border-white/[0.04] last:border-0
-                               hover:bg-white/[0.02] transition-colors"
-                  >
-                    {/* Game emoji */}
-                    <div className="w-10 flex justify-center shrink-0">
-                      <span className="text-lg">
-                        {GAME_EMOJIS[entry.game] || "🎮"}
-                      </span>
-                    </div>
+              <div className="p-4 sm:p-5">
+                <div className="relative pl-8">
+                  {/* Vertical connecting line */}
+                  <div className="absolute left-3 top-0 bottom-0 w-px bg-white/[0.06]" />
 
-                    {/* Game title */}
-                    <div className="flex-1 min-w-0">
-                      <span
-                        className="text-sm font-semibold truncate block"
-                        style={{ color: getGameColor(entry.game) }}
+                  {state.scores.map((entry, index) => {
+                    const isRecent = index === 0;
+                    return (
+                      <motion.div
+                        key={`${entry.game}-${entry.ts}-${index}`}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.03, duration: 0.2 }}
+                        className="relative mb-4 last:mb-0"
                       >
-                        {getGameTitle(entry.game)}
-                      </span>
-                    </div>
+                        {/* Timeline dot */}
+                        <div
+                          className="absolute -left-5 top-3.5 w-3 h-3 rounded-full border-2"
+                          style={{
+                            borderColor: getGameColor(entry.game),
+                            background: isRecent
+                              ? getGameColor(entry.game)
+                              : "#0a0a0a",
+                            boxShadow: isRecent
+                              ? `0 0 8px ${getGameColor(entry.game)}40`
+                              : "none",
+                          }}
+                        />
 
-                    {/* Score */}
-                    <div className="w-20 text-right shrink-0">
-                      <span className="font-mono text-sm font-bold text-cream tabular-nums">
-                        {formatNumber(entry.score)}
-                      </span>
-                    </div>
-
-                    {/* Date */}
-                    <div className="w-28 text-right shrink-0 hidden sm:block">
-                      <span className="text-[11px] font-mono text-cream-dim opacity-60">
-                        {entry.ts ? formatDate(entry.ts) : "—"}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
+                        {/* Entry card */}
+                        <div
+                          className={`bg-[#0d0d0d] border rounded-xl p-3 sm:p-4 ${
+                            isRecent
+                              ? "border-white/[0.08]"
+                              : "border-white/[0.04]"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-base">
+                              {GAME_EMOJIS[entry.game] || "🎮"}
+                            </span>
+                            <span
+                              className="text-sm font-bold truncate"
+                              style={{ color: getGameColor(entry.game) }}
+                            >
+                              {getGameTitle(entry.game)}
+                            </span>
+                            <span className="ml-auto font-mono text-sm font-bold text-brand-gold tabular-nums">
+                              {formatNumber(entry.score)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-cream-dim font-mono">
+                            {entry.ts ? formatDate(entry.ts) : "—"}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </div>
             )}
-          </CyberCard>
+          </div>
         </motion.div>
       </div>
     </section>
