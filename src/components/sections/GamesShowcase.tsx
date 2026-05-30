@@ -15,11 +15,10 @@ import { GameModal } from "@/components/game/GameModal";
    ───────────────────────────────────────────────────────────── */
 
 // Card = clickable button, no navigation
-// DEGEN FLUID SCALING START
+// DEGEN FLUID SCALING START — Production-reviewed architecture
 const CARD_CLASSES =
-  "arcade-card group relative flex flex-col cursor-pointer " +
-  "transition-all duration-300 ease-out " +
-  "hover:scale-[1.03] hover:shadow-[0_0_48px_rgba(255,46,136,0.5)]";
+  "arcade-card group relative cursor-pointer " +
+  "transition-all duration-300 ease-out";
 // DEGEN FLUID SCALING END
 
 function ArcadeCabinet({
@@ -71,19 +70,10 @@ function ArcadeCabinet({
         }
       }}
     >
-      {/* DEGEN CARD FIX START */}
-      {/* Glossy plastic sheen */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 rounded-2xl pointer-events-none z-30"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 40%, transparent 70%)",
-        }}
-      />
-
-      {/* ── Thumbnail — top 55% of card ── */}
-      <div className="relative w-full" style={{ flex: "0 0 55%" }}>
+      {/* DEGEN CARD FIX START — Production-reviewed flex column structure */}
+      {/* ── Image wrapper — flex:1 absorbs extra space, min-height:0 prevents overflow ── */}
+      {/* ── Glossy sheen is now a ::after pseudo-element (GPU-accelerated) ── */}
+      <div className="arcade-card__image-wrapper">
         <Image
           src={artSrc}
           alt={game.title}
@@ -103,8 +93,8 @@ function ArcadeCabinet({
         )}
       </div>
 
-      {/* ── Card body — bottom 45% ── */}
-      <div className="flex flex-col flex-1 px-4 pb-4 pt-2 min-h-0">
+      {/* ── Card content — fixed height area, never gets squished ── */}
+      <div className="arcade-card__content flex flex-col flex-1 min-h-0 pt-2">
         {/* Genre tags */}
         <div className="flex flex-wrap gap-1.5 mb-2">
           {game.tags?.slice(0, 3).map((tag) => (
@@ -161,7 +151,7 @@ function ArcadeCabinet({
           </p>
         )}
       </div>
-      {/* DEGEN CARD FIX END */}
+      {/* DEGEN CARD FIX END — Production-reviewed flex column structure */}
     </motion.div>
   );
 }
@@ -170,7 +160,7 @@ export function GamesShowcase() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
 
   return (
-    <section id="games" className="py-10 relative overflow-hidden">
+    <section id="games" className="relative overflow-hidden">
       {/* Background layers */}
       <div
         aria-hidden="true"
@@ -194,7 +184,8 @@ export function GamesShowcase() {
         }}
       />
 
-      <div className="container-main relative z-10">
+      {/* DEGEN FLUID SCALING — arcade-section owns its own max-width */}
+      <div className="arcade-section relative z-10">
         {/* Header — minimal */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

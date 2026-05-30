@@ -709,31 +709,107 @@ body {
 /* ──────────────────────────────────────────
    Arcade Grid — DEGEN FLUID SCALING (2026)
    ────────────────────────────────────────── */
-/* DEGEN FLUID SCALING START */
-.arcade-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 32vw, 380px), 1fr));
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 100%;
+/* DEGEN FLUID SCALING START — Production-reviewed architecture */
+
+/* 1. Outer Section Wrapper — owns its own max-width, portable module */
+.arcade-section {
+  --grid-max: 1280px;
+  --grid-gutter: clamp(1rem, 2vw, 1.5rem);
+
+  width: min(var(--grid-max), 100%);
+  margin-inline: auto;
+  padding-block: 2.5rem;
+  padding-inline: clamp(1rem, 4vw, 2rem);
 }
 
+/* 2. The Intrinsic Grid — zero media queries, pure intrinsic sizing */
+.arcade-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(clamp(280px, 32vw, 380px), 1fr)
+  );
+  gap: var(--grid-gutter);
+  width: 100%;
+}
+
+/* 3. The Card — uniform height via flex column, no text squishing */
 .arcade-card {
   aspect-ratio: 4 / 5;
   width: 100%;
-  max-width: 100%;
-  contain: layout style paint;
+  display: flex;
+  flex-direction: column;
+  contain: layout style;
+  overflow: hidden;
+  border-radius: 16px;
   background: #0a0613;
   border: 2px solid rgba(255,46,136,0.4);
-  border-radius: 16px;
+  transition: box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arcade-card:hover {
+    box-shadow: 0 0 48px rgba(255,46,136,0.5);
+  }
+}
+
+/* 4. Image Wrapper — absorbs extra space, min-height:0 fixes flex overflow bug */
+.arcade-card__image-wrapper {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  position: relative;
   overflow: hidden;
 }
 
-.arcade-card img {
+/* Glossy sheen — GPU-accelerated via transform, runs on compositor thread */
+.arcade-card__image-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%) skewX(-20deg);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+  z-index: 30;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arcade-card:hover .arcade-card__image-wrapper::after {
+    transform: translateX(100%) skewX(-20deg);
+  }
+}
+
+/* 5. Image — explicit sizing eliminates CLS */
+.arcade-card__image-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
+
+/* 6. Text Content — fixed height area at card bottom */
+.arcade-card__content {
+  padding: 0 1rem 1rem;
+}
+
+/* 7. Accessibility — respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .arcade-card,
+  .arcade-card__image-wrapper::after {
+    transition: none !important;
+  }
+  .arcade-card:hover {
+    transform: none !important;
+  }
+}
+
 /* DEGEN FLUID SCALING END */
 
 /* ──────────────────────────────────────────
