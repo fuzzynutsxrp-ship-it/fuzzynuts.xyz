@@ -59,12 +59,12 @@ function ShimmerBar({
 
 export function LeaderboardSkeleton() {
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-forest-900/50 backdrop-blur-sm relative">
+    <div className="w-full overflow-hidden rounded-2xl border-2 border-hot-pink/30 bg-degen-950 relative">
       {/* Ambient neon glow */}
       <div className="absolute inset-0 pointer-events-none ldr-ambient" />
 
       {/* Header skeleton */}
-      <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 px-6 py-4 border-b border-white/5">
+      <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 px-6 py-4 border-b border-hot-pink/10">
         <ShimmerBar className="w-8 h-4" />
         <ShimmerBar className="h-4 w-32" delay={50} />
         <ShimmerBar className="w-20 h-4" delay={100} />
@@ -76,21 +76,21 @@ export function LeaderboardSkeleton() {
         {[...Array(ROW_COUNT)].map((_, i) => (
           <motion.div
             key={i}
-            className="grid grid-cols-[auto_1fr_auto_auto] gap-4 px-6 py-3 border-b border-white/5 last:border-0"
+            className="grid grid-cols-[auto_1fr_auto_auto] gap-4 px-6 py-3 border-b border-hot-pink/10 last:border-0"
             variants={rowVariants}
           >
             {/* Rank badge */}
             <div className="flex items-center justify-center w-8 h-8">
               <div
                 className={`w-6 h-6 rounded-full ${
-                  i < 3 ? "bg-gold/20" : "bg-white/5"
+                  i < 3 ? "bg-gold/20" : "bg-hot-pink/10"
                 } animate-pulse`}
               />
             </div>
 
             {/* Player info */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+              <div className="w-8 h-8 rounded-full bg-degen-900 animate-pulse" />
               <div className="space-y-2">
                 <ShimmerBar
                   className={`h-3 ${
@@ -122,7 +122,7 @@ export function LeaderboardSkeleton() {
       </motion.div>
 
       {/* Footer skeleton */}
-      <div className="px-6 py-3 bg-white/5">
+      <div className="px-6 py-3 bg-degen-900">
         <ShimmerBar className="w-32 h-3" />
       </div>
 
@@ -179,7 +179,7 @@ export function LeaderboardSkeleton() {
 
 export function LeaderboardSkeletonShimmer() {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-forest-900/50">
+    <div className="relative overflow-hidden rounded-2xl border-2 border-hot-pink/20 bg-degen-950">
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
       <LeaderboardSkeleton />
     </div>

@@ -15,12 +15,14 @@ import { GameModal } from "@/components/game/GameModal";
    ───────────────────────────────────────────────────────────── */
 
 // Card = clickable button, no navigation
+// DEGEN SCALING START — aspect-ratio locked via .arcade-card (globals.css)
 const CARD_CLASSES =
   "arcade-card group relative flex flex-col rounded-2xl cursor-pointer " +
   "border-2 border-hot-pink neon-ring-pink " +
-  "bg-[rgba(10,6,19,0.58)] " +
+  "bg-degen-950 " +
   "transition-all duration-300 ease-out " +
   "hover:scale-[1.03] hover:shadow-[0_0_48px_rgba(255,46,136,0.5)]";
+// DEGEN SCALING END
 
 function ArcadeCabinet({
   game,
@@ -82,17 +84,19 @@ function ArcadeCabinet({
       />
 
       {/* ── Thumbnail — square, dominant, 80% of card ── */}
-      <div className="relative aspect-square overflow-hidden rounded-t-xl">
+      {/* DEGEN SCALING START */}
+      <div className="arcade-card__thumb relative overflow-hidden rounded-t-xl">
         <Image
           src={artSrc}
           alt={game.title}
           fill
-          sizes="(min-width: 1024px) 220px, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1280px) 380px, (min-width: 640px) 50vw, 100vw"
           loading="lazy"
           onError={handleArtError}
           className="object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-110"
         />
       </div>
+      {/* DEGEN SCALING END */}
     </motion.div>
   );
 }
@@ -141,8 +145,10 @@ export function GamesShowcase() {
           </h2>
         </motion.div>
 
-        {/* Grid — tight 16px gaps like Pump.fun */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+        {/* Grid — DEGEN SCALING: fluid auto-fit with clamp, zero CLS */}
+        {/* DEGEN SCALING START */}
+        <div className="arcade-grid">
+        {/* DEGEN SCALING END */}
           {GAMES.map((game, i) => (
             <ArcadeCabinet
               key={game.id}

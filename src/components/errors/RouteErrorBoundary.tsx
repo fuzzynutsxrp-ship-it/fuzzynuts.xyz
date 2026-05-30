@@ -80,7 +80,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
     if (this.props.gameMode) {
       return (
         <motion.div
-          className="absolute inset-0 z-20 flex items-center justify-center bg-forest-900/80 backdrop-blur-sm"
+          className="absolute inset-0 z-20 flex items-center justify-center bg-degen-950/95"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
@@ -100,7 +100,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="px-4 py-2 border border-white/20 rounded-lg hover:bg-white/5 transition"
+                className="px-4 py-2 border border-hot-pink/30 rounded-lg hover:bg-degen-900 transition"
               >
                 Go Home
               </button>
@@ -149,7 +149,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
             </button>
             <button
               onClick={this.handleGoHome}
-              className="px-6 py-3 border border-white/20 rounded-xl hover:bg-white/5 transition"
+              className="px-6 py-3 border border-hot-pink/30 rounded-xl hover:bg-degen-900 hover:border-hot-pink/50 transition"
             >
               Back to Home
             </button>

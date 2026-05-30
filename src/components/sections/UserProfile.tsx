@@ -206,17 +206,17 @@ function ConnectPrompt() {
 function SkeletonRows() {
   return (
     <div className="relative pl-8">
-      <div className="absolute left-3 top-0 bottom-0 w-px bg-white/[0.04]" />
+      <div className="absolute left-3 top-0 bottom-0 w-px bg-hot-pink/10" />
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="relative mb-4 last:mb-0" style={{ animationDelay: `${i * 80}ms` }}>
-          <div className="absolute -left-5 top-3.5 w-3 h-3 rounded-full bg-[#111] animate-pulse" />
-          <div className="bg-[#0d0d0d] border border-white/[0.04] rounded-xl p-4">
+          <div className="absolute -left-5 top-3.5 w-3 h-3 rounded-full bg-degen-900 animate-pulse" />
+          <div className="bg-degen-950 border border-hot-pink/10 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded bg-[#111] animate-pulse" />
-              <div className="w-24 h-4 rounded bg-[#111] animate-pulse" />
-              <div className="ml-auto w-16 h-4 rounded bg-[#111] animate-pulse" />
+              <div className="w-6 h-6 rounded bg-degen-900 animate-pulse" />
+              <div className="w-24 h-4 rounded bg-degen-900 animate-pulse" />
+              <div className="ml-auto w-16 h-4 rounded bg-degen-900 animate-pulse" />
             </div>
-            <div className="w-20 h-3 rounded bg-[#111] animate-pulse" />
+            <div className="w-20 h-3 rounded bg-degen-900 animate-pulse" />
           </div>
         </div>
       ))}
@@ -300,7 +300,7 @@ export function UserProfile() {
       <section id="user-profile" className="py-16 relative">
         <div className="container-main">
           <div
-            className="bg-[#0a0a0a] border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
+            className="bg-degen-950 border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
             style={{ boxShadow: "0 0 40px rgba(251,191,36,0.08), 0 0 80px rgba(251,191,36,0.04)" }}
           >
             <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
@@ -342,7 +342,7 @@ export function UserProfile() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div
-            className="bg-[#0a0a0a] border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
+            className="bg-degen-950 border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
             style={{ boxShadow: "0 0 40px rgba(251,191,36,0.1), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)" }}
           >
             {/* Floating nuts around header */}
@@ -377,7 +377,7 @@ export function UserProfile() {
                     </p>
                     {/* XP mini bar */}
                     <div className="mt-2 flex items-center gap-2">
-                      <div className="w-24 h-1.5 rounded-full bg-[#111] overflow-hidden">
+                      <div className="w-24 h-1.5 rounded-full bg-degen-900 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-500"
                           style={{ width: `${xpProgress}%` }}
@@ -399,8 +399,8 @@ export function UserProfile() {
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs
                                font-semibold text-cream-dim hover:text-cream
-                               bg-[#111] hover:bg-[#1a1a1a]
-                               border border-white/[0.08] hover:border-brand-gold/30
+                               bg-degen-900 hover:bg-[#1a1a1a]
+                               border border-hot-pink/20 hover:border-gold/40
                                transition-all min-h-[40px]
                                disabled:opacity-40 cursor-pointer"
                     title="Refresh scores"
@@ -451,7 +451,7 @@ export function UserProfile() {
               icon: <Gamepad2 size={20} className="text-neon-green" />,
               borderColor: "border-neon-green/40",
               glowColor: "shadow-[0_0_20px_rgba(16,185,129,0.12)]",
-              bg: "bg-[#0a0a0a]",
+              bg: "bg-degen-950",
             },
             {
               label: "Games Played",
@@ -501,7 +501,7 @@ export function UserProfile() {
               {Object.entries(bestByGame).map(([gameId, entry]) => (
                 <div
                   key={gameId}
-                  className="bg-[#0a0a0a] border-2 border-white/[0.08] hover:border-brand-gold/30 rounded-xl p-4 flex items-center gap-3 transition-all"
+                  className="bg-degen-950 border-2 border-hot-pink/20 hover:border-gold/40 rounded-xl p-4 flex items-center gap-3 transition-all"
                   style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
                 >
                   <div
@@ -546,7 +546,7 @@ export function UserProfile() {
 
           {/* XP Progress Bar */}
           <div
-            className="mb-4 bg-[#0a0a0a] border-2 border-brand-gold/30 rounded-xl p-4"
+            className="mb-4 bg-degen-950 border-2 border-brand-gold/30 rounded-xl p-4"
             style={{ boxShadow: "0 0 20px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" }}
           >
             <div className="flex items-center justify-between mb-2">
@@ -557,7 +557,7 @@ export function UserProfile() {
                 {unlockedAchievements.size}/{ACHIEVEMENTS.length}
               </span>
             </div>
-            <div className="h-2.5 rounded-full bg-[#111] overflow-hidden">
+            <div className="h-2.5 rounded-full bg-degen-900 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-500 transition-all duration-500"
                 style={{ width: `${xpProgress}%` }}
@@ -580,7 +580,7 @@ export function UserProfile() {
                     className={`p-4 flex items-center gap-3 rounded-xl border-2 transition-all ${
                       isUnlocked
                         ? "bg-[#0f0a00] border-brand-gold/40"
-                        : "bg-[#0a0a0a] border-white/[0.06] opacity-50"
+                        : "bg-degen-950 border-hot-pink/15 opacity-50"
                     }`}
                     style={isUnlocked ? { boxShadow: "0 0 20px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.12)" } : undefined}
                   >
@@ -588,7 +588,7 @@ export function UserProfile() {
                       className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 ${
                         isUnlocked
                           ? "bg-[#0f0a00] border border-brand-gold/30"
-                          : "bg-[#111] border border-white/[0.06]"
+                          : "bg-degen-900 border border-hot-pink/15"
                       }`}
                     >
                       {isUnlocked ? achievement.icon : "🔒"}
@@ -608,7 +608,7 @@ export function UserProfile() {
                   </div>
                   {/* Tooltip for locked achievements */}
                   {!isUnlocked && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-[#0a0a0a] border border-white/[0.08] text-xs text-cream-dim whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-degen-950 border border-hot-pink/20 text-xs text-cream-dim whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
                       Play {getGameTitle(achievement.game)} to unlock
                     </div>
                   )}
@@ -629,7 +629,7 @@ export function UserProfile() {
             Score History
           </h3>
           <div
-            className="bg-[#0a0a0a] border-2 border-white/[0.08] rounded-2xl overflow-hidden"
+            className="bg-degen-950 border-2 border-hot-pink/20 rounded-2xl overflow-hidden"
             style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
           >
             {/* Loading */}
@@ -694,7 +694,7 @@ export function UserProfile() {
               <div className="p-4 sm:p-5">
                 <div className="relative pl-8">
                   {/* Vertical connecting line */}
-                  <div className="absolute left-3 top-0 bottom-0 w-px bg-white/[0.06]" />
+                  <div className="absolute left-3 top-0 bottom-0 w-px bg-degen-800" />
 
                   {state.scores.map((entry, index) => {
                     const isRecent = index === 0;
@@ -722,10 +722,10 @@ export function UserProfile() {
 
                         {/* Entry card */}
                         <div
-                          className={`bg-[#0d0d0d] border-2 rounded-xl p-3 sm:p-4 transition-all ${
+                          className={`bg-degen-950 border-2 rounded-xl p-3 sm:p-4 transition-all ${
                             isRecent
                               ? "border-brand-gold/30"
-                              : "border-white/[0.04] hover:border-white/[0.08]"
+                              : "border-hot-pink/10 hover:border-hot-pink/20"
                           }`}
                           style={isRecent ? { boxShadow: "0 0 15px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" } : undefined}
                         >

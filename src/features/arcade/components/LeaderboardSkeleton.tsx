@@ -37,8 +37,8 @@ function SkeletonRow({ index }: { index: number }) {
       transition={{ delay: index * 0.04, duration: 0.3, ease: "easeOut" }}
       className={`
         flex items-center gap-3 px-4 py-3.5
-        border-b border-white/[0.04] last:border-0
-        ${isTopThree ? "bg-white/[0.015]" : ""}
+        border-b border-hot-pink/10 last:border-0
+        ${isTopThree ? "bg-degen-900" : ""}
       `}
     >
       {/* Rank badge */}
@@ -117,7 +117,7 @@ export function LeaderboardSkeleton({ rows = 10, showHeader = true }: Leaderboar
 
       {/* Table header skeleton */}
       {showHeader && (
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-white/[0.02]">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-hot-pink/20 bg-degen-900">
           <div className="w-8 h-3 rounded skeleton-shimmer" />
           <div className="flex-1">
             <div className="w-14 h-3 rounded skeleton-shimmer" style={{ animationDelay: "50ms" }} />

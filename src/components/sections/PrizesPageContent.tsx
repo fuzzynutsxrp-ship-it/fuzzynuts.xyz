@@ -170,7 +170,7 @@ export function PrizesPageContent() {
         >
           {/* 1st Place Pedestal */}
           <div
-            className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/40 bg-[#0f0a00] py-6 sm:py-8 px-3 text-center"
+            className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
             style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
           >
             <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">🥜</span>
@@ -184,7 +184,7 @@ export function PrizesPageContent() {
 
           {/* 2nd Place Pedestal */}
           <div
-            className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/40 bg-[#0a0a0a] py-6 sm:py-8 px-3 text-center"
+            className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
             style={{ boxShadow: "0 0 25px rgba(192,192,192,0.15), 0 0 50px rgba(192,192,192,0.08), inset 0 1px 0 rgba(192,192,192,0.15)" }}
           >
             <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">🥜</span>
@@ -198,7 +198,7 @@ export function PrizesPageContent() {
 
           {/* 3rd Place Pedestal */}
           <div
-            className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/40 bg-[#0f0800] py-6 sm:py-8 px-3 text-center"
+            className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
             style={{ boxShadow: "0 0 25px rgba(180,83,9,0.15), 0 0 50px rgba(180,83,9,0.08), inset 0 1px 0 rgba(180,83,9,0.15)" }}
           >
             <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">🥜</span>
@@ -230,14 +230,14 @@ export function PrizesPageContent() {
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <CyberCard accentColor="gold" className="overflow-hidden bg-[#0a0a0a]">
+          <CyberCard accentColor="gold" className="overflow-hidden bg-degen-950">
             <div className="p-6 sm:p-8 relative">
               {/* Floating nuts */}
               <span className="absolute top-4 right-6 text-xl float-nut-1 opacity-40 pointer-events-none">🥜</span>
               <span className="absolute bottom-4 left-8 text-lg float-nut-2 opacity-30 pointer-events-none" style={{ animationDelay: "0.9s" }}>🥜</span>
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#0f0a00] border border-brand-gold/30">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-degen-950 border border-brand-gold/30">
                   <Trophy size={20} className="text-brand-gold" />
                 </div>
                 <h3 className="font-display text-xl sm:text-2xl font-black text-cream">
@@ -284,7 +284,7 @@ export function PrizesPageContent() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ delay: i * 0.08, duration: 0.4 }}
               >
-                <CyberCard accentColor="green" className="h-full bg-[#0a0a0a]">
+                <CyberCard accentColor="green" className="h-full bg-degen-950">
                   <div className="p-5 sm:p-6 text-center relative">
                     {/* Step number watermark */}
                     <span className="absolute top-3 right-4 font-display text-5xl font-black opacity-[0.06] pointer-events-none" style={{ color: step.color }}>
@@ -332,9 +332,9 @@ export function PrizesPageContent() {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <CyberCard accentColor="gold" className="overflow-hidden bg-[#0a0a0a]">
+          <CyberCard accentColor="gold" className="overflow-hidden bg-degen-950">
             {/* Header row */}
-            <div className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-cream-dim border-b border-white/[0.08] bg-[#0d0d0d]">
+            <div className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-cream-dim border-b border-hot-pink/20 bg-degen-950">
               <span className="w-8 text-center">Rank</span>
               <span className="flex-1">Degen</span>
               <span className="hidden sm:block w-28">Game</span>
@@ -355,8 +355,8 @@ export function PrizesPageContent() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.04, duration: 0.25 }}
-                  className={`flex items-center gap-3 px-4 py-3 border-b border-white/[0.04] last:border-0
-                    ${winner.rank <= 3 ? `bg-[#0d0d0d] ${rankBorderGlow}` : "hover:bg-[#111]"}
+                  className={`flex items-center gap-3 px-4 py-3 border-b border-hot-pink/10 last:border-0
+                    ${winner.rank <= 3 ? `bg-degen-950 ${rankBorderGlow}` : "hover:bg-degen-900"}
                   `}
                 >
                   {/* Rank */}
@@ -403,7 +403,7 @@ export function PrizesPageContent() {
           transition={{ delay: 0.25 }}
           className="mb-8"
         >
-          <CyberCard accentColor="green" className="overflow-hidden bg-[#0a0a0a]">
+          <CyberCard accentColor="green" className="overflow-hidden bg-degen-950">
             <div className="p-6 sm:p-8 relative">
               {/* Floating nuts */}
               <span className="absolute top-4 left-6 text-lg float-nut-2 opacity-30 pointer-events-none">🥜</span>
@@ -426,7 +426,7 @@ export function PrizesPageContent() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.04, duration: 0.25 }}
-                    className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#0d0d0d] border border-white/[0.04] hover:border-neon-green/20 transition-colors"
+                    className="flex items-start gap-3 px-4 py-3 rounded-xl bg-degen-950 border border-hot-pink/10 hover:border-neon-green/20 transition-colors"
                   >
                     <span className="text-neon-green font-mono text-xs font-bold mt-0.5 shrink-0">
                       {String(i + 1).padStart(2, "0")}

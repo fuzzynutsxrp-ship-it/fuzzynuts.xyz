@@ -54,7 +54,7 @@ export type { CountdownState } from "./hooks/useWeeklyCountdown";
 
 // ── Components ──
 export { LeaderboardSkeleton } from "./components/LeaderboardSkeleton";
-export { WeeklyResetCountdown } from "./components/WeeklyResetCountdown";
+
 
 // ── Validation ──
 export {

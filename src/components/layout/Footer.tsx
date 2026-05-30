@@ -30,9 +30,13 @@ const XRPL_LINKS = [
 export function Footer() {
   return (
     <footer
-      className="relative pt-20 pb-8 border-t border-[rgba(245,196,66,0.12)]"
+      className="relative pt-20 pb-8 border-t-2 border-hot-pink/20 overflow-hidden"
       role="contentinfo"
     >
+      {/* Floating nut particles */}
+      <span className="absolute top-8 left-[15%] text-xl float-nut-1 opacity-30 pointer-events-none" aria-hidden="true">🥜</span>
+      <span className="absolute top-16 right-[20%] text-lg float-nut-2 opacity-25 pointer-events-none" aria-hidden="true">🌰</span>
+      <span className="absolute bottom-20 left-[35%] text-sm float-nut-3 opacity-20 pointer-events-none" aria-hidden="true">🥜</span>
       <div className="container-main">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
           {/* Brand */}
@@ -73,7 +77,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.15, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-[rgba(245,196,66,0.08)] border border-[rgba(245,196,66,0.12)] hover:bg-[rgba(245,196,66,0.15)] hover:border-[rgba(245,196,66,0.25)] transition-all"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-degen-950 border-2 border-gold/30 hover:bg-degen-900 hover:border-gold/50 hover:shadow-[0_0_16px_rgba(251,191,36,0.25)] transition-all"
                   aria-label={link.label}
                 >
                   {link.icon}

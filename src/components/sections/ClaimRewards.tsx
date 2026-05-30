@@ -68,7 +68,9 @@ function ClaimConfirmModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
+      /* DEGEN FINAL POLISH START — solid overlay, no blur */
+      style={{ background: "rgba(0,0,0,0.92)" }}
+      /* DEGEN FINAL POLISH END */
       onClick={(e) => {
         if (e.target === e.currentTarget && !claiming) onCancel();
       }}
@@ -78,15 +80,16 @@ function ClaimConfirmModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        className="relative w-full max-w-md rounded-2xl border border-brand-gold/20
-                   bg-[rgba(1,5,8,0.95)] backdrop-blur-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md rounded-2xl border-2 border-brand-gold/40
+                   bg-degen-950 shadow-[0_0_30px_rgba(251,191,36,0.2)] overflow-hidden"
+          /* DEGEN FINAL POLISH END */
       >
         {/* Close button */}
         {!claiming && (
           <button
             onClick={onCancel}
             className="absolute top-4 right-4 p-2 rounded-lg text-cream-dim hover:text-cream
-                       hover:bg-white/[0.06] transition-colors min-h-[44px] min-w-[44px]
+                       hover:bg-degen-800 transition-colors min-h-[44px] min-w-[44px]
                        flex items-center justify-center"
             aria-label="Cancel"
           >
@@ -106,21 +109,21 @@ function ClaimConfirmModal({
           </h3>
 
           <div className="space-y-3 mb-6">
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-degen-900 border border-hot-pink/15 text-sm">
               <span className="text-cream-dim">Prize</span>
               <span className="font-bold text-brand-gold">{tier.emoji} {tier.label} — {tier.amount}</span>
             </div>
             {game && (
-              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-degen-900 border border-hot-pink/15 text-sm">
                 <span className="text-cream-dim">Game</span>
                 <span className="text-cream font-medium">{game}</span>
               </div>
             )}
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-degen-900 border border-hot-pink/15 text-sm">
               <span className="text-cream-dim">Network</span>
               <span className="text-cream font-medium">XRPL Mainnet</span>
             </div>
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm">
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-degen-900 border border-hot-pink/15 text-sm">
               <span className="text-cream-dim">Est. Gas</span>
               <span className="text-cream font-medium">~0.000012 XRP</span>
             </div>
@@ -132,8 +135,8 @@ function ClaimConfirmModal({
               onClick={onCancel}
               disabled={claiming}
               className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold
-                         text-cream-dim border border-white/[0.1] hover:border-white/[0.2]
-                         hover:bg-white/[0.04] transition-all min-h-[44px]
+                         text-cream-dim border border-hot-pink/25 hover:border-hot-pink/40
+                         hover:bg-degen-900 transition-all min-h-[44px]
                          disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Cancel
@@ -337,14 +340,14 @@ export function ClaimRewards() {
                 transition={{ delay: 0.6, duration: 0.4 }}
                 className="w-full max-w-sm"
               >
-                <div className="rounded-xl bg-white/[0.03] border border-neon-green/20 p-4 space-y-3">
+                <div className="rounded-xl bg-degen-900 border border-neon-green/20 p-4 space-y-3">
                   <div className="flex items-center justify-center gap-2">
                     <ShieldCheck size={14} className="text-neon-green" />
                     <span className="text-[11px] font-bold uppercase tracking-widest text-neon-green">
                       Verified on XRPL Ledger
                     </span>
                   </div>
-                  <div className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2">
+                  <div className="flex items-center justify-between bg-degen-900 rounded-lg px-3 py-2">
                     <span className="text-[11px] font-mono text-cream-dim truncate mr-2">
                       {txHash.slice(0, 12)}…{txHash.slice(-8)}
                     </span>
@@ -353,9 +356,9 @@ export function ClaimRewards() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
-                                 bg-neon-green/10 border border-neon-green/20
+                                 bg-degen-900 border-2 border-acid/30
                                  text-[11px] font-bold text-neon-green
-                                 hover:bg-neon-green/20 transition-colors shrink-0"
+                                 hover:bg-degen-800 transition-colors shrink-0"
                     >
                       <ExternalLink size={10} />
                       XRPScan
@@ -397,8 +400,8 @@ export function ClaimRewards() {
           <button
             onClick={checkEligibility}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold
-                       text-cream-dim hover:text-cream bg-white/[0.04] hover:bg-white/[0.08]
-                       border border-white/[0.06] transition-all min-h-[44px] shrink-0"
+                       text-cream-dim hover:text-cream bg-degen-900 hover:bg-degen-950
+                       border border-hot-pink/15 hover:border-hot-pink/30 transition-all min-h-[44px] shrink-0"
           >
             Re-check
           </button>

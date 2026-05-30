@@ -62,16 +62,18 @@ export function LeaderboardClient() {
         </motion.div>
       </div>
 
-      {/* ── Leaderboard Glass Container ── */}
+      {/* DEGEN FINAL POLISH START — solid degen-950, neon-ring-pink border, no glass */}
+      {/* ── Leaderboard Container ── */}
       <div className="container-main py-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="rounded-2xl border border-white/[0.08]
-                     bg-[rgba(1,5,8,0.55)] backdrop-blur-xl
-                     shadow-[0_8px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(16,185,129,0.04)]
+          className="rounded-2xl border-2 border-hot-pink neon-ring-pink
+                     bg-degen-950
+                     shadow-[0_0_24px_rgba(255,46,136,0.25),0_8px_40px_rgba(0,0,0,0.5)]
                      overflow-hidden"
+          /* DEGEN FINAL POLISH END */
         >
           <Leaderboard />
         </motion.div>

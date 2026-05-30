@@ -153,8 +153,8 @@ export function Prizes() {
                 tier.rank === "1st" ? "sm:-translate-y-3 animate-pulse-pink" : ""
               }`}
               style={{
-                background: "rgba(10, 6, 19, 0.7)",
-                border: `1px solid color-mix(in srgb, ${tier.color} 45%, transparent)`,
+                background: "#0a0613",
+                border: `2px solid color-mix(in srgb, ${tier.color} 50%, transparent)`,
                 boxShadow:
                   tier.rank === "1st"
                     ? `0 0 36px color-mix(in srgb, ${tier.color} 30%, transparent)`
@@ -204,7 +204,7 @@ export function Prizes() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="flex flex-col items-center text-center sm:items-start sm:text-left p-4 rounded-xl"
-              style={{ background: "rgba(1, 5, 8, 0.4)" }}
+              style={{ background: "#0a0613", border: "1.5px solid rgba(255,46,136,0.15)", boxShadow: "0 0 10px rgba(255,46,136,0.06), inset 0 0 12px rgba(124,58,237,0.06)" }}
             >
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"

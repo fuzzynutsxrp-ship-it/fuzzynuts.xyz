@@ -477,7 +477,7 @@ export function Trust() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="flex items-start gap-3 p-4 rounded-xl"
-              style={{ background: "rgba(1, 5, 8, 0.4)" }}
+              style={{ background: "#0a0613", border: "1.5px solid rgba(255,46,136,0.15)", boxShadow: "0 0 10px rgba(255,46,136,0.06), inset 0 0 12px rgba(124,58,237,0.06)" }}
             >
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
