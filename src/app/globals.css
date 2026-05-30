@@ -715,6 +715,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 32vw, 380px), 1fr));
   gap: 1.5rem;
   width: 100%;
+  max-width: 100%;
 }
 
 .arcade-card {
@@ -722,6 +723,10 @@ body {
   width: 100%;
   max-width: 100%;
   contain: layout style paint;
+  background: #0a0613;
+  border: 2px solid rgba(255,46,136,0.4);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .arcade-card img {

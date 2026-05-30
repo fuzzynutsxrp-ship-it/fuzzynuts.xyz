@@ -17,9 +17,7 @@ import { GameModal } from "@/components/game/GameModal";
 // Card = clickable button, no navigation
 // DEGEN FLUID SCALING START
 const CARD_CLASSES =
-  "arcade-card group relative flex flex-col rounded-2xl cursor-pointer " +
-  "border-2 border-hot-pink neon-ring-pink " +
-  "bg-degen-950 " +
+  "arcade-card group relative flex flex-col cursor-pointer " +
   "transition-all duration-300 ease-out " +
   "hover:scale-[1.03] hover:shadow-[0_0_48px_rgba(255,46,136,0.5)]";
 // DEGEN FLUID SCALING END
