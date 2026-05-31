@@ -15,114 +15,30 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://fuzzynuts.xyz/games/mario/" />
 
-    <!-- Font: non-blocking, loaded async with preconnect -->
+    <!-- Font: non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
 
+    <!-- Shared arcade shell -->
+    <link rel="stylesheet" href="../../css/design-tokens.css">
+    <link rel="stylesheet" href="../../css/arcade-shell.css">
     <link href="index.css" rel="stylesheet" />
     <link rel="shortcut icon" href="Theme/Mario.gif">
 
     <style>
-        /* Fuzzynuts Branding — lightweight overrides only */
-        header {
-            background: #0d0b06 !important;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            border-bottom: 2px solid #d4a017;
-            min-height: 48px;
-        }
-        header img { display: none; }
-
-        .fuzzy-brand {
-            font-family: 'Press Start 2P', 'Courier New', monospace;
-            color: #d4a017;
-            font-size: 18px;
-            letter-spacing: 2px;
-            white-space: nowrap;
-        }
-        .fuzzy-brand .nut-emoji { margin-right: 8px; }
-
-        .fuzzy-nav {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .fuzzy-nav a {
-            color: #8b7355;
-            text-decoration: none;
-            font-size: 12px;
-            font-family: 'Press Start 2P', 'Courier New', monospace;
-        }
-        .fuzzy-nav a:hover { color: #d4a017; }
-
-        #header-right { display: none; }
-
-        body { background: #0a0a0a !important; overscroll-behavior: none; }
-
+        /* Game-specific overrides only */
+        body { font-family: 'Press Start 2P', 'Courier New', monospace; }
         #controls { border-bottom: 1px solid #1a1208; }
-
-        /* Loading screen */
-        #fuzzy-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            transition: opacity 0.4s ease;
-        }
-        #fuzzy-loader.hide { opacity: 0; pointer-events: none; }
-        #fuzzy-loader .loader-title {
-            font-family: 'Press Start 2P', 'Courier New', monospace;
-            color: #d4a017;
-            font-size: 20px;
-            letter-spacing: 2px;
-        }
-        #fuzzy-loader .loader-bar {
-            width: 200px;
-            height: 4px;
-            background: #1a1208;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        #fuzzy-loader .loader-fill {
-            height: 100%;
-            width: 30%;
-            background: #d4a017;
-            border-radius: 2px;
-            animation: loaderSlide 1.2s ease-in-out infinite;
-        }
-        @keyframes loaderSlide {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(400%); }
-        }
     </style>
+
     <!-- Preload the heavy bundle so download starts ASAP -->
     <link rel="preload" href="FullScreenMario.bundle.js" as="script">
 </head>
 
 <body>
-    <header>
-        <div class="fuzzy-brand">
-            <span class="nut-emoji">🐿️</span>SUPER FUZZYNUTS
-        </div>
-        <div class="fuzzy-nav">
-            <a href="../../arcade/">← Arcade</a>
-            <a href="../../">Home</a>
-        </div>
-    </header>
-
-    <!-- Loading screen (renders instantly while JS parses) -->
-    <div id="fuzzy-loader">
-        <div class="loader-title">🐿️ LOADING...</div>
-        <div class="loader-bar"><div class="loader-fill"></div></div>
-    </div>
+    <!-- Nav injected by arcade-shell.js -->
 
     <section id="game">
         <!-- FSM.UserWrapper will fill out this section... -->
@@ -140,6 +56,18 @@
             localStorage.removeItem('FullScreenMario' + keys[i]);
         }
     })();
+    </script>
+
+    <!-- Shared arcade shell -->
+    <script src="../../js/arcade-shell.js"></script>
+    <script>
+    ArcadeShell.init({
+      slug: 'mario',
+      title: 'Super Fuzzynuts',
+      icon: '🍄',
+      accentColor: '#ef4444',
+      hideNavOnPlay: true,
+    });
     </script>
 
     <!-- All game engine scripts concatenated into one file -->
@@ -189,20 +117,13 @@
                 };
 
                 // --- Patch 2: setMap guards against negative-lives exploit ---
-                // When the player dies on their last life, there's a ~5s window
-                // before gameOver fires. During that window, clicking a map in
-                // the Maps UI calls setMap() directly — bypassing gameOver.
-                // This lets the player continue with negative lives + stacked score.
-                // Fix: if lives <= 0 when setMap is called, force a full gameStart.
                 var originalSetMap = proto.setMap;
                 proto.setMap = function(name, location) {
                     var FSM = proto.ensureCorrectCaller(this);
                     if (FSM.ItemsHolder && FSM.ItemsHolder.getItem("lives") <= 0) {
-                        // Player is dead — cancel any pending gameOver event
                         if (FSM.TimeHandler) {
                             FSM.TimeHandler.cancelAllEvents();
                         }
-                        // Full reset, then load the requested map
                         FSM.ItemsHolder.setItem("score", 0);
                         FSM.ItemsHolder.setItem("coins", 0);
                         FSM.ItemsHolder.setItem("lives",
@@ -216,70 +137,54 @@
                 console.log('[Fuzzynuts] Patched gameStart + setMap');
             }
         }, 100);
-        // Failsafe: stop polling after 30s if bundle never loads
         setTimeout(function() { clearInterval(patchCheck); }, 30000);
     })();
     </script>
 
-    <!-- Fuzzynuts Arcade Score Submitter (shared localStorage) -->
+    <!-- Fuzzynuts Arcade Score Submitter -->
     <script src="../fuzzy-score.js" type="text/javascript"></script>
     <script type="text/javascript">
     (function() {
         'use strict';
-        var gameStartTime = Date.now();
-        var lastSavedScore = 0;
 
-        function saveScore() {
+        // Score getter: reads from FSM engine
+        function getMarioScore() {
             try {
-                if (typeof FSM === 'undefined' || !FSM || !FSM.ItemsHolder) return;
-                var score = FSM.ItemsHolder.getItem("score") || 0;
-
-                // Only submit if score increased (skip 0 on restart)
-                if (score > 0 && score > lastSavedScore) {
-                    var duration = Math.floor((Date.now() - gameStartTime) / 1000);
-                    FuzzyScoreSubmit('mario', score, duration);
-                    lastSavedScore = score;
+                if (typeof FSM !== 'undefined' && FSM && FSM.ItemsHolder) {
+                    return FSM.ItemsHolder.getItem("score") || 0;
                 }
-
-                // Detect game restart: score went to 0 while we had a previous score
-                if (score === 0 && lastSavedScore > 0) {
-                    lastSavedScore = 0;
-                    gameStartTime = Date.now();
-                }
-            } catch(e) { /* silent */ }
+            } catch(e) {}
+            return 0;
         }
 
-        // Wait for game engine, then start polling + hide loader
+        // Wait for game engine, then hook up auto-save + hide loader
         var readyCheck = setInterval(function() {
             if (typeof FSM !== 'undefined' && FSM && FSM.ItemsHolder) {
                 clearInterval(readyCheck);
-                // Hide loading screen
-                var loader = document.getElementById('fuzzy-loader');
-                if (loader) {
-                    loader.classList.add('hide');
-                    setTimeout(function() { loader.remove(); }, 500);
-                }
-                // Save periodically (every 15s)
-                setInterval(saveScore, 15000);
+                // Hide the arcade shell loader
+                ArcadeShell.hideLoader();
+                // Hook up auto-save (submits on tab blur + page exit)
+                ArcadeShell.autoSave(getMarioScore);
+                // Periodic save every 15s
+                setInterval(function() {
+                    ArcadeShell.submit(getMarioScore());
+                }, 15000);
+                // Reset score tracking on game restart detection
+                var lastCheck = 0;
+                setInterval(function() {
+                    var score = getMarioScore();
+                    if (score === 0 && lastCheck > 0) {
+                        ArcadeShell.resetScore();
+                    }
+                    lastCheck = score;
+                }, 2000);
             }
         }, 500);
-        // Failsafe: stop polling after 30s if engine never initializes
+        // Failsafe
         setTimeout(function() {
             clearInterval(readyCheck);
-            var loader = document.getElementById('fuzzy-loader');
-            if (loader) {
-                var title = loader.querySelector('.loader-title');
-                if (title) title.textContent = '⚠️ Load timeout — try reloading';
-            }
+            ArcadeShell.showLoader('⚠️ Load timeout — try reloading');
         }, 30000);
-
-        // Always save on page exit
-        window.addEventListener('beforeunload', saveScore);
-
-        // Save when tab loses focus
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) saveScore();
-        });
     })();
     </script>
 </body>

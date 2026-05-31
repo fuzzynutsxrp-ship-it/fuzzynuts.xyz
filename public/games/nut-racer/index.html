@@ -6,19 +6,27 @@
   <title>Nut Racer — Fuzzynuts Arcade</title>
   <meta name="description" content="Race through the forest at top speed! An Outrun-style arcade racer in the Fuzzynuts Arcade on XRPL.">
   <link rel="icon" href="../../logo_512.png" type="image/png">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Nut Racer — Fuzzynuts Arcade">
+  <meta property="og:description" content="High-speed Outrun-style racing in the Fuzzynuts Arcade on XRPL.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fuzzynuts.xyz/games/nut-racer/">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+
+  <!-- Shared arcade shell -->
   <link rel="stylesheet" href="../../css/design-tokens.css">
+  <link rel="stylesheet" href="../../css/arcade-shell.css">
   <link href="nut-racer.css" rel="stylesheet">
 </head>
 <body>
 
-  <header class="game-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 1rem;background:rgba(11,15,25,0.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(245,166,35,0.08);z-index:10;">
-    <a href="../../arcade/" style="color:var(--text-muted);text-decoration:none;font-weight:500;font-size:0.9rem;">← Arcade</a>
-    <div style="font-family:var(--font-display);font-weight:700;color:var(--text-primary);">Nut Racer</div>
-    <a href="../../" style="color:var(--text-muted);text-decoration:none;font-size:0.85rem;">Home</a>
-  </header>
+  <!-- Nav injected by arcade-shell.js -->
 
   <div id="racer">
     <div id="hud">
@@ -62,6 +70,19 @@
 
   <div id="fps" style="display:none"></div>
 
+  <!-- Shared arcade shell -->
+  <script src="../../js/arcade-shell.js"></script>
+  <script>
+    ArcadeShell.init({
+      slug: 'racer',
+      title: 'Nut Racer',
+      icon: '🏎️',
+      accentColor: '#f97316',
+      hideNavOnPlay: true,
+    });
+  </script>
+
+  <!-- Game scripts -->
   <script src="stats.js"></script>
   <script src="common.js"></script>
   <script src="nut-racer.js"></script>

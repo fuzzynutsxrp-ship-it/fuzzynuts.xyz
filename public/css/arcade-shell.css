@@ -1,0 +1,301 @@
+/* ═══════════════════════════════════════════════════════════════
+   FUZZYNUTS ARCADE — Unified Shell
+
+   Single source of truth for the nav bar, loading screen, and
+   mobile-safe base styles shared by ALL standalone arcade games.
+
+   Usage:
+     <link href="../../css/arcade-shell.css" rel="stylesheet">
+
+   Games can override --arcade-accent and --arcade-font to theme
+   the shell to their color palette.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Design tokens (imported from shared file) ── */
+/* Games should load design-tokens.css BEFORE this file */
+
+/* ── Shell custom properties (game-overridable) ── */
+:root {
+  --arcade-accent: var(--accent-gold, #d4a843);
+  --arcade-accent-hover: var(--accent-gold-dark, #b8922f);
+  --arcade-accent-glow: var(--accent-gold-glow, rgba(212, 168, 67, 0.4));
+  --arcade-bg: rgba(10, 10, 15, 0.92);
+  --arcade-border: rgba(245, 166, 35, 0.15);
+  --arcade-font: var(--font-display, "Outfit", system-ui, sans-serif);
+  --arcade-nav-height: 44px;
+  --arcade-text-muted: rgba(255, 255, 255, 0.55);
+  --arcade-text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET + BASE
+   ═══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  background: var(--bg-base, #0a0a0a);
+  font-family: var(--arcade-font);
+  /* Safe area for notch/gesture-bar devices */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+a { color: inherit; }
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV BAR — Consistent across all games
+
+   Injected by arcade-shell.js as:
+   <nav class="arcade-nav" id="arcadeNav">
+     <div class="arcade-nav__left">
+       <a class="arcade-nav__back" href="…">← Arcade</a>
+       <span class="arcade-nav__dot"></span>
+       <span class="arcade-nav__title">Game Title</span>
+     </div>
+     <div class="arcade-nav__right">
+       <a class="arcade-nav__link" href="…">fuzzynuts.xyz</a>
+       <a class="arcade-nav__brand" href="…">🕹️ ARCADE</a>
+     </div>
+   </nav>
+   ═══════════════════════════════════════════════════════════════ */
+
+.arcade-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--arcade-nav-height);
+  padding: 0 0.75rem;
+  background: var(--arcade-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--arcade-border);
+  font-family: var(--arcade-font);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.arcade-nav.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Left cluster */
+.arcade-nav__left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Back button */
+.arcade-nav__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.7rem;
+  background: linear-gradient(135deg, rgba(245,166,35,0.15), rgba(245,166,35,0.05));
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 6px;
+  color: var(--arcade-accent);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.arcade-nav__back:hover {
+  background: rgba(245,166,35,0.25);
+  border-color: rgba(245,166,35,0.5);
+  transform: translateX(-2px);
+}
+.arcade-nav__back svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* Brand dot */
+.arcade-nav__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(245, 166, 35, 0.4);
+  flex-shrink: 0;
+}
+
+/* Game title */
+.arcade-nav__title {
+  color: var(--arcade-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+}
+@media (min-width: 600px) {
+  .arcade-nav__title { display: block; }
+}
+
+/* Right cluster */
+.arcade-nav__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.arcade-nav__link {
+  color: var(--arcade-text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.arcade-nav__link:hover { color: var(--arcade-accent); }
+
+.arcade-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  background: linear-gradient(135deg, rgba(245,166,35,0.15), rgba(245,166,35,0.05));
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 6px;
+  color: var(--arcade-accent);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.arcade-nav__brand:hover {
+  background: rgba(245,166,35,0.25);
+  border-color: rgba(245,166,35,0.5);
+  color: #ffd280;
+}
+
+/* Nav responsive */
+@media (max-width: 400px) {
+  .arcade-nav { padding: 0 0.5rem; }
+  .arcade-nav__back { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+  .arcade-nav__link { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING SCREEN — Consistent branded spinner
+
+   Managed by arcade-shell.js:
+     ArcadeShell.showLoader("Game Title")
+     ArcadeShell.hideLoader()
+   ═══════════════════════════════════════════════════════════════ */
+
+.arcade-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-base, #0a0a0a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  transition: opacity 0.4s ease;
+}
+
+.arcade-loader.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.arcade-loader__icon {
+  font-size: 3rem;
+  line-height: 1;
+  animation: arcade-loader-bounce 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px var(--arcade-accent-glow));
+}
+
+@keyframes arcade-loader-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(8deg); }
+}
+
+.arcade-loader__title {
+  font-family: var(--arcade-font);
+  color: var(--arcade-accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.arcade-loader__bar {
+  width: 180px;
+  height: 3px;
+  background: rgba(245, 166, 35, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.arcade-loader__fill {
+  height: 100%;
+  width: 30%;
+  background: var(--arcade-accent);
+  border-radius: 2px;
+  animation: arcade-loader-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes arcade-loader-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.arcade-loader__status {
+  font-size: 0.7rem;
+  color: var(--arcade-text-muted);
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME CONTAINER — Push below nav
+   ═══════════════════════════════════════════════════════════════ */
+
+.arcade-game {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - var(--arcade-nav-height));
+  height: calc(100svh - var(--arcade-nav-height));
+  height: calc(100dvh - var(--arcade-nav-height));
+  overflow: hidden;
+}
+
+/* Full-bleed variant (nav auto-hides, game fills entire viewport) */
+.arcade-game--fullbleed {
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+}
