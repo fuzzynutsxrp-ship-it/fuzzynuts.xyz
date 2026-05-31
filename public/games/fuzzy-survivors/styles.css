@@ -55,6 +55,11 @@ body {
     box-shadow: 0 0 60px rgba(255, 46, 136, 0.2);
     border-radius: 6px;
     overflow: hidden;
+    /* Scale to fill the viewport while preserving the game's 3:2 aspect ratio.
+       Without explicit width/height, the flex parent (body) sized this to the
+       canvas's intrinsic 1200×800, leaving the iframe mostly black. */
+    width: min(100vw, calc(100dvh * 1.5));
+    height: min(100dvh, calc(100vw / 1.5));
     max-width: 100vw;
     max-height: 100vh;
     max-height: 100svh;
