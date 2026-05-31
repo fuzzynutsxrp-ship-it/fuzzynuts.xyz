@@ -222,19 +222,26 @@
     // Resolve base path from script location
     BASE = resolveBase();
 
+    // Detect iframe — suppress nav when embedded in GameModal
+    var inIframe = (function() {
+      try { return window.self !== window.top; } catch (e) { return true; }
+    })();
+
     // Apply accent color override
     applyAccentColor(config.accentColor);
 
-    // Inject nav
-    injectNav();
+    // Only inject nav when running as a standalone page (not in an iframe)
+    if (!inIframe) {
+      injectNav();
+      setupNavAutoHide();
+    } else {
+      document.body.classList.add('in-iframe');
+    }
 
     // Inject loader if configured
     if (config.showLoader) {
       injectLoader('Booting cabinet…');
     }
-
-    // Setup auto-hide
-    setupNavAutoHide();
 
     // Track game start time
     gameStartTime = Date.now();
@@ -244,7 +251,7 @@
       try { readyCallbacks[i](); } catch (e) { console.error(e); }
     }
 
-    console.log('[ArcadeShell] Initialized for ' + config.slug);
+    console.log('[ArcadeShell] Initialized for ' + config.slug + (inIframe ? ' (iframe mode)' : ''));
   }
 
   function onReady(fn) {

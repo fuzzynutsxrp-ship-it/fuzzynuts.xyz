@@ -283,7 +283,7 @@ a { color: inherit; }
 /* ═══════════════════════════════════════════════════════════════
    GAME CONTAINER — Push below nav
    ═══════════════════════════════════════════════════════════════ */
-
+/* Game container — Push below nav (standalone only) */
 .arcade-game {
   position: relative;
   width: 100%;
@@ -295,6 +295,13 @@ a { color: inherit; }
 
 /* Full-bleed variant (nav auto-hides, game fills entire viewport) */
 .arcade-game--fullbleed {
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+}
+
+/* When embedded in iframe (GameModal), suppress nav offset */
+body.in-iframe .arcade-game {
   height: 100vh;
   height: 100svh;
   height: 100dvh;
