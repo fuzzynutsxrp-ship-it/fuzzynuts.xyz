@@ -11,9 +11,27 @@
       ]
     },
     {
-      "source": "/(.*)\\.(js|css|woff|woff2|png|jpg|svg|ico|webp|mp4|wasm)",
+      "source": "/_next/static/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/videos/(.*)\\.(mp4|webm)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/games/(.*)\\.(js|css|woff|woff2|png|jpg|jpeg|svg|webp|wasm|json|gif|mp3|wav|ogg)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=300, stale-while-revalidate=86400" }
+      ]
+    },
+    {
+      "source": "/(icons|images|fonts)/(.*)\\.(js|css|woff|woff2|png|jpg|jpeg|svg|ico|webp)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800" }
       ]
     },
     {
