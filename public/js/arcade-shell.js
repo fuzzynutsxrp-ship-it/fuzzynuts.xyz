@@ -26,13 +26,17 @@
 
   // ── Resolve relative paths from the game's location ──
   function resolveBase() {
-    // Walk up from /games/{slug}/ to find the public root
+    // Check for explicit data-base attribute on the script tag
     var scripts = document.getElementsByTagName('script');
     for (var i = 0; i < scripts.length; i++) {
       var src = scripts[i].getAttribute('src') || '';
       if (src.indexOf('arcade-shell.js') !== -1) {
-        // Strip the filename to get the directory
-        return src.replace(/[^/]*$/, '');
+        var explicitBase = scripts[i].getAttribute('data-base');
+        if (explicitBase) return explicitBase;
+        // Fallback: walk up from js/ to public root
+        // src = "../../js/arcade-shell.js" → dir = "../../js/" → base = "../../"
+        var dir = src.replace(/[^/]*$/, '');
+        return dir.replace(/js\/$/, '');
       }
     }
     return '../../';
