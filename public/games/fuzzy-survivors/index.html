@@ -55,7 +55,7 @@
         <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet"></noscript>
         <!-- Shared arcade shell -->
         <link rel="stylesheet" href="../../css/design-tokens.css">
-        <link rel="stylesheet" href="../../css/arcade-shell.css?v=scroll-fix">
+        <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
         <style>
             /* Let the game container fill the screen — nav auto-hides during play */
             #gameContainer { padding-top: 0; }
@@ -329,18 +329,6 @@
 
 
         <script type="module">
-            // Initialize arcade shell
-            if (typeof ArcadeShell !== 'undefined') {
-                ArcadeShell.init({
-                    slug: 'fuzzy-survivors',
-                    title: 'Fuzzy Survivors',
-                    icon: '⚔️',
-                    accentColor: '#a855f7',
-                    hideNavOnPlay: true,
-                    showLoader: false, // Game has its own start screen
-                });
-            }
-
             import { boot } from './src/main.js';
             const game = boot();
             // Pause button (UI click) mirrors Esc.
@@ -364,7 +352,18 @@
         </script>
 
         <!-- Shared arcade shell -->
-        <script src="../../js/arcade-shell.js?v=scroll-fix"></script>
+        <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
+        <script>
+            // Initialize arcade shell (must run AFTER arcade-shell.js loads)
+            ArcadeShell.init({
+                slug: 'fuzzy-survivors',
+                title: 'Fuzzy Survivors',
+                icon: '⚔️',
+                accentColor: '#a855f7',
+                hideNavOnPlay: true,
+                showLoader: false, // Game has its own start screen
+            });
+        </script>
 
         <!-- Service worker with forced update for development -->
         <script>

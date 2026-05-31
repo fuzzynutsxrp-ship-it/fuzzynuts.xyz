@@ -21,7 +21,7 @@
 
   <!-- Shared arcade shell -->
   <link rel="stylesheet" href="../../css/design-tokens.css">
-  <link rel="stylesheet" href="../../css/arcade-shell.css?v=scroll-fix">
+  <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
   <link href="nut-racer.css" rel="stylesheet">
 </head>
 <body>
@@ -71,7 +71,7 @@
   <div id="fps" style="display:none"></div>
 
   <!-- Shared arcade shell -->
-  <script src="../../js/arcade-shell.js?v=scroll-fix"></script>
+  <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
   <script>
     ArcadeShell.init({
       slug: 'racer',
@@ -79,6 +79,7 @@
       icon: '🏎️',
       accentColor: '#f97316',
       hideNavOnPlay: true,
+      showLoader: false, // Game has no loader call — avoid stuck "Booting cabinet..."
     });
   </script>
 
@@ -87,5 +88,21 @@
   <script src="common.js"></script>
   <script src="nut-racer.js"></script>
   <script src="../fuzzy-score.js"></script>
+  <script>
+    // Score submission — periodic save + auto-save on exit
+    function getRacerScore() {
+      try { return parseInt(document.getElementById('race_score_value')?.textContent) || 0; }
+      catch(e) { return 0; }
+    }
+    ArcadeShell.autoSave(getRacerScore);
+    setInterval(function() { ArcadeShell.submit(getRacerScore()); }, 15000);
+
+    // Register service worker for offline caching
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+        });
+    }
+  </script>
 </body>
 </html>

@@ -23,7 +23,7 @@
 
     <!-- Shared arcade shell -->
     <link rel="stylesheet" href="../../css/design-tokens.css">
-    <link rel="stylesheet" href="../../css/arcade-shell.css?v=scroll-fix">
+    <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
     <link href="index.css" rel="stylesheet" />
     <link rel="shortcut icon" href="Theme/Mario.gif">
 
@@ -46,9 +46,9 @@
                 justify-content: center;
             }
             section#game .EightBitter {
-                transform-origin: top center;
+                transform-origin: center center;
                 /* Scale down to fit: 375/1265 ≈ 0.296 for iPhone, scales up on larger screens */
-                transform: scale(calc(100vw / 1265));
+                transform: scale(min(calc(100vw / 1265), calc(100dvh / 464)));
                 margin: 0;
             }
             #controls {
@@ -83,7 +83,7 @@
     </script>
 
     <!-- Shared arcade shell -->
-    <script src="../../js/arcade-shell.js?v=scroll-fix"></script>
+    <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
     <script>
     ArcadeShell.init({
       slug: 'mario',
@@ -197,6 +197,13 @@
                 ArcadeShell.hideLoader();
                 // Hook up auto-save (submits on tab blur + page exit)
                 ArcadeShell.autoSave(getMarioScore);
+
+    // Register service worker for offline caching
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+        });
+    }
                 // Periodic save every 15s
                 setInterval(function() {
                     ArcadeShell.submit(getMarioScore());

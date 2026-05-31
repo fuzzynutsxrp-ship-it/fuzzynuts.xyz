@@ -14,7 +14,7 @@
     <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet"></noscript>
     <!-- Shared arcade shell -->
     <link rel="stylesheet" href="../../css/design-tokens.css">
-    <link rel="stylesheet" href="../../css/arcade-shell.css?v=scroll-fix">
+    <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
     <style>
         /* ── Global reset ── */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -308,7 +308,7 @@
     </div>
 
     <!-- ═══ SHARED ARCADE SHELL ═══ -->
-    <script src="../../js/arcade-shell.js?v=scroll-fix"></script>
+    <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
     <script>
         ArcadeShell.init({
             slug: 'minigolf',
@@ -316,6 +316,7 @@
             icon: '⛳',
             accentColor: '#22d3ee',
             hideNavOnPlay: true,
+            showLoader: false, // Game has its own loadingScreen
         });
     </script>
 
@@ -324,6 +325,11 @@
 
     <!-- ═══ EMSCRIPTEN BOOTSTRAP ═══ -->
     <script type='text/javascript'>
+        // Register service worker for offline caching (before WASM loads)
+        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+            navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+        }
+
         // Loading progress tracking
         const loadingBar = document.getElementById('loadingBar');
         const loadingStatus = document.getElementById('loadingStatus');
@@ -595,7 +601,7 @@
         // The nav bar stays visible for the first 5 seconds then auto-hides
         // It re-appears on mouse hover near the top edge
         (function() {
-            const nav = document.getElementById('fuzzyNav');
+            const nav = document.getElementById('arcadeNav');
             if (!nav) return;
 
             let hideTimer;

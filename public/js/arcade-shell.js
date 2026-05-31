@@ -99,7 +99,7 @@
       var anyVisible = false;
       for (var i = 0; i < overlayIds.length; i++) {
         var el = document.getElementById(overlayIds[i]);
-        if (el && el.style.display !== 'none' && el.offsetParent !== null) {
+        if (el && el.style.display !== 'none' && el.offsetParent !== null && !el.classList.contains('hidden')) {
           anyVisible = true;
           break;
         }
@@ -109,7 +109,11 @@
         var dialogs = document.querySelectorAll('dialog[open]');
         anyVisible = dialogs.length > 0;
       }
-      navEl.classList.toggle('hidden', !anyVisible);
+      // Only toggle class if state actually changed (avoid layout thrash)
+      var shouldHide = !anyVisible;
+      if (navEl.classList.contains('hidden') !== shouldHide) {
+        navEl.classList.toggle('hidden', shouldHide);
+      }
     }
 
     // Poll at 500ms — lightweight and catches all state transitions

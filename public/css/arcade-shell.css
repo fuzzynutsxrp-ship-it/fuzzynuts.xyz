@@ -306,3 +306,17 @@ body.in-iframe .arcade-game {
   height: 100svh;
   height: 100dvh;
 }
+
+/* ── Overlay scroll fix (CRITICAL for mobile) ── */
+/* body touch-action: manipulation blocks scrolling in child overlays.
+   Re-enable vertical pan on all overlay elements so pause menus,
+   game-over screens, and settings can scroll on touch devices. */
+.overlay {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* In iframe mode, overlays don't need nav-bar padding */
+body.in-iframe .overlay {
+  padding-top: 0;
+}

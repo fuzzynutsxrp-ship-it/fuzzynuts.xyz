@@ -133,7 +133,7 @@ export function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 pt-[env(safe-area-inset-top)] ${
           scrolled
             ? // Solid dark bar with intense warm neon underglow — matches Leaderboard prize cards
               "bg-[#0a0a0a] border-b-2 border-brand-gold/40 shadow-[0_4px_30px_rgba(0,0,0,0.5),0_0_30px_rgba(251,191,36,0.15),0_0_60px_rgba(251,191,36,0.08),0_1px_0_rgba(251,191,36,0.2)]"
@@ -444,7 +444,7 @@ export function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 text-[var(--color-cream)] hover:text-brand-gold cursor-pointer"
+              className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-cream)] hover:text-brand-gold cursor-pointer"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               <AnimatePresence mode="wait">
