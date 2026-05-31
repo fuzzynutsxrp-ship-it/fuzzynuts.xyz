@@ -101,14 +101,19 @@
     <script type="text/javascript">
     (function() {
         'use strict';
-        // Always enable touch controls — they don't interfere on desktop
-        // and are essential for mobile. The FSM engine positions them as
-        // overlays at screen edges, harmless on non-touch devices.
-        if (typeof FullScreenMario !== 'undefined' &&
-            FullScreenMario.FullScreenMario && FullScreenMario.FullScreenMario.settings &&
-            FullScreenMario.FullScreenMario.settings.touch) {
-            FullScreenMario.FullScreenMario.settings.touch.enabled = true;
-        }
+        // TouchPasser is created during UserWrapper init, which happens
+        // after the bundle loads. We poll until it's ready, then enable.
+        var touchCheck = setInterval(function() {
+            if (typeof FSM !== 'undefined' && FSM && FSM.TouchPasser) {
+                clearInterval(touchCheck);
+                FSM.TouchPasser.enabled = true;
+                FSM.TouchPasser.enable();
+                FSM.TouchPasser.addControls();
+                console.log('[Fuzzynuts] Touch controls enabled');
+            }
+        }, 200);
+        // Failsafe
+        setTimeout(function() { clearInterval(touchCheck); }, 15000);
     })();
     </script>
 
