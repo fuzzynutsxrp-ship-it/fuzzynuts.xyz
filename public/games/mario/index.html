@@ -28,9 +28,33 @@
     <link rel="shortcut icon" href="Theme/Mario.gif">
 
     <style>
-        /* Game-specific overrides only */
+        /* Game-specific overrides */
         body { font-family: 'Press Start 2P', 'Courier New', monospace; }
         #controls { border-bottom: 1px solid #1a1208; }
+
+        /* ═══ MOBILE RESPONSIVE — scale canvas to fit viewport ═══ */
+        @media (max-width: 1300px) {
+            body { overflow: hidden !important; }
+            section#game {
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                min-height: 0;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            section#game .EightBitter {
+                transform-origin: top center;
+                /* Scale down to fit: 375/1265 ≈ 0.296 for iPhone, scales up on larger screens */
+                transform: scale(calc(100vw / 1265));
+                margin: 0;
+            }
+            #controls {
+                display: none; /* Hide desktop controls panel on mobile */
+            }
+        }
     </style>
 
     <!-- Preload the heavy bundle so download starts ASAP -->
@@ -73,18 +97,17 @@
     <!-- All game engine scripts concatenated into one file -->
     <script src="FullScreenMario.bundle.js" type="text/javascript"></script>
 
-    <!-- Auto-enable touch controls on touch devices -->
+    <!-- Force-enable touch controls for mobile playability -->
     <script type="text/javascript">
     (function() {
         'use strict';
-        var isTouchDevice = ('ontouchstart' in window) ||
-            (navigator.maxTouchPoints > 0) ||
-            (window.matchMedia('(pointer: coarse)').matches);
-        if (isTouchDevice && typeof FullScreenMario !== 'undefined' &&
+        // Always enable touch controls — they don't interfere on desktop
+        // and are essential for mobile. The FSM engine positions them as
+        // overlays at screen edges, harmless on non-touch devices.
+        if (typeof FullScreenMario !== 'undefined' &&
             FullScreenMario.FullScreenMario && FullScreenMario.FullScreenMario.settings &&
             FullScreenMario.FullScreenMario.settings.touch) {
             FullScreenMario.FullScreenMario.settings.touch.enabled = true;
-            console.log('[Fuzzynuts] Touch device detected — enabling touch controls');
         }
     })();
     </script>
