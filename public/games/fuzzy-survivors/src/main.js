@@ -553,11 +553,15 @@ export class Game {
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         if (isMobile) {
-            // MOBILE: CSS position:fixed;inset:0 handles fullscreen sizing.
-            // Do NOT set inline width/height — it would conflict with the CSS.
-            // Just clear any stale inline styles from previous desktop-path runs.
-            container.style.width = '';
-            container.style.height = '';
+            // MOBILE: calculate scale to maintain aspect ratio within viewport.
+            // CSS position:fixed;inset:0 handles fullscreen, but we need to
+            // constrain the container to the correct aspect ratio.
+            const vp = typeof window !== 'undefined' && window.visualViewport;
+            const vpW = vp ? vp.width : window.innerWidth;
+            const vpH = vp ? vp.height : window.innerHeight;
+            const scale = Math.min(vpW / CONFIG.CANVAS_WIDTH, vpH / CONFIG.CANVAS_HEIGHT);
+            container.style.width = `${CONFIG.CANVAS_WIDTH * scale}px`;
+            container.style.height = `${CONFIG.CANVAS_HEIGHT * scale}px`;
             return;
         }
 
