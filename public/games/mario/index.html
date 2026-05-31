@@ -103,17 +103,21 @@
         'use strict';
         // TouchPasser is created during UserWrapper init, which happens
         // after the bundle loads. We poll until it's ready, then enable.
+        var attempts = 0;
         var touchCheck = setInterval(function() {
+            attempts++;
+            // Check both FSM.TouchPasser and the settings-based fallback
             if (typeof FSM !== 'undefined' && FSM && FSM.TouchPasser) {
                 clearInterval(touchCheck);
                 FSM.TouchPasser.enabled = true;
                 FSM.TouchPasser.enable();
                 FSM.TouchPasser.addControls();
-                console.log('[Fuzzynuts] Touch controls enabled');
+                console.log('[Fuzzynuts] Touch controls enabled via TouchPasser');
+            } else if (attempts > 50) {
+                clearInterval(touchCheck);
+                console.warn('[Fuzzynuts] TouchPasser not found after 10s');
             }
         }, 200);
-        // Failsafe
-        setTimeout(function() { clearInterval(touchCheck); }, 15000);
     })();
     </script>
 
