@@ -55,7 +55,7 @@
         <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet"></noscript>
         <!-- Shared arcade shell -->
         <link rel="stylesheet" href="../../css/design-tokens.css">
-        <link rel="stylesheet" href="../../css/arcade-shell.css?v=1626812">
+        <link rel="stylesheet" href="../../css/arcade-shell.css?v=84210fd2">
         <style>
             /* Let the game container fill the screen — nav auto-hides during play */
             #gameContainer { padding-top: 0; }
@@ -337,6 +337,7 @@
                     icon: '⚔️',
                     accentColor: '#a855f7',
                     hideNavOnPlay: true,
+                    showLoader: false, // Game has its own start screen
                 });
             }
 
@@ -363,7 +364,7 @@
         </script>
 
         <!-- Shared arcade shell -->
-        <script src="../../js/arcade-shell.js?v=1626812"></script>
+        <script src="../../js/arcade-shell.js?v=84210fd2"></script>
 
         <!-- Service worker with forced update for development -->
         <script>
