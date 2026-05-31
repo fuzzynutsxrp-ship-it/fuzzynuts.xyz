@@ -12,6 +12,8 @@ body {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
 }
 
 /* Header */
@@ -44,7 +46,8 @@ body {
 #racer {
   position: relative;
   width: 100%;
-  height: calc(100vh - 44px);
+  height: calc(100vh - 44px); /* fallback */
+  height: calc(100dvh - 44px);
   background: #0a0a0a;
 }
 
@@ -175,8 +178,8 @@ body {
 #touch-controls {
   display: none;
   position: fixed;
-  bottom: 16px;
-  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
   z-index: 20;
   opacity: 0.6;
 }
@@ -213,10 +216,13 @@ body {
 }
 @media (max-width: 768px) {
   #touch-controls { display: block; }
-  .fuzzy-header { height: 38px; padding: 0 10px; }
+  .game-header { height: 38px; padding: 0 10px; }
   .fuzzy-brand { font-size: 11px; }
   .fuzzy-nav a { font-size: 9px; }
-  #racer { height: calc(100vh - 38px); }
+  #racer {
+    height: calc(100vh - 38px); /* fallback */
+    height: calc(100dvh - 38px);
+  }
   .hud { font-size: 8px; }
   #hud { padding: 6px 8px; gap: 6px; }
 }

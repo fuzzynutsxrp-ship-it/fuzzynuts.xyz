@@ -474,8 +474,8 @@
                 }
             }
         };
-        window.onerror = function() {
-            console.log("onerror: " + event.message);
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.log("onerror: " + message + " at " + source + ":" + lineno);
         };
     </script>
     <script async type="text/javascript" src="golf.js"></script>

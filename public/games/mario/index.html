@@ -2,6 +2,9 @@
 <html lang="en-us">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Super Fuzzynuts — The Nuttiest Platformer on XRPL</title>
     <meta name="keywords" content="fuzzynuts, super fuzzynuts, platformer, mario, html5, xrpl, arcade, crypto, game, nut" />
     <meta name="description" content="Play Super Fuzzynuts — a full 32-level platformer with random maps, mods, and a level editor. Part of the Fuzzynuts Arcade on XRPL." />
@@ -57,7 +60,7 @@
 
         #header-right { display: none; }
 
-        body { background: #0a0a0a !important; }
+        body { background: #0a0a0a !important; overscroll-behavior: none; }
 
         #controls { border-bottom: 1px solid #1a1208; }
 
@@ -142,6 +145,22 @@
     <!-- All game engine scripts concatenated into one file -->
     <script src="FullScreenMario.bundle.js" type="text/javascript"></script>
 
+    <!-- Auto-enable touch controls on touch devices -->
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+        var isTouchDevice = ('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) ||
+            (window.matchMedia('(pointer: coarse)').matches);
+        if (isTouchDevice && typeof FullScreenMario !== 'undefined' &&
+            FullScreenMario.FullScreenMario && FullScreenMario.FullScreenMario.settings &&
+            FullScreenMario.FullScreenMario.settings.touch) {
+            FullScreenMario.FullScreenMario.settings.touch.enabled = true;
+            console.log('[Fuzzynuts] Touch device detected — enabling touch controls');
+        }
+    })();
+    </script>
+
     <!--
       MONKEY-PATCHES for Fuzzynuts Arcade:
       1. gameStart: Force score/coins reset on Game Over restart
@@ -197,6 +216,8 @@
                 console.log('[Fuzzynuts] Patched gameStart + setMap');
             }
         }, 100);
+        // Failsafe: stop polling after 30s if bundle never loads
+        setTimeout(function() { clearInterval(patchCheck); }, 30000);
     })();
     </script>
 
@@ -242,6 +263,15 @@
                 setInterval(saveScore, 15000);
             }
         }, 500);
+        // Failsafe: stop polling after 30s if engine never initializes
+        setTimeout(function() {
+            clearInterval(readyCheck);
+            var loader = document.getElementById('fuzzy-loader');
+            if (loader) {
+                var title = loader.querySelector('.loader-title');
+                if (title) title.textContent = '⚠️ Load timeout — try reloading';
+            }
+        }, 30000);
 
         // Always save on page exit
         window.addEventListener('beforeunload', saveScore);

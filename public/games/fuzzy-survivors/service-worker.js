@@ -11,7 +11,7 @@
 /* eslint-env serviceworker */
 /* global self, caches, fetch */
 
-const CACHE = 'fuzzy-survivors-v3.2.0';
+const CACHE = 'fuzzy-survivors-v3.3.0';
 const ASSETS = [
     './',
     './index.html',
@@ -30,6 +30,15 @@ const ASSETS = [
     './src/i18n.js',
     './src/storage.js',
     './src/achievements.js',
+    './src/pool.js',
+    './src/spatial-hash.js',
+    './src/keymap.js',
+    './src/haptics.js',
+    './src/tutorial.js',
+    './src/replay.js',
+    './src/daily.js',
+    './src/stages.js',
+    './src/konami.js',
     './docs/hero.svg',
     './docs/og-card.svg'
 ];

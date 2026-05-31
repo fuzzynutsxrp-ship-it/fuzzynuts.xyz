@@ -24,6 +24,7 @@
   --font-display: "Outfit", sans-serif;
 
   /* ── Text Colors ── */
+  --text-primary: rgba(245, 240, 230, 0.95);
   --text-muted: rgba(245, 240, 230, 0.45);
   --text-secondary: rgba(245, 240, 230, 0.7);
 
