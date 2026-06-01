@@ -70,6 +70,26 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md). All security-relevant changes
 follow [SECURITY.md](./SECURITY.md). AI agents working in this repo
 must read [HERMES.md](./HERMES.md) first.
 
+## Open-RSC Status
+
+RuneScape Classic integration via [Open-RSC](https://gitlab.com/openrsc/openrsc).
+
+- **Auth flow**: XRPL wallet challenge → sign → verify. 32 tests green (15 vitest + 17 integration).
+- **API toggle**: `GAME_SERVER_READY` env var gates the `/api/auth/game-session` endpoint. Returns 503 provisioning message while the game VPS is being set up.
+- **VPS deploy**: One-command script at `tools/deploy-openrsc-vps.sh`. Installs Java, MariaDB, clones Open-RSC, builds, creates systemd service, opens firewall.
+- **Handoff guide**: [docs/HANDOFF_VPS_SETUP.md](./docs/HANDOFF_VPS_SETUP.md) — plain-language steps for setting up the game server VPS.
+- **Config template**: [apps/games-build/openrsc/INTEGRATION_NOTES.md](./apps/games-build/openrsc/INTEGRATION_NOTES.md) — verified local.conf for FuzzyNuts branding.
+
+### Quick status
+
+| Component | Status |
+|-----------|--------|
+| Challenge format | `FuzzyNuts-Auth-{nonce}-{timestamp}` (UTF-8) |
+| XRPL verify | `verifyKeypairSignature` (xrpl.js v4) with hex encoding |
+| Game session HMAC | `shared-anticheat` signGameSession / verifyGameSession |
+| VPS script | `tools/deploy-openrsc-vps.sh` (Ubuntu 22.04+, idempotent) |
+| API env toggle | `GAME_SERVER_READY=true` in Railway dashboard |
+
 ## License
 
 [MIT](./LICENSE). Note: some game assets in `apps/games-build/games/`

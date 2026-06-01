@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@fuzzynuts/arcade-core": "workspace:*",
-    "@fuzzynuts/shared-anticheat": "workspace:*"
+    "@fuzzynuts/shared-anticheat": "workspace:*",
+    "@fuzzynuts/xrpl-token-utils": "workspace:*"
   },
   "devDependencies": {
     "@fuzzynuts/tsconfig": "workspace:*",

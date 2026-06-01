@@ -10,7 +10,8 @@
     ".": "./src/index.ts",
     "./hmac": "./src/hmac.ts",
     "./nonce": "./src/nonce.ts",
-    "./session-token": "./src/session-token.ts"
+    "./session-token": "./src/session-token.ts",
+    "./game-session-hmac": "./src/game-session-hmac.ts"
   },
   "scripts": {
     "test": "vitest run",

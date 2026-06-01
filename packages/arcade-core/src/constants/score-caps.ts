@@ -27,6 +27,7 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   "nut-racer": 2_000_000,
   "fuzzynuts-world": 10_000_000,
   "top-secret": 1_000_000,
+  rsc: 99_000_000, // [MANUAL VERIFICATION REQUIRED] — RSC XP-based scoring, cap TBD
 };
 
 /** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */

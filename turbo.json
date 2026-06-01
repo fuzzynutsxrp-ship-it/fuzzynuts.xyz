@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local", ".env"],
-  "globalEnv": ["NODE_ENV", "VERCEL_ENV", "RAILWAY_ENVIRONMENT", "CI"],
+  "globalEnv": ["NODE_ENV", "VERCEL_ENV", "RAILWAY_ENVIRONMENT", "CI", "GAME_SERVER_READY"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -27,7 +27,8 @@
         "NUT_DISTRIBUTOR",
         "XUMM_API_KEY",
         "WALLET_JWT_SECRET",
-        "GAME_SESSION_SECRET"
+        "GAME_SESSION_SECRET",
+        "OPENRSC_GAME_ENDPOINT"
       ]
     },
     "dev": {

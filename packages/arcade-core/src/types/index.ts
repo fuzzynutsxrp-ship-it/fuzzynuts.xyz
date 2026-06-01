@@ -16,3 +16,13 @@ export function getWeekKey(now: Date = new Date()): WeekKey {
   const year = d.getUTCFullYear();
   return { value: `${year}-W${String(weekNumber).padStart(2, "0")}`, year, weekNumber };
 }
+
+export type {
+  GameSessionToken,
+  GameSessionRequest,
+} from "./game-sessions";
+
+export {
+  DEFAULT_GAME_SERVER_ENDPOINT,
+  GAME_SESSION_TTL_MS,
+} from "./game-sessions";

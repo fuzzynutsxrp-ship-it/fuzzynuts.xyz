@@ -97,6 +97,9 @@ importers:
       '@fuzzynuts/shared-anticheat':
         specifier: workspace:*
         version: link:../../packages/shared-anticheat
+      '@fuzzynuts/xrpl-token-utils':
+        specifier: workspace:*
+        version: link:../../packages/xrpl-token-utils
     devDependencies:
       '@fuzzynuts/tsconfig':
         specifier: workspace:*
@@ -280,12 +283,18 @@ importers:
         specifier: ^4.0.0
         version: 4.6.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     devDependencies:
+      '@fuzzynuts/shared-anticheat':
+        specifier: workspace:*
+        version: link:../shared-anticheat
       '@fuzzynuts/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
         specifier: ^20
         version: 20.19.41
+      ripple-keypairs:
+        specifier: ^2.0.0
+        version: 2.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       typescript:
         specifier: ^5.6.0
         version: 5.9.3
@@ -9959,7 +9968,7 @@ snapshots:
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
       '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
