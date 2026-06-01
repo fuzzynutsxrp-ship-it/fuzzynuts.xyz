@@ -162,9 +162,30 @@ EOF
 echo "  Config: ${OPENRSC_DIR}/server/local.conf"
 echo ""
 
-# ── Step 5: Build with Ant (via make) ─────────────────────────
+# ── Step 5: Initialize database ───────────────────────────────
 
-echo "[5/7] Building server with Ant (this may take a few minutes)..."
+echo "[5/8] Initializing game database..."
+
+DB_DIR="${OPENRSC_DIR}/server/inc/sqlite"
+mkdir -p "${DB_DIR}"
+
+if [ ! -f "${DB_DIR}/${DB_NAME}.db" ]; then
+  # Copy from the default Open-RSC database as a template
+  if [ -f "${DB_DIR}/openrsc.db" ]; then
+    cp "${DB_DIR}/openrsc.db" "${DB_DIR}/${DB_NAME}.db"
+    echo "  Database: ${DB_DIR}/${DB_NAME}.db (from openrsc template)"
+  else
+    touch "${DB_DIR}/${DB_NAME}.db"
+    echo "  Database: ${DB_DIR}/${DB_NAME}.db (empty — server will init)"
+  fi
+else
+  echo "  Database: ${DB_DIR}/${DB_NAME}.db (already exists)"
+fi
+echo ""
+
+# ── Step 6: Build with Ant ────────────────────────────────────
+
+echo "[6/8] Building server with Ant (this may take a few minutes)..."
 
 cd "${OPENRSC_DIR}"
 make compile 2>&1 | tail -10
@@ -172,9 +193,9 @@ make compile 2>&1 | tail -10
 echo "  Build complete."
 echo ""
 
-# ── Step 6: Systemd service ───────────────────────────────────
+# ── Step 7: Systemd service ───────────────────────────────────
 
-echo "[6/7] Creating systemd service..."
+echo "[7/8] Creating systemd service..."
 
 cat > /etc/systemd/system/openrsc.service <<EOF
 [Unit]
@@ -184,8 +205,8 @@ After=network.target mariadb.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=${OPENRSC_DIR}
-ExecStart=/bin/bash -c "cd ${OPENRSC_DIR} && make run-server"
+WorkingDirectory=${OPENRSC_DIR}/server
+ExecStart=/usr/bin/ant runserverzgc -DconfFile=local
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
@@ -199,9 +220,9 @@ systemctl daemon-reload
 echo "  Service: /etc/systemd/system/openrsc.service"
 echo ""
 
-# ── Step 7: Firewall ──────────────────────────────────────────
+# ── Step 8: Firewall ──────────────────────────────────────────
 
-echo "[7/7] Configuring firewall..."
+echo "[8/8] Configuring firewall..."
 
 ufw --force enable > /dev/null 2>&1
 ufw allow 22/tcp comment "SSH" > /dev/null 2>&1
