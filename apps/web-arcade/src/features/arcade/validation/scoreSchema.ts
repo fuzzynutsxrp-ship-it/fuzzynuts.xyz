@@ -91,7 +91,7 @@ const BaseScoreObject = z.object({
  */
 export const ScorePayloadSchema = BaseScoreObject.refine(
   (data) => {
-    const cap = SCORE_CAPS[data.game];
+    const cap = (SCORE_CAPS as Record<string, number>)[data.game];
     return cap === undefined || data.score <= cap;
   },
   {
@@ -127,7 +127,7 @@ export const SecureScorePayloadSchema = BaseScoreObject
   })
   .refine(
     (data) => {
-      const cap = SCORE_CAPS[data.game];
+      const cap = (SCORE_CAPS as Record<string, number>)[data.game];
       return cap === undefined || data.score <= cap;
     },
     { message: "Score exceeds maximum allowed for this game", path: ["score"] }
