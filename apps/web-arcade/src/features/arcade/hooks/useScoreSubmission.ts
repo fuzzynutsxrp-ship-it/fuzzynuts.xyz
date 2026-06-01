@@ -93,7 +93,7 @@ export function useScoreSubmission(slug: string): ScoreSubmissionReturn {
 
       // Validate score cap
       const score = event.data.score as number | undefined;
-      const cap = SCORE_CAPS[slug] ?? Infinity;
+      const cap = (SCORE_CAPS as Record<string, number>)[slug] ?? Infinity;
       if (score !== undefined && (score <= 0 || score > cap)) {
         setStatus("error");
         setErrorMessage(`Invalid score — must be between 1 and ${cap.toLocaleString()}`);
