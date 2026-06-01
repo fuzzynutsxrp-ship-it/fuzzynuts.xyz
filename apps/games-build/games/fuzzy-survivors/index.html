@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+        <meta name="color-scheme" content="dark" />
+        <meta name="theme-color" content="#1b1330" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta
+            name="description"
+            content="Fuzzy Survivors — a Fuzzynuts Arcade roguelite. Survive the forest as a squirrel!"
+        />
+        <title>Fuzzy Survivors — Fuzzynuts Arcade</title>
+
+        <!-- Canonical + favicon (SVG keeps the bundle dependency-free) -->
+        <link rel="canonical" href="https://fuzzynuts.xyz/games/fuzzy-survivors/" />
+        <link rel="icon" type="image/svg+xml" href="./docs/hero.svg" />
+        <link rel="manifest" href="./manifest.json" />
+
+        <!-- Open Graph / social share -->
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Fuzzy Survivors — Fuzzynuts Arcade" />
+        <meta
+            property="og:description"
+            content="Survive the forest as a squirrel! A Fuzzynuts Arcade roguelite."
+        />
+        <meta property="og:image" content="./docs/og-card.svg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+            property="og:url"
+            content="https://fuzzynuts.xyz/games/fuzzy-survivors/"
+        />
+
+        <!-- Twitter card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Fuzzy Survivors — Fuzzynuts Arcade" />
+        <meta
+            name="twitter:description"
+            content="Survive the forest as a squirrel! A Fuzzynuts Arcade roguelite."
+        />
+        <meta name="twitter:image" content="./docs/og-card.svg" />
+
+        <link rel="stylesheet" href="./styles.css" />
+        <script src="../fuzzy-score.js" type="text/javascript"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /* ═══ FUZZYNUTS ARCADE NAV BAR ═══ */
+            .fuzzy-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.4rem 1rem;
+                background: rgba(10, 10, 6, 0.85);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(245, 166, 35, 0.15);
+                font-family: 'Outfit', sans-serif;
+                transition: transform 0.35s ease, opacity 0.35s ease;
+            }
+            .fuzzy-nav.hidden {
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+            }
+            .fuzzy-nav-left {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+            .fuzzy-nav-back {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.35rem 0.8rem;
+                background: rgba(245, 166, 35, 0.12);
+                border: 1px solid rgba(245, 166, 35, 0.25);
+                border-radius: 8px;
+                color: #f5a623;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.2s;
+                cursor: pointer;
+                font-family: inherit;
+            }
+            .fuzzy-nav-back:hover {
+                background: rgba(245, 166, 35, 0.22);
+                border-color: rgba(245, 166, 35, 0.4);
+                color: #ffd280;
+                transform: translateX(-2px);
+            }
+            .fuzzy-nav-back svg {
+                width: 14px;
+                height: 14px;
+                fill: currentColor;
+            }
+            .fuzzy-nav-brand {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                text-decoration: none;
+                color: #f5a623;
+                font-weight: 800;
+                font-size: 0.85rem;
+                letter-spacing: 0.5px;
+            }
+            .fuzzy-nav-brand:hover {
+                color: #ffd280;
+            }
+            .fuzzy-nav-brand .brand-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: rgba(245, 166, 35, 0.4);
+            }
+            .fuzzy-nav-right {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+            }
+            .fuzzy-nav-link {
+                color: rgba(255, 255, 255, 0.55);
+                text-decoration: none;
+                font-size: 0.78rem;
+                font-weight: 600;
+                transition: color 0.2s;
+            }
+            .fuzzy-nav-link:hover {
+                color: #f5a623;
+            }
+            .fuzzy-nav-game-title {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.78rem;
+                font-weight: 600;
+                display: none;
+            }
+            @media (min-width: 600px) {
+                .fuzzy-nav-game-title {
+                    display: block;
+                }
+            }
+            /* Let the game container fill the screen — nav auto-hides during play */
+            #gameContainer {
+                padding-top: 0;
+            }
+            /* On very small screens, shrink nav */
+            @media (max-width: 400px) {
+                .fuzzy-nav {
+                    padding: 0.3rem 0.5rem;
+                }
+                .fuzzy-nav-back {
+                    font-size: 0.7rem;
+                    padding: 0.3rem 0.6rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- ═══ FUZZYNUTS ARCADE NAV BAR ═══ -->
+        <nav class="fuzzy-nav" id="fuzzyNav">
+            <div class="fuzzy-nav-left">
+                <a href="../../arcade/" class="fuzzy-nav-back" title="Back to Arcade">
+                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                    Arcade
+                </a>
+                <span class="brand-dot"></span>
+                <span class="fuzzy-nav-game-title">🐿️ Fuzzy Survivors</span>
+            </div>
+            <div class="fuzzy-nav-right">
+                <a href="../../" class="fuzzy-nav-link">fuzzynuts.xyz</a>
+                <a href="../../arcade/" class="fuzzy-nav-brand" title="Fuzzynuts Arcade">
+                    🕹️ ARCADE
+                </a>
+            </div>
+        </nav>
+
+        <div id="gameContainer" aria-label="Fuzzy Survivors game">
+            <canvas
+                id="gameCanvas"
+                width="1200"
+                height="800"
+                tabindex="0"
+                aria-label="Game canvas"
+            ></canvas>
+
+            <div id="ui" role="presentation">
+                <div id="topLeft" class="hud">
+                    <div><span data-i18n="level">LEVEL</span>: <span id="level">1</span></div>
+                    <div class="bar-label" data-i18n="xp">XP</div>
+                    <div class="exp-bar">
+                        <div class="exp-fill" id="expBar" style="width: 0%"></div>
+                    </div>
+                    <div class="bar-label">
+                        <span data-i18n="time">TIME</span>: <span id="time">00:00</span>
+                    </div>
+                    <div id="waveLabel" class="hud-sub"></div>
+                    <div id="highScore" class="hud-sub"></div>
+                </div>
+
+                <div id="topRight" class="hud">
+                    <div><span data-i18n="kills">KILLS</span>: <span id="kills">0</span></div>
+                    <div id="fpsCounter" class="hud-sub" style="display: none">0 fps</div>
+                    <button id="btnPause" class="icon-btn" aria-label="Pause">⏸</button>
+                </div>
+
+                <div id="bottomLeft" class="hud">
+                    <div>
+                        <span data-i18n="hp">HP</span>: <span id="hp">100</span>/<span id="maxHp"
+                            >100</span
+                        >
+                    </div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="hpBar" style="width: 100%"></div>
+                    </div>
+                    <div class="chip-row" id="passiveIcons" role="list" aria-label="Passives"></div>
+                </div>
+
+                <div
+                    class="chip-row weapon-icons"
+                    id="weaponIcons"
+                    role="list"
+                    aria-label="Weapons"
+                ></div>
+
+                <div id="bossBanner" class="boss-banner" aria-live="polite"></div>
+
+                <div
+                    id="achievementToasts"
+                    class="ach-toast-host"
+                    aria-live="polite"
+                    aria-atomic="false"
+                ></div>
+
+                <!--
+                    Visually-hidden live region. All gameplay events with
+                    meaningful accessibility signal (boss incoming, level-up,
+                    achievement unlock, boss defeated) are mirrored into this
+                    paragraph so screen readers announce them. See
+                    docs/ACCESSIBILITY.md for the full list.
+                -->
+                <p
+                    id="a11yLiveRegion"
+                    class="sr-only"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                ></p>
+            </div>
+
+            <!-- Virtual joystick (touch only) -->
+            <div id="joystickBase" class="joystick" aria-hidden="true">
+                <div id="joystickKnob" class="joystick-knob"></div>
+            </div>
+
+            <!-- iter-14: special-skill button (touch only). Bottom-right counterpart
+                 to the joystick on mobile. Opens the pause menu by default until
+                 per-build skills are wired in. -->
+            <button
+                id="specialSkillBtn"
+                class="special-skill-btn"
+                aria-label="Special skill"
+                aria-hidden="true"
+            >
+                ✦
+            </button>
+
+            <!-- iter-14: PWA install prompt. Shown once on first load on a browser
+                 that fires `beforeinstallprompt`; dismissed forever once the user
+                 acts on it. -->
+            <div
+                id="pwaInstallPrompt"
+                class="pwa-install-prompt"
+                role="dialog"
+                aria-live="polite"
+                style="display: none"
+            >
+                <span>Install Fuzzy Survivors as an app for full-screen play.</span>
+                <button id="pwaInstallBtn" class="btn primary">Install</button>
+                <button id="pwaInstallDismiss" class="btn">Not now</button>
+            </div>
+
+            <!-- Menus -->
+            <div
+                id="startScreen"
+                class="overlay"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="startTitle"
+            >
+                <div class="overlay-card">
+                    <h1 id="startTitle" data-i18n="title">FUZZY SURVIVORS</h1>
+                    <div class="subtitle" data-i18n="subtitle">
+                        A Fuzzynuts Arcade roguelite
+                    </div>
+                    <div class="instructions">
+                        <div><strong data-i18n="howToPlay">How to play</strong></div>
+                        <div>• <span data-i18n="move">WASD / arrow keys to move</span></div>
+                        <div>
+                            • <span data-i18n="autoAttack">Weapons auto-attack nearby foes</span>
+                        </div>
+                        <div>• Esc / P to pause</div>
+                        <div>• <span data-i18n="survive">Survive as long as you can!</span></div>
+                    </div>
+                    <div class="btn-row">
+                        <button id="btnStart" class="btn primary" data-i18n="start">
+                            Start Run
+                        </button>
+                        <button
+                            id="btnStage"
+                            class="btn ghost"
+                            data-i18n="stage"
+                            aria-describedby="btnStageChip"
+                        >
+                            Stage <span id="btnStageChip" class="stage-chip">🍂 Acorn Hollow</span>
+                        </button>
+                        <button id="btnDaily" class="btn ghost" data-i18n="dailyChallenge">
+                            Daily Challenge
+                        </button>
+                        <button id="btnViewStreak" class="btn ghost" data-i18n="viewStreak">
+                            View Streak
+                        </button>
+                        <button id="btnSpeedrun" class="btn ghost" data-i18n="speedrun">
+                            Speedrun
+                        </button>
+                        <button id="btnLeaderboard" class="btn ghost" data-i18n="leaderboard">
+                            Leaderboard
+                        </button>
+                        <button id="btnSettings" class="btn ghost" data-i18n="settings">
+                            Settings
+                        </button>
+                        <button id="btnAchievements" class="btn ghost" data-i18n="viewAchievements">
+                            View Achievements
+                        </button>
+                        <button id="btnHowTo" class="btn ghost" data-i18n="howToPlayBtn">
+                            How to Play
+                        </button>
+                        <button id="btnTutorial" class="btn ghost" data-i18n="tryTutorial">
+                            Try Tutorial
+                        </button>
+                        <button id="btnReplay" class="btn ghost" data-i18n="replayLastRun">
+                            Replay Last Run
+                        </button>
+                    </div>
+                    <div class="hotkey-hint" aria-hidden="true">
+                        <span data-i18n="hotkeyHint"
+                            >Tip: <kbd>P</kbd>/<kbd>Esc</kbd> pause · <kbd>M</kbd> mute ·
+                            <kbd>H</kbd> help</span
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div id="achievementsScreen" class="overlay" style="display: none"></div>
+            <div id="leaderboardScreen" class="overlay" style="display: none"></div>
+            <div id="stagePickerScreen" class="overlay" style="display: none"></div>
+            <div id="streakScreen" class="overlay" style="display: none"></div>
+            <div id="helpScreen" class="overlay" style="display: none"></div>
+            <div id="howToPlayScreen" class="overlay" style="display: none"></div>
+
+            <div
+                id="levelUpMenu"
+                class="overlay"
+                style="display: none"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="levelUpTitle"
+            >
+                <div class="overlay-card levelup">
+                    <h2 id="levelUpTitle" data-i18n="chooseUpgrade">Choose an upgrade</h2>
+                    <div id="upgradeOptions" role="menu"></div>
+                </div>
+            </div>
+
+            <div
+                id="pauseMenu"
+                class="overlay"
+                style="display: none"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="pauseTitle"
+            >
+                <div class="overlay-card">
+                    <h2 id="pauseTitle" data-i18n="paused">PAUSED</h2>
+                    <div class="btn-row vertical">
+                        <button id="btnResume" class="btn primary" data-i18n="resume">
+                            Resume
+                        </button>
+                        <button id="btnQuit" class="btn ghost" data-i18n="quit">
+                            Quit to Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                id="gameOver"
+                class="overlay"
+                style="display: none"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="gameOverTitle"
+            >
+                <div class="overlay-card gameover">
+                    <h1 id="gameOverTitle" data-i18n="gameover">YOU DIED</h1>
+                    <div class="stats">
+                        <div>
+                            <span data-i18n="finalTime">Survived</span>:
+                            <span id="finalTime">00:00</span>
+                        </div>
+                        <div>
+                            <span data-i18n="finalKills">Kills</span>:
+                            <span id="finalKills">0</span>
+                        </div>
+                        <div>
+                            <span data-i18n="finalLevel">Level</span>:
+                            <span id="finalLevel">1</span>
+                        </div>
+                    </div>
+                    <div class="arcade-score-row" id="arcadeScoreRow" style="margin:0.8rem 0; padding:0.5rem; background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.2); border-radius:8px; text-align:center;">
+                        <div style="color:#f5a623; font-size:0.7rem; font-weight:600; letter-spacing:1px; text-transform:uppercase;">🏆 Arcade Score</div>
+                        <div id="arcadeScoreVal" style="color:#ffd280; font-size:1.4rem; font-weight:800; font-family:'Outfit',sans-serif;">0</div>
+                    </div>
+                    <details class="hs-details">
+                        <summary data-i18n="highScores">High Scores</summary>
+                        <div id="highScoreList" class="hs-list"></div>
+                    </details>
+                    <div class="btn-row">
+                        <button id="btnRetry" class="btn primary" data-i18n="retry">Retry</button>
+                        <button id="btnMenu" class="btn ghost" data-i18n="mainMenu">
+                            Main Menu
+                        </button>
+                        <a href="../../arcade/" class="btn ghost" style="color:#f5a623;border-color:rgba(245,166,35,0.3);">← Arcade</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settingsMenu" class="overlay" style="display: none"></div>
+        </div>
+
+
+        <script type="module">
+            import { boot } from './src/main.js';
+            const game = boot();
+            // Pause button (UI click) mirrors Esc.
+            document
+                .getElementById('btnPause')
+                ?.addEventListener('click', () => game.togglePause());
+
+            // ── Nav bar auto-hide during gameplay ──
+            // Hide the nav when the game is actively running (no overlays visible).
+            // Show it on start screen, pause, game over, level-up, etc.
+            (function() {
+                const nav = document.getElementById('fuzzyNav');
+                if (!nav) return;
+                const overlays = [
+                    'startScreen', 'pauseMenu', 'gameOver', 'levelUpMenu',
+                    'settingsMenu', 'achievementsScreen', 'leaderboardScreen',
+                    'stagePickerScreen', 'streakScreen', 'helpScreen',
+                    'howToPlayScreen'
+                ];
+                function checkNav() {
+                    const anyVisible = overlays.some(id => {
+                        const el = document.getElementById(id);
+                        return el && el.style.display !== 'none';
+                    });
+                    nav.classList.toggle('hidden', !anyVisible);
+                }
+                // Poll at 500ms — lightweight and catches all state transitions
+                setInterval(checkNav, 500);
+                checkNav();
+            })();
+
+            // ── Intercept FuzzyScoreSubmit to populate the arcade score display ──
+            // The cached main.js may not have the DOM update code yet, so we
+            // wrap the global function here (inline script, not cached by SW).
+            if (typeof FuzzyScoreSubmit === 'function') {
+                const _origSubmit = FuzzyScoreSubmit;
+                window.FuzzyScoreSubmit = function(game, score, duration) {
+                    const result = _origSubmit(game, score, duration);
+                    // Update the golden arcade score box on game-over
+                    const el = document.getElementById('arcadeScoreVal');
+                    if (el) el.textContent = Math.floor(score).toLocaleString();
+                    return result;
+                };
+            }
+        </script>
+
+        <!-- Service worker DISABLED — was causing stale-asset bugs after deploys.
+             The cache version (fuzzy-survivors-vX.X.X in service-worker.js) was
+             hardcoded and never bumped, so the SW kept serving old main.js even
+             after new code shipped, requiring users to hard-refresh. PWA offline
+             capability isn't useful in an iframe anyway.
+
+             This script actively unregisters any pre-existing SW and clears its
+             caches so users who installed it before see a clean slate on next
+             visit. Safe to remove entirely once the cleanup window has passed. -->
+        <script>
+            if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    regs.forEach(function (reg) { reg.unregister(); });
+                });
+                if (typeof caches !== 'undefined' && caches.keys) {
+                    caches.keys().then(function (keys) {
+                        keys.forEach(function (k) {
+                            if (k.indexOf('fuzzy-survivors') === 0) caches.delete(k);
+                        });
+                    });
+                }
+            }
+        </script>
+    </body>
+</html>

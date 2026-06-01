@@ -1,0 +1,62 @@
+# ═══════════════════════════════════════════════════════════════
+# FUZZYNUTS GAMES — Docker Compose (Optional)
+#
+# Usage:
+#   docker compose up              — Start all game dev servers
+#   docker compose up --build      — Rebuild image and start
+#   docker compose down            — Stop everything
+#
+#   docker compose run --service-ports app npm run dev:mario
+#                                  — Start only Mario on port 3001
+#
+# The native npm workflow (npm run dev:*) remains the primary
+# development method. Docker is provided for portability.
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fuzzynuts-games-dev
+
+    # ── Port mapping: host ↔ container (explicit, no random ports) ──
+    ports:
+      - "3001:3001"   # Mario (Super Fuzzynuts)
+      - "3002:3002"   # Fuzzy Survivors
+      - "3003:3003"   # Fuzzy Putt (Minigolf)
+      - "3004:3004"   # Nut Racer
+      - "3005:3005"   # Fuzzynuts World
+      - "3006:3006"   # New Game (Game #6)
+      - "3099:3099"   # postMessage test harness
+
+    # ── Live editing: bind-mount game sources from host ──
+    # Changes made on the host are instantly reflected in the container.
+    # Refresh the browser to see updates (serve is a static server).
+    volumes:
+      # Game directories (live-editable)
+      - ./mario:/app/mario
+      - ./fuzzy-survivors:/app/fuzzy-survivors
+      - ./minigolf:/app/minigolf
+      - ./nut-racer:/app/nut-racer
+      - ./fuzzynuts-world:/app/fuzzynuts-world
+      - ./new-game:/app/new-game
+
+      # Shared assets & scripts (live-editable)
+      - ./shared:/app/shared
+      - ./scripts:/app/scripts
+
+      # ── Optional: Mount the main project for in-container sync ──
+      # Uncomment the line below to enable `./scripts/sync-to-main.sh`
+      # from inside the container. The script resolves the main project
+      # path as $(dirname "/app")/fuzzynuts-optimized = /fuzzynuts-optimized.
+      #
+      # - ../fuzzynuts-optimized:/fuzzynuts-optimized
+
+    environment:
+      - NODE_ENV=development
+
+    restart: unless-stopped
+
+    # Override the default CMD to run a single game:
+    # docker compose run --service-ports app serve mario -p 3001 -s --cors

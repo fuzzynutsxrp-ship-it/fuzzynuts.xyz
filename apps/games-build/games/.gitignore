@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Backups created by sync script
+.backups/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*

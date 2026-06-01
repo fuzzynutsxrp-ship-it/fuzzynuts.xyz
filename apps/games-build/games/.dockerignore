@@ -1,0 +1,32 @@
+# ── Dependencies ──
+node_modules/
+
+# ── Sync backups (auto-generated, can be large) ──
+.backups/
+
+# ── Version control ──
+.git/
+.gitignore
+
+# ── Docker (don't recurse into itself) ──
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# ── OS artifacts ──
+.DS_Store
+Thumbs.db
+
+# ── Editor config ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Logs ──
+*.log
+npm-debug.log*
+
+# ── Documentation (not needed in image) ──
+README.md
