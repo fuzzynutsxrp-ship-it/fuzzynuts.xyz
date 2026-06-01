@@ -1,0 +1,31 @@
+{
+  "name": "@fuzzynuts/xrpl-token-utils",
+  "version": "0.1.0",
+  "private": true,
+  "description": "XRPL client factory (mainnet / altnet), signature verification, NUT AMM pricing, and multisig-aware payouts. Server-side only — never bundle into the browser.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./verify": "./src/verify.ts",
+    "./amm-price": "./src/amm-price.ts",
+    "./payout": "./src/payout.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:network": "CI_OFFLINE= vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "xrpl": "^4.0.0"
+  },
+  "devDependencies": {
+    "@fuzzynuts/tsconfig": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.9"
+  }
+}
