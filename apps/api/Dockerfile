@@ -14,9 +14,7 @@ COPY apps/api/ ./apps/api/
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Skip tsc build — tsx transpiles at runtime
-# RUN cd apps/api && pnpm build
-
 EXPOSE 4000
 
-CMD ["sh", "-c", "cd apps/api && npx tsx src/server.ts"]
+# Start with tsx
+CMD ["node", "--import", "tsx", "apps/api/src/server.ts"]
