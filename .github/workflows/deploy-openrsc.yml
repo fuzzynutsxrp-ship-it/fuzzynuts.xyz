@@ -1,0 +1,114 @@
+# Deploy Open-RSC Game Server to VPS
+#
+# Trigger: Click "Run workflow" in GitHub Actions tab
+# What it does: SSHs into the VPS and runs the automated deploy script
+#
+# Setup (one-time, browser only):
+#   1. Go to digitalocean.com → Droplets → your droplet → Access
+#   2. If you see "Reset root password" — click it, check your email for the password
+#   3. Go to github.com → your repo → Settings → Secrets and variables → Actions
+#   4. Click "New repository secret":
+#      Name: VPS_SSH_KEY
+#      Value: (see instructions below)
+#   5. Click "New repository secret":
+#      Name: VPS_HOST
+#      Value: 137.184.194.158
+#   6. Click "New repository secret":
+#      Name: VPS_PASSWORD
+#      Value: (the root password from DigitalOcean email)
+#
+# HOW TO GET VPS_SSH_KEY:
+#   - On your Mac: open Terminal, type: cat ~/.ssh/id_rsa
+#   - On Windows: open PowerShell, type: type $env:USERPROFILE\.ssh\id_rsa
+#   - Copy EVERYTHING from "-----BEGIN" to "END-----" including those lines
+#   - Paste into the GitHub secret
+#
+#   If you don't have an SSH key, DigitalOcean can create one:
+#   - Go to digitalocean.com → Settings → Security → SSH Keys → Add
+#   - It will show you a public key — but we need the PRIVATE key
+#   - Easier: just use the password option (VPS_PASSWORD) instead
+
+name: Deploy Open-RSC to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'What to do'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - status
+          - restart
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Deploy game server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            set -e
+            echo "═══════════════════════════════════════"
+            echo "  FuzzyNuts Game Server — Deploying"
+            echo "═══════════════════════════════════════"
+
+            # Download and run the deploy script
+            curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/deploy-openrsc-vps.sh -o /tmp/deploy-openrsc.sh
+            bash /tmp/deploy-openrsc.sh
+
+            # Start the server
+            systemctl enable --now openrsc
+            sleep 5
+
+            # Check status
+            echo ""
+            echo "═══════════════════════════════════════"
+            echo "  Server Status"
+            echo "═══════════════════════════════════════"
+            systemctl status openrsc --no-pager || true
+
+            # Check port
+            echo ""
+            echo "Port 43594 check:"
+            ss -tlnp | grep 43594 || echo "WARNING: Port 43594 not listening yet"
+
+      - name: Show completion
+        if: success()
+        run: |
+          echo ""
+          echo "═══════════════════════════════════════"
+          echo "  DEPLOY COMPLETE"
+          echo "═══════════════════════════════════════"
+          echo ""
+          echo "  Game server deployed to 137.184.194.158"
+          echo ""
+          echo "  Next steps:"
+          echo "  1. Set DNS: game.fuzzynuts.xyz → 137.184.194.158"
+          echo "     (Cloudflare: DNS-only, grey cloud)"
+          echo ""
+          echo "  2. In Railway dashboard:"
+          echo "     Change GAME_SERVER_READY from false to true"
+          echo "     Click Redeploy"
+          echo ""
+          echo "  3. Visit fuzzynuts.xyz/play/rsc"
+          echo "     Wallet connect should now work"
+
+      - name: Show failure
+        if: failure()
+        run: |
+          echo ""
+          echo "DEPLOY FAILED"
+          echo ""
+          echo "Common fixes:"
+          echo "1. Check VPS_PASSWORD secret is correct"
+          echo "2. Check the VPS is running (digitalocean.com → Droplets)"
+          echo "3. Try running the workflow again (sometimes first attempt times out)"
