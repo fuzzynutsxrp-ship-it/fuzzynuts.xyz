@@ -1,4 +1,7 @@
 {
+  "installCommand": "corepack enable && corepack prepare pnpm@9.15.0 --activate && pnpm install",
+  "buildCommand": "cd ../.. && pnpm build:web",
+  "outputDirectory": "out",
   "headers": [
     {
       "source": "/(.*)",
