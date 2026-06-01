@@ -1,0 +1,17 @@
+{
+  "name": "@fuzzynuts/tools-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace-level scripts (status generator, migrations, etc.). All scripts default to --dry-run.",
+  "type": "module",
+  "scripts": {
+    "status": "tsx generate-status.ts",
+    "status:check": "tsx generate-status.ts --check"
+  },
+  "dependencies": {
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}
