@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd apps/api && pnpm install && pnpm build"
+
+[deploy]
+startCommand = "pnpm start"
+rootDirectory = "apps/api"
+
+[deploy.healthcheck]
+path = "/healthz"
+timeout = 300
