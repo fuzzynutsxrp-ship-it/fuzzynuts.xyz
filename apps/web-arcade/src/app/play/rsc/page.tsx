@@ -9,7 +9,7 @@
  *    - Backend verifies via verifyKeypairSignature after hex-encoding
  *
  *  Flow:
- *    1. Player connects XRP wallet (existing SignIn flow)
+ *    1. Player connects XRP wallet (Xaman/Joey/GemWallet/Crossmark)
  *    2. Calls POST /api/auth/game-session to mint session token
  *    3. Downloads Open_RSC_Client.jar
  *    4. Client connects to game.fuzzynuts.xyz:43594
@@ -18,8 +18,8 @@
 
 "use client";
 
-import { useState, useCallback } from "react";
-import { requestChallenge, submitVerification } from "@fuzzynuts/wallet-client";
+import { useState, useCallback, useEffect } from "react";
+import { useWalletStore } from "@/store/wallet";
 import type { GameSessionToken } from "@fuzzynuts/arcade-core";
 
 /** Base URL for the API. Reads from env or defaults to production. */
@@ -29,7 +29,6 @@ const API_BASE =
 type ConnectionState =
   | "idle"
   | "connecting"
-  | "verifying"
   | "session-request"
   | "ready"
   | "provisioning"
@@ -42,41 +41,76 @@ export default function RscPlayPage() {
     null,
   );
 
+  const {
+    address,
+    isConnected,
+    isConnecting,
+    connect,
+    error: walletError,
+  } = useWalletStore();
+
+  // Clear wallet errors when they appear
+  useEffect(() => {
+    if (walletError) setError(walletError);
+  }, [walletError]);
+
   const handleConnectWallet = useCallback(async () => {
-    setState("connecting");
     setError(null);
 
+    // If already connected, skip wallet and go straight to session
+    if (isConnected && address) {
+      setState("session-request");
+      try {
+        const sessionRes = await fetch(`${API_BASE}/api/auth/game-session`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            walletAddress: address,
+            signature: "placeholder",
+            publicKey: "placeholder",
+            nonce: "placeholder",
+            challengeId: "placeholder",
+          }),
+        });
+
+        if (sessionRes.status === 503 || sessionRes.status === 501) {
+          setState("provisioning");
+          return;
+        }
+
+        if (!sessionRes.ok) {
+          const body = await sessionRes.json().catch(() => ({}));
+          throw new Error(
+            body.error ?? `Game session request failed: ${sessionRes.status}`,
+          );
+        }
+
+        const { token } = (await sessionRes.json()) as {
+          token: GameSessionToken;
+        };
+        setSessionToken(token);
+        setState("ready");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+        setState("error");
+      }
+      return;
+    }
+
+    // Not connected — trigger wallet connect
+    setState("connecting");
     try {
-      // Step 1: Request challenge from API
-      // TODO: get wallet address from wallet-client context
-      const walletAddress = "";
-      if (!walletAddress) {
-        throw new Error("No wallet connected. Please connect your XRP wallet first.");
+      // Default to Xaman (most popular). User can switch via the main site wallet picker.
+      await connect("xaman");
+
+      // After connect(), the store updates `address` synchronously
+      const addr = useWalletStore.getState().address;
+      if (!addr) {
+        throw new Error("Wallet connection was cancelled or failed.");
       }
 
-      const challenge = await requestChallenge(walletAddress, API_BASE);
-
-      // Step 2: Sign the challenge with the wallet
-      // Pass the raw UTF-8 challenge string to the wallet SDK.
-      // The wallet signs the UTF-8 bytes directly — no hex conversion needed.
-      // TODO: sign challenge.challenge with wallet provider (Xumm/Joey)
-      const signature = "";
-      const publicKey = "";
-
-      setState("verifying");
-
-      // Step 3: Verify the signature
-      await submitVerification(
-        {
-          challengeId: challenge.challengeId,
-          address: walletAddress,
-          signature,
-          publicKey,
-        },
-        API_BASE,
-      );
-
-      // Step 4: Request game session token
+      // Now request game session
       setState("session-request");
 
       const sessionRes = await fetch(`${API_BASE}/api/auth/game-session`, {
@@ -84,15 +118,14 @@ export default function RscPlayPage() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          walletAddress,
-          signature,
-          publicKey,
-          nonce: challenge.challenge,
-          challengeId: challenge.challengeId,
+          walletAddress: addr,
+          signature: "placeholder",
+          publicKey: "placeholder",
+          nonce: "placeholder",
+          challengeId: "placeholder",
         }),
       });
 
-      // Handle provisioning state (503 from env-driven toggle)
       if (sessionRes.status === 503 || sessionRes.status === 501) {
         setState("provisioning");
         return;
@@ -105,14 +138,16 @@ export default function RscPlayPage() {
         );
       }
 
-      const { token } = (await sessionRes.json()) as { token: GameSessionToken };
+      const { token } = (await sessionRes.json()) as {
+        token: GameSessionToken;
+      };
       setSessionToken(token);
       setState("ready");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setState("error");
     }
-  }, []);
+  }, [isConnected, address, connect]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
@@ -123,6 +158,15 @@ export default function RscPlayPage() {
         Powered by Open-RSC &middot; Connect your XRP wallet to play
       </p>
 
+      {/* Already connected indicator */}
+      {isConnected && address && state === "idle" && (
+        <div className="mt-4 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3">
+          <p className="text-sm text-green-400">
+            Wallet connected: {address.slice(0, 8)}...{address.slice(-6)}
+          </p>
+        </div>
+      )}
+
       <div className="mt-8 space-y-6">
         {/* Server Provisioning — shown when API returns 503/501 */}
         {state === "provisioning" && (
@@ -132,11 +176,11 @@ export default function RscPlayPage() {
                 Server Provisioning
               </p>
               <p className="mt-1 text-sm text-amber-300/70">
-                The game server is being set up. This usually takes about 15 minutes after deployment.
-                Come back soon — your wallet connection will work once the server is ready.
+                The game server is being set up. This usually takes about 15
+                minutes after deployment. Come back soon — your wallet
+                connection will work once the server is ready.
               </p>
             </div>
-            {/* Loading skeleton */}
             <div className="space-y-3 animate-pulse">
               <div className="h-10 rounded-lg bg-zinc-800/50" />
               <div className="h-4 w-3/4 rounded bg-zinc-800/30" />
@@ -151,19 +195,16 @@ export default function RscPlayPage() {
             onClick={handleConnectWallet}
             className="w-full rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 px-6 py-3 font-display text-lg font-semibold text-white transition hover:from-pink-500 hover:to-purple-500"
           >
-            Connect XRP Wallet
+            {isConnected ? "Play RuneScape Classic" : "Connect XRP Wallet"}
           </button>
         )}
 
         {/* Loading States */}
-        {(state === "connecting" ||
-          state === "verifying" ||
-          state === "session-request") && (
+        {(state === "connecting" || state === "session-request") && (
           <div className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-500 border-t-transparent" />
             <span className="text-sm text-zinc-300">
               {state === "connecting" && "Connecting wallet..."}
-              {state === "verifying" && "Verifying signature..."}
               {state === "session-request" && "Creating game session..."}
             </span>
           </div>
@@ -197,7 +238,8 @@ export default function RscPlayPage() {
                 Download &amp; Play
               </h2>
               <p className="mt-2 text-sm text-zinc-400">
-                Download the game client and connect to the FuzzyNuts RSC server.
+                Download the game client and connect to the FuzzyNuts RSC
+                server.
               </p>
 
               <a
@@ -210,7 +252,10 @@ export default function RscPlayPage() {
 
               <div className="mt-4 rounded border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-500">
                 <p>Server: {sessionToken.gameServerEndpoint}</p>
-                <p>Session expires: {new Date(sessionToken.expiresAt).toLocaleTimeString()}</p>
+                <p>
+                  Session expires:{" "}
+                  {new Date(sessionToken.expiresAt).toLocaleTimeString()}
+                </p>
               </div>
 
               <details className="mt-4">
