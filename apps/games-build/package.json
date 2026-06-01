@@ -1,34 +1,25 @@
 {
-  "name": "fuzzynuts-games-dev",
-  "version": "1.0.0",
+  "name": "@fuzzynuts/games-build",
+  "version": "0.1.0",
   "private": true,
-  "description": "Isolated development workspace for Fuzzynuts arcade games. Changes here NEVER auto-deploy.",
+  "description": "Single Vite-driven bundler for every iframe game. Replaces the historical fuzzynuts-games-dev / public/games dual-tree (which had drifted). Emits content-hashed assets into apps/web-arcade/public/games/<slug>/.",
+  "type": "module",
   "scripts": {
-    "dev:mario": "npx -y serve mario -p 3001 -s --cors",
-    "dev:survivors": "npx -y serve fuzzy-survivors -p 3002 -s --cors",
-    "dev:minigolf": "npx -y serve minigolf -p 3003 -s --cors",
-    "dev:racer": "npx -y serve nut-racer -p 3004 -s --cors",
-    "dev:fuzzynuts-world": "npx -y serve fuzzynuts-world -p 3005 -s --cors",
-    "dev:top-secret": "npx -y serve top-secret -p 3006 -s --cors",
-    "dev:new-game": "npx -y serve new-game -p 3007 -s --cors",
-    "dev:all": "echo 'Ports: mario=3001, survivors=3002, minigolf=3003, racer=3004, fuzzynuts-world=3005, top-secret=3006, new-game=3007, harness=3099'",
-    "sync:mario": "bash scripts/sync-to-main.sh mario",
-    "sync:survivors": "bash scripts/sync-to-main.sh fuzzy-survivors",
-    "sync:minigolf": "bash scripts/sync-to-main.sh minigolf",
-    "sync:racer": "bash scripts/sync-to-main.sh nut-racer",
-    "sync:fuzzynuts-world": "bash scripts/sync-to-main.sh fuzzynuts-world",
-    "sync:top-secret": "bash scripts/sync-to-main.sh top-secret",
-    "sync:new-game": "bash scripts/sync-to-main.sh new-game",
-    "sync:score-bridge": "bash scripts/sync-to-main.sh fuzzy-score",
-    "pull:mario": "bash scripts/pull-from-main.sh mario",
-    "pull:survivors": "bash scripts/pull-from-main.sh fuzzy-survivors",
-    "pull:minigolf": "bash scripts/pull-from-main.sh minigolf",
-    "pull:racer": "bash scripts/pull-from-main.sh nut-racer",
-    "pull:fuzzynuts-world": "bash scripts/pull-from-main.sh fuzzynuts-world",
-    "pull:top-secret": "bash scripts/pull-from-main.sh top-secret",
-    "pull:new-game": "bash scripts/pull-from-main.sh new-game",
-    "scaffold": "bash scripts/scaffold-new-game.sh",
-    "verify": "bash scripts/verify-build.sh",
-    "test:messages": "npx -y serve shared -p 3099 -s --cors"
+    "dev": "node scripts/build.mjs --watch",
+    "build": "node scripts/build.mjs",
+    "build:one": "node scripts/build.mjs --game",
+    "clean": "rm -rf ../web-arcade/public/games/* && find . -name 'dist' -type d -prune -exec rm -rf {} +",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo '(games-build uses repo-root eslint)'",
+    "test": "echo '(no tests yet — game-specific tests live alongside each game)'"
+  },
+  "dependencies": {
+    "@fuzzynuts/arcade-core": "workspace:*",
+    "@fuzzynuts/shared-anticheat": "workspace:*"
+  },
+  "devDependencies": {
+    "@fuzzynuts/tsconfig": "workspace:*",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0"
   }
 }
