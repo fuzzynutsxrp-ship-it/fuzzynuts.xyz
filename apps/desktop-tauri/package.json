@@ -1,0 +1,22 @@
+{
+  "name": "@fuzzynuts/desktop-tauri",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tauri 2.x desktop shell wrapping the @fuzzynuts/web-arcade static export. Linux / macOS / Windows.",
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf src-tauri/target dist .turbo"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.1.0"
+  },
+  "devDependencies": {
+    "@fuzzynuts/tsconfig": "workspace:*",
+    "@tauri-apps/cli": "^2.1.0",
+    "typescript": "^5.6.0"
+  }
+}
