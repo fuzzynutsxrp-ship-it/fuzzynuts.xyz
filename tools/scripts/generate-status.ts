@@ -82,9 +82,13 @@ function rootVersion(): string {
 }
 
 function recentCommits(n = 10): string {
-  const lines = sh(`git log -n ${n} --pretty=format:%h\t%s\t%an\t%ar`).split("\n").filter(Boolean);
+  const SEP = "\x1F"; // ASCII unit separator — safe from shell interpretation
+  const formatStr = `%h${SEP}%s${SEP}%an${SEP}%ar`;
+  const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}'`);
+  if (!raw) return "";
+  const lines = raw.split("\n").filter(Boolean);
   return lines.map((l) => {
-    const [sha, subject, author, when] = l.split("\t");
+    const [sha, subject, author, when] = l.split(SEP);
     return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
   }).join("\n");
 }
