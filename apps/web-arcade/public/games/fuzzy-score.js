@@ -59,8 +59,31 @@ var FuzzyScoreSubmit = (function() {
   var STORAGE_KEY = 'fuzzy_arcade_scores';
   var WALLET_KEY  = 'fuzzy_wallet';
   var API_BASE    = 'https://world.fuzzynuts.xyz/api/scores';
-  var SCORE_CAPS  = { 'top-secret': 999999, mario: 99999, survivors: 999999, minigolf: 10500, 'fuzzynuts-world': 9999999, nutracer: 99999 };
-  var MIN_DURATION = 15; // seconds
+  /* ─────────────────────────────────────────────────────────────
+     TEMPORARY copy of SCORE_CAPS. Stays in sync manually until
+     the games-build pipeline (Phase D) bundles this file from
+     @fuzzynuts/arcade-core. After that, this object is generated.
+
+     CHANGED in monorepo migration:
+       - `nutracer` (typo) → `nut-racer` (canonical)
+       - `survivors`       → `fuzzy-survivors` (canonical)
+       - cap values aligned with packages/arcade-core/src/constants/score-caps.ts
+     The old keys are kept as aliases so already-shipped clients
+     don't break mid-deploy; remove the aliases in a follow-up.
+     ───────────────────────────────────────────────────────────── */
+  var SCORE_CAPS  = {
+    'mario': 9999990,
+    'fuzzy-survivors': 5000000,
+    'minigolf': 100000,
+    'nut-racer': 2000000,
+    'fuzzynuts-world': 10000000,
+    'top-secret': 1000000,
+    // legacy aliases (DO NOT add to canonical list)
+    'survivors': 5000000,
+    'racer': 2000000,
+    'nutracer': 2000000
+  };
+  var MIN_DURATION = 5; // seconds — aligns with MIN_PLAY_DURATION_SECONDS in arcade-core
 
   function getCurrentWeekKey() {
     var now = new Date();

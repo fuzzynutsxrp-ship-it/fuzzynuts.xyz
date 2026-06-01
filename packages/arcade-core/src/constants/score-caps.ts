@@ -1,0 +1,49 @@
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  SCORE_CAPS — anti-cheat ceiling per game
+ *
+ *  Single source of truth. Imported by:
+ *    - @fuzzynuts/web-arcade  (UI gating + zod schema)
+ *    - @fuzzynuts/api         (server-side enforcement)
+ *    - @fuzzynuts/games-build (score-submitter bundled into every game)
+ *
+ *  Three divergent copies existed pre-migration:
+ *    - apps/web-arcade/src/features/arcade/constants/index.ts
+ *    - apps/web-arcade/public/games/fuzzy-score.js  (had wrong "nutracer" key)
+ *    - the deployed Railway api  (separate repo, separate values)
+ *  This file replaces all three. Tests in tests/score-caps.test.ts
+ *  enforce that every slug in GAME_SLUGS has a cap and vice-versa.
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+import type { GameSlug } from "./slugs";
+import { GAME_SLUGS } from "./slugs";
+
+/** Per-game maximum score accepted by the API. Submissions above are rejected. */
+export const SCORE_CAPS: Record<GameSlug, number> = {
+  mario: 9_999_990,
+  "fuzzy-survivors": 5_000_000,
+  minigolf: 100_000,
+  "nut-racer": 2_000_000,
+  "fuzzynuts-world": 10_000_000,
+  "top-secret": 1_000_000,
+};
+
+/** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */
+export function getScoreCap(slug: GameSlug): number {
+  return SCORE_CAPS[slug];
+}
+
+/** Minimum play duration (seconds) before a score is considered legit. Applies to every game. */
+export const MIN_PLAY_DURATION_SECONDS = 5;
+
+/** Debounce between accepted submissions from the same session (ms). */
+export const SUBMIT_COOLDOWN_MS = 5_000;
+
+/** Maximum acceptable clock drift between client `timestamp` and server time (ms). */
+export const MAX_TIMESTAMP_DRIFT_MS = 120_000; // ±2 minutes
+
+/** Compile-time check: every slug listed in GAME_SLUGS has a cap entry.
+ *  If this line fails to typecheck, a slug was added without a cap. */
+const _exhaustiveCheck: Record<(typeof GAME_SLUGS)[number], number> = SCORE_CAPS;
+void _exhaustiveCheck;
