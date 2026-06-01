@@ -1,0 +1,9 @@
+{
+  "extends": "@fuzzynuts/tsconfig/vite.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "shared",
+    "noEmit": true
+  },
+  "include": ["shared/**/*.ts", "scripts/**/*.mjs"]
+}

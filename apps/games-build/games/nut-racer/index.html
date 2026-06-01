@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Nut Racer — Fuzzynuts Arcade</title>
+    <meta
+      name="description"
+      content="Race through the forest at top speed! An Outrun-style arcade racer in the Fuzzynuts Arcade on XRPL."
+    />
+    <link rel="icon" href="../../logo_512.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../css/design-tokens.css" />
+    <link href="nut-racer.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header
+      class="game-header"
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: rgba(11, 15, 25, 0.88);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(245, 166, 35, 0.08);
+        z-index: 10;
+      "
+    >
+      <a
+        href="../../arcade/"
+        style="
+          color: var(--text-muted);
+          text-decoration: none;
+          font-weight: 500;
+          font-size: 0.9rem;
+        "
+        >← Arcade</a
+      >
+      <div
+        style="
+          font-family: var(--font-display);
+          font-weight: 700;
+          color: var(--text-primary);
+        "
+      >
+        Nut Racer
+      </div>
+      <a
+        href="../../"
+        style="
+          color: var(--text-muted);
+          text-decoration: none;
+          font-size: 0.85rem;
+        "
+        >Home</a
+      >
+    </header>
+
+    <div id="racer">
+      <div id="hud">
+        <span id="speed" class="hud"
+          ><span id="speed_value" class="value">0</span> mph</span
+        >
+        <span id="current_lap_time" class="hud"
+          >Lap: <span id="current_lap_time_value" class="value">0.0</span></span
+        >
+        <span id="last_lap_time" class="hud" style="display: none"
+          >Last: <span id="last_lap_time_value" class="value">0.0</span></span
+        >
+        <span id="fast_lap_time" class="hud"
+          >Best: <span id="fast_lap_time_value" class="value">0.0</span></span
+        >
+        <span id="lap_count" class="hud"
+          >Lap: <span id="lap_count_value" class="value">0</span>/3</span
+        >
+        <span id="race_score" class="hud score-hud"
+          >Score: <span id="race_score_value" class="value">0</span></span
+        >
+      </div>
+      <canvas id="canvas">
+        Sorry, your browser does not support the &lt;canvas&gt; element
+      </canvas>
+    </div>
+
+    <!-- Race complete overlay -->
+    <div id="race-complete" style="display: none">
+      <div class="race-complete-inner">
+        <h2>🏁 RACE COMPLETE!</h2>
+        <div class="race-stats">
+          <div class="stat-row">
+            <span>Best Lap</span><span id="rc-best-lap">0.0</span>
+          </div>
+          <div class="stat-row">
+            <span>Total Time</span><span id="rc-total-time">0.0</span>
+          </div>
+          <div class="stat-row highlight">
+            <span>Score</span><span id="rc-score">0</span>
+          </div>
+        </div>
+        <button id="race-again-btn" onclick="restartRace()">
+          🏎️ RACE AGAIN
+        </button>
+        <a href="../../arcade/" class="back-link">← Back to Arcade</a>
+      </div>
+    </div>
+
+    <!-- Mobile touch controls -->
+    <div id="touch-controls">
+      <div class="touch-row">
+        <button class="touch-btn" id="touch-up">▲</button>
+      </div>
+      <div class="touch-row">
+        <button class="touch-btn" id="touch-left">◀</button>
+        <button class="touch-btn" id="touch-down">▼</button>
+        <button class="touch-btn" id="touch-right">▶</button>
+      </div>
+    </div>
+
+    <div id="fps" style="display: none"></div>
+
+    <!-- Dummy stubs for common.js's Game.playMusic() — it expects #music and #mute
+       to exist. The audio element has no <source> so .play() rejects silently;
+       the mute span is hidden. We deliberately ship no music to keep the game
+       silent in the iframe (no audio focus stealing, smaller bundle). -->
+    <audio id="music" preload="none"></audio>
+    <span id="mute" style="display: none"></span>
+
+    <script src="stats.js"></script>
+    <script src="common.js"></script>
+    <script src="../fuzzy-score.js"></script>
+    <script src="nut-racer.js"></script>
+  </body>
+</html>

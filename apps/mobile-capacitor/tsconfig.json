@@ -1,0 +1,10 @@
+{
+  "extends": "@fuzzynuts/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "*.ts"]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": ["@changesets/changelog-github", { "repo": "fuzzynutsxrp-ship-it/fuzzynuts.xyz" }],
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@fuzzynuts/web-arcade",
+    "@fuzzynuts/api",
+    "@fuzzynuts/games-build",
+    "@fuzzynuts/desktop-tauri",
+    "@fuzzynuts/mobile-capacitor"
+  ]
+}

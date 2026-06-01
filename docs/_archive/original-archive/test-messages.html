@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuzzynuts — postMessage Test Harness</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0f0a;
+      color: #e8e0d0;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    h1 { font-size: 1.4rem; color: #f5c442; margin-bottom: 0.5rem; }
+    .subtitle { color: #999; font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      border: 1px solid rgba(245,196,66,0.15);
+    }
+    label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: #999; }
+    input, select {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #e8e0d0;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: scale(1.03); }
+    .btn-gold { background: linear-gradient(135deg, #f5c442, #d4a530); color: #0a0f0a; }
+    .btn-gold:hover { box-shadow: 0 0 20px rgba(245,196,66,0.3); }
+    .btn-red { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-green { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+    .btn-cyan { background: rgba(34,211,238,0.2); color: #22d3ee; border: 1px solid rgba(34,211,238,0.3); }
+    .log-container {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    .log-entry { padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .log-entry .time { color: #666; margin-right: 0.5rem; }
+    .log-entry .type { font-weight: 600; margin-right: 0.5rem; }
+    .log-entry.success .type { color: #10b981; }
+    .log-entry.error .type { color: #ef4444; }
+    .log-entry.info .type { color: #22d3ee; }
+    .log-entry.sent .type { color: #f5c442; }
+    .section-title { font-size: 1rem; color: #f5c442; margin: 1.5rem 0 0.5rem; }
+    .help { background: rgba(245,196,66,0.08); border: 1px solid rgba(245,196,66,0.2); border-radius: 8px; padding: 1rem; margin-top: 1.5rem; font-size: 0.8rem; color: #ccc; line-height: 1.6; }
+    .help code { background: rgba(255,255,255,0.1); padding: 0.15rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <h1>🐿️ postMessage Test Harness</h1>
+  <p class="subtitle">Simulate & debug messages between games ↔ GameWrapper.tsx</p>
+
+  <div class="controls">
+    <label>
+      Game Slug
+      <select id="game-slug">
+        <option value="mario">mario</option>
+        <option value="survivors">survivors</option>
+        <option value="minigolf">minigolf</option>
+        <option value="nutracer">nutracer</option>
+        <option value="fuzzynuts-world">fuzzynuts-world</option>
+      </select>
+    </label>
+    <label>
+      Score
+      <input type="number" id="score-value" value="42069" min="1" max="999999">
+    </label>
+    <label>
+      Duration (sec)
+      <input type="number" id="duration-value" value="120" min="0" max="9999">
+    </label>
+    <div style="display:flex; align-items:flex-end; gap:0.5rem; flex-wrap:wrap;">
+      <button class="btn btn-gold" onclick="simulateScoreSubmit()">📤 Submit Score</button>
+      <button class="btn btn-green" onclick="simulateSuccessMsg()">✅ Success Message</button>
+      <button class="btn btn-red" onclick="simulateErrorMsg()">❌ Error Message</button>
+      <button class="btn btn-cyan" onclick="simulateGameReady()">🎮 Game Ready</button>
+    </div>
+  </div>
+
+  <h3 class="section-title">📋 Message Log</h3>
+  <div class="log-container" id="log"></div>
+
+  <div class="help">
+    <strong>How to use this harness:</strong><br><br>
+    <strong>From a game page:</strong> Include <code>&lt;script src="../fuzzy-score.js"&gt;&lt;/script&gt;</code> in your game, then call:<br>
+    <code>FuzzyScoreSubmit('mario', 42069, 120)</code><br><br>
+    <strong>Message contract (game → GameWrapper):</strong><br>
+    <code>window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: true }, '*')</code><br><br>
+    <strong>Message contract (game → LoadingOverlay):</strong><br>
+    <code>window.parent.postMessage({ type: 'gameReady' }, '*')</code><br><br>
+    <strong>Message contract (GameWrapper → game):</strong><br>
+    <code>{ type: 'setMute', muted: true/false }</code>
+  </div>
+
+  <!-- Include the actual score bridge for testing -->
+  <script src="fuzzy-score.js"></script>
+  <script>
+    const logEl = document.getElementById('log');
+
+    function log(type, cls, data) {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${cls}`;
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false, fractionalSecondDigits: 3 });
+      entry.innerHTML = `<span class="time">${time}</span><span class="type">[${type}]</span>${JSON.stringify(data)}`;
+      logEl.prepend(entry);
+    }
+
+    // Listen for ALL postMessage events
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'object') {
+        if (event.data.type === 'FUZZY_SCORE_SUBMITTED') {
+          log(event.data.success ? 'SCORE_OK' : 'SCORE_FAIL', event.data.success ? 'success' : 'error', event.data);
+        } else if (event.data.type === 'gameReady' || event.data === 'gameReady') {
+          log('GAME_READY', 'info', event.data);
+        } else if (event.data.type === 'setMute') {
+          log('MUTE_CMD', 'info', event.data);
+        } else {
+          log('UNKNOWN', 'info', event.data);
+        }
+      }
+    });
+
+    function simulateScoreSubmit() {
+      const game = document.getElementById('game-slug').value;
+      const score = parseInt(document.getElementById('score-value').value) || 0;
+      const duration = parseInt(document.getElementById('duration-value').value) || 0;
+      log('SUBMIT', 'sent', { game, score, duration });
+      const result = FuzzyScoreSubmit(game, score, duration);
+      log('RESULT', result.success ? 'success' : 'error', result);
+    }
+
+    function simulateSuccessMsg() {
+      const msg = { type: 'FUZZY_SCORE_SUBMITTED', success: true };
+      log('SEND', 'sent', msg);
+      window.postMessage(msg, '*');
+    }
+
+    function simulateErrorMsg() {
+      const msg = { type: 'FUZZY_SCORE_SUBMITTED', success: false };
+      log('SEND', 'sent', msg);
+      window.postMessage(msg, '*');
+    }
+
+    function simulateGameReady() {
+      const msg = { type: 'gameReady' };
+      log('SEND', 'sent', msg);
+      window.postMessage(msg, '*');
+    }
+
+    log('INIT', 'info', { status: 'Harness ready', fuzzyScoreLoaded: typeof FuzzyScoreSubmit === 'function' });
+  </script>
+</body>
+</html>

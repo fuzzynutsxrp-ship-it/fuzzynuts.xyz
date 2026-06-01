@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+dist
+build
+coverage
+.turbo
+apps/web-arcade/public/games
+apps/desktop-tauri/src-tauri/target
+apps/mobile-capacitor/android
+apps/mobile-capacitor/ios
+pnpm-lock.yaml
+package-lock.json
+*.tsbuildinfo

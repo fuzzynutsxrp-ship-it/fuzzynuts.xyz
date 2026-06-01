@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: mailto:security@fuzzynuts.xyz
+    about: Report privately. Do NOT open a public Issue.
+  - name: Discussion / question
+    url: https://github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/discussions
+    about: Open a Discussion instead of an Issue.

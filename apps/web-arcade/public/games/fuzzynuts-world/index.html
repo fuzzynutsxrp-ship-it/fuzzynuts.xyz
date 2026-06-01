@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuzzynuts World — Private MMORPG</title>
+  <meta name="description" content="Enter Fuzzynuts World, a private 2D MMORPG adventure. Explore, quest, and compete on the XRPL-powered Fuzzynuts Arcade.">
+  <link rel="icon" href="../../logo_512.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/design-tokens.css">
+  <link rel="stylesheet" href="../../css/game-wrapper.css">
+  <style>
+    body { justify-content: center; align-items: center; text-align: center; padding: var(--space-lg); }
+    .world-logo { font-size: 3rem; margin-bottom: var(--space-md); }
+    .world-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.25rem; }
+    .world-subtitle { color: var(--text-muted); font-size: 0.85rem; margin-bottom: var(--space-xl); }
+    .play-btn {
+      font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+      color: var(--bg-base); border: none; padding: 1rem 2.5rem;
+      border-radius: var(--radius-lg); cursor: pointer; text-decoration: none;
+      display: inline-block; transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .play-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--accent-gold-glow); }
+    .world-info { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; max-width: 400px; margin: var(--space-lg) auto 0; }
+    .world-info .highlight { color: var(--accent-gold); }
+    .back-link { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; margin-top: var(--space-lg); display: inline-block; transition: color 180ms ease; }
+    .back-link:hover { color: var(--accent-gold); }
+    .particles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: -1; }
+    .particle { position: absolute; font-size: 16px; opacity: 0.12; animation: fall linear infinite; }
+    @keyframes fall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.12; } 90% { opacity: 0.12; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <div class="world-logo">🐿️⚔️</div>
+  <h1 class="world-title">Fuzzynuts World</h1>
+  <p class="world-subtitle">A Private MMORPG Adventure</p>
+
+  <a href="#" id="play-link" class="play-btn" onclick="launchGame()">⚔️ Enter World</a>
+
+  <div class="world-info">
+    <p>Explore a persistent 2D fantasy world.</p>
+    <p>Create a character, complete quests, battle monsters, and compete with other players.</p>
+    <p class="highlight">🌰 Powered by the Fuzzynuts Arcade on XRPL</p>
+  </div>
+
+  <a href="../../arcade/" class="back-link">← Back to Arcade</a>
+
+  <script>
+    const WORLD_URL = 'https://world.fuzzynuts.xyz';
+    function launchGame() { window.open(WORLD_URL, '_blank'); }
+
+    // Forest particle effect
+    const emojis = ['🌰', '🍂', '🍁', '🌿', '🥜', '🐿️'];
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 15; i++) {
+      const el = document.createElement('span');
+      el.className = 'particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + '%';
+      el.style.animationDuration = (8 + Math.random() * 12) + 's';
+      el.style.animationDelay = (Math.random() * 10) + 's';
+      container.appendChild(el);
+    }
+  </script>
+</body>
+</html>

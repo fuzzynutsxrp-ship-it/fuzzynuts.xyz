@@ -1,0 +1,80 @@
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  Slug map — single source of truth
+ *
+ *  Background: prior to monorepo migration, three files had three
+ *  different slug spellings ("racer" vs "nutracer" vs "nut-racer").
+ *  This caused per-game score caps to silently miss for nut-racer
+ *  because the lookup key didn't match. Fixed here, enforced by
+ *  the round-trip test in tests/slugs.test.ts.
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+/** Canonical URL slug for each game — used in URLs and as the score-caps key. */
+export type GameSlug =
+  | "mario"
+  | "fuzzy-survivors"
+  | "minigolf"
+  | "nut-racer"
+  | "fuzzynuts-world"
+  | "top-secret";
+
+/** Every canonical slug, in display order. */
+export const GAME_SLUGS: readonly GameSlug[] = [
+  "mario",
+  "fuzzy-survivors",
+  "minigolf",
+  "nut-racer",
+  "fuzzynuts-world",
+  "top-secret",
+] as const;
+
+/**
+ * Legacy ID → canonical slug mapping.
+ *
+ * Two ids did not match 1:1 with their slugs historically:
+ *   - "survivors" → "fuzzy-survivors"
+ *   - "racer"     → "nut-racer"  (also seen as "nutracer" in the broken submitter)
+ *
+ * Any new id must be added here, never inferred at call sites.
+ */
+export const ID_TO_SLUG: Record<string, GameSlug> = {
+  // canonical ids = canonical slugs
+  mario: "mario",
+  "fuzzy-survivors": "fuzzy-survivors",
+  minigolf: "minigolf",
+  "nut-racer": "nut-racer",
+  "fuzzynuts-world": "fuzzynuts-world",
+  "top-secret": "top-secret",
+
+  // legacy aliases (do not remove without a migration)
+  survivors: "fuzzy-survivors",
+  racer: "nut-racer",
+  nutracer: "nut-racer", // the bug spelling — accept it as input, normalize to canonical
+};
+
+/** Reverse: canonical slug → legacy id used by GAMES[] in the web-arcade UI. */
+export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
+  mario: "mario",
+  "fuzzy-survivors": "survivors",
+  minigolf: "minigolf",
+  "nut-racer": "racer",
+  "fuzzynuts-world": "fuzzynuts-world",
+  "top-secret": "top-secret",
+};
+
+/**
+ * Normalize any incoming game identifier to a canonical slug.
+ * Returns null for unknown inputs — callers must handle that explicitly
+ * rather than silently falling through to a default.
+ */
+export function normalizeSlug(input: string | null | undefined): GameSlug | null {
+  if (!input) return null;
+  const lowered = input.toLowerCase().trim();
+  return ID_TO_SLUG[lowered] ?? null;
+}
+
+/** Type guard. */
+export function isGameSlug(value: unknown): value is GameSlug {
+  return typeof value === "string" && (GAME_SLUGS as readonly string[]).includes(value);
+}
