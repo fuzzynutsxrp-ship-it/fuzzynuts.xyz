@@ -1,0 +1,26 @@
+# Default: maintainers review everything
+*                                                       @fuzzynutsxrp-ship-it
+
+# ── Money-handling code: maintainer-only ──
+/packages/arcade-core/                                  @fuzzynutsxrp-ship-it
+/packages/xrpl-token-utils/                             @fuzzynutsxrp-ship-it
+/packages/shared-anticheat/                             @fuzzynutsxrp-ship-it
+/apps/api/src/routes/rewards.ts                         @fuzzynutsxrp-ship-it
+/apps/api/src/routes/session.ts                         @fuzzynutsxrp-ship-it
+/apps/api/src/routes/auth.ts                            @fuzzynutsxrp-ship-it
+/apps/api/src/middleware/walletAuth.ts                  @fuzzynutsxrp-ship-it
+
+# ── Governance + security docs: maintainer-only ──
+/SECURITY.md                                            @fuzzynutsxrp-ship-it
+/HERMES.md                                              @fuzzynutsxrp-ship-it
+/CODE_OF_CONDUCT.md                                     @fuzzynutsxrp-ship-it
+/LICENSE                                                @fuzzynutsxrp-ship-it
+/docs/adr/                                              @fuzzynutsxrp-ship-it
+/docs/runbooks/                                         @fuzzynutsxrp-ship-it
+
+# ── CI + release plumbing ──
+/.github/workflows/                                     @fuzzynutsxrp-ship-it
+/.github/CODEOWNERS                                     @fuzzynutsxrp-ship-it
+/turbo.json                                             @fuzzynutsxrp-ship-it
+/pnpm-workspace.yaml                                    @fuzzynutsxrp-ship-it
+/package.json                                           @fuzzynutsxrp-ship-it

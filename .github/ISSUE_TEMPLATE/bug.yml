@@ -1,0 +1,18 @@
+name: Bug
+description: Something is broken
+labels: [bug, triage]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: What happened?, description: One paragraph. }
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes: { label: Steps to reproduce, render: markdown }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: Expected behaviour }
+  - type: input
+    id: where
+    attributes: { label: Where, description: "URL / device / browser / commit SHA" }

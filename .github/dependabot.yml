@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      types: { patterns: ["@types/*"] }
+      eslint: { patterns: ["eslint*", "@eslint/*"] }
+      next: { patterns: ["next*", "@next/*", "eslint-config-next"] }
+      react: { patterns: ["react*", "@types/react*"] }
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: weekly }
+
+  - package-ecosystem: cargo
+    directory: "/apps/desktop-tauri/src-tauri"
+    schedule: { interval: weekly }
