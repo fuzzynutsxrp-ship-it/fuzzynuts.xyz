@@ -24,7 +24,7 @@ import type { GameSessionToken } from "@fuzzynuts/arcade-core";
 
 /** Base URL for the API. Reads from env or defaults to production. */
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "https://world.fuzzynuts.xyz";
+  process.env.NEXT_PUBLIC_API_URL ?? "https://respectful-motivation-production-5b86.up.railway.app";
 
 type ConnectionState =
   | "idle"
