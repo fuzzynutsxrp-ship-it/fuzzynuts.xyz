@@ -10,7 +10,7 @@
 "use client";
 
 /** Web client URL — TeaVM RSC client hosted on the game VPS */
-const RSC_CLIENT_BASE = "http://game.fuzzynuts.xyz";
+const RSC_CLIENT_BASE = "https://game.fuzzynuts.xyz";
 
 /** RSA parameters for the FuzzyNuts Open-RSC server */
 const RSA_EXPONENT = "65537";
