@@ -155,14 +155,14 @@ export async function validateScoreSubmission(
   if (!parseResult.success) {
     return {
       valid: false,
-      error: `Invalid payload: ${parseResult.error.issues[0].message}`,
+      error: `Invalid payload: ${parseResult.error.issues[0]!.message}`,
       statusCode: 400,
     };
   }
   const data = parseResult.data;
 
   // ── 2. Verify score cap ──
-  const cap = SCORE_CAPS[data.gameSlug];
+  const cap = SCORE_CAPS[data.gameSlug]!;
   if (data.score > cap) {
     return {
       valid: false,

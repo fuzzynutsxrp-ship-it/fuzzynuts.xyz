@@ -20,10 +20,9 @@ export interface WalletJwtPayload {
   exp: number;
 }
 
-declare module "express-serve-static-core" {
-  interface Request {
-    wallet?: WalletJwtPayload;
-  }
+/** Augment Express Request with wallet property */
+interface WalletRequest extends Request {
+  wallet?: WalletJwtPayload;
 }
 
 export function buildWalletAuth(env: { WALLET_JWT_SECRET: string }) {
@@ -41,7 +40,7 @@ export function buildWalletAuth(env: { WALLET_JWT_SECRET: string }) {
       const { payload } = await jwtVerify(match[1]!, secret, {
         issuer: "fuzzynuts.xyz",
       });
-      req.wallet = payload as unknown as WalletJwtPayload;
+      (req as WalletRequest).wallet = payload as unknown as WalletJwtPayload;
       next();
     } catch {
       res.status(401).json({ error: "E_BAD_SESSION" });

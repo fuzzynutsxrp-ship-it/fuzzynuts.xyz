@@ -76,7 +76,7 @@ function base58Encode(payload: Uint8Array): string {
   for (const byte of payload) {
     let carry = byte;
     for (let j = 0; j < digits.length; j++) {
-      carry += digits[j] << 8;
+      carry += digits[j]! << 8;
       digits[j] = carry % 58;
       carry = (carry / 58) | 0;
     }
@@ -95,7 +95,7 @@ function base58Encode(payload: Uint8Array): string {
 
   // Reverse digits
   for (let i = digits.length - 1; i >= 0; i--) {
-    encoded += BASE58_ALPHABET[digits[i]];
+    encoded += BASE58_ALPHABET[digits[i]!]!;
   }
 
   return encoded;

@@ -195,7 +195,7 @@ export async function validateScoreSubmission(
   /* ── Step 1: Schema validation ── */
   const parsed = ServerScoreSchema.safeParse(body);
   if (!parsed.success) {
-    const firstError = parsed.error.issues[0];
+    const firstError = parsed.error.issues[0]!;
     return {
       valid: false,
       error: `Validation failed: ${firstError.path.join(".")} — ${firstError.message}`,
