@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { GAMES } from "@/lib/utils";
 import { GameModal } from "@/components/game/GameModal";
@@ -159,12 +158,11 @@ function ArcadeCabinet({
 
 export function GamesShowcase() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
-  const router = useRouter();
 
   /** RSC is an external game — navigate directly, don't open the modal */
   const handlePlay = (gameId: string) => {
     if (gameId === "rsc") {
-      router.push("/play/rsc/");
+      window.location.href = "/games/rsc/";
     } else {
       setActiveGameId(gameId);
     }

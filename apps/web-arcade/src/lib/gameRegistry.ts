@@ -215,7 +215,7 @@ export const GAME_LIST: GameMetadata[] = [
     minPlayTime: 15,
     controls: ["Click to move / attack", "F1-F5 for menus", "Right-click for options"],
     iconPath: "/icons/icon-world-pop.webp",
-    iframePath: "/play/rsc/",
+    iframePath: "/games/rsc/",
     sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
     leaderboardEnabled: true,
     achievementsEnabled: false,

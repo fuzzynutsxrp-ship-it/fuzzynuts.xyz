@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <title>RuneScape Classic — Fuzzynuts Arcade</title>
+  <meta name="description" content="Play RuneScape Classic in your browser via Open-RSC. No downloads, no Java installs. Part of the Fuzzynuts Arcade on XRPL.">
+  <link rel="icon" href="../../logo_512.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/design-tokens.css">
+  <link rel="stylesheet" href="../../css/game-wrapper.css">
+  <style>
+    body {
+      justify-content: flex-start;
+      align-items: center;
+      text-align: center;
+      padding: var(--space-lg);
+      padding-top: calc(var(--space-lg) + 2rem);
+    }
+    .rsc-icon { font-size: 3rem; margin-bottom: var(--space-md); }
+    .rsc-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      margin-bottom: 0.25rem;
+    }
+    .rsc-subtitle {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: var(--space-xl);
+    }
+    .play-btn {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+      color: var(--bg-base);
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .play-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px var(--accent-gold-glow);
+    }
+    .rsc-info {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      max-width: 440px;
+      margin: var(--space-lg) auto 0;
+    }
+    .rsc-info .highlight { color: var(--accent-gold); }
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-top: var(--space-lg);
+      display: inline-block;
+      transition: color 180ms ease;
+    }
+    .back-link:hover { color: var(--accent-gold); }
+
+    /* Game iframe container */
+    .game-frame-wrap {
+      display: none;
+      width: 100%;
+      max-width: 780px;
+      margin: var(--space-lg) auto 0;
+    }
+    .game-frame-wrap iframe {
+      width: 100%;
+      aspect-ratio: 765 / 503;
+      border: 2px solid rgba(255, 46, 136, 0.2);
+      border-radius: var(--radius-lg);
+      background: #000;
+      display: block;
+    }
+    .game-frame-wrap.visible { display: block; }
+
+    /* Hide landing when playing */
+    .landing.hidden { display: none; }
+
+    /* Particles */
+    .particles {
+      position: fixed; inset: 0;
+      pointer-events: none; overflow: hidden; z-index: -1;
+    }
+    .particle {
+      position: absolute; font-size: 16px; opacity: 0.12;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.12; }
+      90%  { opacity: 0.12; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <!-- Landing screen -->
+  <div class="landing" id="landing">
+    <div class="rsc-icon">⚔️🏰</div>
+    <h1 class="rsc-title">RuneScape Classic</h1>
+    <p class="rsc-subtitle">Browser MMORPG — Powered by Open-RSC</p>
+
+    <a href="#" id="play-link" class="play-btn" onclick="launchGame(); return false;">⚔️ Play Now</a>
+
+    <div class="rsc-info">
+      <p>The original 2001 RuneScape — playable in your browser.</p>
+      <p>Explore, quest, skill, and PK in the classic world. Create a character on first login.</p>
+      <p class="highlight">🌰 No downloads or Java needed — click and play</p>
+    </div>
+
+    <a href="../../" class="back-link">← Back to Arcade</a>
+  </div>
+
+  <!-- Game iframe (shown after clicking Play) -->
+  <div class="game-frame-wrap" id="gameFrame">
+    <iframe
+      id="rscIframe"
+      title="RuneScape Classic — FuzzyNuts"
+      allow="autoplay; fullscreen"
+      loading="lazy"
+    ></iframe>
+    <a href="../../" class="back-link" style="margin-top: var(--space-md);">← Back to Arcade</a>
+  </div>
+
+  <script>
+    /* ── RSC server connection params ── */
+    var RSC_CLIENT_BASE = 'https://game.fuzzynuts.xyz';
+    var RSA_EXPONENT = '65537';
+    var RSA_MODULUS = '9115015542438186018327044408313987277889783174239809826491015549573028356381739563861028029945657804756198333660503635469704152602063914154601665525357981';
+    var CLIENT_URL = RSC_CLIENT_BASE + '/#members,game.fuzzynuts.xyz,43494,' + RSA_EXPONENT + ',' + RSA_MODULUS + ',true';
+
+    function launchGame() {
+      var landing = document.getElementById('landing');
+      var gameFrame = document.getElementById('gameFrame');
+      var iframe = document.getElementById('rscIframe');
+
+      iframe.src = CLIENT_URL;
+      landing.classList.add('hidden');
+      gameFrame.classList.add('visible');
+    }
+
+    /* ── Forest particle effect ── */
+    var emojis = ['🌰', '🍂', '🍁', '🌿', '🥜', '🐿️'];
+    var container = document.getElementById('particles');
+    for (var i = 0; i < 15; i++) {
+      var el = document.createElement('span');
+      el.className = 'particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + '%';
+      el.style.animationDuration = (8 + Math.random() * 12) + 's';
+      el.style.animationDelay = (Math.random() * 10) + 's';
+      container.appendChild(el);
+    }
+  </script>
+</body>
+</html>
