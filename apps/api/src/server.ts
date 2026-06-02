@@ -12,10 +12,14 @@ import cors from "cors";
 import { buildSessionRouter } from "./routes/session";
 import { buildAuthRouter } from "./routes/auth";
 import { buildGameSessionRouter } from "./routes/game-session";
+import { buildRscRouter } from "./routes/rsc";
+import { buildWalletAuth } from "./middleware/walletAuth";
 
 const PORT = Number(process.env.PORT ?? 4000);
 const WALLET_JWT_SECRET = required("WALLET_JWT_SECRET");
 const GAME_SESSION_SECRET = required("GAME_SESSION_SECRET");
+const MONGODB_URI = required("MONGODB_URI");
+const RSC_PASSWORD_SECRET = required("RSC_PASSWORD_SECRET");
 
 function required(name: string): string {
   const v = process.env[name];
@@ -66,6 +70,12 @@ app.use(
     challengeStore,
   }),
 );
+
+// RSC wallet-to-username mapping (gated by wallet JWT)
+app.use("/api/rsc", buildWalletAuth({ WALLET_JWT_SECRET }), buildRscRouter({
+  MONGODB_URI,
+  RSC_PASSWORD_SECRET,
+}));
 
 // TODO(auth-rollout): mount migrated /api/scores, /api/rewards, /api/scores/stream
 

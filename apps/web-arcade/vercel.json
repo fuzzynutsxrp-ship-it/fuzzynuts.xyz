@@ -59,6 +59,10 @@
     {
       "source": "/api/scores/stream",
       "destination": "https://world.fuzzynuts.xyz/api/scores/stream"
+    },
+    {
+      "source": "/api/rsc/:path*",
+      "destination": "https://world.fuzzynuts.xyz/api/rsc/:path*"
     }
   ],
   "redirects": [

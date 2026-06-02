@@ -1,154 +1,91 @@
-# FuzzyNuts RSC — VPS Setup Guide
+# VPS Setup — RSC Wallet Auto-Login
 
-This guide walks you through getting the RuneScape Classic game server running. No technical experience needed — just follow each step.
+## What Changed
 
----
+The RSC game page now supports automatic login via XRP wallet. When a user
+connects their wallet on fuzzynuts.xyz and clicks "Play Now":
 
-## What You Need
+1. The page reads the wallet address from the `fuzzy_session_meta` cookie
+2. It calls `GET /api/rsc/credentials` to look up the wallet-to-username mapping
+3. If found, credentials are injected into the TeaVM iframe URL hash → auto-login
+4. If not found, a "Claim Username" modal appears → user picks a name → account created
 
-- A VPS (virtual server) running Ubuntu 22.04 or newer
-- Your VPS IP address (the hosting company gives you this)
-- SSH access to your VPS (the hosting company gives you a password or key)
+The TeaVM client on the VPS needs a one-time patch to read the new hash parameters.
 
-Recommended VPS providers: Hetzner ($5/mo), DigitalOcean ($6/mo), or Vultr ($6/mo). Pick the cheapest Ubuntu option.
+## One-Time VPS Setup (YOU MUST DO THIS)
 
----
+### Step 1: Copy the patch script to the VPS
 
-## Step 1: Rent a VPS
+Open the DigitalOcean web console for droplet `67.205.132.6` and run:
 
-Go to one of these sites and create an account:
+```bash
+# Copy the script content from tools/patch-rsc-teavm-client.sh in this repo
+# Paste it into a new file on the VPS:
+cat > /root/patch-rsc-teavm-client.sh << 'SCRIPTEOF'
+# (paste the entire contents of tools/patch-rsc-teavm-client.sh here)
+SCRIPTEOF
 
-- **Hetzner**: https://hetzner.com/cloud → CX22 (€4.49/mo)
-- **DigitalOcean**: https://digitalocean.com → Basic Droplet ($6/mo)
-- **Vultr**: https://vultr.com → Cloud Compute ($6/mo)
-
-Choose:
-- **OS**: Ubuntu 22.04 LTS (or 24.04 LTS)
-- **Location**: closest to your players
-- **Size**: smallest/cheapest is fine
-
-Save the **IP address** they give you. It looks like: `123.45.67.89`
-
----
-
-## Step 2: Connect to Your VPS
-
-Open a terminal (on Mac: Terminal app, on Windows: PowerShell) and type:
-
-```
-ssh root@YOUR_VPS_IP
+chmod +x /root/patch-rsc-teavm-client.sh
 ```
 
-Replace `YOUR_VPS_IP` with the actual IP address from Step 1.
+### Step 2: Run the script
 
-It will ask for a password — paste the one your hosting company gave you.
-
----
-
-## Step 3: Run the Setup Script
-
-Once you're connected to the VPS, paste this entire command and press Enter:
-
-```
-curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/deploy-openrsc-vps.sh | bash
+```bash
+bash /root/patch-rsc-teavm-client.sh
 ```
 
-This takes 5–10 minutes. It installs everything automatically. When it finishes, it shows you:
+This will:
+- Back up the original `mudclient.java` and `classes.js`
+- Patch the Java source to accept username/password from URL hash params 6 and 7
+- Rebuild the TeaVM JavaScript via Maven
+- Deploy the new `classes.js` to `/var/www/rsc-client/teavm/`
 
-- **Database password** — save this somewhere safe
-- **Next steps** — follow them in order
+The script is idempotent — safe to run twice.
 
----
+### Step 3: Verify
 
-## Step 4: Start the Game Server
+Load the game page at `https://fuzzynuts.xyz/games/rsc/` and click Play Now.
+If you have a wallet connected with a claimed username, it should auto-login.
 
-After the script finishes, run these two commands:
+## Railway Environment Variables
 
-```
-systemctl enable --now openrsc
-systemctl status openrsc
-```
-
-If it says "active (running)" — the server is live.
-
----
-
-## Step 5: Set Up Your Domain
-
-Go to wherever you manage your domain (Cloudflare, Namecheap, GoDaddy, etc.) and add a DNS record:
-
-| Field | Value |
-|-------|-------|
-| Type | A |
-| Name | game |
-| Value | your VPS IP address |
-| Proxy | DNS only (grey cloud) |
-
-**Important**: If you use Cloudflare, the proxy MUST be off (grey cloud, not orange). The game uses a raw TCP connection that Cloudflare's proxy doesn't support.
-
-The final address will be: `game.fuzzynuts.xyz`
-
----
-
-## Step 6: Turn On the Game in the App
-
-Go to your Railway dashboard (where the API is deployed) and add this environment variable:
+Add these to the Railway API service (brilliant-nurturing):
 
 ```
-GAME_SERVER_READY=true
+MONGODB_URI=mongodb+srv://...       # Your existing Railway MongoDB connection string
+RSC_PASSWORD_SECRET=<64-char-hex>   # Generate with: openssl rand -hex 32
+GAME_SERVER_READY=true              # Enables the game-session endpoint
 ```
 
-Then redeploy. The `/play/rsc` page will now let players connect their wallet and download the game client.
+## Architecture Summary
 
----
-
-## That's It
-
-The game server is running. Players can:
-1. Go to fuzzynuts.xyz/play/rsc
-2. Connect their XRP wallet
-3. Download the game client
-4. Play RuneScape Classic
-
----
-
-## If Something Goes Wrong
-
-**Server won't start?**
 ```
-journalctl -u openrsc -n 50
-```
-This shows the last 50 lines of the server log. Look for error messages.
+Browser (fuzzynuts.xyz)
+  ├── Reads fuzzy_session_meta cookie → wallet address
+  ├── GET /api/rsc/credentials (proxied via Vercel → Railway)
+  │     └── MongoDB wallet_mappings → { username, encryptedPassword }
+  ├── Builds iframe URL: game.fuzzynuts.xyz/#...,,username,password
+  └── history.replaceState → clears hash from URL bar
 
-**Can't connect from the game client?**
-- Check that port 43594 is open: `ufw status`
-- Check the DNS record resolves: `dig game.fuzzynuts.xyz`
+TeaVM Client (game.fuzzynuts.xyz)
+  ├── main() reads window.location.hash
+  ├── Parses params [6]=username, [7]=password
+  ├── Sets loginScreen=2, fills panel fields
+  └── Calls login(username, password, false) → auto-login
 
-**Need to restart the server?**
-```
-systemctl restart openrsc
+Open-RSC Server (67.205.132.6:43594)
+  └── Validates username + password via DataConversions.checkPassword()
 ```
 
-**Need to see live logs?**
+## Rolling Back
+
+If something goes wrong on the VPS:
+
+```bash
+# Restore original classes.js
+cp /var/www/rsc-client/teavm/backup-*/classes.js.orig /var/www/rsc-client/teavm/classes.js
 ```
-journalctl -u openrsc -f
-```
-Press Ctrl+C to stop watching.
 
----
-
-## Turning On the Game (After VPS Is Ready)
-
-After the VPS script finishes and DNS propagates:
-
-1. Go to https://railway.app → your **fuzzynuts-api** project → **Variables** tab
-2. Find `GAME_SERVER_READY` and change it from `false` to `true`
-3. Click **Redeploy** (top right)
-4. Wait 1–2 minutes
-5. Visit https://fuzzynuts.xyz/play/rsc
-6. Click "Connect XRP Wallet" — it should now proceed past the provisioning screen to the JAR download
-
-If you still see "Server Provisioning", make sure:
-- The VPS is running (`systemctl status openrsc` should say "active")
-- DNS has propagated (visit `game.fuzzynuts.xyz` in browser — should show something, even an error is fine)
-- You saved the Railway variables after editing
+The web frontend changes (cookie reading, modal, API calls) work independently
+of the VPS patch — users will just see the manual login screen if the TeaVM
+client isn't patched yet.
