@@ -48,7 +48,7 @@ app.use(
 
 app.use(express.json({ limit: "16kb" }));
 
-app.get("/healthz", (_req, res) => res.json({ ok: true }));
+app.get("/healthz", (_req, res) => res.json({ ok: true, rsc: true, version: "2.0" }));
 
 // Shared challenge store — auth.ts issues challenges, game-session.ts consumes them
 const challengeStore = new Map<
