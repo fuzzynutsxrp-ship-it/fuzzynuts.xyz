@@ -17,4 +17,4 @@ RUN pnpm install --frozen-lockfile
 EXPOSE 4000
 
 # Start with tsx
-CMD ["node", "--import", "tsx", "apps/api/src/server.ts"]
+CMD ["npx", "tsx", "apps/api/src/server.ts"]
