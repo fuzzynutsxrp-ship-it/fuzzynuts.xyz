@@ -90,10 +90,10 @@ echo "▸ Step 3: Setting up Maven build..."
 rm -rf "${BUILD_DIR}"
 mkdir -p "${BUILD_DIR}/src/main/java"
 
-# Copy all source trees
+# Copy game-specific source trees only (NOT org/ — that's TeaVM internals
+# provided by the teavm-classlib Maven dependency, not user code)
 cp -r "${SRC_DIR}/mudclient" "${BUILD_DIR}/src/main/java/"
 cp -r "${SRC_DIR}/com" "${BUILD_DIR}/src/main/java/"
-cp -r "${SRC_DIR}/org" "${BUILD_DIR}/src/main/java/"
 
 # Copy pom.xml from META-INF (or create one if missing)
 POM_SRC="/var/www/rsc-client/META-INF/maven/2003scape/mudclient/pom.xml"
