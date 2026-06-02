@@ -2,17 +2,11 @@
  * ═══════════════════════════════════════════════════════════════
  *  /play/rsc — RuneScape Classic (Open-RSC) game page
  *
- *  Encoding contract for wallet signing:
- *    - API issues challenge via formatGameChallenge() → plain UTF-8 string
- *    - Wallet SDK signs this exact string (raw UTF-8 bytes)
- *    - Pass the raw UTF-8 challenge to Xumm/Joey sign request
- *    - Backend verifies via verifyKeypairSignature after hex-encoding
- *
  *  Flow:
  *    1. Player connects XRP wallet (Xaman/Joey/GemWallet/Crossmark)
  *    2. Calls POST /api/auth/game-session to mint session token
- *    3. Downloads Open_RSC_Client.jar
- *    4. Client connects to game.fuzzynuts.xyz:43594
+ *    3. Embeds browser-based RSC client (TeaVM) in iframe
+ *    4. Client connects to game.fuzzynuts.xyz via WebSocket
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -25,6 +19,18 @@ import type { GameSessionToken } from "@fuzzynuts/arcade-core";
 /** Base URL for the API. Reads from env or defaults to production. */
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "https://fuzzynutsxyz-production.up.railway.app";
+
+/** Web client URL — TeaVM RSC client hosted on the game VPS */
+const RSC_CLIENT_BASE = "http://game.fuzzynuts.xyz";
+
+/** RSA parameters for the FuzzyNuts Open-RSC server */
+const RSA_EXPONENT = "65537";
+const RSA_MODULUS = "8289659822450956547091737980685999494469917119448636848399591851485736573017442330778779185880707301889402408746652224912191720358420083485471439352872909";
+
+/** Build the web client URL with server connection params */
+function buildClientUrl(): string {
+  return `${RSC_CLIENT_BASE}/#members,game.fuzzynuts.xyz,43494,${RSA_EXPONENT},${RSA_MODULUS},true`;
+}
 
 type ConnectionState =
   | "idle"
@@ -101,16 +107,13 @@ export default function RscPlayPage() {
     // Not connected — trigger wallet connect
     setState("connecting");
     try {
-      // Default to Xaman (most popular). User can switch via the main site wallet picker.
       await connect("xaman");
 
-      // After connect(), the store updates `address` synchronously
       const addr = useWalletStore.getState().address;
       if (!addr) {
         throw new Error("Wallet connection was cancelled or failed.");
       }
 
-      // Now request game session
       setState("session-request");
 
       const sessionRes = await fetch(`${API_BASE}/api/auth/game-session`, {
@@ -150,12 +153,12 @@ export default function RscPlayPage() {
   }, [isConnected, address, connect]);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="font-display text-3xl font-bold text-white">
         RuneScape Classic
       </h1>
       <p className="mt-2 text-sm text-zinc-400">
-        Powered by Open-RSC &middot; Connect your XRP wallet to play
+        Powered by Open-RSC &middot; Play in your browser — no downloads needed
       </p>
 
       {/* Already connected indicator */}
@@ -168,7 +171,7 @@ export default function RscPlayPage() {
       )}
 
       <div className="mt-8 space-y-6">
-        {/* Server Provisioning — shown when API returns 503/501 */}
+        {/* Server Provisioning */}
         {state === "provisioning" && (
           <div className="space-y-4">
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
@@ -180,11 +183,6 @@ export default function RscPlayPage() {
                 minutes after deployment. Come back soon — your wallet
                 connection will work once the server is ready.
               </p>
-            </div>
-            <div className="space-y-3 animate-pulse">
-              <div className="h-10 rounded-lg bg-zinc-800/50" />
-              <div className="h-4 w-3/4 rounded bg-zinc-800/30" />
-              <div className="h-4 w-1/2 rounded bg-zinc-800/30" />
             </div>
           </div>
         )}
@@ -223,59 +221,33 @@ export default function RscPlayPage() {
           </div>
         )}
 
-        {/* Success — Download Card */}
+        {/* Success — Embedded Game Client */}
         {state === "ready" && sessionToken && (
           <div className="space-y-4">
             <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3">
               <p className="text-sm text-green-400">
                 Wallet verified: {sessionToken.walletAddress.slice(0, 8)}...
-                {sessionToken.walletAddress.slice(-6)}
+                {sessionToken.walletAddress.slice(-6)} &middot; Playing as guest
               </p>
             </div>
 
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6">
-              <h2 className="font-display text-xl font-semibold text-white">
-                Download &amp; Play
-              </h2>
-              <p className="mt-2 text-sm text-zinc-400">
-                Download the game client and connect to the FuzzyNuts RSC
-                server.
+            {/* Game Client iframe */}
+            <div className="relative rounded-lg border border-zinc-800 overflow-hidden bg-black">
+              <iframe
+                src={buildClientUrl()}
+                title="RuneScape Classic — FuzzyNuts"
+                className="w-full border-0"
+                style={{ height: "75vh", minHeight: "500px" }}
+                allow="autoplay; fullscreen"
+              />
+            </div>
+
+            <div className="rounded border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-500">
+              <p>Server: {sessionToken.gameServerEndpoint}</p>
+              <p>
+                Session expires:{" "}
+                {new Date(sessionToken.expiresAt).toLocaleTimeString()}
               </p>
-
-              <a
-                href="/games/rsc/Open_RSC_Client.jar"
-                download
-                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-pink-600 px-5 py-2.5 font-display font-semibold text-white transition hover:bg-pink-500"
-              >
-                Download Open_RSC_Client.jar
-              </a>
-
-              <div className="mt-4 rounded border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-500">
-                <p>Server: {sessionToken.gameServerEndpoint}</p>
-                <p>
-                  Session expires:{" "}
-                  {new Date(sessionToken.expiresAt).toLocaleTimeString()}
-                </p>
-              </div>
-
-              <details className="mt-4">
-                <summary className="cursor-pointer text-sm text-zinc-500 hover:text-zinc-300">
-                  Client won&apos;t launch? Manual setup
-                </summary>
-                <div className="mt-2 space-y-1 rounded border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-500">
-                  <p>1. Install Java 8+ on your machine</p>
-                  <p>2. Run: java -jar Open_RSC_Client.jar</p>
-                  <p>
-                    3. If it can&apos;t find the server, edit{" "}
-                    <code className="text-pink-400">ip.txt</code> to{" "}
-                    <code className="text-pink-400">fuzzynuts.xyz</code>
-                  </p>
-                  <p>
-                    4. Edit <code className="text-pink-400">port.txt</code> to{" "}
-                    <code className="text-pink-400">43594</code>
-                  </p>
-                </div>
-              </details>
             </div>
           </div>
         )}
