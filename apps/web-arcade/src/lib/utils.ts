@@ -109,6 +109,17 @@ export const GAMES = [
     color: "#8B5CF6",
     tags: ["Coming Soon", "🔒 Classified"],
   },
+  {
+    id: "rsc",
+    title: "RuneScape Classic",
+    type: "MMORPG",
+    description:
+      "The original RuneScape — playable in your browser via Open-RSC. Explore, quest, skill, and PK in the classic 2001 world.",
+    icon: "/icons/icon-world-pop.webp",
+    image: "⚔️",
+    color: "#22c55e",
+    tags: ["MMORPG", "Classic", "PvP"],
+  },
 ];
 
 export const HOW_TO_STEPS = [

@@ -204,6 +204,31 @@ export const GAME_LIST: GameMetadata[] = [
     ],
     touchHint: "Virtual joystick: drag to move, tap to interact",
   },
+  {
+    slug: "rsc",
+    title: "RuneScape Classic",
+    genre: "MMORPG",
+    color: "#22c55e",
+    description:
+      "The original RuneScape — playable in your browser via Open-RSC. Explore, quest, skill, and PK in the classic 2001 world. No downloads needed.",
+    scoreCap: 99_000_000,
+    minPlayTime: 15,
+    controls: ["Click to move / attack", "F1-F5 for menus", "Right-click for options"],
+    iconPath: "/icons/icon-world-pop.webp",
+    iframePath: "/play/rsc/",
+    sandbox: "allow-scripts allow-same-origin allow-popups allow-pointer-lock",
+    leaderboardEnabled: true,
+    achievementsEnabled: false,
+    status: "live",
+    scoreType: "high-score",
+    loadingTips: [
+      "Click anywhere to move your character",
+      "Right-click NPCs and objects for interaction options",
+      "Train skills to level up and unlock new content",
+      "Beware of PKers in the Wilderness!",
+    ],
+    touchHint: "Tap to move and interact — classic point-and-click controls",
+  },
 ];
 
 /* ── Registry API ── */

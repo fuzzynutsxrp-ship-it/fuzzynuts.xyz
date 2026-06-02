@@ -47,6 +47,7 @@ const GAME_EMOJIS: Record<string, string> = {
   survivors: "⚔️",
   minigolf: "⛳",
   racer: "🏎️",
+  rsc: "⚔️",
 };
 
 /* ═══════════════════════════════════════════════════════════════

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { GAMES } from "@/lib/utils";
 import { GameModal } from "@/components/game/GameModal";
@@ -158,6 +159,16 @@ function ArcadeCabinet({
 
 export function GamesShowcase() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
+  const router = useRouter();
+
+  /** RSC is an external game — navigate directly, don't open the modal */
+  const handlePlay = (gameId: string) => {
+    if (gameId === "rsc") {
+      router.push("/play/rsc/");
+    } else {
+      setActiveGameId(gameId);
+    }
+  };
 
   return (
     <section id="games" className="relative overflow-hidden">
@@ -209,7 +220,7 @@ export function GamesShowcase() {
               key={game.id}
               game={game}
               index={i}
-              onPlay={setActiveGameId}
+              onPlay={handlePlay}
             />
           ))}
         </div>
@@ -219,7 +230,7 @@ export function GamesShowcase() {
       <GameModal
         gameId={activeGameId}
         onClose={() => setActiveGameId(null)}
-        onGameSwitch={setActiveGameId}
+        onGameSwitch={handlePlay}
       />
     </section>
   );
