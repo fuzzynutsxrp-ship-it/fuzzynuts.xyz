@@ -62,7 +62,7 @@
     },
     {
       "source": "/api/rsc/:path*",
-      "destination": "https://world.fuzzynuts.xyz/api/rsc/:path*"
+      "destination": "https://fuzzynutsxyz-production.up.railway.app/api/rsc/:path*"
     }
   ],
   "redirects": [
