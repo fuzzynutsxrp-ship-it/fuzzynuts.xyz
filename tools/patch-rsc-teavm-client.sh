@@ -6,218 +6,309 @@
 #  via URL hash parameters (username + password appended after the
 #  existing connection params).
 #
-#  WHAT IT DOES:
-#    1. Backs up the original mudclient.java and classes.js
-#    2. Adds autoLoginUser / autoLoginPass fields to mudclient.java
-#    3. Parses hash params [6]=username, [7]=password in main()
-#    4. Auto-fills the login panel and calls login() after game init
-#    5. Rebuilds classes.js via Maven + TeaVM
-#    6. Deploys the new classes.js to /var/www/rsc-client/teavm/
+#  APPROACH: Injects a JavaScript wrapper into index.html that:
+#    1. Intercepts window.location.hash (returns only 6 standard params)
+#    2. Stores auto-login credentials in sessionStorage
+#    3. After main() initializes, simulates keyboard input to fill
+#       the login form and submit automatically
+#
+#  DOES NOT modify classes.js — only index.html is changed.
 #
 #  IDEMPOTENT: Safe to run twice. Checks if patches are already applied.
 #
-#  RUN ONCE via DigitalOcean web console (copy-paste entire script):
-#    bash /root/patch-rsc-teavm-client.sh
+#  RUN ONCE:
+#    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/patch-rsc-teavm-client.sh | bash
 # ═══════════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
-SRC_DIR="/var/www/rsc-client/teavm/src"
-MUCLIENT_SRC="${SRC_DIR}/mudclient/mudclient.java"
-TEAVM_DIR="/var/www/rsc-client/teavm"
-BUILD_DIR="/tmp/rsc-teavm-build"
-BACKUP_DIR="/var/www/rsc-client/teavm/backup-$(date +%Y%m%d-%H%M%S)"
+HTML_FILE="/var/www/rsc-client/index.html"
+BACKUP_DIR="/var/www/rsc-client/backup-$(date +%Y%m%d-%H%M%S)"
 
 echo "═══════════════════════════════════════════════════════"
-echo " FuzzyNuts RSC TeaVM Auto-Login Patch"
+echo " FuzzyNuts RSC Auto-Login Patch (JS Injection)"
 echo "═══════════════════════════════════════════════════════"
 
 # ── Step 0: Check if already patched ──────────────────────────────
-if grep -q 'autoLoginUser' "${MUCLIENT_SRC}" 2>/dev/null; then
-  echo "✓ Patch already applied (autoLoginUser field found)."
-  echo "  Skipping patch. Rebuilding only..."
-  ALREADY_PATCHED=true
-else
-  ALREADY_PATCHED=false
+if grep -q 'fuzzynuts-autologin' "${HTML_FILE}" 2>/dev/null; then
+  echo ""
+  echo "✓ Patch already applied (fuzzynuts-autologin marker found)."
+  echo "  Nothing to do."
+  exit 0
 fi
 
-# ── Step 1: Back up originals ─────────────────────────────────────
+# ── Step 1: Back up original index.html ───────────────────────────
 echo ""
-echo "▸ Step 1: Backing up originals..."
+echo "▸ Step 1: Backing up index.html..."
 mkdir -p "${BACKUP_DIR}"
-cp "${MUCLIENT_SRC}" "${BACKUP_DIR}/mudclient.java.orig"
-cp "${TEAVM_DIR}/classes.js" "${BACKUP_DIR}/classes.js.orig" 2>/dev/null || true
-echo "  Backups at: ${BACKUP_DIR}"
+cp "${HTML_FILE}" "${BACKUP_DIR}/index.html.orig"
+echo "  Backup at: ${BACKUP_DIR}/index.html.orig"
 
-# ── Step 2: Patch mudclient.java ──────────────────────────────────
-if [ "${ALREADY_PATCHED}" = false ]; then
-  echo ""
-  echo "▸ Step 2: Patching mudclient.java..."
-
-  # 2a. Add fields after the existing password field declaration
-  #     Target: "String password;" (the last login-related field)
-  sed -i '/^   String password;$/a\
-   \/\/ FuzzyNuts auto-login fields (injected by patch script)\
-   String autoLoginUser;\
-   String autoLoginPass;' "${MUCLIENT_SRC}"
-
-  # 2b. Add hash param parsing in main() after the existing 6-param block
-  #     Target: the line after "Packet.reenableOpcodeEncryption = false;"
-  #     We insert after the closing brace of the webArgs.length > 5 block
-  sed -i '/Packet\.reenableOpcodeEncryption = false;/{n;s/\t\t}/\t\t}\n\n\t\t\/\/ FuzzyNuts: parse auto-login credentials from hash params 6 and 7\n\t\tif (webArgs.length > 7) {\n\t\t\tmud.autoLoginUser = webArgs[6];\n\t\t\tmud.autoLoginPass = webArgs[7];\n\t\t}/}' "${MUCLIENT_SRC}"
-
-  # 2c. Add auto-login logic after resetLoginScreenVariables() in startGame()
-  #     Target: "this.resetLoginScreenVariables();"
-  #     We inject the auto-login block right after it
-  sed -i '/this\.resetLoginScreenVariables();$/a\
-                           \/\/ FuzzyNuts: auto-login if credentials provided via hash\
-                           if (this.autoLoginUser != null \&\& this.autoLoginPass != null \&\& this.autoLoginUser.length() > 0) {\
-                              this.loginScreen = 2;\
-                              this.panelLoginExistingUser.updateText(this.field_355, this.autoLoginUser);\
-                              this.panelLoginExistingUser.updateText(this.field_356, this.autoLoginPass);\
-                              this.login(this.autoLoginUser, this.autoLoginPass, false);\
-                           }' "${MUCLIENT_SRC}"
-
-  echo "  ✓ Fields, hash parsing, and auto-login logic injected."
+# ── Step 2: Restore original classes.js if a previous patch broke it
+echo ""
+echo "▸ Step 2: Ensuring clean classes.js..."
+if [ -f "/var/www/rsc-client/teavm/classes.js.bak" ]; then
+  # Check if current classes.js differs from backup (might be corrupted)
+  CURRENT_SIZE=$(wc -c < "/var/www/rsc-client/teavm/classes.js")
+  BACKUP_SIZE=$(wc -c < "/var/www/rsc-client/teavm/classes.js.bak")
+  if [ "${CURRENT_SIZE}" -ne "${BACKUP_SIZE}" ]; then
+    echo "  classes.js size mismatch — restoring from backup..."
+    cp "/var/www/rsc-client/teavm/classes.js.bak" "/var/www/rsc-client/teavm/classes.js"
+    echo "  ✓ Restored original classes.js"
+  else
+    echo "  ✓ classes.js looks intact"
+  fi
 else
-  echo ""
-  echo "▸ Step 2: Skipping patch (already applied)."
+  echo "  ✓ No backup to restore"
 fi
 
-# ── Step 3: Set up Maven build directory ──────────────────────────
+# ── Step 3: Write patched index.html ──────────────────────────────
 echo ""
-echo "▸ Step 3: Setting up Maven build..."
-rm -rf "${BUILD_DIR}"
-mkdir -p "${BUILD_DIR}/src/main/java"
+echo "▸ Step 3: Writing patched index.html..."
 
-# Copy game-specific source trees only (NOT org/ — that's TeaVM internals
-# provided by the teavm-classlib Maven dependency, not user code)
-cp -r "${SRC_DIR}/mudclient" "${BUILD_DIR}/src/main/java/"
-cp -r "${SRC_DIR}/com" "${BUILD_DIR}/src/main/java/"
+cat > "${HTML_FILE}" << 'HTMLEOF'
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Runescape by Andrew Gower</title>
+    <meta charset="utf-8">
+    <style>body{margin:0;background-color: black;}</style>
+  </head>
+  <body>
+    <!-- fuzzynuts-autologin: injected by patch-rsc-teavm-client.sh -->
+    <script>
+    (function() {
+      'use strict';
 
-# Copy pom.xml from META-INF (or create one if missing)
-POM_SRC="/var/www/rsc-client/META-INF/maven/2003scape/mudclient/pom.xml"
-if [ -f "${POM_SRC}" ]; then
-  cp "${POM_SRC}" "${BUILD_DIR}/pom.xml"
+      // ── Parse auto-login credentials from URL hash ──
+      // Hash format: #members,host,port,rsa_exp,rsa_mod,useSSL,USERNAME,PASSWORD
+      var fullHash = window.location.hash;
+      var hashStr = fullHash.substring(1); // strip #
+      var parts = hashStr.split(',');
+
+      var autoUser = null;
+      var autoPass = null;
+
+      if (parts.length > 7 && parts[6] && parts[7]) {
+        autoUser = decodeURIComponent(parts[6]);
+        autoPass = decodeURIComponent(parts[7]);
+
+        // Store in sessionStorage for the auto-login loop
+        sessionStorage.setItem('fn_autouser', autoUser);
+        sessionStorage.setItem('fn_autopass', autoPass);
+
+        // Strip auto-login params from hash so TeaVM only sees 6 standard params
+        var cleanHash = '#' + parts.slice(0, 6).join(',');
+        // Use replaceState to avoid triggering hashchange events
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', cleanHash);
+        } else {
+          window.location.hash = cleanHash;
+        }
+      } else {
+        // Check sessionStorage for credentials from a previous page load
+        autoUser = sessionStorage.getItem('fn_autouser');
+        autoPass = sessionStorage.getItem('fn_autopass');
+      }
+
+      // ── Auto-login keyboard simulation ──
+      // After main() runs and the game canvas appears, simulate typing
+      // the username + password and pressing Enter.
+      if (autoUser && autoPass) {
+        // Store for use after main() returns
+        window._fnAutoUser = autoUser;
+        window._fnAutoPass = autoPass;
+        window._fnAutoLoginScheduled = false;
+      }
+    })();
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="teavm/classes.js"></script>
+    <script>
+    main();
+
+    // ── Schedule auto-login after game initializes ──
+    (function() {
+      var autoUser = window._fnAutoUser;
+      var autoPass = window._fnAutoPass;
+      if (!autoUser || !autoPass) return;
+
+      var MAX_WAIT = 600; // 2 minutes max
+      var pollCount = 0;
+      var canvas = null;
+
+      // Helper: dispatch a keydown + keyup event to the canvas
+      function sendKey(ch) {
+        if (!canvas) return;
+        canvas.dispatchEvent(new KeyboardEvent('keydown', {
+          key: ch, code: 'Key' + ch.toUpperCase(),
+          bubbles: true, cancelable: true
+        }));
+        canvas.dispatchEvent(new KeyboardEvent('keyup', {
+          key: ch, code: 'Key' + ch.toUpperCase(),
+          bubbles: true, cancelable: true
+        }));
+      }
+
+      function sendEnter() {
+        if (!canvas) return;
+        canvas.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Enter', code: 'Enter',
+          bubbles: true, cancelable: true
+        }));
+        canvas.dispatchEvent(new KeyboardEvent('keyup', {
+          key: 'Enter', code: 'Enter',
+          bubbles: true, cancelable: true
+        }));
+      }
+
+      function sendTab() {
+        if (!canvas) return;
+        canvas.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Tab', code: 'Tab',
+          bubbles: true, cancelable: true
+        }));
+      }
+
+      function sendClick(x, y) {
+        if (!canvas) return;
+        var rect = canvas.getBoundingClientRect();
+        canvas.dispatchEvent(new MouseEvent('mousedown', {
+          clientX: rect.left + x, clientY: rect.top + y,
+          bubbles: true, cancelable: true
+        }));
+        canvas.dispatchEvent(new MouseEvent('mouseup', {
+          clientX: rect.left + x, clientY: rect.top + y,
+          bubbles: true, cancelable: true
+        }));
+      }
+
+      // Poll until canvas appears and game has loaded
+      var checkInterval = setInterval(function() {
+        pollCount++;
+        if (pollCount > MAX_WAIT) {
+          clearInterval(checkInterval);
+          sessionStorage.removeItem('fn_autouser');
+          sessionStorage.removeItem('fn_autopass');
+          return;
+        }
+
+        // Find the canvas
+        if (!canvas) {
+          canvas = document.querySelector('canvas');
+          if (!canvas) return;
+          canvas.setAttribute('tabindex', '0');
+          canvas.focus();
+        }
+
+        // Wait 6 seconds after canvas appears for game to load
+        if (pollCount < 30) return;
+
+        // The game shows "Click here to login" initially.
+        // Click the center of the canvas to trigger the login flow.
+        if (pollCount === 30) {
+          canvas.focus();
+          var w = canvas.width || 512;
+          var h = canvas.height || 346;
+          sendClick(w / 2, h / 2);
+          return;
+        }
+
+        // Wait 2 more seconds for the menu to appear
+        if (pollCount < 40) return;
+
+        // Click "Existing User" — typically in the lower portion of the canvas
+        if (pollCount === 40) {
+          var w = canvas.width || 512;
+          var h = canvas.height || 346;
+          sendClick(w / 2, h * 0.6);
+          return;
+        }
+
+        // Wait for login form to appear
+        if (pollCount < 50) return;
+
+        // ── Type username ──
+        if (pollCount === 50) {
+          canvas.focus();
+          for (var i = 0; i < autoUser.length; i++) {
+            (function(ch, delay) {
+              setTimeout(function() { sendKey(ch); }, delay);
+            })(autoUser[i], 80 * i);
+          }
+          return;
+        }
+
+        // ── Tab to password field ──
+        if (pollCount === 55) {
+          setTimeout(function() { sendTab(); }, 100);
+          return;
+        }
+
+        // ── Type password ──
+        if (pollCount === 60) {
+          for (var j = 0; j < autoPass.length; j++) {
+            (function(ch, delay) {
+              setTimeout(function() { sendKey(ch); }, delay);
+            })(autoPass[j], 80 * j);
+          }
+          return;
+        }
+
+        // ── Press Enter to login ──
+        if (pollCount === 70) {
+          setTimeout(function() { sendEnter(); }, 200);
+          // Clean up after successful attempt
+          setTimeout(function() {
+            sessionStorage.removeItem('fn_autouser');
+            sessionStorage.removeItem('fn_autopass');
+          }, 2000);
+          clearInterval(checkInterval);
+          return;
+        }
+      }, 200);
+    })();
+    </script>
+  </body>
+</html>
+HTMLEOF
+
+echo "  ✓ Patched index.html written"
+
+# ── Step 4: Verify ────────────────────────────────────────────────
+echo ""
+echo "▸ Step 4: Verifying patch..."
+if grep -q 'fuzzynuts-autologin' "${HTML_FILE}"; then
+  echo "  ✓ Auto-login wrapper found in index.html"
 else
-  echo "  ⚠ pom.xml not found at ${POM_SRC}, creating minimal one..."
-  cat > "${BUILD_DIR}/pom.xml" << 'POMEOF'
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>2003scape</groupId>
-  <artifactId>mudclient</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>war</packaging>
-  <properties>
-    <java.version>1.8</java.version>
-    <teavm.version>0.6.1</teavm.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.teavm</groupId>
-      <artifactId>teavm-classlib</artifactId>
-      <version>${teavm.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.teavm</groupId>
-      <artifactId>teavm-jso-apis</artifactId>
-      <version>${teavm.version}</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.teavm</groupId>
-        <artifactId>teavm-maven-plugin</artifactId>
-        <version>${teavm.version}</version>
-        <executions>
-          <execution>
-            <id>web-client</id>
-            <goals><goal>compile</goal></goals>
-            <configuration>
-              <targetDirectory>${project.build.directory}/generated/js/teavm</targetDirectory>
-              <mainClass>mudclient.mudclient</mainClass>
-              <minifying>true</minifying>
-              <debugInformationGenerated>true</debugInformationGenerated>
-              <sourceMapsGenerated>true</sourceMapsGenerated>
-              <sourceFilesCopied>true</sourceFilesCopied>
-              <optimizationLevel>FULL</optimizationLevel>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-</project>
-POMEOF
-fi
-
-echo "  ✓ Build directory ready at ${BUILD_DIR}"
-
-# ── Step 4: Build with Maven + TeaVM ──────────────────────────────
-echo ""
-echo "▸ Step 4: Building TeaVM client (this takes 1-3 minutes)..."
-cd "${BUILD_DIR}"
-mvn clean package -q 2>&1 | tail -20
-
-# ── Step 5: Deploy ────────────────────────────────────────────────
-echo ""
-echo "▸ Step 5: Deploying new classes.js..."
-NEW_JS="${BUILD_DIR}/target/generated/js/teavm/classes.js"
-
-if [ ! -f "${NEW_JS}" ]; then
-  echo "  ✗ ERROR: Build did not produce classes.js at ${NEW_JS}"
-  echo "  Check Maven output above for errors."
-  echo "  Original files are backed up at: ${BACKUP_DIR}"
+  echo "  ✗ ERROR: Patch verification failed"
   exit 1
 fi
 
-# Deploy
-cp "${NEW_JS}" "${TEAVM_DIR}/classes.js"
-cp "${BUILD_DIR}/target/generated/js/teavm/classes.js.map" "${TEAVM_DIR}/classes.js.map" 2>/dev/null || true
-cp "${BUILD_DIR}/target/generated/js/teavm/classes.js.teavmdbg" "${TEAVM_DIR}/classes.js.teavmdbg" 2>/dev/null || true
-
-echo "  ✓ Deployed new classes.js ($(wc -c < "${TEAVM_DIR}/classes.js") bytes)"
-
-# ── Step 6: Verify ────────────────────────────────────────────────
-echo ""
-echo "▸ Step 6: Verifying patch..."
-if grep -q 'autoLoginUser' "${TEAVM_DIR}/classes.js" 2>/dev/null || \
-   grep -q 'autoLogin' "${TEAVM_DIR}/classes.js" 2>/dev/null; then
-  echo "  ✓ Auto-login code found in compiled classes.js"
-else
-  echo "  ⚠ Could not verify auto-login in classes.js (may be minified)."
-  echo "  Check manually by loading the game with hash params."
+if grep -q 'window.location.hash' "${HTML_FILE}"; then
+  echo "  ✓ Hash interception logic present"
 fi
 
-# ── Cleanup ───────────────────────────────────────────────────────
-echo ""
-echo "▸ Cleaning up build directory..."
-rm -rf "${BUILD_DIR}"
+if grep -q 'sendKey' "${HTML_FILE}"; then
+  echo "  ✓ Keyboard simulation logic present"
+fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
 echo " ✓ PATCH COMPLETE"
 echo ""
-echo " New hash format:"
+echo " Hash format (unchanged):"
 echo "   #members,host,port,rsa_exp,rsa_mod,true,USERNAME,PASSWORD"
+echo ""
+echo " How it works:"
+echo "   1. index.html extracts USERNAME,PASSWORD from hash params 6+7"
+echo "   2. Strips them from hash (TeaVM sees standard 6 params)"
+echo "   3. After game loads, simulates keyboard input to fill login"
+echo "   4. Auto-submits the login form"
 echo ""
 echo " Test URL:"
 echo "   https://game.fuzzynuts.xyz/#members,game.fuzzynuts.xyz,43494,65537,RSA_MODULUS,true,TestUser,testpass123"
 echo ""
-echo " Backups at: ${BACKUP_DIR}"
-echo " To rollback: cp ${BACKUP_DIR}/classes.js.orig ${TEAVM_DIR}/classes.js"
+echo " Backup at: ${BACKUP_DIR}/"
+echo " To rollback: cp ${BACKUP_DIR}/index.html.orig /var/www/rsc-client/index.html"
 echo "═══════════════════════════════════════════════════════"
