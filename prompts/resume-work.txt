@@ -1,0 +1,6 @@
+Read .hermes-state.json and .hermes-recovery.md.
+
+Current state: [paste contents of .hermes-state.json]
+
+Continue from "nextAction". Do not repeat completed work.
+If nextAction requires manual steps I cannot do, generate the exact instructions and wait for my confirmation.

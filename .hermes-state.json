@@ -1,0 +1,26 @@
+{
+  "lastUpdated": "2026-06-03T00:00:00Z",
+  "currentPhase": "wallet-autologin-implementation",
+  "completed": [
+    "api-routes-rsc.ts-implemented",
+    "api-middleware-walletAuth.ts-implemented",
+    "tools-patch-rsc-teavm-client.sh-created",
+    "web-arcade-rsc-index.html-updated"
+  ],
+  "pending": [
+    "rebuild-api-dist",
+    "add-vercel-rewrite-for-rsc",
+    "set-railway-env-vars",
+    "run-teavm-patch-on-vps",
+    "end-to-end-test"
+  ],
+  "blockers": [
+    "api-dist-is-stale-needs-rebuild",
+    "teavm-patch-not-run-on-vps-yet"
+  ],
+  "nextAction": "rebuild-api-dist-and-add-vercel-rewrites",
+  "manualStepsRequired": [
+    "set-MONGODB_URI-and-RSC_PASSWORD_SECRET-in-railway",
+    "run-curl-command-to-patch-teavm-on-vps"
+  ]
+}
