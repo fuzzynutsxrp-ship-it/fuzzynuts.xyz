@@ -41,7 +41,6 @@ interface ProfileState {
 const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
 
 const GAME_EMOJIS: Record<string, string> = {
-  "top-secret": "🕵️",
   "fuzzynuts-world": "🌍",
   mario: "🍄",
   survivors: "⚔️",
@@ -65,12 +64,12 @@ interface Achievement {
 
 const ACHIEVEMENTS: Achievement[] = [
   {
-    id: "desert-explorer",
-    title: "Classified Agent",
-    description: "Played the Top Secret game before anyone else",
-    icon: "🕵️",
-    game: "top-secret",
-    storageKey: "fuzzy_achievement_desert_explorer",
+    id: "rsc-explorer",
+    title: "Gielinor Explorer",
+    description: "Logged into RuneScape Classic",
+    icon: "⚔️",
+    game: "rsc",
+    storageKey: "fuzzy_achievement_rsc_explorer",
   },
   {
     id: "world-traveler",

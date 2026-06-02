@@ -2,77 +2,134 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#0a0613">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>RuneScape Classic — Fuzzynuts Arcade</title>
   <meta name="description" content="Play RuneScape Classic in your browser via Open-RSC. No downloads, no Java. Part of the Fuzzynuts Arcade on XRPL.">
   <link rel="icon" href="../../logo_512.png" type="image/png">
+
+  <!-- Fonts (non-blocking) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"></noscript>
 
-  <!-- Shared arcade shell — ALL game pages use this -->
+  <!-- Shared arcade shell -->
   <link rel="stylesheet" href="../../css/design-tokens.css">
   <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
 
   <style>
-    /* Landing screen */
-    .ext-landing {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 2rem 1rem; min-height: calc(100dvh - 60px);
+    /* ── RSC landing screen ── */
+    .rsc-landing {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      min-height: calc(100dvh - 60px);
     }
-    .ext-landing.hidden { display: none; }
-    .ext-icon { font-size: 3rem; margin-bottom: 1rem; }
-    .ext-title {
-      font-family: var(--font-display, 'Outfit', system-ui, sans-serif);
-      font-size: 1.5rem; font-weight: 700;
-      color: var(--arcade-accent, #fbbf24); margin-bottom: 0.25rem;
+    .rsc-landing.hidden { display: none; }
+    .rsc-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .rsc-title {
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fbbf24;
+      margin-bottom: 0.25rem;
     }
-    .ext-subtitle { color: var(--text-muted, #9ca3af); font-size: 0.85rem; margin-bottom: 2rem; }
-    .ext-play-btn {
-      font-family: var(--font-display, 'Outfit', system-ui, sans-serif);
-      font-size: 1rem; font-weight: 700;
-      background: linear-gradient(135deg, var(--arcade-accent, #fbbf24), var(--arcade-accent-dark, #d4a843));
-      color: var(--bg-base, #0a0613); border: none; padding: 1rem 2.5rem;
-      border-radius: 0.75rem; cursor: pointer; text-decoration: none;
-      display: inline-block; transition: transform 180ms ease, box-shadow 180ms ease;
+    .rsc-subtitle {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
     }
-    .ext-play-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--arcade-accent-glow, rgba(251,191,36,0.4)); }
-    .ext-info {
-      font-size: 0.85rem; color: var(--text-secondary, #d1d5db);
-      line-height: 1.8; max-width: 440px; margin: 2rem auto 0;
+    .rsc-play-btn {
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fbbf24, #d4a843);
+      color: #0a0613;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 180ms ease, box-shadow 180ms ease;
     }
-    .ext-info .highlight { color: var(--arcade-accent, #fbbf24); }
+    .rsc-play-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(251,191,36,0.4);
+    }
+    .rsc-info {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.8;
+      max-width: 400px;
+      margin: 2rem auto 0;
+    }
+    .rsc-info .highlight { color: #fbbf24; }
 
-    /* Game iframe container */
-    .ext-game-wrap {
-      display: none; width: 100%; height: calc(100dvh - 60px); background: #000;
+    /* ── Game iframe container ── */
+    .rsc-game-wrap {
+      display: none;
+      width: 100%;
+      height: calc(100dvh - 60px);
+      background: #000;
     }
-    .ext-game-wrap.visible { display: flex; align-items: center; justify-content: center; }
-    .ext-game-wrap iframe { width: 765px; height: 503px; max-width: 100%; border: 0; display: block; }
+    .rsc-game-wrap.visible {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rsc-game-wrap iframe {
+      width: 765px;
+      height: 503px;
+      max-width: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* ── Particles ── */
+    .rsc-particles {
+      position: fixed; inset: 0;
+      pointer-events: none; overflow: hidden; z-index: -1;
+    }
+    .rsc-particle {
+      position: absolute; font-size: 16px; opacity: 0.12;
+      animation: rsc-fall linear infinite;
+    }
+    @keyframes rsc-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.12; }
+      90%  { opacity: 0.12; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
 
     @media (max-width: 768px) {
-      .ext-landing { padding: 1.5rem 1rem; }
-      .ext-icon { font-size: 2.5rem; }
-      .ext-title { font-size: 1.35rem; }
-      .ext-game-wrap iframe { width: 100vw; height: calc(100dvh - 60px); }
+      .rsc-landing { padding: 1.5rem 1rem; }
+      .rsc-icon { font-size: 2.5rem; }
+      .rsc-title { font-size: 1.35rem; }
+      .rsc-game-wrap iframe {
+        width: 100vw;
+        height: calc(100dvh - 60px);
+      }
     }
   </style>
 </head>
 <body>
   <!-- Nav injected by arcade-shell.js -->
 
+  <div class="rsc-particles" id="rscParticles"></div>
+
   <!-- Landing screen -->
-  <div class="ext-landing" id="extLanding">
-    <div class="ext-icon">⚔️🏰</div>
-    <h1 class="ext-title">RuneScape Classic</h1>
-    <p class="ext-subtitle">Browser MMORPG — Powered by Open-RSC</p>
-    <button type="button" class="ext-play-btn" id="extPlayBtn">⚔️ Play Now</button>
-    <div class="ext-info">
+  <div class="rsc-landing" id="rscLanding">
+    <div class="rsc-icon">⚔️🏰</div>
+    <h1 class="rsc-title">RuneScape Classic</h1>
+    <p class="rsc-subtitle">Browser MMORPG — Powered by Open-RSC</p>
+
+    <button type="button" class="rsc-play-btn" id="rscPlayBtn">⚔️ Play Now</button>
+
+    <div class="rsc-info">
       <p>The original 2001 RuneScape — playable in your browser.</p>
       <p>Explore, quest, skill, and PK in the classic world. Create a character on first login.</p>
       <p class="highlight">🌰 No downloads or Java needed — click and play</p>
@@ -80,16 +137,16 @@
   </div>
 
   <!-- Game iframe (shown after clicking Play) -->
-  <div class="ext-game-wrap" id="extGameWrap">
+  <div class="rsc-game-wrap" id="rscGameWrap">
     <iframe
-      id="gameIframe"
+      id="rscIframe"
       title="RuneScape Classic — FuzzyNuts"
       allow="autoplay; fullscreen"
       loading="lazy"
     ></iframe>
   </div>
 
-  <!-- Shared arcade shell — MUST be in regular <script>, NOT module -->
+  <!-- Shared arcade shell -->
   <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
   <script>
     ArcadeShell.init({
@@ -106,18 +163,32 @@
   <script src="../fuzzy-score.js"></script>
 
   <script>
-    /* RSC server connection params */
+    /* ── RSC server connection params ── */
     var RSC_CLIENT_BASE = 'https://game.fuzzynuts.xyz';
     var RSA_EXPONENT = '65537';
     var RSA_MODULUS = '9115015542438186018327044408313987277889783174239809826491015549573028356381739563861028029945657804756198333660503635469704152602063914154601665525357981';
     var CLIENT_URL = RSC_CLIENT_BASE + '/#members,game.fuzzynuts.xyz,43494,' + RSA_EXPONENT + ',' + RSA_MODULUS + ',true';
 
-    document.getElementById('extPlayBtn').addEventListener('click', function() {
-      document.getElementById('extLanding').classList.add('hidden');
-      var frame = document.getElementById('extGameWrap');
-      document.getElementById('gameIframe').src = CLIENT_URL;
+    /* ── Launch game on button click ── */
+    document.getElementById('rscPlayBtn').addEventListener('click', function() {
+      document.getElementById('rscLanding').classList.add('hidden');
+      var frame = document.getElementById('rscGameWrap');
+      document.getElementById('rscIframe').src = CLIENT_URL;
       frame.classList.add('visible');
     });
+
+    /* ── Forest particle effect ── */
+    var emojis = ['🌰', '🍂', '🍁', '🌿', '🥜', '🐿️'];
+    var container = document.getElementById('rscParticles');
+    for (var i = 0; i < 15; i++) {
+      var el = document.createElement('span');
+      el.className = 'rsc-particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + '%';
+      el.style.animationDuration = (8 + Math.random() * 12) + 's';
+      el.style.animationDelay = (Math.random() * 10) + 's';
+      container.appendChild(el);
+    }
   </script>
 </body>
 </html>

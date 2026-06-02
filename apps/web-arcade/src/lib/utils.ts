@@ -99,17 +99,6 @@ export const GAMES = [
     tags: ["Racing", "Speed", "3 Laps"],
   },
   {
-    id: "top-secret",
-    title: "Top Secret",
-    type: "??? Classified",
-    description:
-      "🔒 A brand-new game is being built behind closed doors. Stay tuned — details dropping soon.",
-    icon: "/icons/icon-top-secret-pop.webp",
-    image: "🕵️",
-    color: "#8B5CF6",
-    tags: ["Coming Soon", "🔒 Classified"],
-  },
-  {
     id: "rsc",
     title: "RuneScape Classic",
     type: "MMORPG",

@@ -17,7 +17,6 @@ export type GameSlug =
   | "minigolf"
   | "nut-racer"
   | "fuzzynuts-world"
-  | "top-secret"
   | "rsc";
 
 /** Every canonical slug, in display order. */
@@ -27,7 +26,6 @@ export const GAME_SLUGS: readonly GameSlug[] = [
   "minigolf",
   "nut-racer",
   "fuzzynuts-world",
-  "top-secret",
   "rsc",
 ] as const;
 
@@ -47,8 +45,6 @@ export const ID_TO_SLUG: Record<string, GameSlug> = {
   minigolf: "minigolf",
   "nut-racer": "nut-racer",
   "fuzzynuts-world": "fuzzynuts-world",
-  "top-secret": "top-secret",
-
   // legacy aliases (do not remove without a migration)
   survivors: "fuzzy-survivors",
   racer: "nut-racer",
@@ -63,7 +59,6 @@ export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
   minigolf: "minigolf",
   "nut-racer": "racer",
   "fuzzynuts-world": "fuzzynuts-world",
-  "top-secret": "top-secret",
   rsc: "rsc",
 };
 

@@ -34,7 +34,6 @@ const PRIZE_LABELS: Record<number, { color: string; glow: string }> = {
 
 /** Map game IDs to accent colors for the CyberCard system */
 const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange" | "gold"> = {
-  "top-secret": "purple",
   "fuzzynuts-world": "green",
   mario: "red",
   survivors: "purple",
@@ -45,7 +44,6 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
 
 /** Map game IDs to emojis for the tab selector */
 const GAME_EMOJIS: Record<string, string> = {
-  "top-secret": "🕵️",
   "fuzzynuts-world": "🌍",
   mario: "🍄",
   survivors: "⚔️",

@@ -30,14 +30,10 @@ function ArcadeCabinet({
   index: number;
   onPlay: (gameId: string) => void;
 }) {
-  const isComingSoon = game.id === "top-secret";
+  const isComingSoon = false;
 
-  // Try PNG first, fall back to webp for top-secret, then icon
-  const [artSrc, setArtSrc] = useState(
-    game.id === "top-secret"
-      ? `/images/games/top-secret.webp`
-      : `/images/games/${game.id}.png`
-  );
+  // Try PNG first, fall back to icon
+  const [artSrc, setArtSrc] = useState(`/images/games/${game.id}.png`);
   const handleArtError = () => {
     if (artSrc !== game.icon) setArtSrc(game.icon);
   };
@@ -159,15 +155,6 @@ function ArcadeCabinet({
 export function GamesShowcase() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
 
-  /** RSC is an external game — navigate directly, don't open the modal */
-  const handlePlay = (gameId: string) => {
-    if (gameId === "rsc") {
-      window.location.href = "/games/rsc/";
-    } else {
-      setActiveGameId(gameId);
-    }
-  };
-
   return (
     <section id="games" className="relative overflow-hidden">
       {/* Background layers */}
@@ -218,7 +205,7 @@ export function GamesShowcase() {
               key={game.id}
               game={game}
               index={i}
-              onPlay={handlePlay}
+              onPlay={setActiveGameId}
             />
           ))}
         </div>
@@ -228,7 +215,7 @@ export function GamesShowcase() {
       <GameModal
         gameId={activeGameId}
         onClose={() => setActiveGameId(null)}
-        onGameSwitch={handlePlay}
+        onGameSwitch={setActiveGameId}
       />
     </section>
   );
