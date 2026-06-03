@@ -18,7 +18,10 @@ RUN chmod +x /entrypoint.sh
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
+# Debug: verify files exist
+RUN echo "=== FILES ===" && ls -la apps/api/src/server.ts && echo "=== NODE ===" && node --version
+
 EXPOSE 4000
 
-# Use entrypoint for debug logging
-CMD ["/entrypoint.sh"]
+# Simple test: can the container start?
+CMD ["node", "-e", "console.log('Container started!'); setTimeout(() => console.log('Still alive...'), 5000);"]
