@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "cd apps/api && pnpm install"
 
 [deploy]
-startCommand = "cd apps/api && npx tsx src/server.ts"
+startCommand = "npx tsx apps/api/src/server.ts"
 
 [deploy.healthcheck]
 path = "/healthz"
