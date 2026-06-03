@@ -328,9 +328,20 @@
       return match ? decodeURIComponent(match[1]) : null;
     }
 
-    /* ── Check if wallet is connected (non-HttpOnly cookie) ── */
+    /* ── Check if wallet is connected ── */
     function isWalletConnected() {
-      return !!getCookie('fuzzy_session_meta');
+      // Check auth cookie (set by XRPL signature verification)
+      if (getCookie('fuzzy_session_meta')) return true;
+      // Fallback: check localStorage (set by Reown/AppKit wallet connect)
+      try {
+        if (localStorage.getItem('fuzzy_wallet_enc')) return true;
+        var plain = localStorage.getItem('fuzzy_wallet');
+        if (plain) {
+          var parsed = JSON.parse(plain);
+          if (parsed && typeof parsed.address === 'string') return true;
+        }
+      } catch (e) { /* ignore */ }
+      return false;
     }
 
     /* ── Build clean TeaVM client URL (no credentials) ── */
