@@ -18,10 +18,11 @@ RUN chmod +x /entrypoint.sh
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Debug: verify files exist
-RUN echo "=== FILES ===" && ls -la apps/api/src/server.ts && echo "=== NODE ===" && node --version
+# Cache bust: force rebuild
+ARG CACHE_BUST=1
+RUN echo "Cache bust $CACHE_BUST"
 
 EXPOSE 4000
 
-# Simple test: can the container start?
-CMD ["node", "-e", "console.log('Container started!'); setTimeout(() => console.log('Still alive...'), 5000);"]
+# Use shell form to ensure /bin/sh is used
+CMD /entrypoint.sh
