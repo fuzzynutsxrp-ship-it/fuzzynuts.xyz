@@ -16,16 +16,26 @@ import { buildRscRouter } from "./routes/rsc";
 import { buildWalletAuth } from "./middleware/walletAuth";
 
 const PORT = Number(process.env.PORT ?? 4000);
-const WALLET_JWT_SECRET = required("WALLET_JWT_SECRET");
-const GAME_SESSION_SECRET = required("GAME_SESSION_SECRET");
-const MONGODB_URI = required("MONGODB_URI");
-const RSC_PASSWORD_SECRET = required("RSC_PASSWORD_SECRET");
 
-function required(name: string): string {
+/**
+ * Env vars: read at startup but don't throw if missing.
+ * Routes that need them will return 503 if the var was absent.
+ * This prevents Railway container crashes when env vars are
+ * injected at deploy time (Dockerfile builder quirk).
+ */
+function optionalEnv(name: string, fallback = ""): string {
   const v = process.env[name];
-  if (!v) throw new Error(`Missing required env: ${name}`);
+  if (!v) {
+    console.warn(`[api] Missing env var: ${name} (feature will return 503)`);
+    return fallback;
+  }
   return v;
 }
+
+const WALLET_JWT_SECRET = optionalEnv("WALLET_JWT_SECRET");
+const GAME_SESSION_SECRET = optionalEnv("GAME_SESSION_SECRET");
+const MONGODB_URI = optionalEnv("MONGODB_URI");
+const RSC_PASSWORD_SECRET = optionalEnv("RSC_PASSWORD_SECRET");
 
 const app = express();
 
@@ -48,7 +58,15 @@ app.use(
 
 app.use(express.json({ limit: "16kb" }));
 
-app.get("/healthz", (_req, res) => res.json({ ok: true, rsc: true, version: "2.0" }));
+app.get("/healthz", (_req, res) => {
+  const envStatus = {
+    WALLET_JWT_SECRET: !!WALLET_JWT_SECRET,
+    GAME_SESSION_SECRET: !!GAME_SESSION_SECRET,
+    MONGODB_URI: !!MONGODB_URI,
+    RSC_PASSWORD_SECRET: !!RSC_PASSWORD_SECRET,
+  };
+  res.json({ ok: true, rsc: true, version: "2.0", env: envStatus });
+});
 
 // Shared challenge store — auth.ts issues challenges, game-session.ts consumes them
 const challengeStore = new Map<
@@ -72,10 +90,17 @@ app.use(
 );
 
 // RSC wallet-to-username mapping (gated by wallet JWT)
-app.use("/api/rsc", buildWalletAuth({ WALLET_JWT_SECRET }), buildRscRouter({
-  MONGODB_URI,
-  RSC_PASSWORD_SECRET,
-}));
+// Returns 503 if required env vars are missing
+if (MONGODB_URI && RSC_PASSWORD_SECRET && WALLET_JWT_SECRET) {
+  app.use("/api/rsc", buildWalletAuth({ WALLET_JWT_SECRET }), buildRscRouter({
+    MONGODB_URI,
+    RSC_PASSWORD_SECRET,
+  }));
+} else {
+  app.use("/api/rsc", (_req, res) => {
+    res.status(503).json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
+  });
+}
 
 // TODO(auth-rollout): mount migrated /api/scores, /api/rewards, /api/scores/stream
 
