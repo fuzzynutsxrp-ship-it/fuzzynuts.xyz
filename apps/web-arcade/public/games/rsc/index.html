@@ -355,7 +355,7 @@
       statusEl.textContent = 'Checking wallet...';
       statusEl.className = 'rsc-status loading';
 
-      fetch(API_BASE + '/credentials', {
+      fetch(API_BASE + '/credentials?address=' + encodeURIComponent(walletAddress), {
         method: 'GET',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' }
@@ -396,7 +396,7 @@
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username })
+        body: JSON.stringify({ username: username, address: walletAddress })
       })
         .then(function(res) {
           return res.json().then(function(data) {

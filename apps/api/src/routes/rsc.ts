@@ -20,7 +20,10 @@ import type { WalletJwtPayload } from "../middleware/walletAuth";
 
 // ── Username validation ─────────────────────────────────────────
 const USERNAME_RE = /^[a-zA-Z0-9]{3,12}$/;
-const ClaimBody = z.object({ username: z.string().min(3).max(12).regex(USERNAME_RE) });
+const ClaimBody = z.object({
+  username: z.string().min(3).max(12).regex(USERNAME_RE),
+  address: z.string().regex(/^r[1-9A-HJ-NP-Za-k-z]{24,34}$/).optional(),
+});
 
 // ── AES-256-GCM helpers ─────────────────────────────────────────
 const ALGO = "aes-256-gcm";
@@ -96,14 +99,16 @@ export function buildRscRouter(env: {
 
   // POST /api/rsc/claim-username
   router.post("/claim-username", async (req: Request, res: Response) => {
-    const wallet = (req as Request & { wallet?: WalletJwtPayload }).wallet;
-    if (!wallet?.address) {
-      return res.status(401).json({ error: "E_NO_SESSION" });
-    }
-
+    // Accept wallet from JWT (auth flow) OR from request body (standalone page)
+    const jwtWallet = (req as Request & { wallet?: WalletJwtPayload }).wallet;
     const parsed = ClaimBody.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: "E_INVALID_USERNAME", detail: parsed.error.flatten() });
+    }
+
+    const walletAddress = jwtWallet?.address || parsed.data.address;
+    if (!walletAddress) {
+      return res.status(401).json({ error: "E_NO_SESSION" });
     }
 
     const { username } = parsed.data;
@@ -112,7 +117,7 @@ export function buildRscRouter(env: {
       const col = await getCollection(env.MONGODB_URI);
 
       // Check if this wallet already has a mapping
-      const existing = await col.findOne({ walletAddress: wallet.address });
+      const existing = await col.findOne({ walletAddress });
       if (existing) {
         return res.status(409).json({
           error: "E_ALREADY_CLAIMED",
@@ -131,7 +136,7 @@ export function buildRscRouter(env: {
       const encryptedPassword = encrypt(gamePassword, env.RSC_PASSWORD_SECRET);
 
       await col.insertOne({
-        walletAddress: wallet.address,
+        walletAddress,
         username,
         encryptedPassword,
         createdAt: new Date(),
@@ -145,15 +150,17 @@ export function buildRscRouter(env: {
   });
 
   // GET /api/rsc/credentials
+  // Accept wallet from JWT OR from query param ?address=r...
   router.get("/credentials", async (req: Request, res: Response) => {
-    const wallet = (req as Request & { wallet?: WalletJwtPayload }).wallet;
-    if (!wallet?.address) {
+    const jwtWallet = (req as Request & { wallet?: WalletJwtPayload }).wallet;
+    const walletAddress = jwtWallet?.address || (typeof req.query.address === 'string' ? req.query.address : null);
+    if (!walletAddress) {
       return res.status(401).json({ error: "E_NO_SESSION" });
     }
 
     try {
       const col = await getCollection(env.MONGODB_URI);
-      const mapping = await col.findOne({ walletAddress: wallet.address });
+      const mapping = await col.findOne({ walletAddress });
 
       if (!mapping) {
         return res.status(404).json({ error: "E_NO_MAPPING" });

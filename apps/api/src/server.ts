@@ -114,12 +114,12 @@ async function bootstrap() {
     console.error("[api] Failed to load game-session router:", e);
   }
 
-  // RSC wallet-to-username mapping (gated by wallet JWT)
-  if (MONGODB_URI && RSC_PASSWORD_SECRET && WALLET_JWT_SECRET) {
+  // RSC wallet-to-username mapping
+  // Auth handled inside rsc.ts (accepts JWT cookie OR address param)
+  if (MONGODB_URI && RSC_PASSWORD_SECRET) {
     try {
-      const { buildWalletAuth } = await import("./middleware/walletAuth");
       const { buildRscRouter } = await import("./routes/rsc");
-      app.use("/api/rsc", buildWalletAuth({ WALLET_JWT_SECRET }), buildRscRouter({
+      app.use("/api/rsc", buildRscRouter({
         MONGODB_URI,
         RSC_PASSWORD_SECRET,
       }));
