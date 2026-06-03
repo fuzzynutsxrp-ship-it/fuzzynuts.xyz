@@ -1,28 +1,6 @@
 FROM node:22-slim
 
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
-
 WORKDIR /app
 
-# Copy workspace root files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-
-# Copy workspace packages needed by the API
-COPY packages/ ./packages/
-COPY apps/api/ ./apps/api/
-
-# Copy entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Cache bust: force rebuild
-ARG CACHE_BUST=1
-RUN echo "Cache bust $CACHE_BUST"
-
-EXPOSE 4000
-
-# Use shell form to ensure /bin/sh is used
-CMD /entrypoint.sh
+# Just test if the container can start
+CMD ["node", "-e", "console.log('hello'); setInterval(() => {}, 1000);"]
