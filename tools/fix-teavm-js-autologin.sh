@@ -2,12 +2,10 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Fix canvas keyboard simulation
 #
-#  ROOT CAUSE: KeyboardEvent missing keyCode/which/charCode properties.
-#  TeaVM (compiled Java) reads event.keyCode, not event.key.
-#  Without keyCode, Java sees 0 for every keypress and ignores it.
-#
-#  FIX: Add proper keyCode mapping + correct button coordinates
-#       from mudclient.java source + console logging for debugging.
+#  v4: Hidden canvas during auto-login + postMessage to parent.
+#  The canvas is invisible during the login sequence and only
+#  revealed after the game connects. Parent window receives
+#  { type: 'rsc-login-complete' } via postMessage.
 #
 #  RUN ON VPS:
 #    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash
@@ -19,10 +17,9 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (Keyboard Simulation)"
+echo " Fix TeaVM Auto-Login (v4 — hidden canvas)"
 echo "═══════════════════════════════════════════════════════"
 
-# Backup
 mkdir -p "$(dirname "$BACKUP")"
 cp "$HTML_FILE" "$BACKUP"
 echo "✓ Backup at: $BACKUP"
@@ -36,7 +33,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v3 — fixed coordinates + uppercase keyCode -->
+    <!-- fuzzynuts-autologin: v4 — hidden canvas + postMessage to parent -->
     <script>
     (function() {
       'use strict';
@@ -87,22 +84,32 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
       console.log('[autologin] Scheduling auto-login for user: ' + autoUser);
 
-      var MAX_WAIT = 900; // 3 minutes max
+      var MAX_WAIT = 900;
       var pollCount = 0;
       var canvas = null;
+      var loginComplete = false;
 
-      // Map character to keyCode — handles a-z, A-Z, 0-9
+      function notifyParent() {
+        if (loginComplete) return;
+        loginComplete = true;
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'rsc-login-complete' }, '*');
+            console.log('[autologin] Notified parent: login complete');
+          }
+        } catch (e) { /* cross-origin, ignore */ }
+      }
+
       function charToKeyCode(ch) {
         if (ch.length === 1) {
           var code = ch.charCodeAt(0);
-          if (code >= 65 && code <= 90) return code;   // A-Z (65-90)
-          if (code >= 97 && code <= 122) return code - 32; // a-z -> A-Z (65-90)
-          if (code >= 48 && code <= 57) return code;   // 0-9 (48-57)
+          if (code >= 65 && code <= 90) return code;
+          if (code >= 97 && code <= 122) return code - 32;
+          if (code >= 48 && code <= 57) return code;
         }
         return 0;
       }
 
-      // Send a complete keyboard event with all properties TeaVM needs
       function sendKeyEvent(type, ch, keyCode) {
         if (!canvas) return;
         var evt = new KeyboardEvent(type, {
@@ -142,7 +149,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         var rect = canvas.getBoundingClientRect();
         var cx = rect.left + x;
         var cy = rect.top + y;
-        console.log('[autologin] Click at canvas(' + Math.round(x) + ',' + Math.round(y) + ') screen(' + Math.round(cx) + ',' + Math.round(cy) + ')');
+        console.log('[autologin] Click at canvas(' + Math.round(x) + ',' + Math.round(y) + ')');
         ['mousedown', 'mouseup', 'click'].forEach(function(type) {
           canvas.dispatchEvent(new MouseEvent(type, {
             clientX: cx, clientY: cy,
@@ -151,11 +158,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         });
       }
 
-      // Button coordinates from mudclient.java:
-      //   halfGameWidth = 256, halfGameHeight = 172
-      //   yOffsetWelcome = 40
-      //   "Existing User" button: (256+100, 172+73+40) = (356, 285), size 120x35
-      //   Login form Ok button:   (256+154, 172+83+0)  = (410, 255), size 120x25
+      // Button coordinates from mudclient.java
       var EXISTING_USER_X = 356;
       var EXISTING_USER_Y = 285;
       var OK_BUTTON_X = 410;
@@ -166,20 +169,23 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount > MAX_WAIT) {
           clearInterval(checkInterval);
           console.log('[autologin] TIMEOUT after ' + MAX_WAIT + ' polls');
+          if (canvas) canvas.style.visibility = 'visible';
+          notifyParent();
           return;
         }
 
         if (!canvas) {
           canvas = document.querySelector('canvas');
           if (!canvas) return;
+          canvas.style.visibility = 'hidden';
           canvas.setAttribute('tabindex', '0');
           canvas.focus();
-          console.log('[autologin] Canvas found: ' + canvas.width + 'x' + canvas.height);
+          console.log('[autologin] Canvas found: ' + canvas.width + 'x' + canvas.height + ' (hidden)');
         }
 
-        // Step 1: Click center — "Click here to login" (10s after canvas)
+        // Step 1: Click center (10s after canvas)
         if (pollCount === 50) {
-          console.log('[autologin] Step 1: Clicking center ("Click here to login")');
+          console.log('[autologin] Step 1: Clicking center');
           canvas.focus();
           var w = canvas.width || 512;
           var h = canvas.height || 345;
@@ -187,41 +193,35 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           return;
         }
 
-        // Wait 4s for menu to appear
         if (pollCount < 70) return;
 
-        // Step 2: Click "Existing User" at exact button coordinates
+        // Step 2: Click "Existing User"
         if (pollCount === 70) {
-          console.log('[autologin] Step 2: Clicking "Existing User" at (' + EXISTING_USER_X + ',' + EXISTING_USER_Y + ')');
+          console.log('[autologin] Step 2: Clicking Existing User');
           canvas.focus();
           sendClick(EXISTING_USER_X, EXISTING_USER_Y);
           return;
         }
 
-        // Wait 4s for login form to appear
         if (pollCount < 90) return;
 
-        // Step 3: Type username (form auto-focuses username field)
+        // Step 3: Type username
         if (pollCount === 90) {
           console.log('[autologin] Step 3: Typing username: ' + autoUser);
           canvas.focus();
           for (var i = 0; i < autoUser.length; i++) {
             (function(ch, delay) {
-              setTimeout(function() {
-                console.log('[autologin]   key: ' + ch + ' keyCode=' + charToKeyCode(ch));
-                sendKey(ch);
-              }, delay);
+              setTimeout(function() { sendKey(ch); }, delay);
             })(autoUser[i], 100 * i);
           }
           return;
         }
 
-        // Wait for username to be typed
         if (pollCount < 100) return;
 
-        // Step 4: Tab to password field
+        // Step 4: Tab to password
         if (pollCount === 100) {
-          console.log('[autologin] Step 4: Tab to password field');
+          console.log('[autologin] Step 4: Tab to password');
           sendTab();
           return;
         }
@@ -239,22 +239,23 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           return;
         }
 
-        // Wait for password to be typed
         if (pollCount < 125) return;
 
-        // Step 6: Press Enter to login
+        // Step 6: Press Enter + click Ok
         if (pollCount === 125) {
-          console.log('[autologin] Step 6: Pressing Enter to login');
+          console.log('[autologin] Step 6: Pressing Enter');
           sendEnter();
-          // Also click Ok button as fallback
           setTimeout(function() {
-            console.log('[autologin] Step 6b: Clicking Ok button as fallback');
+            console.log('[autologin] Step 6b: Clicking Ok button');
             sendClick(OK_BUTTON_X, OK_BUTTON_Y);
           }, 500);
           setTimeout(function() {
+            console.log('[autologin] Revealing canvas');
+            if (canvas) canvas.style.visibility = 'visible';
+            notifyParent();
             sessionStorage.removeItem('fn_autouser');
             sessionStorage.removeItem('fn_autopass');
-            console.log('[autologin] Credentials cleared');
+            console.log('[autologin] Done');
           }, 3000);
           clearInterval(checkInterval);
           return;
@@ -268,41 +269,21 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-# Verify
-echo ""
-echo "Verifying..."
-if grep -q 'keyCode' "$HTML_FILE"; then
-  echo "✓ keyCode property set on events"
+if grep -q 'visibility' "$HTML_FILE"; then
+  echo "✓ Canvas hiding enabled"
 fi
-if grep -q 'charCode' "$HTML_FILE"; then
-  echo "✓ charCode property set on events"
+if grep -q 'postMessage' "$HTML_FILE"; then
+  echo "✓ postMessage to parent enabled"
 fi
-if grep -q 'console.log' "$HTML_FILE"; then
-  echo "✓ Console logging enabled"
-fi
-if grep -q 'fuzzynuts-autologin' "$HTML_FILE"; then
-  echo "✓ Auto-login marker present"
-fi
-if grep -q 'EXISTING_USER_X' "$HTML_FILE"; then
-  echo "✓ Correct button coordinates from mudclient.java"
+if grep -q 'v4' "$HTML_FILE"; then
+  echo "✓ v4 marker present"
 fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v3)"
+echo " ✓ FIX APPLIED (v4)"
 echo ""
-echo " What changed from v1/v2:"
-echo "   - Fixed charToKeyCode: now handles A-Z (was only a-z)"
-echo "   - Fixed 'Existing User' click: (356,285) from Java source"
-echo "     (was (256,207) — off by 100px X, 78px Y)"
-echo "   - Added Ok button click as fallback after Enter"
-echo "   - Increased timing: 4s between major steps (was 2s)"
-echo ""
-echo " To verify:"
-echo "   1. Open game.fuzzynuts.xyz in browser"
-echo "   2. Open DevTools → Console"
-echo "   3. Look for [autologin] messages"
-echo "   4. Watch for Step 1 through Step 6"
-echo ""
+echo " Canvas is hidden during auto-login sequence."
+echo " Parent window receives postMessage on login complete."
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
