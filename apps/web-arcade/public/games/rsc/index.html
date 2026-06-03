@@ -289,16 +289,32 @@
       return match ? decodeURIComponent(match[1]) : null;
     }
 
-    /* ── Parse wallet address from session meta cookie ── */
+    /* ── Parse wallet address from cookie OR localStorage ── */
     function getWalletAddress() {
+      // Try cookie first (set by auth flow)
       try {
         var meta = getCookie('fuzzy_session_meta');
-        if (!meta) return null;
-        var data = JSON.parse(meta);
-        return data && typeof data.address === 'string' ? data.address : null;
-      } catch (e) {
-        return null;
-      }
+        if (meta) {
+          var data = JSON.parse(meta);
+          if (data && typeof data.address === 'string') return data.address;
+        }
+      } catch (e) { /* ignore */ }
+
+      // Fallback: read from localStorage (set by wallet store on connect)
+      try {
+        var enc = localStorage.getItem('fuzzy_wallet_enc');
+        if (enc) {
+          // Encrypted format — base64(iv + ciphertext), can't decrypt here
+          // Try plaintext fallback
+        }
+        var plain = localStorage.getItem('fuzzy_wallet');
+        if (plain) {
+          var parsed = JSON.parse(plain);
+          if (parsed && typeof parsed.address === 'string') return parsed.address;
+        }
+      } catch (e) { /* ignore */ }
+
+      return null;
     }
 
     /* ── Build the TeaVM client URL with optional credentials ── */
