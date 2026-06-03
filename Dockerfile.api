@@ -11,10 +11,14 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
 
+# Copy entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
 EXPOSE 4000
 
-# Start with tsx
-CMD ["npx", "tsx", "apps/api/src/server.ts"]
+# Use entrypoint for debug logging
+CMD ["/entrypoint.sh"]
