@@ -385,6 +385,82 @@
     var loadingOverlay = document.getElementById('rscLoadingOverlay');
     var loadingText = document.getElementById('rscLoadingText');
 
+    var walletAddress = getWalletAddress();
+    var hasMapping = false;
+    var mappingChecked = false;
+
+    /* ── Check if wallet has a username mapping ── */
+    function checkMapping() {
+      if (!walletAddress) {
+        mappingChecked = true;
+        return;
+      }
+      statusEl.textContent = 'Checking wallet...';
+      statusEl.className = 'rsc-status loading';
+
+      fetch('https://fuzzynutsxyz-production.up.railway.app/api/rsc/credentials?address=' + encodeURIComponent(walletAddress), {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(function(res) {
+          mappingChecked = true;
+          if (res.ok) {
+            hasMapping = true;
+            statusEl.textContent = 'Ready to play!';
+            statusEl.className = 'rsc-status';
+          } else if (res.status === 404) {
+            hasMapping = false;
+            statusEl.textContent = 'Claim a username to play';
+            statusEl.className = 'rsc-status';
+          } else {
+            statusEl.textContent = '';
+            statusEl.className = 'rsc-status';
+          }
+        })
+        .catch(function() {
+          mappingChecked = true;
+          statusEl.textContent = '';
+          statusEl.className = 'rsc-status';
+        });
+    }
+
+    /* ── Claim a username via API ── */
+    function claimUsername(username) {
+      claimBtn.disabled = true;
+      modalError.textContent = '';
+
+      fetch('https://fuzzynutsxyz-production.up.railway.app/api/rsc/claim-username', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, address: walletAddress })
+      })
+        .then(function(res) {
+          return res.json().then(function(data) {
+            return { ok: res.ok, status: res.status, data: data };
+          });
+        })
+        .then(function(result) {
+          claimBtn.disabled = false;
+          if (result.ok) {
+            hasMapping = true;
+            modal.classList.remove('visible');
+            launchGame();
+          } else if (result.status === 409 && result.data.error === 'E_USERNAME_TAKEN') {
+            modalError.textContent = 'That username is taken. Try another.';
+          } else if (result.status === 409 && result.data.error === 'E_ALREADY_CLAIMED') {
+            hasMapping = true;
+            modal.classList.remove('visible');
+            launchGame();
+          } else {
+            modalError.textContent = 'Something went wrong. Try again.';
+          }
+        })
+        .catch(function() {
+          claimBtn.disabled = false;
+          modalError.textContent = 'Network error. Check your connection.';
+        });
+    }
+
     /* ── Hide the loading overlay ── */
     var overlayDismissed = false;
     function dismissOverlay() {
@@ -436,17 +512,40 @@
 
     /* ── Play button handler ── */
     playBtn.addEventListener('click', function() {
-      if (isWalletConnected()) {
-        // Wallet connected — launch game (iframe will fetch credentials)
+      if (!walletAddress) {
+        // No wallet — prompt to connect
+        statusEl.textContent = 'Please connect your wallet first';
+        statusEl.className = 'rsc-status';
+        return;
+      }
+
+      if (hasMapping) {
+        // Has mapping — launch game directly
         launchGame();
+      } else if (!mappingChecked) {
+        // Haven't checked yet — check now, then decide
+        statusEl.textContent = 'Checking...';
+        statusEl.className = 'rsc-status loading';
+        checkMapping();
+        var waitCheck = setInterval(function() {
+          if (mappingChecked) {
+            clearInterval(waitCheck);
+            if (hasMapping) {
+              launchGame();
+            } else {
+              modal.classList.add('visible');
+              usernameInput.focus();
+            }
+          }
+        }, 200);
       } else {
-        // No wallet — show modal to claim username (legacy flow)
+        // No mapping — show claim modal
         modal.classList.add('visible');
         usernameInput.focus();
       }
     });
 
-    /* ── Claim button handler (legacy — for users without cookie) ── */
+    /* ── Claim button handler ── */
     claimBtn.addEventListener('click', function() {
       var username = usernameInput.value.trim();
       if (!username || username.length < 3) {
@@ -457,13 +556,7 @@
         modalError.textContent = 'Letters and numbers only.';
         return;
       }
-      modalError.textContent = '';
-      claimBtn.disabled = true;
-
-      // This path is for users who haven't connected their wallet yet
-      // They'll need to connect first, then the iframe will handle the rest
-      modalError.textContent = 'Please connect your wallet first using the wallet button in the navigation.';
-      claimBtn.disabled = false;
+      claimUsername(username);
     });
 
     /* ── Enter key in username input ── */
@@ -473,12 +566,11 @@
       }
     });
 
-    /* ── Update status based on wallet connection ── */
-    if (isWalletConnected()) {
-      statusEl.textContent = 'Wallet connected — click Play to start';
-      statusEl.className = 'rsc-status';
+    /* ── Check mapping on page load if wallet connected ── */
+    if (walletAddress) {
+      checkMapping();
     } else {
-      statusEl.textContent = 'Connect your wallet for auto-login';
+      statusEl.textContent = 'Connect your wallet to play';
       statusEl.className = 'rsc-status';
     }
 
