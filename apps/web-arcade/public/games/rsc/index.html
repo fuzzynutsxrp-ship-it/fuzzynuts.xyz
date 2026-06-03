@@ -328,9 +328,9 @@
       return match ? decodeURIComponent(match[1]) : null;
     }
 
-    /* ── Check if wallet is connected (cookie exists) ── */
+    /* ── Check if wallet is connected (non-HttpOnly cookie) ── */
     function isWalletConnected() {
-      return !!getCookie('fuzzy_wallet_session');
+      return !!getCookie('fuzzy_session_meta');
     }
 
     /* ── Build clean TeaVM client URL (no credentials) ── */
