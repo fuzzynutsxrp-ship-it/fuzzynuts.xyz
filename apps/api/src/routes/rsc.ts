@@ -165,7 +165,7 @@ export function buildRscRouter(env: {
       }
 
       // Generate a random 32-char hex game password
-      const gamePassword = crypto.randomBytes(16).toString("hex");
+      const gamePassword = crypto.randomBytes(10).toString("hex");
       const encryptedPassword = encrypt(gamePassword, env.RSC_PASSWORD_SECRET);
 
       await col.insertOne({
