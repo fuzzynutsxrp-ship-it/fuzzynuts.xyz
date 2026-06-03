@@ -396,10 +396,15 @@
       }, 400);
     }
 
-    /* ── Listen for postMessage from iframe (login complete) ── */
+    /* ── Listen for postMessage from iframe ── */
     window.addEventListener('message', function(e) {
       if (e.data && e.data.type === 'rsc-login-complete') {
         dismissOverlay();
+      }
+      if (e.data && e.data.type === 'rsc-login-error') {
+        loadingText.textContent = e.data.detail || 'Login failed. Please reconnect your wallet.';
+        loadingText.className = 'rsc-loading-text error';
+        // Keep overlay visible with error — don't show game login screen
       }
     });
 
