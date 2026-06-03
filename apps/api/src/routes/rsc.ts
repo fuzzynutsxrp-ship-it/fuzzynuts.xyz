@@ -218,5 +218,31 @@ export function buildRscRouter(env: {
     }
   });
 
+  // DELETE /api/rsc/mapping — delete wallet mapping (for password reset)
+  router.delete("/mapping", async (req: Request, res: Response) => {
+    let walletAddress: string | null = null;
+    if (env.WALLET_JWT_SECRET) {
+      walletAddress = await getWalletFromCookie(req, env.WALLET_JWT_SECRET);
+    }
+    if (!walletAddress && typeof req.query.address === "string") {
+      walletAddress = req.query.address;
+    }
+    if (!walletAddress) {
+      return res.status(401).json({ error: "E_NO_SESSION" });
+    }
+
+    try {
+      const col = await getCollection(env.MONGODB_URI);
+      const result = await col.deleteOne({ walletAddress });
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ error: "E_NO_MAPPING" });
+      }
+      return res.json({ ok: true, deleted: walletAddress });
+    } catch (err) {
+      console.error("[rsc] delete mapping error:", err);
+      return res.status(500).json({ error: "E_INTERNAL" });
+    }
+  });
+
   return router;
 }
