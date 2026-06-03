@@ -2,9 +2,9 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Silent auto-login, no login screen
 #
-#  v7: Canvas NEVER revealed unless login succeeds.
+#  v8: Canvas visible on BOTH success and failure.
 #  Detects success via "Session id:" console message from the game.
-#  On failure: sends postMessage with error, canvas stays hidden.
+#  On failure: sends postMessage with error, canvas becomes visible so user can see what happened.
 #  The traditional login screen is completely inaccessible.
 #
 #  RUN ON VPS:
@@ -33,7 +33,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v7 — silent login, canvas hidden until success -->
+    <!-- fuzzynuts-autologin: v8 — canvas visible on success AND failure -->
     <script>
     (function() {
       'use strict';
@@ -192,6 +192,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount > MAX_WAIT) {
           clearInterval(checkInterval);
           _origConsoleLog('[autologin] TIMEOUT');
+          if (canvas) canvas.style.visibility = 'visible';
           notifyParent('rsc-login-error', 'Login timed out. Please try again.');
           return;
         }
@@ -212,6 +213,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           if (elapsed > LOGIN_TIMEOUT) {
             clearInterval(checkInterval);
             _origConsoleLog('[autologin] Login failed — no Session id after ' + (elapsed * 200) + 'ms');
+            if (canvas) canvas.style.visibility = 'visible';
             notifyParent('rsc-login-error', 'Login failed. Invalid credentials or server error.');
             return;
           }
@@ -235,6 +237,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             .catch(function(err) {
               _origConsoleLog('[autologin] Fetch failed: ' + err.message);
               clearInterval(checkInterval);
+              if (canvas) canvas.style.visibility = 'visible';
               notifyParent('rsc-login-error', 'Could not retrieve credentials. Please reconnect wallet.');
             });
           return;
@@ -318,15 +321,15 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v7' "$HTML_FILE"; then echo "✓ v7 marker present"; fi
+if grep -q 'v8' "$HTML_FILE"; then echo "✓ v8 marker present"; fi
 if grep -q '_sessionIdDetected' "$HTML_FILE"; then echo "✓ Login success detection enabled"; fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v7 — silent login)"
+echo " ✓ FIX APPLIED (v8 — canvas visible on success AND failure)"
 echo ""
-echo " Canvas stays hidden until login succeeds."
+echo " Canvas becomes visible on both login success and failure."
+echo " On failure: error message sent to parent page for retry UI."
 echo " Traditional login screen is never visible."
-echo " Failure shows error in parent overlay."
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"

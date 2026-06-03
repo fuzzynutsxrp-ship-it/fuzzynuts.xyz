@@ -31,6 +31,8 @@ const WALLET_JWT_SECRET = optionalEnv("WALLET_JWT_SECRET");
 const GAME_SESSION_SECRET = optionalEnv("GAME_SESSION_SECRET");
 const MONGODB_URI = optionalEnv("MONGODB_URI");
 const RSC_PASSWORD_SECRET = optionalEnv("RSC_PASSWORD_SECRET");
+const VPS_ACCOUNT_URL = optionalEnv("VPS_ACCOUNT_URL");
+const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 
 const app = express();
 
@@ -124,6 +126,8 @@ async function bootstrap() {
         MONGODB_URI,
         RSC_PASSWORD_SECRET,
         WALLET_JWT_SECRET,
+        VPS_ACCOUNT_URL,
+        VPS_ACCOUNT_SECRET,
       }));
     } catch (e) {
       console.error("[api] Failed to load RSC router:", e);

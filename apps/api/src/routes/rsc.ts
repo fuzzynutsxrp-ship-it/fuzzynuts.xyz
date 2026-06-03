@@ -122,6 +122,8 @@ export function buildRscRouter(env: {
   MONGODB_URI: string;
   RSC_PASSWORD_SECRET: string;
   WALLET_JWT_SECRET?: string;
+  VPS_ACCOUNT_URL?: string;
+  VPS_ACCOUNT_SECRET?: string;
 }): Router {
   const router = Router();
 
@@ -164,8 +166,37 @@ export function buildRscRouter(env: {
         return res.status(409).json({ error: "E_USERNAME_TAKEN" });
       }
 
-      // Generate a random 32-char hex game password
+      // Generate a random 20-char hex game password
       const gamePassword = crypto.randomBytes(10).toString("hex");
+
+      // Create account on VPS game server
+      if (env.VPS_ACCOUNT_URL && env.VPS_ACCOUNT_SECRET) {
+        try {
+          const vpsRes = await fetch(`${env.VPS_ACCOUNT_URL}/create-account`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-account-secret": env.VPS_ACCOUNT_SECRET,
+            },
+            body: JSON.stringify({ username, password: gamePassword }),
+            signal: AbortSignal.timeout(10000),
+          });
+          const vpsData = await vpsRes.json() as { success: boolean; error?: string };
+          if (!vpsRes.ok || !vpsData.success) {
+            console.error("[rsc] VPS account creation failed:", vpsData);
+            if (vpsRes.status === 409) {
+              return res.status(409).json({ error: "E_USERNAME_TAKEN" });
+            }
+            return res.status(502).json({ error: "E_ACCOUNT_CREATION_FAILED" });
+          }
+        } catch (fetchErr) {
+          console.error("[rsc] VPS account server unreachable:", fetchErr);
+          return res.status(502).json({ error: "E_ACCOUNT_SERVER_DOWN" });
+        }
+      } else {
+        console.warn("[rsc] VPS_ACCOUNT_URL or VPS_ACCOUNT_SECRET not set — skipping game account creation");
+      }
+
       const encryptedPassword = encrypt(gamePassword, env.RSC_PASSWORD_SECRET);
 
       await col.insertOne({

@@ -1,0 +1,15 @@
+{
+  "name": "rsc-account-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Creates Open-RSC game accounts in SQLite for FuzzyNuts auto-login",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.7.0",
+    "express": "^4.21.0"
+  }
+}
