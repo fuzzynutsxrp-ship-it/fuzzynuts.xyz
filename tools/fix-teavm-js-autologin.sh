@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-#  fix-teavm-js-autologin.sh — Fix canvas keyboard simulation
+#  fix-teavm-js-autologin.sh — Secure auto-login via HttpOnly cookie
 #
-#  v4: Hidden canvas during auto-login + postMessage to parent.
-#  The canvas is invisible during the login sequence and only
-#  revealed after the game connects. Parent window receives
-#  { type: 'rsc-login-complete' } via postMessage.
+#  v5: Fetches credentials from API using HttpOnly cookie.
+#  No passwords in URL hash. No passwords in parent page JS.
+#  The iframe fetches credentials directly from the API using
+#  credentials: 'include' which sends the fuzzy_wallet_session cookie.
 #
 #  RUN ON VPS:
 #    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash
@@ -17,7 +17,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v4 — hidden canvas)"
+echo " Fix TeaVM Auto-Login (v5 — secure cookie auth)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -33,40 +33,26 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v4 — hidden canvas + postMessage to parent -->
+    <!-- fuzzynuts-autologin: v5 — secure cookie auth, no hash passwords -->
     <script>
     (function() {
       'use strict';
 
-      var fullHash = window.location.hash;
-      var hashStr = fullHash.substring(1);
+      // Read connection params from hash (standard TeaVM format)
+      // These are NOT credentials — just server address, RSA keys, etc.
+      var hashStr = window.location.hash.substring(1);
       var parts = hashStr.split(',');
 
-      var autoUser = null;
-      var autoPass = null;
-
-      if (parts.length > 7 && parts[6] && parts[7]) {
-        autoUser = decodeURIComponent(parts[6]);
-        autoPass = decodeURIComponent(parts[7]);
-        sessionStorage.setItem('fn_autouser', autoUser);
-        sessionStorage.setItem('fn_autopass', autoPass);
-        var cleanHash = '#' + parts.slice(0, 6).join(',');
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', cleanHash);
-        } else {
-          window.location.hash = cleanHash;
-        }
-        console.log('[autologin] Credentials parsed from hash, user=' + autoUser);
-      } else {
-        autoUser = sessionStorage.getItem('fn_autouser');
-        autoPass = sessionStorage.getItem('fn_autopass');
-        if (autoUser) console.log('[autologin] Credentials restored from sessionStorage');
+      // Parse standard connection params (first 6 only)
+      // Format: #members,host,port,rsa_exp,rsa_mod,useSSL
+      if (parts.length >= 6) {
+        window._fnServerHost = parts[1];
+        window._fnServerPort = parts[2];
       }
 
-      if (autoUser && autoPass) {
-        window._fnAutoUser = autoUser;
-        window._fnAutoPass = autoPass;
-      }
+      // Check if we should attempt auto-login
+      // This flag is set by the parent page via URL param
+      window._fnAutoLogin = parts.length >= 6;
     })();
     </script>
 
@@ -75,19 +61,38 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     main();
 
     (function() {
-      var autoUser = window._fnAutoUser;
-      var autoPass = window._fnAutoPass;
-      if (!autoUser || !autoPass) {
-        console.log('[autologin] No credentials, skipping auto-login');
+      if (!window._fnAutoLogin) {
+        console.log('[autologin] No auto-login requested, skipping');
         return;
       }
 
-      console.log('[autologin] Scheduling auto-login for user: ' + autoUser);
-
+      console.log('[autologin] Starting secure credential fetch...');
       var MAX_WAIT = 900;
       var pollCount = 0;
       var canvas = null;
       var loginComplete = false;
+      var credentials = null;
+
+      // ── Fetch credentials securely from API using HttpOnly cookie ──
+      function fetchCredentials() {
+        return fetch('https://fuzzynutsxyz-production.up.railway.app/api/rsc/credentials', {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(function(res) {
+            if (res.ok) return res.json();
+            if (res.status === 401) throw new Error('E_NOT_AUTHENTICATED');
+            if (res.status === 404) throw new Error('E_NO_MAPPING');
+            throw new Error('E_API_ERROR_' + res.status);
+          })
+          .then(function(data) {
+            if (data && data.username && data.gamePassword) {
+              return { username: data.username, password: data.gamePassword };
+            }
+            throw new Error('E_INVALID_RESPONSE');
+          });
+      }
 
       function notifyParent() {
         if (loginComplete) return;
@@ -164,6 +169,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       var OK_BUTTON_X = 410;
       var OK_BUTTON_Y = 255;
 
+      // ── Phase 1: Wait for canvas, then fetch credentials ──
       var checkInterval = setInterval(function() {
         pollCount++;
         if (pollCount > MAX_WAIT) {
@@ -181,7 +187,29 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           canvas.setAttribute('tabindex', '0');
           canvas.focus();
           console.log('[autologin] Canvas found: ' + canvas.width + 'x' + canvas.height + ' (hidden)');
+
+          // Fetch credentials from API using HttpOnly cookie
+          fetchCredentials()
+            .then(function(creds) {
+              credentials = creds;
+              console.log('[autologin] Credentials received for user: ' + creds.username);
+              // Clear password from memory after storing
+              // (it will be used in the keyboard simulation below)
+            })
+            .catch(function(err) {
+              console.warn('[autologin] Credential fetch failed: ' + err.message);
+              // Show canvas without auto-login
+              clearInterval(checkInterval);
+              canvas.style.visibility = 'visible';
+              notifyParent();
+            });
+          return;
         }
+
+        // Wait for credentials to be fetched
+        if (!credentials) return;
+
+        // ── Phase 2: Auto-login sequence ──
 
         // Step 1: Click center (10s after canvas)
         if (pollCount === 50) {
@@ -207,12 +235,12 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
         // Step 3: Type username
         if (pollCount === 90) {
-          console.log('[autologin] Step 3: Typing username: ' + autoUser);
+          console.log('[autologin] Step 3: Typing username: ' + credentials.username);
           canvas.focus();
-          for (var i = 0; i < autoUser.length; i++) {
+          for (var i = 0; i < credentials.username.length; i++) {
             (function(ch, delay) {
               setTimeout(function() { sendKey(ch); }, delay);
-            })(autoUser[i], 100 * i);
+            })(credentials.username[i], 100 * i);
           }
           return;
         }
@@ -230,11 +258,11 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
         // Step 5: Type password
         if (pollCount === 105) {
-          console.log('[autologin] Step 5: Typing password (' + autoPass.length + ' chars)');
-          for (var j = 0; j < autoPass.length; j++) {
+          console.log('[autologin] Step 5: Typing password (' + credentials.password.length + ' chars)');
+          for (var j = 0; j < credentials.password.length; j++) {
             (function(ch, delay) {
               setTimeout(function() { sendKey(ch); }, delay);
-            })(autoPass[j], 100 * j);
+            })(credentials.password[j], 100 * j);
           }
           return;
         }
@@ -249,14 +277,19 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             console.log('[autologin] Step 6b: Clicking Ok button');
             sendClick(OK_BUTTON_X, OK_BUTTON_Y);
           }, 500);
+
+          // Clear credentials from memory immediately
+          var username = credentials.username;
+          credentials = null;
+
+          // Wait 3s then show canvas and notify parent
           setTimeout(function() {
             console.log('[autologin] Revealing canvas');
             if (canvas) canvas.style.visibility = 'visible';
             notifyParent();
-            sessionStorage.removeItem('fn_autouser');
-            sessionStorage.removeItem('fn_autopass');
-            console.log('[autologin] Done');
+            console.log('[autologin] Done — credentials cleared from memory');
           }, 3000);
+
           clearInterval(checkInterval);
           return;
         }
@@ -269,21 +302,22 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'visibility' "$HTML_FILE"; then
-  echo "✓ Canvas hiding enabled"
+if grep -q 'credentials.*include' "$HTML_FILE"; then
+  echo "✓ Secure cookie fetch enabled"
 fi
 if grep -q 'postMessage' "$HTML_FILE"; then
   echo "✓ postMessage to parent enabled"
 fi
-if grep -q 'v4' "$HTML_FILE"; then
-  echo "✓ v4 marker present"
+if grep -q 'v5' "$HTML_FILE"; then
+  echo "✓ v5 marker present"
 fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v4)"
+echo " ✓ FIX APPLIED (v5 — secure cookie auth)"
 echo ""
-echo " Canvas is hidden during auto-login sequence."
-echo " Parent window receives postMessage on login complete."
+echo " Credentials fetched from API using HttpOnly cookie."
+echo " No passwords in URL hash or parent page JS."
+echo " Canvas hidden during auto-login sequence."
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"

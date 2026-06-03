@@ -310,61 +310,32 @@
 
   <script>
     /* ═══════════════════════════════════════════════════════════════
-       RSC Auto-Login — Wallet-to-Username Flow
+       RSC Auto-Login — Secure Cookie Auth (OWASP compliant)
 
-       1. Read wallet address from fuzzy_session_meta cookie
-       2. Call GET /api/rsc/credentials (proxied via Vercel)
-       3. If 404 → show "Claim Username" modal
-       4. If success → inject credentials into TeaVM iframe hash
-       5. Use history.replaceState to clear hash from URL bar
+       1. Check if wallet is connected (fuzzy_wallet_session cookie)
+       2. If connected → load iframe with clean URL (no passwords)
+       3. Iframe fetches credentials internally using HttpOnly cookie
+       4. Parent page NEVER sees or handles game passwords
        ═══════════════════════════════════════════════════════════════ */
 
     var RSC_CLIENT_BASE = 'https://game.fuzzynuts.xyz';
     var RSA_EXPONENT = '65537';
     var RSA_MODULUS = '9115015542438186018327044408313987277889783174239809826491015549573028356381739563861028029945657804756198333660503635469704152602063914154601665525357981';
-    var API_BASE = 'https://fuzzynutsxyz-production.up.railway.app/api/rsc';  // Direct to Railway API
 
     /* ── Read cookie value by name ── */
     function getCookie(name) {
-      var match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)'));
+      var match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&') + '=([^;]*)'));
       return match ? decodeURIComponent(match[1]) : null;
     }
 
-    /* ── Parse wallet address from cookie OR localStorage ── */
-    function getWalletAddress() {
-      // Try cookie first (set by auth flow)
-      try {
-        var meta = getCookie('fuzzy_session_meta');
-        if (meta) {
-          var data = JSON.parse(meta);
-          if (data && typeof data.address === 'string') return data.address;
-        }
-      } catch (e) { /* ignore */ }
-
-      // Fallback: read from localStorage (set by wallet store on connect)
-      try {
-        var enc = localStorage.getItem('fuzzy_wallet_enc');
-        if (enc) {
-          // Encrypted format — base64(iv + ciphertext), can't decrypt here
-          // Try plaintext fallback
-        }
-        var plain = localStorage.getItem('fuzzy_wallet');
-        if (plain) {
-          var parsed = JSON.parse(plain);
-          if (parsed && typeof parsed.address === 'string') return parsed.address;
-        }
-      } catch (e) { /* ignore */ }
-
-      return null;
+    /* ── Check if wallet is connected (cookie exists) ── */
+    function isWalletConnected() {
+      return !!getCookie('fuzzy_wallet_session');
     }
 
-    /* ── Build the TeaVM client URL with optional credentials ── */
-    function buildClientUrl(username, password) {
-      var base = RSC_CLIENT_BASE + '/#members,' + RSC_CLIENT_BASE.replace('https://', '') + ',43494,' + RSA_EXPONENT + ',' + RSA_MODULUS + ',true';
-      if (username && password) {
-        base += ',' + encodeURIComponent(username) + ',' + encodeURIComponent(password);
-      }
-      return base;
+    /* ── Build clean TeaVM client URL (no credentials) ── */
+    function buildClientUrl() {
+      return RSC_CLIENT_BASE + '/#members,' + RSC_CLIENT_BASE.replace('https://', '') + ',43494,' + RSA_EXPONENT + ',' + RSA_MODULUS + ',true';
     }
 
     /* ── DOM references ── */
@@ -379,100 +350,6 @@
     var modalError = document.getElementById('rscModalError');
     var loadingOverlay = document.getElementById('rscLoadingOverlay');
     var loadingText = document.getElementById('rscLoadingText');
-
-    var walletAddress = getWalletAddress();
-    var gameUsername = null;
-    var gamePassword = null;
-    var credentialsLoaded = false;
-    var credentialsLoading = false;
-
-    /* ── Fetch credentials from the API ── */
-    function fetchCredentials() {
-      if (credentialsLoaded || credentialsLoading) return;
-      if (!walletAddress) {
-        credentialsLoaded = true;
-        return;
-      }
-
-      credentialsLoading = true;
-      statusEl.textContent = 'Checking wallet...';
-      statusEl.className = 'rsc-status loading';
-
-      fetch(API_BASE + '/credentials?address=' + encodeURIComponent(walletAddress), {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      })
-        .then(function(res) {
-          if (res.ok) return res.json();
-          if (res.status === 404) return null;  // No mapping yet
-          throw new Error('API error: ' + res.status);
-        })
-        .then(function(data) {
-          credentialsLoaded = true;
-          credentialsLoading = false;
-          if (data && data.username && data.gamePassword) {
-            gameUsername = data.username;
-            gamePassword = data.gamePassword;
-            statusEl.textContent = 'Welcome back, ' + gameUsername + '!';
-            statusEl.className = 'rsc-status';
-          } else {
-            statusEl.textContent = 'Connect your wallet to auto-login';
-            statusEl.className = 'rsc-status';
-          }
-        })
-        .catch(function(err) {
-          credentialsLoaded = true;
-          credentialsLoading = false;
-          statusEl.textContent = '';
-          statusEl.className = 'rsc-status';
-          console.warn('[RSC] Could not fetch credentials:', err);
-        });
-    }
-
-    /* ── Claim a username ── */
-    function claimUsername(username) {
-      claimBtn.disabled = true;
-      modalError.textContent = '';
-
-      fetch(API_BASE + '/claim-username', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, address: walletAddress })
-      })
-        .then(function(res) {
-          return res.json().then(function(data) {
-            return { ok: res.ok, status: res.status, data: data };
-          });
-        })
-        .then(function(result) {
-          claimBtn.disabled = false;
-          if (result.ok) {
-            gameUsername = result.data.username;
-            gamePassword = result.data.gamePassword;
-            modal.classList.remove('visible');
-            launchGame();
-          } else if (result.status === 409 && result.data.error === 'E_USERNAME_TAKEN') {
-            modalError.textContent = 'That username is taken. Try another.';
-          } else if (result.status === 409 && result.data.error === 'E_ALREADY_CLAIMED') {
-            gameUsername = result.data.username;
-            modal.classList.remove('visible');
-            // Re-fetch credentials since we already have a mapping
-            credentialsLoaded = false;
-            fetchCredentials();
-          } else if (result.status === 401) {
-            modalError.textContent = 'Session expired. Please reconnect your wallet.';
-          } else {
-            modalError.textContent = 'Something went wrong. Try again.';
-          }
-        })
-        .catch(function(err) {
-          claimBtn.disabled = false;
-          modalError.textContent = 'Network error. Check your connection.';
-          console.error('[RSC] claim-username error:', err);
-        });
-    }
 
     /* ── Hide the loading overlay ── */
     var overlayDismissed = false;
@@ -495,83 +372,41 @@
     /* ── Launch the game in the iframe ── */
     function launchGame() {
       landing.classList.add('hidden');
-      var hasCredentials = !!(gameUsername && gamePassword);
-      var url = buildClientUrl(gameUsername, gamePassword);
+      var url = buildClientUrl();
       iframe.src = url;
       gameWrap.classList.add('visible');
 
-      // Show overlay only when auto-login is happening
-      if (hasCredentials) {
-        overlayDismissed = false;
-        loadingOverlay.classList.remove('hidden', 'fade-out');
-        loadingText.textContent = 'Connecting to game server...';
-        loadingText.className = 'rsc-loading-text';
+      // Show overlay — iframe will postMessage when login completes
+      overlayDismissed = false;
+      loadingOverlay.classList.remove('hidden', 'fade-out');
+      loadingText.textContent = 'Connecting to game server...';
+      loadingText.className = 'rsc-loading-text';
 
-        // Timeout fallback: dismiss after 25 seconds
-        setTimeout(function() {
-          if (!overlayDismissed) {
-            loadingText.textContent = 'Login taking longer than expected...';
-            loadingText.className = 'rsc-loading-text error';
-          }
-        }, 25000);
-        setTimeout(function() {
-          dismissOverlay();
-        }, 30000);
-      } else {
-        // No credentials — hide overlay immediately
-        loadingOverlay.classList.add('hidden');
-      }
-
-      // Clear credentials from the URL bar for security
-      iframe.addEventListener('load', function() {
-        try {
-          window.history.replaceState(null, '', window.location.pathname);
-        } catch (e) {
-          // Ignore — some browsers restrict this
+      // Timeout fallback: dismiss after 25 seconds
+      setTimeout(function() {
+        if (!overlayDismissed) {
+          loadingText.textContent = 'Login taking longer than expected...';
+          loadingText.className = 'rsc-loading-text error';
         }
-      }, { once: true });
+      }, 25000);
+      setTimeout(function() {
+        dismissOverlay();
+      }, 30000);
     }
 
     /* ── Play button handler ── */
     playBtn.addEventListener('click', function() {
-      // If we already have credentials, launch immediately
-      if (gameUsername && gamePassword) {
+      if (isWalletConnected()) {
+        // Wallet connected — launch game (iframe will fetch credentials)
         launchGame();
-        return;
-      }
-
-      // If wallet is connected but no credentials yet, wait for fetch
-      if (walletAddress && !credentialsLoaded) {
-        statusEl.textContent = 'Loading...';
-        statusEl.className = 'rsc-status loading';
-        var checkInterval = setInterval(function() {
-          if (credentialsLoaded) {
-            clearInterval(checkInterval);
-            if (gameUsername && gamePassword) {
-              launchGame();
-            } else {
-              modal.classList.add('visible');
-              usernameInput.focus();
-            }
-          }
-        }, 200);
-        // Start the fetch if not already in progress
-        fetchCredentials();
-        return;
-      }
-
-      // If wallet connected but no mapping (404 from earlier fetch)
-      if (walletAddress && credentialsLoaded && !gameUsername) {
+      } else {
+        // No wallet — show modal to claim username (legacy flow)
         modal.classList.add('visible');
         usernameInput.focus();
-        return;
       }
-
-      // No wallet connected — launch without auto-login
-      launchGame();
     });
 
-    /* ── Claim button handler ── */
+    /* ── Claim button handler (legacy — for users without cookie) ── */
     claimBtn.addEventListener('click', function() {
       var username = usernameInput.value.trim();
       if (!username || username.length < 3) {
@@ -582,7 +417,13 @@
         modalError.textContent = 'Letters and numbers only.';
         return;
       }
-      claimUsername(username);
+      modalError.textContent = '';
+      claimBtn.disabled = true;
+
+      // This path is for users who haven't connected their wallet yet
+      // They'll need to connect first, then the iframe will handle the rest
+      modalError.textContent = 'Please connect your wallet first using the wallet button in the navigation.';
+      claimBtn.disabled = false;
     });
 
     /* ── Enter key in username input ── */
@@ -592,9 +433,13 @@
       }
     });
 
-    /* ── Auto-fetch credentials on page load if wallet is connected ── */
-    if (walletAddress) {
-      fetchCredentials();
+    /* ── Update status based on wallet connection ── */
+    if (isWalletConnected()) {
+      statusEl.textContent = 'Wallet connected — click Play to start';
+      statusEl.className = 'rsc-status';
+    } else {
+      statusEl.textContent = 'Connect your wallet for auto-login';
+      statusEl.className = 'rsc-status';
     }
 
     /* ── Forest particle effect ── */

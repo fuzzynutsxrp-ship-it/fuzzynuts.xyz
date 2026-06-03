@@ -38,6 +38,7 @@ const app = express();
 const ALLOWED_ORIGINS = [
   "https://fuzzynuts.xyz",
   "https://www.fuzzynuts.xyz",
+  "https://game.fuzzynuts.xyz",
   "http://localhost:3000", // local dev
 ];
 app.use(
@@ -122,6 +123,7 @@ async function bootstrap() {
       app.use("/api/rsc", buildRscRouter({
         MONGODB_URI,
         RSC_PASSWORD_SECRET,
+        WALLET_JWT_SECRET,
       }));
     } catch (e) {
       console.error("[api] Failed to load RSC router:", e);

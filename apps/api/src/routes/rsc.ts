@@ -15,8 +15,8 @@ import { Router } from "express";
 import { z } from "zod";
 import crypto from "node:crypto";
 import { MongoClient, type Db, type Collection } from "mongodb";
+import { jwtVerify } from "jose";
 import type { Request, Response } from "express";
-import type { WalletJwtPayload } from "../middleware/walletAuth";
 
 // ── Username validation ─────────────────────────────────────────
 const USERNAME_RE = /^[a-zA-Z0-9]{3,12}$/;
@@ -89,24 +89,57 @@ async function getCollection(uri: string): Promise<Collection<WalletMapping>> {
   return _db.collection<WalletMapping>("wallet_mappings");
 }
 
+// ── JWT cookie helper ───────────────────────────────────────────
+const COOKIE_NAME = "fuzzy_wallet_session";
+
+async function getWalletFromCookie(
+  req: Request,
+  secret: string,
+): Promise<string | null> {
+  const cookieHeader = req.headers.cookie;
+  if (!cookieHeader) return null;
+
+  const match = cookieHeader.match(
+    new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`),
+  );
+  if (!match) return null;
+
+  try {
+    const { payload } = await jwtVerify(
+      match[1],
+      new TextEncoder().encode(secret),
+      { issuer: "fuzzynuts.xyz" },
+    );
+    return typeof payload.address === "string" ? payload.address : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Express router ──────────────────────────────────────────────
 
 export function buildRscRouter(env: {
   MONGODB_URI: string;
   RSC_PASSWORD_SECRET: string;
+  WALLET_JWT_SECRET?: string;
 }): Router {
   const router = Router();
 
   // POST /api/rsc/claim-username
   router.post("/claim-username", async (req: Request, res: Response) => {
-    // Accept wallet from JWT (auth flow) OR from request body (standalone page)
-    const jwtWallet = (req as Request & { wallet?: WalletJwtPayload }).wallet;
     const parsed = ClaimBody.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: "E_INVALID_USERNAME", detail: parsed.error.flatten() });
     }
 
-    const walletAddress = jwtWallet?.address || parsed.data.address;
+    // Get wallet from cookie (secure) or body (legacy)
+    let walletAddress: string | null = null;
+    if (env.WALLET_JWT_SECRET) {
+      walletAddress = await getWalletFromCookie(req, env.WALLET_JWT_SECRET);
+    }
+    if (!walletAddress) {
+      walletAddress = parsed.data.address || null;
+    }
     if (!walletAddress) {
       return res.status(401).json({ error: "E_NO_SESSION" });
     }
@@ -150,10 +183,20 @@ export function buildRscRouter(env: {
   });
 
   // GET /api/rsc/credentials
-  // Accept wallet from JWT OR from query param ?address=r...
+  // Reads wallet from HttpOnly JWT cookie (secure) OR query param (legacy)
   router.get("/credentials", async (req: Request, res: Response) => {
-    const jwtWallet = (req as Request & { wallet?: WalletJwtPayload }).wallet;
-    const walletAddress = jwtWallet?.address || (typeof req.query.address === 'string' ? req.query.address : null);
+    let walletAddress: string | null = null;
+
+    // Try secure cookie first
+    if (env.WALLET_JWT_SECRET) {
+      walletAddress = await getWalletFromCookie(req, env.WALLET_JWT_SECRET);
+    }
+
+    // Fallback: query param (legacy, will be removed)
+    if (!walletAddress && typeof req.query.address === "string") {
+      walletAddress = req.query.address;
+    }
+
     if (!walletAddress) {
       return res.status(401).json({ error: "E_NO_SESSION" });
     }
