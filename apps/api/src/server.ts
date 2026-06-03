@@ -9,11 +9,6 @@
 
 import express from "express";
 import cors from "cors";
-import { buildSessionRouter } from "./routes/session";
-import { buildAuthRouter } from "./routes/auth";
-import { buildGameSessionRouter } from "./routes/game-session";
-import { buildRscRouter } from "./routes/rsc";
-import { buildWalletAuth } from "./middleware/walletAuth";
 
 const PORT = Number(process.env.PORT ?? 4000);
 
@@ -65,46 +60,90 @@ app.get("/healthz", (_req, res) => {
     MONGODB_URI: !!MONGODB_URI,
     RSC_PASSWORD_SECRET: !!RSC_PASSWORD_SECRET,
   };
-  res.json({ ok: true, rsc: true, version: "2.0", env: envStatus });
+  res.json({ ok: true, rsc: true, version: "2.1", env: envStatus });
 });
 
-// Shared challenge store — auth.ts issues challenges, game-session.ts consumes them
-const challengeStore = new Map<
-  string,
-  { address: string; challenge: string; exp: number }
->();
+// ── Bootstrap routers — wrap each import in try/catch so a broken
+//    dependency (e.g. xrpl native addon) doesn't kill the process.
 
-app.use("/api/session", buildSessionRouter({ GAME_SESSION_SECRET }));
-app.use(
-  "/api/auth",
-  buildAuthRouter({ WALLET_JWT_SECRET, challengeStore }),
-);
-app.use(
-  "/api/auth",
-  buildGameSessionRouter({
-    GAME_SESSION_SECRET,
-    OPENRSC_GAME_ENDPOINT: process.env.OPENRSC_GAME_ENDPOINT,
-    GAME_SERVER_READY: process.env.GAME_SERVER_READY,
-    challengeStore,
-  }),
-);
+async function bootstrap() {
+  // Shared challenge store
+  const challengeStore = new Map<
+    string,
+    { address: string; challenge: string; exp: number }
+  >();
 
-// RSC wallet-to-username mapping (gated by wallet JWT)
-// Returns 503 if required env vars are missing
-if (MONGODB_URI && RSC_PASSWORD_SECRET && WALLET_JWT_SECRET) {
-  app.use("/api/rsc", buildWalletAuth({ WALLET_JWT_SECRET }), buildRscRouter({
-    MONGODB_URI,
-    RSC_PASSWORD_SECRET,
-  }));
-} else {
-  app.use("/api/rsc", (_req, res) => {
-    res.status(503).json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
+  // Session router (no xrpl dependency)
+  try {
+    const { buildSessionRouter } = await import("./routes/session");
+    app.use("/api/session", buildSessionRouter({ GAME_SESSION_SECRET }));
+  } catch (e) {
+    console.error("[api] Failed to load session router:", e);
+    app.use("/api/session", (_req, res) => {
+      res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+    });
+  }
+
+  // Auth router (depends on xrpl-token-utils)
+  try {
+    const { buildAuthRouter } = await import("./routes/auth");
+    app.use(
+      "/api/auth",
+      buildAuthRouter({ WALLET_JWT_SECRET, challengeStore }),
+    );
+  } catch (e) {
+    console.error("[api] Failed to load auth router:", e);
+    app.use("/api/auth", (_req, res) => {
+      res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+    });
+  }
+
+  // Game session router (depends on xrpl-token-utils)
+  try {
+    const { buildGameSessionRouter } = await import("./routes/game-session");
+    app.use(
+      "/api/auth",
+      buildGameSessionRouter({
+        GAME_SESSION_SECRET,
+        OPENRSC_GAME_ENDPOINT: process.env.OPENRSC_GAME_ENDPOINT,
+        GAME_SERVER_READY: process.env.GAME_SERVER_READY,
+        challengeStore,
+      }),
+    );
+  } catch (e) {
+    console.error("[api] Failed to load game-session router:", e);
+  }
+
+  // RSC wallet-to-username mapping (gated by wallet JWT)
+  if (MONGODB_URI && RSC_PASSWORD_SECRET && WALLET_JWT_SECRET) {
+    try {
+      const { buildWalletAuth } = await import("./middleware/walletAuth");
+      const { buildRscRouter } = await import("./routes/rsc");
+      app.use("/api/rsc", buildWalletAuth({ WALLET_JWT_SECRET }), buildRscRouter({
+        MONGODB_URI,
+        RSC_PASSWORD_SECRET,
+      }));
+    } catch (e) {
+      console.error("[api] Failed to load RSC router:", e);
+      app.use("/api/rsc", (_req, res) => {
+        res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+      });
+    }
+  } else {
+    app.use("/api/rsc", (_req, res) => {
+      res.status(503).json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
+    });
+  }
+
+  // TODO(auth-rollout): mount migrated /api/scores, /api/rewards, /api/scores/stream
+
+  app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`@fuzzynuts/api listening on :${PORT}`);
   });
 }
 
-// TODO(auth-rollout): mount migrated /api/scores, /api/rewards, /api/scores/stream
-
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`@fuzzynuts/api listening on :${PORT}`);
+bootstrap().catch((e) => {
+  console.error("[api] Fatal bootstrap error:", e);
+  process.exit(1);
 });
