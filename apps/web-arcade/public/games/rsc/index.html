@@ -344,9 +344,32 @@
       return false;
     }
 
-    /* ── Build clean TeaVM client URL (no credentials) ── */
-    function buildClientUrl() {
-      return RSC_CLIENT_BASE + '/#members,' + RSC_CLIENT_BASE.replace('https://', '') + ',43494,' + RSA_EXPONENT + ',' + RSA_MODULUS + ',true';
+    /* ── Get wallet address from localStorage ── */
+    function getWalletAddress() {
+      try {
+        var plain = localStorage.getItem('fuzzy_wallet');
+        if (plain) {
+          var parsed = JSON.parse(plain);
+          if (parsed && typeof parsed.address === 'string') return parsed.address;
+        }
+      } catch (e) { /* ignore */ }
+      try {
+        var meta = getCookie('fuzzy_session_meta');
+        if (meta) {
+          var data = JSON.parse(meta);
+          if (data && typeof data.address === 'string') return data.address;
+        }
+      } catch (e) { /* ignore */ }
+      return null;
+    }
+
+    /* ── Build TeaVM client URL with wallet address (not password) ── */
+    function buildClientUrl(walletAddress) {
+      var base = RSC_CLIENT_BASE + '/#members,' + RSC_CLIENT_BASE.replace('https://', '') + ',43494,' + RSA_EXPONENT + ',' + RSA_MODULUS + ',true';
+      if (walletAddress) {
+        base += ',' + encodeURIComponent(walletAddress);
+      }
+      return base;
     }
 
     /* ── DOM references ── */
@@ -383,7 +406,8 @@
     /* ── Launch the game in the iframe ── */
     function launchGame() {
       landing.classList.add('hidden');
-      var url = buildClientUrl();
+      var walletAddress = getWalletAddress();
+      var url = buildClientUrl(walletAddress);
       iframe.src = url;
       gameWrap.classList.add('visible');
 
