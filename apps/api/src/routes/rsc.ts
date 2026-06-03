@@ -22,7 +22,7 @@ import type { WalletJwtPayload } from "../middleware/walletAuth";
 const USERNAME_RE = /^[a-zA-Z0-9]{3,12}$/;
 const ClaimBody = z.object({
   username: z.string().min(3).max(12).regex(USERNAME_RE),
-  address: z.string().regex(/^r[1-9A-HJ-NP-Za-k-z]{24,34}$/).optional(),
+  address: z.string().regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/).optional(),
 });
 
 // ── AES-256-GCM helpers ─────────────────────────────────────────
