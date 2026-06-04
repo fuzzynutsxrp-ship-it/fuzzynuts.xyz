@@ -501,30 +501,18 @@
         // Keep overlay visible with error — don't show game login screen
       }
       if (e.data && e.data.type === 'rsc-session-lost') {
-        // Session guard detected logout in the iframe
+        // Session guard detected logout — redirect to arcade
         var reason = e.data.detail || 'Session disconnected';
-        console.log('[rsc] Session lost: ' + reason);
+        console.log('[rsc] Session lost: ' + reason + ' — redirecting to play screen');
 
-        if (!canReload()) {
-          // Too many reloads — show error and stop
-          loadingOverlay.classList.remove('hidden', 'fade-out');
-          loadingText.textContent = 'Connection issues. Please refresh the page.';
-          loadingText.className = 'rsc-loading-text error';
-          return;
-        }
-
-        // Show reconnecting overlay
+        // Show brief overlay then redirect back to play screen
         overlayDismissed = false;
         loadingOverlay.classList.remove('hidden', 'fade-out');
-        loadingText.textContent = 'Session lost — reconnecting...';
+        loadingText.textContent = 'Session ended — returning to arcade...';
         loadingText.className = 'rsc-loading-text';
 
-        // Wait 2 seconds then reload the iframe
         setTimeout(function() {
-          var walletAddr = getWalletAddress();
-          iframe.src = buildClientUrl(walletAddr);
-          // The iframe reload re-triggers the entire auto-login flow
-          // The overlay stays visible until rsc-login-complete arrives
+          window.location.href = '/play/rsc';
         }, 2000);
       }
     });
