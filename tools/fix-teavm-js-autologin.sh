@@ -508,14 +508,10 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         console.log('[session-guard] LOGOUT — ' + reason);
         if (canvas) canvas.style.visibility = 'hidden';
         notifyParent('rsc-session-lost', reason);
-        // Redirect parent window to homepage (works cross-origin for navigation)
+        // Navigate iframe to parent's homepage (cross-origin nav from within iframe)
         setTimeout(function() {
-          try {
-            window.top.location.href = '/';
-          } catch (e) {
-            // Fallback: try parent
-            try { window.parent.location.href = '/'; } catch (e2) { /* give up */ }
-          }
+          console.log('[session-guard] Redirecting to arcade...');
+          window.location.href = 'https://fuzzynuts.xyz/';
         }, 2000);
       }
 
