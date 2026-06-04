@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-#  fix-teavm-js-autologin.sh — Silent auto-login, no login screen
+#  fix-teavm-js-autologin.sh — Silent auto-login + session guard
 #
-#  v8: Canvas visible on BOTH success and failure.
+#  v9: Adds session guard after login success.
+#  Canvas visible on BOTH success and failure.
 #  Detects success via "Session id:" console message from the game.
-#  On failure: sends postMessage with error, canvas becomes visible so user can see what happened.
+#  After success: monitors for disconnect/logout and hides canvas
+#  + notifies parent if session is lost.
 #  The traditional login screen is completely inaccessible.
 #
 #  RUN ON VPS:
@@ -17,7 +19,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v7 — silent, no login screen)"
+echo " Fix TeaVM Auto-Login (v9 — session guard)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -33,7 +35,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v8 — canvas visible on success AND failure -->
+    <!-- fuzzynuts-autologin: v9 — session guard after login -->
     <script>
     (function() {
       'use strict';
@@ -58,16 +60,63 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
     <script type="text/javascript" charset="utf-8" src="teavm/classes.js"></script>
     <script>
-    // ── Override console.log BEFORE main() to capture "Session id:" ──
+    // ── Override console.log BEFORE main() to capture game messages ──
     var _origConsoleLog = console.log.bind(console);
     var _sessionIdDetected = false;
+    var _logoutDetected = false;
+    var _logoutReason = '';
+    var _recentMessages = [];
+
+    // Logout indicators — phrases the game prints when returning to login screen
+    var _logoutPatterns = [
+      'disconnected',
+      'connection lost',
+      'session expired',
+      'connection closed',
+      'server closed',
+      'timed out',
+      'kicked',
+      'banned',
+      'enter your username',
+      'enter your details',
+      'welcome to runescape',
+      'please enter your',
+      'login screen',
+      'error connecting',
+      'failed to connect',
+      'unable to connect',
+      'no response from server'
+    ];
 
     console.log = function() {
       var args = Array.prototype.slice.call(arguments);
       _origConsoleLog.apply(console, args);
       var msg = args.join(' ');
+
+      // Track login success
       if (msg.indexOf('Session id:') !== -1 || msg.indexOf('Login response:') !== -1) {
         _sessionIdDetected = true;
+      }
+
+      // Track recent messages for session guard (keep last 20)
+      _recentMessages.push(msg.toLowerCase());
+      if (_recentMessages.length > 20) {
+        _recentMessages.shift();
+      }
+
+      // Check for logout indicators
+      var msgLower = msg.toLowerCase();
+      for (var i = 0; i < _logoutPatterns.length; i++) {
+        if (msgLower.indexOf(_logoutPatterns[i]) !== -1) {
+          // Only flag as logout if we've already logged in successfully
+          // (prevents false positive from initial login screen messages)
+          if (window._fnSessionActive) {
+            _logoutDetected = true;
+            _logoutReason = 'Game message: ' + msg.substring(0, 80);
+            _origConsoleLog('[session-guard] Logout detected: ' + _logoutReason);
+            break;
+          }
+        }
       }
     };
 
@@ -93,6 +142,11 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       var loginSubmitted = false;
       var loginSubmitTime = 0;
 
+      // Session guard state
+      window._fnSessionActive = false;
+      var sessionGuardInterval = null;
+      var sessionGuardStarted = false;
+
       function fetchCredentials() {
         var url = 'https://fuzzynutsxyz-production.up.railway.app/api/rsc/credentials?address=' + encodeURIComponent(walletAddress);
         return fetch(url, {
@@ -114,8 +168,8 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       }
 
       function notifyParent(type, detail) {
-        if (loginComplete) return;
-        loginComplete = true;
+        if (loginComplete && type === 'rsc-login-complete') return;
+        if (type === 'rsc-login-complete') loginComplete = true;
         try {
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({ type: type, detail: detail || '' }, '*');
@@ -182,6 +236,93 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         });
       }
 
+      // ────────────────────────────────────────────────────────────
+      //  SESSION GUARD — runs after login succeeds
+      //
+      //  Watches for signs that the game has returned to the login
+      //  screen (server disconnect, session timeout, etc.).
+      //
+      //  If detected:
+      //   1. Hides the canvas immediately
+      //   2. Sends "rsc-session-lost" postMessage to parent page
+      //   3. Stops monitoring
+      //
+      //  The parent page will show a "reconnecting..." message
+      //  and reload the iframe (that's Step 3, not included here).
+      // ────────────────────────────────────────────────────────────
+      function startSessionGuard() {
+        if (sessionGuardStarted) return;
+        sessionGuardStarted = true;
+        window._fnSessionActive = true;
+
+        _origConsoleLog('[session-guard] Active — monitoring for disconnect...');
+
+        // Track canvas dimensions — if they change significantly,
+        // the game may have navigated to a different screen
+        var lastCanvasWidth = canvas ? canvas.width : 0;
+        var lastCanvasHeight = canvas ? canvas.height : 0;
+
+        sessionGuardInterval = setInterval(function() {
+          // Check 1: Console-based logout detection
+          if (_logoutDetected) {
+            clearInterval(sessionGuardInterval);
+            window._fnSessionActive = false;
+            _origConsoleLog('[session-guard] LOGOUT — hiding canvas. Reason: ' + _logoutReason);
+            if (canvas) canvas.style.visibility = 'hidden';
+            notifyParent('rsc-session-lost', _logoutReason);
+            return;
+          }
+
+          // Check 2: Canvas removed from DOM (game unloaded)
+          if (canvas && !document.body.contains(canvas)) {
+            clearInterval(sessionGuardInterval);
+            window._fnSessionActive = false;
+            _origConsoleLog('[session-guard] LOGOUT — canvas removed from DOM');
+            notifyParent('rsc-session-lost', 'Game canvas was removed');
+            return;
+          }
+
+          // Check 3: Canvas resized dramatically (game screen changed)
+          if (canvas) {
+            var w = canvas.width;
+            var h = canvas.height;
+            if (lastCanvasWidth > 0 && lastCanvasHeight > 0) {
+              // If canvas shrinks to tiny or grows huge, something changed
+              if (w < lastCanvasWidth * 0.5 || h < lastCanvasHeight * 0.5) {
+                _origConsoleLog('[session-guard] Canvas shrunk: ' + w + 'x' + h + ' (was ' + lastCanvasWidth + 'x' + lastCanvasHeight + ')');
+                // Don't immediately flag — could be resize. Log it for now.
+              }
+            }
+            lastCanvasWidth = w;
+            lastCanvasHeight = h;
+          }
+
+          // Check 4: Recent messages scan (backup for patterns we missed)
+          // Only check if we have messages since last check
+          var recentCopy = _recentMessages.slice();
+          for (var m = 0; m < recentCopy.length; m++) {
+            var msgLower = recentCopy[m];
+            for (var p = 0; p < _logoutPatterns.length; p++) {
+              if (msgLower.indexOf(_logoutPatterns[p]) !== -1) {
+                clearInterval(sessionGuardInterval);
+                window._fnSessionActive = false;
+                _logoutReason = 'Console message: ' + msgLower.substring(0, 80);
+                _origConsoleLog('[session-guard] LOGOUT — ' + _logoutReason);
+                if (canvas) canvas.style.visibility = 'hidden';
+                notifyParent('rsc-session-lost', _logoutReason);
+                return;
+              }
+            }
+          }
+          _recentMessages = []; // Clear after each check cycle
+
+        }, 3000); // Check every 3 seconds
+      }
+
+      // ────────────────────────────────────────────────────────────
+      //  END SESSION GUARD
+      // ────────────────────────────────────────────────────────────
+
       var EXISTING_USER_X = 356;
       var EXISTING_USER_Y = 285;
       var OK_BUTTON_X = 410;
@@ -203,10 +344,12 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           if (_sessionIdDetected) {
             clearInterval(checkInterval);
             _origConsoleLog('[autologin] Login success detected!');
-            // Game is loading — wait 2s then reveal
+            // Game is loading — wait 2s then reveal + start guard
             setTimeout(function() {
               if (canvas) canvas.style.visibility = 'visible';
               notifyParent('rsc-login-complete');
+              // Start the session guard — monitors for disconnect forever
+              startSessionGuard();
             }, 2000);
             return;
           }
@@ -321,15 +464,21 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v8' "$HTML_FILE"; then echo "✓ v8 marker present"; fi
+if grep -q 'v9' "$HTML_FILE"; then echo "✓ v9 marker present"; fi
 if grep -q '_sessionIdDetected' "$HTML_FILE"; then echo "✓ Login success detection enabled"; fi
+if grep -q 'session-guard' "$HTML_FILE"; then echo "✓ Session guard enabled"; fi
+if grep -q 'rsc-session-lost' "$HTML_FILE"; then echo "✓ Session-lost postMessage present"; fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v8 — canvas visible on success AND failure)"
+echo " ✓ FIX APPLIED (v9 — session guard)"
 echo ""
-echo " Canvas becomes visible on both login success and failure."
-echo " On failure: error message sent to parent page for retry UI."
-echo " Traditional login screen is never visible."
+echo " What changed from v8:"
+echo "   + Session guard monitors for disconnect after login"
+echo "   + Watches console for 18 logout indicator phrases"
+echo "   + Checks canvas presence every 3 seconds"
+echo "   + On logout: hides canvas, notifies parent page"
+echo "   + Parent receives 'rsc-session-lost' with reason"
+echo ""
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
