@@ -2,10 +2,11 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Silent auto-login + session guard
 #
-#  v13: Canvas pixel sampling for logout detection.
+#  v13b: Canvas pixel sampling + iframe-side redirect on logout.
 #  Intercepts WebGL context to force preserveDrawingBuffer.
 #  Detects login screen via brightness analysis + stale canvas.
 #  Monitors WebSocket disconnection. Catches bright-to-dark transition.
+#  On logout: notifies parent + redirects to homepage from iframe.
 #
 #  RUN ON VPS:
 #    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash
@@ -17,7 +18,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v13 — canvas pixel detection)"
+echo " Fix TeaVM Auto-Login (v13b — canvas + iframe redirect)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -33,7 +34,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v13 — canvas pixel sampling for logout -->
+    <!-- fuzzynuts-autologin: v13b — canvas pixel sampling + iframe redirect -->
     <script>
     // ═══════════════════════════════════════════════════════════
     //  BLOCK 1: Initialize ALL shared state FIRST (before any
@@ -435,22 +436,13 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         sessionGuardInterval = setInterval(function() {
           // ── Check 1: Console-based logout detection ──
           if (window._logoutDetected) {
-            clearInterval(sessionGuardInterval);
-            window._fnSessionActive = false;
-            console.log('[session-guard] LOGOUT — hiding canvas. Reason: ' + window._logoutReason);
-            if (canvas) canvas.style.visibility = 'hidden';
-            notifyParent('rsc-session-lost', window._logoutReason);
+            handleLogout('Game message: ' + window._logoutReason);
             return;
           }
 
           // ── Check 2: WebSocket disconnected ──
           if (window._wsDisconnected) {
-            clearInterval(sessionGuardInterval);
-            window._fnSessionActive = false;
-            window._logoutReason = 'WebSocket connection closed';
-            console.log('[session-guard] LOGOUT — ' + window._logoutReason);
-            if (canvas) canvas.style.visibility = 'hidden';
-            notifyParent('rsc-session-lost', window._logoutReason);
+            handleLogout('WebSocket connection closed');
             return;
           }
 
@@ -464,33 +456,20 @@ cat > "$HTML_FILE" << 'HTMLEOF'
               }
             }
             if (allClosed) {
-              clearInterval(sessionGuardInterval);
-              window._fnSessionActive = false;
-              window._logoutReason = 'All WebSocket connections closed';
-              console.log('[session-guard] LOGOUT — ' + window._logoutReason);
-              if (canvas) canvas.style.visibility = 'hidden';
-              notifyParent('rsc-session-lost', window._logoutReason);
+              handleLogout('All WebSocket connections closed');
               return;
             }
           }
 
           // ── Check 4: Canvas removed from DOM ──
           if (canvas && !document.body.contains(canvas)) {
-            clearInterval(sessionGuardInterval);
-            window._fnSessionActive = false;
-            console.log('[session-guard] LOGOUT — canvas removed from DOM');
-            notifyParent('rsc-session-lost', 'Game canvas was removed');
+            handleLogout('Game canvas was removed');
             return;
           }
 
           // ── Check 5: Canvas pixel analysis (v13) ──
           if (_checkLoginScreen()) {
-            clearInterval(sessionGuardInterval);
-            window._fnSessionActive = false;
-            window._logoutReason = 'Login screen detected via canvas pixels';
-            console.log('[session-guard] LOGOUT — ' + window._logoutReason);
-            if (canvas) canvas.style.visibility = 'hidden';
-            notifyParent('rsc-session-lost', window._logoutReason);
+            handleLogout('Login screen detected via canvas pixels');
             return;
           }
 
@@ -514,17 +493,30 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             var msgLower = recentCopy[m];
             for (var p = 0; p < window._logoutPatterns.length; p++) {
               if (msgLower.indexOf(window._logoutPatterns[p]) !== -1) {
-                clearInterval(sessionGuardInterval);
-                window._fnSessionActive = false;
-                window._logoutReason = 'Console message: ' + msgLower.substring(0, 80);
-                console.log('[session-guard] LOGOUT — ' + window._logoutReason);
-                if (canvas) canvas.style.visibility = 'hidden';
-                notifyParent('rsc-session-lost', window._logoutReason);
+                handleLogout('Console message: ' + msgLower.substring(0, 80));
                 return;
               }
             }
           }
         }, 2000); // v13: 2s interval (was 3s)
+      }
+
+      // ── Central logout handler — notifies parent + redirects ──
+      function handleLogout(reason) {
+        clearInterval(sessionGuardInterval);
+        window._fnSessionActive = false;
+        console.log('[session-guard] LOGOUT — ' + reason);
+        if (canvas) canvas.style.visibility = 'hidden';
+        notifyParent('rsc-session-lost', reason);
+        // Redirect parent window to homepage (works cross-origin for navigation)
+        setTimeout(function() {
+          try {
+            window.top.location.href = '/';
+          } catch (e) {
+            // Fallback: try parent
+            try { window.parent.location.href = '/'; } catch (e2) { /* give up */ }
+          }
+        }, 2000);
       }
 
       // ────────────────────────────────────────────────────────────
@@ -668,7 +660,7 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v13' "$HTML_FILE"; then echo "✓ v13 marker present"; fi
+if grep -q 'v13b' "$HTML_FILE"; then echo "✓ v13b marker present"; fi
 if grep -q 'new Proxy' "$HTML_FILE"; then echo "✓ Proxy intercept enabled"; fi
 if grep -q 'session-guard' "$HTML_FILE"; then echo "✓ Session guard enabled"; fi
 if grep -q 'preserveDrawingBuffer' "$HTML_FILE"; then echo "✓ WebGL interceptor enabled"; fi
@@ -677,16 +669,12 @@ if grep -q '_wsDisconnected' "$HTML_FILE"; then echo "✓ WebSocket monitor enab
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v13 — canvas pixel detection)"
+echo " ✓ FIX APPLIED (v13b — canvas + iframe redirect)"
 echo ""
-echo " Changes from v12:"
-echo "   + WebGL context interceptor (preserveDrawingBuffer=true)"
-echo "   + Canvas pixel sampling: 6×5 grid, avg brightness detection"
-echo "   + Login screen detection: dark (<20) + stale canvas"
-echo "   + Bright→dark transition detection (game world → login)"
-echo "   + WebSocket connection monitor (close/error events)"
-echo "   + Session guard interval: 2s (was 3s)"
-echo "   + Debug logging every 30s: canvas avg, stale count"
+echo " Changes from v13:"
+echo "   + handleLogout() centralizes all logout paths"
+echo "   + Iframe redirects parent to / via window.top.location.href"
+echo "   + Works even if parent page is stale/cached"
 echo ""
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
