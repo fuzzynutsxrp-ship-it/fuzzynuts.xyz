@@ -1,6 +1,6 @@
 # FuzzyNuts Project State
 Last updated: 2026-06-04
-Current focus: Redirect to arcade on logout (v13 + parent page update)
+Current focus: Logout detection + redirect fully working (v13b on VPS, parent page deployed)
 
 ## Done
 - API routes: `POST /api/rsc/claim-username`, `GET /api/rsc/credentials` (MongoDB + AES-256-GCM)
@@ -19,10 +19,12 @@ Current focus: Redirect to arcade on logout (v13 + parent page update)
 - v13: Bright→dark transition detection (game world → login screen)
 - v13: WebSocket connection monitor (close/error events trigger logout)
 - v13: Session guard interval reduced from 3s to 2s
-- Parent page: on logout, shows "Session ended — returning to arcade..." then redirects to /play/rsc
+- Parent page: on logout, shows "Session ended — returning to arcade..." then redirects to /
+- Vercel lockfile fixed: `pnpm-lock.yaml` was stale → all builds failing silently since Jun 2
+- `.gitignore` updated: added `!apps/web-arcade/public/games/rsc/` so RSC parent page deploys
 
 ## In Progress
-- Deploy v13 to VPS and test logout detection in production
+- Nothing — logout detection + redirect fully working end-to-end
 
 ## Blocked / Next
 - Railway Express API container crash (env vars not injecting into Docker) — not blocking RSC since auto-login works via direct VPS
