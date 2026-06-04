@@ -23,6 +23,7 @@ interface ChatMessage {
   content: string;
   createdAt: string;
   shadowed?: boolean;
+  linkStripped?: boolean;
 }
 
 interface OnlineUser {
@@ -135,6 +136,12 @@ export function ChatWidget() {
         if (cancelled) return;
         // Shadow messages get a unique ID, always show to sender
         setMessages((prev) => [...prev, { ...msg, shadowed: true }]);
+      });
+
+      socket.on("message:link-stripped", (msg: ChatMessage) => {
+        if (cancelled) return;
+        // Link-stripped messages: show to sender with indicator
+        setMessages((prev) => [...prev, { ...msg, linkStripped: true }]);
       });
 
       socket.on("message:error", (data: { error: string }) => {
@@ -263,7 +270,11 @@ export function ChatWidget() {
             <div className="flex items-baseline gap-2">
               <span
                 className={`text-xs font-semibold ${
-                  msg.shadowed ? "text-[#ef4444]" : "text-[#7c3aed]"
+                  msg.shadowed
+                    ? "text-[#ef4444]"
+                    : msg.linkStripped
+                      ? "text-[#3B82F6]"
+                      : "text-[#7c3aed]"
                 }`}
                 style={{ fontFamily: "var(--font-display)" }}
               >
@@ -277,7 +288,9 @@ export function ChatWidget() {
               className={`mt-0.5 text-[13px] leading-relaxed ${
                 msg.shadowed
                   ? "text-[#ef4444]/70 line-through"
-                  : "text-white/80"
+                  : msg.linkStripped
+                    ? "text-white/70"
+                    : "text-white/80"
               }`}
             >
               {msg.content}
@@ -286,6 +299,12 @@ export function ChatWidget() {
               <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#ef4444]/50">
                 <AlertTriangle size={10} />
                 Only you can see this — flagged by moderation
+              </p>
+            )}
+            {msg.linkStripped && (
+              <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#3B82F6]/60">
+                <AlertTriangle size={10} />
+                Links removed — accounts must be 24+ hours old to post links
               </p>
             )}
           </div>

@@ -29,6 +29,38 @@ interface OnlineUser {
   connectedAt: number;
 }
 
+// ── Trust Score — Link Policy ─────────────────────────────────
+const LINK_REMOVAL_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/** Matches http(s) URLs and bare domains like example.com/path */
+const URL_PATTERN =
+  /https?:\/\/[^\s]+|(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?/gi;
+
+/** Strip all URLs from a message, replacing with "[link removed]" */
+function stripLinks(content: string): string {
+  return content.replace(URL_PATTERN, "[link removed — account too new]");
+}
+
+/** Check if account is older than 24 hours based on wallet_mappings.createdAt */
+async function getAccountAge(
+  uri: string,
+  collectionName: string,
+  walletAddress: string,
+): Promise<number> {
+  try {
+    const db = await getDb(uri);
+    const mappings = db.collection<{ createdAt?: Date }>(collectionName);
+    const mapping = await mappings.findOne(
+      { walletAddress },
+      { projection: { createdAt: 1 } },
+    );
+    if (!mapping?.createdAt) return Infinity; // no creation date = treat as old/trusted
+    return Date.now() - new Date(mapping.createdAt).getTime();
+  } catch {
+    return Infinity; // on error, treat as trusted (fail open)
+  }
+}
+
 // ── Anti-Scam Regex (Tier 1 — runs on every message, <1ms) ───
 const SCAM_PATTERNS: RegExp[] = [
   // Financial promises
@@ -251,8 +283,36 @@ export function initChat(
           return;
         }
 
+        // Trust score — strip links for new accounts (< 24 hours)
+        let finalContent = content;
+        let linksStripped = false;
+        const hasLinks = URL_PATTERN.test(content);
+        URL_PATTERN.lastIndex = 0; // reset regex state after .test()
+        if (hasLinks) {
+          const accountAge = await getAccountAge(
+            opts.MONGODB_URI,
+            opts.walletMappingsCollection,
+            wallet,
+          );
+          if (accountAge < LINK_REMOVAL_AGE_MS) {
+            finalContent = stripLinks(content);
+            linksStripped = true;
+            socket.emit("message:link-stripped", {
+              id: `stripped-${Date.now()}`,
+              username,
+              content: finalContent,
+              originalContent: content,
+              createdAt: new Date().toISOString(),
+              linkStripped: true,
+            });
+            console.log(
+              `[chat] Stripped links from ${username} (account age: ${Math.round(accountAge / 60_000)}min)`,
+            );
+          }
+        }
+
         // Moderate content
-        const modResult = moderate(content);
+        const modResult = moderate(finalContent);
         if (!modResult.clean) {
           // Shadow mode: show message to sender only, hide from everyone else
           socket.emit("message:shadowed", {
@@ -274,7 +334,7 @@ export function initChat(
         const doc: ChatMessage = {
           walletAddress: wallet,
           username,
-          content,
+          content: finalContent,
           createdAt: now,
           expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days
         };
@@ -284,8 +344,9 @@ export function initChat(
         const outgoing = {
           id: result.insertedId.toString(),
           username,
-          content,
+          content: finalContent,
           createdAt: now.toISOString(),
+          ...(linksStripped && { linkStripped: true }),
         };
         io.emit("message:new", outgoing);
       } catch (err) {
