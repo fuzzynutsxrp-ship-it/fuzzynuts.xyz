@@ -35,7 +35,7 @@ const RSC_PASSWORD_SECRET = optionalEnv("RSC_PASSWORD_SECRET");
 const VPS_ACCOUNT_URL = optionalEnv("VPS_ACCOUNT_URL");
 const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
-const ADMIN_WALLET_ADDRESS=option...);
+const ADMIN_WALLET_ADDRESS = optionalEnv("ADMIN_WALLET_ADDRESS");
 
 const app = express();
 
