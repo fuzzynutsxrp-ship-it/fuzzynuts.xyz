@@ -2,9 +2,10 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Silent auto-login + session guard
 #
-#  v12: Fixed initialization crash. Uses safe .bind() pattern.
-#  All window properties initialized BEFORE any console access.
-#  Proxy intercept on console for TeaVM output detection.
+#  v13: Canvas pixel sampling for logout detection.
+#  Intercepts WebGL context to force preserveDrawingBuffer.
+#  Detects login screen via brightness analysis + stale canvas.
+#  Monitors WebSocket disconnection. Catches bright-to-dark transition.
 #
 #  RUN ON VPS:
 #    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash
@@ -16,7 +17,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v12 — safe init)"
+echo " Fix TeaVM Auto-Login (v13 — canvas pixel detection)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -32,15 +33,15 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v12 — safe init, Proxy intercept -->
+    <!-- fuzzynuts-autologin: v13 — canvas pixel sampling for logout -->
     <script>
     // ═══════════════════════════════════════════════════════════
     //  BLOCK 1: Initialize ALL shared state FIRST (before any
     //  console access), then install Proxy intercept.
+    //  v13: Added WebGL interceptor + WebSocket monitor setup.
     // ═══════════════════════════════════════════════════════════
 
     // Step 1: Initialize ALL window properties FIRST
-    // This happens at global scope, before ANY function calls
     window._sessionIdDetected = false;
     window._logoutDetected = false;
     window._logoutReason = '';
@@ -50,6 +51,8 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     window._fnAutoLogin = false;
     window._fnWalletAddress = null;
     window._msgCount = 0;
+    window._wsDisconnected = false;
+    window._wsInstances = [];
 
     window._logoutPatterns = [
       'disconnected',
@@ -84,18 +87,51 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       }
     })();
 
-    // Step 3: Install Proxy intercept on console
-    // Uses .bind() which is safe and well-supported
+    // Step 3: WebGL context interceptor
+    // Force preserveDrawingBuffer so we can read canvas pixels for
+    // login screen detection. Must run BEFORE classes.js loads.
+    (function() {
+      var _origGetContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function(type, attrs) {
+        attrs = attrs || {};
+        if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+          attrs.preserveDrawingBuffer = true;
+        }
+        return _origGetContext.call(this, type, attrs);
+      };
+      window._origLog2 = console.log.bind(console);
+      window._origLog2('[autologin] WebGL interceptor installed (preserveDrawingBuffer=true)');
+    })();
+
+    // Step 4: WebSocket connection monitor
+    // Track WebSocket instances; set flag on close/disconnect.
+    (function() {
+      var _OrigWS = window.WebSocket;
+      window.WebSocket = function(url, protocols) {
+        var ws = protocols ? new _OrigWS(url, protocols) : new _OrigWS(url);
+        window._wsInstances.push(ws);
+        ws.addEventListener('close', function() {
+          window._wsDisconnected = true;
+          if (window._origLog2) window._origLog2('[session-guard] WebSocket closed: ' + url);
+        });
+        ws.addEventListener('error', function() {
+          if (window._origLog2) window._origLog2('[session-guard] WebSocket error: ' + url);
+        });
+        return ws;
+      };
+      window.WebSocket.prototype = _OrigWS.prototype;
+      window._origLog2('[autologin] WebSocket monitor installed');
+    })();
+
+    // Step 5: Install Proxy intercept on console
     (function() {
       var _realConsole = console;
 
-      // Save originals using safe .bind() pattern
       window._origLog = console.log.bind(console);
       window._origInfo = (console.info || console.log).bind(console);
       window._origWarn = (console.warn || console.log).bind(console);
       window._origError = (console.error || console.log).bind(console);
 
-      // Process a console message for detection
       function _processMessage(msg) {
         window._msgCount++;
 
@@ -125,7 +161,6 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         }
       }
 
-      // Install Proxy on window.console
       var handler = {
         get: function(target, prop) {
           var original = target[prop];
@@ -143,8 +178,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
       window.console = new Proxy(_realConsole, handler);
 
-      // Verify
-      window._origLog('[autologin] Console intercept installed (v12)');
+      window._origLog('[autologin] Console intercept installed (v13)');
       window._origLog('[autologin] Shared state ready: _recentMessages=' + Array.isArray(window._recentMessages));
       if (window._fnAutoLogin) {
         window._origLog('[autologin] Wallet address from hash: ' + window._fnWalletAddress.substring(0, 8) + '...');
@@ -152,14 +186,13 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     })();
     </script>
 
-    <!-- classes.js loads AFTER our Proxy is installed -->
+    <!-- classes.js loads AFTER our Proxy + WebGL interceptor are installed -->
     <script type="text/javascript" charset="utf-8" src="teavm/classes.js"></script>
 
     <script>
     // ═══════════════════════════════════════════════════════════
     //  BLOCK 2: Auto-login + session guard
-    //  Runs AFTER classes.js loads and main() is called.
-    //  Reads all state from window object.
+    //  v13: Canvas pixel sampling, stale canvas, WS monitor.
     // ═══════════════════════════════════════════════════════════
     main();
 
@@ -183,6 +216,119 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       var loginSubmitted = false;
       var loginSubmitTime = 0;
       var sessionGuardInterval = null;
+
+      // ── v13: Canvas pixel sampling state ──
+      var _pixelCache = '';
+      var _pixelStaleCount = 0;
+      var _brightnessWasBright = false;
+      var _consecutiveDarkReadings = 0;
+      var _tmpCanvas = null;
+      var _tmpCtx = null;
+
+      // Create offscreen 2D canvas for reading WebGL pixels
+      function _getTmpCtx() {
+        if (_tmpCtx) return _tmpCtx;
+        try {
+          _tmpCanvas = document.createElement('canvas');
+          _tmpCtx = _tmpCanvas.getContext('2d');
+          return _tmpCtx;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Sample canvas pixels and compute average brightness.
+      // Returns { avg, hash } or null on failure.
+      function _sampleCanvas() {
+        if (!canvas) return null;
+        try {
+          var ctx = _getTmpCtx();
+          if (!ctx) return null;
+          _tmpCanvas.width = canvas.width;
+          _tmpCanvas.height = canvas.height;
+          ctx.drawImage(canvas, 0, 0);
+          var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+          // Sample a 6×5 grid of points across the canvas
+          var total = 0;
+          var count = 0;
+          for (var gy = 0; gy < 5; gy++) {
+            for (var gx = 0; gx < 6; gx++) {
+              var px = Math.floor((gx + 0.5) * canvas.width / 6);
+              var py = Math.floor((gy + 0.5) * canvas.height / 5);
+              var idx = (py * canvas.width + px) * 4;
+              // Luma: perceptual brightness weighting
+              total += data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114;
+              count++;
+            }
+          }
+          var avg = total / count;
+
+          // Simple hash for change detection (first 8 sample R values)
+          var hash = '';
+          for (var hi = 0; hi < 8 && hi * 4 < data.length; hi++) {
+            hash += data[hi * 4].toString(16);
+          }
+
+          return { avg: avg, hash: hash };
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Detect if the login screen is currently showing.
+      // Uses 3 signals:
+      //   1. Canvas shows very dark pixels (avg brightness < 20)
+      //   2. Canvas content is frozen (pixel hash unchanged = stale)
+      //   3. Bright-to-dark transition (was playing, now dark)
+      function _checkLoginScreen() {
+        var sample = _sampleCanvas();
+        if (!sample) return false;
+
+        var isDark = sample.avg < 20;
+        var isDim = sample.avg < 35;
+
+        // Stale detection: pixel hash unchanged
+        if (sample.hash === _pixelCache && _pixelCache !== '') {
+          _pixelStaleCount++;
+        } else {
+          _pixelStaleCount = 0;
+        }
+        _pixelCache = sample.hash;
+
+        // Track brightness history for transition detection
+        var wasBright = _brightnessWasBright;
+        _brightnessWasBright = sample.avg > 40;
+
+        // Signal 1: Canvas is very dark AND stale (frozen login screen)
+        if (isDark && _pixelStaleCount >= 3) {
+          window._origLog('[session-guard] Canvas dark+stale: avg=' + sample.avg.toFixed(1) + ' stale=' + _pixelStaleCount);
+          return true;
+        }
+
+        // Signal 2: Bright-to-dark transition (game world → login screen)
+        if (wasBright && isDark) {
+          _consecutiveDarkReadings++;
+          if (_consecutiveDarkReadings >= 2) {
+            window._origLog('[session-guard] Bright→dark transition: avg=' + sample.avg.toFixed(1));
+            return true;
+          }
+        } else if (!isDark) {
+          _consecutiveDarkReadings = 0;
+        }
+
+        // Signal 3: Very dark AND dim for a while (loading/login screen)
+        if (isDark) {
+          _consecutiveDarkReadings++;
+        }
+
+        // Debug logging every 15 checks (30 seconds)
+        if (window._msgCount % 15 === 0) {
+          window._origLog('[session-guard] Canvas avg=' + sample.avg.toFixed(1) + ' stale=' + _pixelStaleCount + ' darkrun=' + _consecutiveDarkReadings);
+        }
+
+        return false;
+      }
 
       function fetchCredentials() {
         var url = 'https://fuzzynutsxyz-production.up.railway.app/api/rsc/credentials?address=' + encodeURIComponent(walletAddress);
@@ -274,20 +420,20 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       }
 
       // ────────────────────────────────────────────────────────────
-      //  SESSION GUARD — runs after login succeeds
+      //  SESSION GUARD — v13: 5 detection methods
       // ────────────────────────────────────────────────────────────
       function startSessionGuard() {
         if (window._fnSessionGuardStarted) return;
         window._fnSessionGuardStarted = true;
         window._fnSessionActive = true;
 
-        console.log('[session-guard] Active — monitoring for disconnect...');
+        console.log('[session-guard] Active — monitoring for disconnect (v13: canvas+ws)...');
 
         var lastCanvasWidth = canvas ? canvas.width : 0;
         var lastCanvasHeight = canvas ? canvas.height : 0;
 
         sessionGuardInterval = setInterval(function() {
-          // Check 1: Console-based logout detection
+          // ── Check 1: Console-based logout detection ──
           if (window._logoutDetected) {
             clearInterval(sessionGuardInterval);
             window._fnSessionActive = false;
@@ -297,7 +443,38 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             return;
           }
 
-          // Check 2: Canvas removed from DOM
+          // ── Check 2: WebSocket disconnected ──
+          if (window._wsDisconnected) {
+            clearInterval(sessionGuardInterval);
+            window._fnSessionActive = false;
+            window._logoutReason = 'WebSocket connection closed';
+            console.log('[session-guard] LOGOUT — ' + window._logoutReason);
+            if (canvas) canvas.style.visibility = 'hidden';
+            notifyParent('rsc-session-lost', window._logoutReason);
+            return;
+          }
+
+          // ── Check 3: All WebSocket instances closed ──
+          if (window._wsInstances.length > 0) {
+            var allClosed = true;
+            for (var w = 0; w < window._wsInstances.length; w++) {
+              if (window._wsInstances[w].readyState <= 1) { // CONNECTING or OPEN
+                allClosed = false;
+                break;
+              }
+            }
+            if (allClosed) {
+              clearInterval(sessionGuardInterval);
+              window._fnSessionActive = false;
+              window._logoutReason = 'All WebSocket connections closed';
+              console.log('[session-guard] LOGOUT — ' + window._logoutReason);
+              if (canvas) canvas.style.visibility = 'hidden';
+              notifyParent('rsc-session-lost', window._logoutReason);
+              return;
+            }
+          }
+
+          // ── Check 4: Canvas removed from DOM ──
           if (canvas && !document.body.contains(canvas)) {
             clearInterval(sessionGuardInterval);
             window._fnSessionActive = false;
@@ -306,7 +483,18 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             return;
           }
 
-          // Check 3: Canvas resized dramatically
+          // ── Check 5: Canvas pixel analysis (v13) ──
+          if (_checkLoginScreen()) {
+            clearInterval(sessionGuardInterval);
+            window._fnSessionActive = false;
+            window._logoutReason = 'Login screen detected via canvas pixels';
+            console.log('[session-guard] LOGOUT — ' + window._logoutReason);
+            if (canvas) canvas.style.visibility = 'hidden';
+            notifyParent('rsc-session-lost', window._logoutReason);
+            return;
+          }
+
+          // ── Check 6: Canvas resized dramatically ──
           if (canvas) {
             var w = canvas.width;
             var h = canvas.height;
@@ -319,7 +507,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             lastCanvasHeight = h;
           }
 
-          // Check 4: Recent messages scan
+          // ── Check 7: Recent console messages scan ──
           var recentCopy = window._recentMessages.slice();
           window._recentMessages = [];
           for (var m = 0; m < recentCopy.length; m++) {
@@ -336,7 +524,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
               }
             }
           }
-        }, 3000);
+        }, 2000); // v13: 2s interval (was 3s)
       }
 
       // ────────────────────────────────────────────────────────────
@@ -480,20 +668,25 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v12' "$HTML_FILE"; then echo "✓ v12 marker present"; fi
+if grep -q 'v13' "$HTML_FILE"; then echo "✓ v13 marker present"; fi
 if grep -q 'new Proxy' "$HTML_FILE"; then echo "✓ Proxy intercept enabled"; fi
 if grep -q 'session-guard' "$HTML_FILE"; then echo "✓ Session guard enabled"; fi
+if grep -q 'preserveDrawingBuffer' "$HTML_FILE"; then echo "✓ WebGL interceptor enabled"; fi
+if grep -q '_sampleCanvas' "$HTML_FILE"; then echo "✓ Canvas pixel sampling enabled"; fi
+if grep -q '_wsDisconnected' "$HTML_FILE"; then echo "✓ WebSocket monitor enabled"; fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v12 — safe init)"
+echo " ✓ FIX APPLIED (v13 — canvas pixel detection)"
 echo ""
-echo " Changes from v11:"
-echo "   + ALL window properties initialized at global scope FIRST"
-echo "   + Safe .bind() pattern instead of Function.prototype.call.bind"
-echo "   + No IIFE wrapping the property initialization"
-echo "   + _msgCount counter for debugging"
-echo "   + Message count shown on timeout for diagnostics"
+echo " Changes from v12:"
+echo "   + WebGL context interceptor (preserveDrawingBuffer=true)"
+echo "   + Canvas pixel sampling: 6×5 grid, avg brightness detection"
+echo "   + Login screen detection: dark (<20) + stale canvas"
+echo "   + Bright→dark transition detection (game world → login)"
+echo "   + WebSocket connection monitor (close/error events)"
+echo "   + Session guard interval: 2s (was 3s)"
+echo "   + Debug logging every 30s: canvas avg, stale count"
 echo ""
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
