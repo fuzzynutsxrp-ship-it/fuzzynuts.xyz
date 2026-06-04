@@ -23,7 +23,7 @@ const path = require('path');
 // ── Config ─────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const ACCOUNT_SECRET = process.env.ACCOUNT_SECRET;
-const DB_PATH = process.env.DB_PATH || '/opt/openrsc/server/openrsc.db';
+const DB_PATH = process.env.DB_PATH || '/opt/openrsc/server/inc/sqlite/preservation.db';
 const BCRYPT_ROUNDS = 10; // must match Open-RSC's bcryptWorkFactor
 
 if (!ACCOUNT_SECRET) {
@@ -99,7 +99,10 @@ app.post('/create-account', (req, res) => {
 
   try {
     // Hash password with bcrypt (matches Open-RSC's hashPassword(password, null))
-    const hashedPassword = bcrypt.hashSync(password, BCRYPT_ROUNDS);
+    let hashedPassword = bcrypt.hashSync(password, BCRYPT_ROUNDS);
+    // Open-RSC Java BCrypt uses $2y$ prefix, Node bcrypt uses $2b$
+    // Same algorithm, but Java rejects $2b$ as needing rehash
+    hashedPassword = hashedPassword.replace('$2b$', '$2y$');
 
     // Insert player
     const creationDate = Math.floor(Date.now() / 1000);

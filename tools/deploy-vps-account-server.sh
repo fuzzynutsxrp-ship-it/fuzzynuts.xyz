@@ -16,7 +16,7 @@
 set -euo pipefail
 
 INSTALL_DIR="/opt/account-server"
-DB_PATH="/opt/openrsc/server/openrsc.db"
+DB_PATH="/opt/openrsc/server/inc/sqlite/preservation.db"
 SERVICE_NAME="account-server"
 
 echo "═══════════════════════════════════════════════════════"
