@@ -35,7 +35,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v9 — session guard after login -->
+    <!-- fuzzynuts-autologin: v10 — console intercept BEFORE classes.js -->
     <script>
     (function() {
       'use strict';
@@ -52,74 +52,95 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(addr)) {
           window._fnWalletAddress = addr;
           window._fnAutoLogin = true;
-          console.log('[autologin] Wallet address from hash: ' + addr.substring(0, 8) + '...');
         }
+      }
+
+      // ── Intercept ALL console methods BEFORE classes.js loads ──
+      // TeaVM captures references to console.log/info/warn/error when its
+      // script loads. If we override AFTER, TeaVM's cached references still
+      // point to the originals and we miss all game output.
+      var _origConsoleLog = console.log.bind(console);
+      var _origConsoleInfo = (console.info || console.log).bind(console);
+      var _origConsoleWarn = (console.warn || console.log).bind(console);
+      var _origConsoleError = (console.error || console.log).bind(console);
+
+      var _sessionIdDetected = false;
+      var _logoutDetected = false;
+      var _logoutReason = '';
+      var _recentMessages = [];
+
+      // Logout indicators — phrases the game prints when returning to login screen
+      var _logoutPatterns = [
+        'disconnected',
+        'connection lost',
+        'session expired',
+        'connection closed',
+        'server closed',
+        'timed out',
+        'kicked',
+        'banned',
+        'enter your username',
+        'enter your details',
+        'welcome to runescape',
+        'please enter your',
+        'login screen',
+        'error connecting',
+        'failed to connect',
+        'unable to connect',
+        'no response from server'
+      ];
+
+      // Generic interceptor factory — wraps any console method
+      function _wrapConsoleMethod(orig) {
+        return function() {
+          orig.apply(console, arguments);
+          var args = Array.prototype.slice.call(arguments);
+          var msg = args.join(' ');
+
+          // Track login success (regex handles any whitespace/number)
+          if (/Session id:\s*\d+/.test(msg) || /Login response:\s*\d+/.test(msg)) {
+            _sessionIdDetected = true;
+            _origConsoleLog('[autologin] ✓ Session ID detected in: ' + msg.substring(0, 60));
+          }
+
+          // Track recent messages for session guard
+          _recentMessages.push(msg.toLowerCase());
+          if (_recentMessages.length > 20) {
+            _recentMessages.shift();
+          }
+
+          // Check for logout indicators (only after session is active)
+          if (window._fnSessionActive) {
+            var msgLower = msg.toLowerCase();
+            for (var i = 0; i < _logoutPatterns.length; i++) {
+              if (msgLower.indexOf(_logoutPatterns[i]) !== -1) {
+                _logoutDetected = true;
+                _logoutReason = 'Game message: ' + msg.substring(0, 80);
+                _origConsoleLog('[session-guard] Logout detected: ' + _logoutReason);
+                break;
+              }
+            }
+          }
+        };
+      }
+
+      // Override all four console methods BEFORE classes.js loads
+      console.log = _wrapConsoleMethod(_origConsoleLog);
+      console.info = _wrapConsoleMethod(_origConsoleInfo);
+      console.warn = _wrapConsoleMethod(_origConsoleWarn);
+      console.error = _wrapConsoleMethod(_origConsoleError);
+
+      _origConsoleLog('[autologin] Console intercept installed (v10)');
+      if (window._fnAutoLogin) {
+        _origConsoleLog('[autologin] Wallet address from hash: ' + window._fnWalletAddress.substring(0, 8) + '...');
       }
     })();
     </script>
 
+    <!-- classes.js loads AFTER our intercept — TeaVM will capture our wrapped methods -->
     <script type="text/javascript" charset="utf-8" src="teavm/classes.js"></script>
+
     <script>
-    // ── Override console.log BEFORE main() to capture game messages ──
-    var _origConsoleLog = console.log.bind(console);
-    var _sessionIdDetected = false;
-    var _logoutDetected = false;
-    var _logoutReason = '';
-    var _recentMessages = [];
-
-    // Logout indicators — phrases the game prints when returning to login screen
-    var _logoutPatterns = [
-      'disconnected',
-      'connection lost',
-      'session expired',
-      'connection closed',
-      'server closed',
-      'timed out',
-      'kicked',
-      'banned',
-      'enter your username',
-      'enter your details',
-      'welcome to runescape',
-      'please enter your',
-      'login screen',
-      'error connecting',
-      'failed to connect',
-      'unable to connect',
-      'no response from server'
-    ];
-
-    console.log = function() {
-      var args = Array.prototype.slice.call(arguments);
-      _origConsoleLog.apply(console, args);
-      var msg = args.join(' ');
-
-      // Track login success
-      if (msg.indexOf('Session id:') !== -1 || msg.indexOf('Login response:') !== -1) {
-        _sessionIdDetected = true;
-      }
-
-      // Track recent messages for session guard (keep last 20)
-      _recentMessages.push(msg.toLowerCase());
-      if (_recentMessages.length > 20) {
-        _recentMessages.shift();
-      }
-
-      // Check for logout indicators
-      var msgLower = msg.toLowerCase();
-      for (var i = 0; i < _logoutPatterns.length; i++) {
-        if (msgLower.indexOf(_logoutPatterns[i]) !== -1) {
-          // Only flag as logout if we've already logged in successfully
-          // (prevents false positive from initial login screen messages)
-          if (window._fnSessionActive) {
-            _logoutDetected = true;
-            _logoutReason = 'Game message: ' + msg.substring(0, 80);
-            _origConsoleLog('[session-guard] Logout detected: ' + _logoutReason);
-            break;
-          }
-        }
-      }
-    };
-
     main();
 
     (function() {
