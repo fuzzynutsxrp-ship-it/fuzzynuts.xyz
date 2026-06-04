@@ -4,6 +4,7 @@ import "./globals.css";
 import { JoeyProvider } from "@/components/providers/JoeyProvider";
 import { AppMount } from "@/components/providers/AppMount";
 import { MotionProvider } from "@/components/providers/MotionProvider";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -165,6 +166,7 @@ export default function RootLayout({
           <JoeyProvider>
             <AppMount />
             {children}
+            <ChatWidget />
           </JoeyProvider>
         </MotionProvider>
       </body>
