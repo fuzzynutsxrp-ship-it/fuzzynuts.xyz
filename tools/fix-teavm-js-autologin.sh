@@ -231,7 +231,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (_tmpCtx) return _tmpCtx;
         try {
           _tmpCanvas = document.createElement('canvas');
-          _tmpCtx = _tmpCanvas.getContext('2d');
+          _tmpCtx = _tmpCanvas.getContext('2d', { willReadFrequently: true });
           return _tmpCtx;
         } catch (e) {
           return null;
