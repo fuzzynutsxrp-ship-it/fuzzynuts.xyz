@@ -2,11 +2,9 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Silent auto-login + session guard
 #
-#  v11: Complete rewrite of console interception.
-#  Uses Proxy on window.console to catch ALL console access,
-#  including references TeaVM cached before our intercept.
-#  All shared state on window object for cross-script-block access.
-#  Canvas pixel sampling as backup logout detection.
+#  v12: Fixed initialization crash. Uses safe .bind() pattern.
+#  All window properties initialized BEFORE any console access.
+#  Proxy intercept on console for TeaVM output detection.
 #
 #  RUN ON VPS:
 #    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash
@@ -18,7 +16,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v11 — Proxy console intercept)"
+echo " Fix TeaVM Auto-Login (v12 — safe init)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -34,60 +32,49 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v11 — Proxy console intercept -->
+    <!-- fuzzynuts-autologin: v12 — safe init, Proxy intercept -->
     <script>
     // ═══════════════════════════════════════════════════════════
-    //  BLOCK 1: Console intercept + shared state
-    //  Runs BEFORE classes.js loads.
-    //  Uses Proxy to intercept ALL console access, even from
-    //  code that cached a reference to console methods.
-    //  ALL state on window object for cross-block access.
+    //  BLOCK 1: Initialize ALL shared state FIRST (before any
+    //  console access), then install Proxy intercept.
     // ═══════════════════════════════════════════════════════════
+
+    // Step 1: Initialize ALL window properties FIRST
+    // This happens at global scope, before ANY function calls
+    window._sessionIdDetected = false;
+    window._logoutDetected = false;
+    window._logoutReason = '';
+    window._recentMessages = [];
+    window._fnSessionActive = false;
+    window._fnSessionGuardStarted = false;
+    window._fnAutoLogin = false;
+    window._fnWalletAddress = null;
+    window._msgCount = 0;
+
+    window._logoutPatterns = [
+      'disconnected',
+      'connection lost',
+      'session expired',
+      'connection closed',
+      'server closed',
+      'timed out',
+      'kicked',
+      'banned',
+      'enter your username',
+      'enter your details',
+      'welcome to runescape',
+      'please enter your',
+      'login screen',
+      'error connecting',
+      'failed to connect',
+      'unable to connect',
+      'no response from server'
+    ];
+
+    // Step 2: Parse hash params
     (function() {
-      'use strict';
-
-      // Save REAL original console methods (not our wrappers)
-      var _realConsole = console;
-      window._origLog = Function.prototype.call.bind(console.log, console);
-      window._origInfo = Function.prototype.call.bind(console.info || console.log, console);
-      window._origWarn = Function.prototype.call.bind(console.warn || console.log, console);
-      window._origError = Function.prototype.call.bind(console.error || console.log, console);
-
-      // Shared state — ALL on window for cross-script-block access
-      window._sessionIdDetected = false;
-      window._logoutDetected = false;
-      window._logoutReason = '';
-      window._recentMessages = [];
-      window._fnSessionActive = false;
-      window._fnSessionGuardStarted = false;
-
-      // Logout indicators
-      window._logoutPatterns = [
-        'disconnected',
-        'connection lost',
-        'session expired',
-        'connection closed',
-        'server closed',
-        'timed out',
-        'kicked',
-        'banned',
-        'enter your username',
-        'enter your details',
-        'welcome to runescape',
-        'please enter your',
-        'login screen',
-        'error connecting',
-        'failed to connect',
-        'unable to connect',
-        'no response from server'
-      ];
-
-      // Hash parsing
       var hashStr = window.location.hash.substring(1);
       var parts = hashStr.split(',');
-      window._fnAutoLogin = false;
-      window._fnWalletAddress = null;
-
       if (parts.length >= 7 && parts[6]) {
         var addr = decodeURIComponent(parts[6]);
         if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(addr)) {
@@ -95,9 +82,23 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           window._fnAutoLogin = true;
         }
       }
+    })();
 
-      // ── Process a console message for detection ──
+    // Step 3: Install Proxy intercept on console
+    // Uses .bind() which is safe and well-supported
+    (function() {
+      var _realConsole = console;
+
+      // Save originals using safe .bind() pattern
+      window._origLog = console.log.bind(console);
+      window._origInfo = (console.info || console.log).bind(console);
+      window._origWarn = (console.warn || console.log).bind(console);
+      window._origError = (console.error || console.log).bind(console);
+
+      // Process a console message for detection
       function _processMessage(msg) {
+        window._msgCount++;
+
         // Track login success
         if (/Session id:\s*\d+/.test(msg) || /Login response:\s*\d+/.test(msg)) {
           window._sessionIdDetected = true;
@@ -124,20 +125,13 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         }
       }
 
-      // ── Install Proxy on window.console ──
-      // This intercepts ALL console access, even from code that
-      // does: var log = console.log; log("hello");
-      // Because the Proxy intercepts the property GET, returning
-      // our wrapped function every time.
+      // Install Proxy on window.console
       var handler = {
         get: function(target, prop) {
           var original = target[prop];
           if (typeof original === 'function') {
-            // Return a wrapped function for every console method
             return function() {
-              // Call the REAL original method
               original.apply(target, arguments);
-              // Process the message for detection
               var args = Array.prototype.slice.call(arguments);
               var msg = args.join(' ');
               _processMessage(msg);
@@ -147,15 +141,13 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         }
       };
 
-      // Replace window.console with our Proxy
-      // After this, ANY access to console.log/info/warn/error
-      // goes through our handler, even from cached references
       window.console = new Proxy(_realConsole, handler);
 
-      // Verify the proxy is working
-      console.log('[autologin] Console intercept installed (v11 — Proxy)');
+      // Verify
+      window._origLog('[autologin] Console intercept installed (v12)');
+      window._origLog('[autologin] Shared state ready: _recentMessages=' + Array.isArray(window._recentMessages));
       if (window._fnAutoLogin) {
-        console.log('[autologin] Wallet address from hash: ' + window._fnWalletAddress.substring(0, 8) + '...');
+        window._origLog('[autologin] Wallet address from hash: ' + window._fnWalletAddress.substring(0, 8) + '...');
       }
     })();
     </script>
@@ -291,32 +283,8 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
         console.log('[session-guard] Active — monitoring for disconnect...');
 
-        // Sample canvas pixels to detect login screen
-        // The login screen has a distinctive dark blue/gray center
         var lastCanvasWidth = canvas ? canvas.width : 0;
         var lastCanvasHeight = canvas ? canvas.height : 0;
-        var sampleCtx = null;
-        try {
-          if (canvas && canvas.getContext) {
-            sampleCtx = canvas.getContext('2d', { willReadFrequently: true });
-          }
-        } catch (e) { /* canvas might not support 2d context */ }
-
-        function sampleCanvasPixels() {
-          if (!sampleCtx || !canvas) return null;
-          try {
-            // Sample center of canvas
-            var w = canvas.width;
-            var h = canvas.height;
-            var cx = Math.floor(w / 2);
-            var cy = Math.floor(h / 2);
-            var pixel = sampleCtx.getImageData(cx, cy, 1, 1).data;
-            return { r: pixel[0], g: pixel[1], b: pixel[2], a: pixel[3] };
-          } catch (e) {
-            // Cross-origin or tainted canvas — can't sample
-            return null;
-          }
-        }
 
         sessionGuardInterval = setInterval(function() {
           // Check 1: Console-based logout detection
@@ -338,21 +306,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             return;
           }
 
-          // Check 3: Canvas pixel sampling (backup detection)
-          var pixel = sampleCanvasPixels();
-          if (pixel) {
-            // Login screen is typically very dark (near black) in center
-            // Game world has varied colors
-            var brightness = (pixel.r + pixel.g + pixel.b) / 3;
-            if (brightness < 5 && pixel.a === 255) {
-              // Very dark pixel — might be login screen
-              // Don't immediately flag — could be loading screen
-              // Log for debugging
-              console.log('[session-guard] Dark pixel detected: rgb(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ')');
-            }
-          }
-
-          // Check 4: Canvas resized dramatically
+          // Check 3: Canvas resized dramatically
           if (canvas) {
             var w = canvas.width;
             var h = canvas.height;
@@ -365,9 +319,9 @@ cat > "$HTML_FILE" << 'HTMLEOF'
             lastCanvasHeight = h;
           }
 
-          // Check 5: Recent messages scan
+          // Check 4: Recent messages scan
           var recentCopy = window._recentMessages.slice();
-          window._recentMessages = []; // Clear after each check cycle
+          window._recentMessages = [];
           for (var m = 0; m < recentCopy.length; m++) {
             var msgLower = recentCopy[m];
             for (var p = 0; p < window._logoutPatterns.length; p++) {
@@ -385,8 +339,6 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         }, 3000);
       }
 
-      // ────────────────────────────────────────────────────────────
-      //  END SESSION GUARD
       // ────────────────────────────────────────────────────────────
 
       var EXISTING_USER_X = 356;
@@ -410,7 +362,6 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           if (window._sessionIdDetected) {
             clearInterval(checkInterval);
             console.log('[autologin] Login success detected!');
-            // Game is loading — wait 2s then reveal + start guard
             setTimeout(function() {
               if (canvas) canvas.style.visibility = 'visible';
               notifyParent('rsc-login-complete');
@@ -420,7 +371,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           }
           if (elapsed > LOGIN_TIMEOUT) {
             clearInterval(checkInterval);
-            console.log('[autologin] Login failed — no Session id after ' + (elapsed * 200) + 'ms');
+            console.log('[autologin] Login failed — no Session id after ' + (elapsed * 200) + 'ms. Messages caught: ' + window._msgCount);
             if (canvas) canvas.style.visibility = 'visible';
             notifyParent('rsc-login-error', 'Login failed. Invalid credentials or server error.');
             return;
@@ -529,22 +480,20 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v11' "$HTML_FILE"; then echo "✓ v11 marker present"; fi
+if grep -q 'v12' "$HTML_FILE"; then echo "✓ v12 marker present"; fi
 if grep -q 'new Proxy' "$HTML_FILE"; then echo "✓ Proxy intercept enabled"; fi
 if grep -q 'session-guard' "$HTML_FILE"; then echo "✓ Session guard enabled"; fi
-if grep -q 'rsc-session-lost' "$HTML_FILE"; then echo "✓ Session-lost postMessage present"; fi
-if grep -q 'sampleCanvasPixels' "$HTML_FILE"; then echo "✓ Pixel sampling enabled"; fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v11 — Proxy console intercept)"
+echo " ✓ FIX APPLIED (v12 — safe init)"
 echo ""
-echo " What changed from v10:"
-echo "   + Uses Proxy on window.console (catches ALL access)"
-echo "   + All shared state on window object (no scope issues)"
-echo "   + Canvas pixel sampling (backup logout detection)"
-echo "   + Regex-based Session id detection"
-echo "   + Debug logging for every intercepted message"
+echo " Changes from v11:"
+echo "   + ALL window properties initialized at global scope FIRST"
+echo "   + Safe .bind() pattern instead of Function.prototype.call.bind"
+echo "   + No IIFE wrapping the property initialization"
+echo "   + _msgCount counter for debugging"
+echo "   + Message count shown on timeout for diagnostics"
 echo ""
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
