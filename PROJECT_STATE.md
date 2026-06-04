@@ -1,6 +1,6 @@
 # FuzzyNuts Project State
 Last updated: 2026-06-04
-Current focus: v13 logout detection via canvas pixel sampling
+Current focus: Redirect to arcade on logout (v13 + parent page update)
 
 ## Done
 - API routes: `POST /api/rsc/claim-username`, `GET /api/rsc/credentials` (MongoDB + AES-256-GCM)
@@ -19,6 +19,7 @@ Current focus: v13 logout detection via canvas pixel sampling
 - v13: Bright→dark transition detection (game world → login screen)
 - v13: WebSocket connection monitor (close/error events trigger logout)
 - v13: Session guard interval reduced from 3s to 2s
+- Parent page: on logout, shows "Session ended — returning to arcade..." then redirects to /play/rsc
 
 ## In Progress
 - Deploy v13 to VPS and test logout detection in production
