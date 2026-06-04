@@ -22,9 +22,14 @@ Current focus: Logout detection + redirect fully working (v13b on VPS, parent pa
 - Parent page: on logout, shows "Session ended — returning to arcade..." then redirects to /
 - Vercel lockfile fixed: `pnpm-lock.yaml` was stale → all builds failing silently since Jun 2
 - `.gitignore` updated: added `!apps/web-arcade/public/games/rsc/` so RSC parent page deploys
+- Community Chat Phase 1A: Socket.io backend with wallet auth, Tier 1 regex moderation, shadow mode
+- Community Chat Phase 1B: React ChatWidget component, real-time messages, mobile-responsive
+- Community Chat Step 2A: Trust score (account age), link stripping for <24h accounts
+- Community Chat Step 2B: Tier 2 AI moderation via OpenAI Moderation API (free tier)
 
 ## In Progress
-- Nothing — logout detection + redirect fully working end-to-end
+- Community Chat Phase 2 — Step 2B (Tier 2 AI moderation) deployed, awaiting OPENAI_API_KEY on Railway
+- Next: Step 2C (/report command), Step 2D (moderation dashboard)
 
 ## Blocked / Next
 - Railway Express API container crash (env vars not injecting into Docker) — not blocking RSC since auto-login works via direct VPS
@@ -40,7 +45,9 @@ Current focus: Logout detection + redirect fully working (v13b on VPS, parent pa
 - `apps/web-arcade/public/games/rsc/index.html` — Parent page: wallet flow, claim modal, session-lost handler
 - `apps/api/src/routes/rsc.ts` — claim-username + credentials endpoints
 - `apps/api/src/middleware/walletAuth.ts` — JWT cookie verification
-- `apps/api/src/server.ts` — Express bootstrap, mounts RSC routes
+- `apps/api/src/server.ts` — Express bootstrap, mounts RSC + chat routes
+- `apps/api/src/routes/chat.ts` — Chat backend: Socket.io, moderation (Tier 1 + Tier 2), trust score, link policy
+- `apps/web-arcade/src/components/chat/ChatWidget.tsx` — Chat frontend: real-time messages, shadow/ai indicators
 - `/var/www/rsc-client/index.html` — Live on VPS (needs v13 deploy), game.fuzzynuts.xyz
 
 ## Technical Notes

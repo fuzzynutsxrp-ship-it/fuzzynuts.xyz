@@ -25,6 +25,7 @@ interface ChatMessage {
   shadowed?: boolean;
   linkStripped?: boolean;
   aiFlagged?: boolean;
+  isSystem?: boolean;
 }
 
 interface OnlineUser {
@@ -147,6 +148,12 @@ export function ChatWidget() {
         if (cancelled) return;
         // Link-stripped messages: show to sender with indicator
         setMessages((prev) => [...prev, { ...msg, linkStripped: true }]);
+      });
+
+      socket.on("message:report-ack", (msg: ChatMessage) => {
+        if (cancelled) return;
+        // Report confirmation: show as system message
+        setMessages((prev) => [...prev, { ...msg, isSystem: true }]);
       });
 
       socket.on("message:error", (data: { error: string }) => {
@@ -272,55 +279,69 @@ export function ChatWidget() {
             key={msg.id}
             className={`mb-3 ${msg.shadowed ? "opacity-50" : ""}`}
           >
-            <div className="flex items-baseline gap-2">
-              <span
-                className={`text-xs font-semibold ${
-                  msg.shadowed && msg.aiFlagged
-                    ? "text-[#e8943a]"
-                    : msg.shadowed
-                      ? "text-[#ef4444]"
-                      : msg.linkStripped
-                        ? "text-[#3B82F6]"
-                        : "text-[#7c3aed]"
-                }`}
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                {msg.username}
-              </span>
-              <span className="text-[10px] text-white/20">
-                {formatTime(msg.createdAt)}
-              </span>
-            </div>
-            <p
-              className={`mt-0.5 text-[13px] leading-relaxed ${
-                msg.shadowed && msg.aiFlagged
-                  ? "text-[#e8943a]/70 line-through"
-                  : msg.shadowed
-                    ? "text-[#ef4444]/70 line-through"
-                    : msg.linkStripped
-                      ? "text-white/70"
-                      : "text-white/80"
-              }`}
-            >
-              {msg.content}
-            </p>
-            {msg.shadowed && msg.aiFlagged && (
-              <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#e8943a]/50">
-                <AlertTriangle size={10} />
-                Only you can see this — flagged by AI moderation
-              </p>
+            {/* System messages (report confirmations) */}
+            {msg.isSystem && (
+              <div className="rounded-lg border border-[#10B981]/20 bg-[#10B981]/5 px-3 py-2">
+                <p className="text-[12px] leading-relaxed text-[#10B981]/80">
+                  {msg.content}
+                </p>
+              </div>
             )}
-            {msg.shadowed && !msg.aiFlagged && (
-              <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#ef4444]/50">
-                <AlertTriangle size={10} />
-                Only you can see this — flagged by moderation
-              </p>
-            )}
-            {msg.linkStripped && (
-              <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#3B82F6]/60">
-                <AlertTriangle size={10} />
-                Links removed — accounts must be 24+ hours old to post links
-              </p>
+
+            {/* Regular / shadowed / link-stripped messages */}
+            {!msg.isSystem && (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={`text-xs font-semibold ${
+                      msg.shadowed && msg.aiFlagged
+                        ? "text-[#e8943a]"
+                        : msg.shadowed
+                          ? "text-[#ef4444]"
+                          : msg.linkStripped
+                            ? "text-[#3B82F6]"
+                            : "text-[#7c3aed]"
+                    }`}
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {msg.username}
+                  </span>
+                  <span className="text-[10px] text-white/20">
+                    {formatTime(msg.createdAt)}
+                  </span>
+                </div>
+                <p
+                  className={`mt-0.5 text-[13px] leading-relaxed ${
+                    msg.shadowed && msg.aiFlagged
+                      ? "text-[#e8943a]/70 line-through"
+                      : msg.shadowed
+                        ? "text-[#ef4444]/70 line-through"
+                        : msg.linkStripped
+                          ? "text-white/70"
+                          : "text-white/80"
+                  }`}
+                >
+                  {msg.content}
+                </p>
+                {msg.shadowed && msg.aiFlagged && (
+                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#e8943a]/50">
+                    <AlertTriangle size={10} />
+                    Only you can see this — flagged by AI moderation
+                  </p>
+                )}
+                {msg.shadowed && !msg.aiFlagged && (
+                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#ef4444]/50">
+                    <AlertTriangle size={10} />
+                    Only you can see this — flagged by moderation
+                  </p>
+                )}
+                {msg.linkStripped && (
+                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#3B82F6]/60">
+                    <AlertTriangle size={10} />
+                    Links removed — accounts must be 24+ hours old to post links
+                  </p>
+                )}
+              </>
             )}
           </div>
         ))}

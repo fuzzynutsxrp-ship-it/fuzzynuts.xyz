@@ -234,6 +234,11 @@ async function ensureIndexes(uri: string): Promise<void> {
   await db.collection<ChatMessage>("chat_messages").createIndex(
     { createdAt: -1 },
   );
+  // Reports collection — TTL index for auto-expiry
+  await db.collection("chat_reports").createIndex(
+    { expiresAt: 1 },
+    { expireAfterSeconds: 0 },
+  );
 }
 
 // ── Init — attach Socket.io to the HTTP server ─────────────────
@@ -264,6 +269,55 @@ export function initChat(
 
   // Track online users (socketId → user info)
   const onlineUsers = new Map<string, OnlineUser>();
+
+  // Track last message per wallet (for /report context)
+  const lastMessages = new Map<string, { username: string; content: string; at: Date }>();
+
+  /** Handle /report command — store report, notify reporter */
+  async function handleReport(
+    reporterWallet: string,
+    reporterUsername: string,
+    targetUsername: string,
+  ): Promise<{ ok: boolean; error?: string }> {
+    try {
+      const db = await getDb(opts.MONGODB_URI);
+      const reports = db.collection("chat_reports");
+
+      // Find the target's last message for context
+      let lastMsg = "";
+      for (const [, msg] of lastMessages) {
+        if (msg.username.toLowerCase() === targetUsername.toLowerCase()) {
+          lastMsg = msg.content;
+          break;
+        }
+      }
+
+      if (!lastMsg) {
+        return { ok: false, error: `No recent messages from "${targetUsername}" found` };
+      }
+
+      // Prevent self-reporting
+      if (reporterUsername.toLowerCase() === targetUsername.toLowerCase()) {
+        return { ok: false, error: "You cannot report yourself" };
+      }
+
+      const now = new Date();
+      await reports.insertOne({
+        reportedUsername: targetUsername,
+        reportedBy: reporterWallet,
+        reporterUsername,
+        lastMessage: lastMsg,
+        createdAt: now,
+        expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+      });
+
+      console.log(`[chat:report] ${reporterUsername} reported ${targetUsername}`);
+      return { ok: true };
+    } catch (err) {
+      console.error("[chat:report] Error:", err);
+      return { ok: false, error: "Failed to submit report" };
+    }
+  }
 
   // ── Auth middleware — resolve wallet → username on connect ──
   io.use(async (socket, next) => {
@@ -335,6 +389,29 @@ export function initChat(
             error: "Message too long (max 500 chars)",
           });
           return;
+        }
+
+        // ── /report command — intercept before any other processing ──
+        if (content.toLowerCase().startsWith("/report ")) {
+          const targetUsername = content.slice(8).trim();
+          if (!targetUsername) {
+            socket.emit("message:error", {
+              error: "Usage: /report username",
+            });
+            return;
+          }
+          const result = await handleReport(wallet, username, targetUsername);
+          if (result.ok) {
+            socket.emit("message:report-ack", {
+              id: `report-${Date.now()}`,
+              username: "System",
+              content: `Report filed against "${targetUsername}". Our moderators will review it.`,
+              createdAt: new Date().toISOString(),
+            });
+          } else {
+            socket.emit("message:error", { error: result.error || "Report failed" });
+          }
+          return; // Don't broadcast /report as a chat message
         }
 
         // Rate limit check
@@ -431,6 +508,9 @@ export function initChat(
           ...(linksStripped && { linkStripped: true }),
         };
         io.emit("message:new", outgoing);
+
+        // Track last message for /report context
+        lastMessages.set(wallet, { username, content: finalContent, at: now });
       } catch (err) {
         console.error("[chat] Message error:", err);
         socket.emit("message:error", { error: "Failed to send message" });
