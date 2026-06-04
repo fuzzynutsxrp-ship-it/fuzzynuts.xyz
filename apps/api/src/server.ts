@@ -7,6 +7,7 @@
  *         Phase E (xrpl-token-utils) finishes.
  */
 
+import { createServer } from "node:http";
 import express from "express";
 import cors from "cors";
 
@@ -139,6 +140,30 @@ async function bootstrap() {
     app.use("/api/rsc", (_req, res) => {
       res.status(503).json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
     });
+  }
+
+  // Community Chat (Socket.io + history endpoint)
+  if (MONGODB_URI && WALLET_JWT_SECRET) {
+    try {
+      const { initChat, buildChatHistoryRouter } = await import("./routes/chat");
+      app.use("/api/chat", buildChatHistoryRouter(MONGODB_URI));
+
+      const httpServer = createServer(app);
+      initChat(httpServer, {
+        MONGODB_URI,
+        WALLET_JWT_SECRET,
+        ALLOWED_ORIGINS,
+        walletMappingsCollection: "wallet_mappings",
+      });
+
+      httpServer.listen(PORT, () => {
+        console.log(`@fuzzynuts/api listening on :${PORT} (with chat)`);
+      });
+      return; // skip the fallback listen below
+    } catch (e) {
+      console.error("[api] Failed to load chat module:", e);
+      // Fall through to standard listen (chat disabled, rest still works)
+    }
   }
 
   // TODO(auth-rollout): mount migrated /api/scores, /api/rewards, /api/scores/stream
