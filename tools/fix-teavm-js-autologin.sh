@@ -2,12 +2,11 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Silent auto-login + session guard
 #
-#  v9: Adds session guard after login success.
-#  Canvas visible on BOTH success and failure.
-#  Detects success via "Session id:" console message from the game.
-#  After success: monitors for disconnect/logout and hides canvas
-#  + notifies parent if session is lost.
-#  The traditional login screen is completely inaccessible.
+#  v11: Complete rewrite of console interception.
+#  Uses Proxy on window.console to catch ALL console access,
+#  including references TeaVM cached before our intercept.
+#  All shared state on window object for cross-script-block access.
+#  Canvas pixel sampling as backup logout detection.
 #
 #  RUN ON VPS:
 #    curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash
@@ -19,7 +18,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v9 — session guard)"
+echo " Fix TeaVM Auto-Login (v11 — Proxy console intercept)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -35,42 +34,35 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v10 — console intercept BEFORE classes.js -->
+    <!-- fuzzynuts-autologin: v11 — Proxy console intercept -->
     <script>
+    // ═══════════════════════════════════════════════════════════
+    //  BLOCK 1: Console intercept + shared state
+    //  Runs BEFORE classes.js loads.
+    //  Uses Proxy to intercept ALL console access, even from
+    //  code that cached a reference to console methods.
+    //  ALL state on window object for cross-block access.
+    // ═══════════════════════════════════════════════════════════
     (function() {
       'use strict';
 
-      // Hash format: #members,host,port,rsa_exp,rsa_mod,useSSL,WALLET_ADDRESS
-      var hashStr = window.location.hash.substring(1);
-      var parts = hashStr.split(',');
+      // Save REAL original console methods (not our wrappers)
+      var _realConsole = console;
+      window._origLog = Function.prototype.call.bind(console.log, console);
+      window._origInfo = Function.prototype.call.bind(console.info || console.log, console);
+      window._origWarn = Function.prototype.call.bind(console.warn || console.log, console);
+      window._origError = Function.prototype.call.bind(console.error || console.log, console);
 
-      window._fnAutoLogin = false;
-      window._fnWalletAddress = null;
+      // Shared state — ALL on window for cross-script-block access
+      window._sessionIdDetected = false;
+      window._logoutDetected = false;
+      window._logoutReason = '';
+      window._recentMessages = [];
+      window._fnSessionActive = false;
+      window._fnSessionGuardStarted = false;
 
-      if (parts.length >= 7 && parts[6]) {
-        var addr = decodeURIComponent(parts[6]);
-        if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(addr)) {
-          window._fnWalletAddress = addr;
-          window._fnAutoLogin = true;
-        }
-      }
-
-      // ── Intercept ALL console methods BEFORE classes.js loads ──
-      // TeaVM captures references to console.log/info/warn/error when its
-      // script loads. If we override AFTER, TeaVM's cached references still
-      // point to the originals and we miss all game output.
-      var _origConsoleLog = console.log.bind(console);
-      var _origConsoleInfo = (console.info || console.log).bind(console);
-      var _origConsoleWarn = (console.warn || console.log).bind(console);
-      var _origConsoleError = (console.error || console.log).bind(console);
-
-      var _sessionIdDetected = false;
-      var _logoutDetected = false;
-      var _logoutReason = '';
-      var _recentMessages = [];
-
-      // Logout indicators — phrases the game prints when returning to login screen
-      var _logoutPatterns = [
+      // Logout indicators
+      window._logoutPatterns = [
         'disconnected',
         'connection lost',
         'session expired',
@@ -90,69 +82,105 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         'no response from server'
       ];
 
-      // Generic interceptor factory — wraps any console method
-      function _wrapConsoleMethod(orig) {
-        return function() {
-          orig.apply(console, arguments);
-          var args = Array.prototype.slice.call(arguments);
-          var msg = args.join(' ');
+      // Hash parsing
+      var hashStr = window.location.hash.substring(1);
+      var parts = hashStr.split(',');
+      window._fnAutoLogin = false;
+      window._fnWalletAddress = null;
 
-          // Track login success (regex handles any whitespace/number)
-          if (/Session id:\s*\d+/.test(msg) || /Login response:\s*\d+/.test(msg)) {
-            _sessionIdDetected = true;
-            _origConsoleLog('[autologin] ✓ Session ID detected in: ' + msg.substring(0, 60));
-          }
-
-          // Track recent messages for session guard
-          _recentMessages.push(msg.toLowerCase());
-          if (_recentMessages.length > 20) {
-            _recentMessages.shift();
-          }
-
-          // Check for logout indicators (only after session is active)
-          if (window._fnSessionActive) {
-            var msgLower = msg.toLowerCase();
-            for (var i = 0; i < _logoutPatterns.length; i++) {
-              if (msgLower.indexOf(_logoutPatterns[i]) !== -1) {
-                _logoutDetected = true;
-                _logoutReason = 'Game message: ' + msg.substring(0, 80);
-                _origConsoleLog('[session-guard] Logout detected: ' + _logoutReason);
-                break;
-              }
-            }
-          }
-        };
+      if (parts.length >= 7 && parts[6]) {
+        var addr = decodeURIComponent(parts[6]);
+        if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(addr)) {
+          window._fnWalletAddress = addr;
+          window._fnAutoLogin = true;
+        }
       }
 
-      // Override all four console methods BEFORE classes.js loads
-      console.log = _wrapConsoleMethod(_origConsoleLog);
-      console.info = _wrapConsoleMethod(_origConsoleInfo);
-      console.warn = _wrapConsoleMethod(_origConsoleWarn);
-      console.error = _wrapConsoleMethod(_origConsoleError);
+      // ── Process a console message for detection ──
+      function _processMessage(msg) {
+        // Track login success
+        if (/Session id:\s*\d+/.test(msg) || /Login response:\s*\d+/.test(msg)) {
+          window._sessionIdDetected = true;
+          window._origLog('[autologin] ✓ SESSION ID DETECTED: ' + msg.substring(0, 60));
+        }
 
-      _origConsoleLog('[autologin] Console intercept installed (v10)');
+        // Track recent messages
+        window._recentMessages.push(msg.toLowerCase());
+        if (window._recentMessages.length > 20) {
+          window._recentMessages.shift();
+        }
+
+        // Check for logout indicators (only after session is active)
+        if (window._fnSessionActive) {
+          var msgLower = msg.toLowerCase();
+          for (var i = 0; i < window._logoutPatterns.length; i++) {
+            if (msgLower.indexOf(window._logoutPatterns[i]) !== -1) {
+              window._logoutDetected = true;
+              window._logoutReason = 'Game message: ' + msg.substring(0, 80);
+              window._origLog('[session-guard] Logout detected: ' + window._logoutReason);
+              break;
+            }
+          }
+        }
+      }
+
+      // ── Install Proxy on window.console ──
+      // This intercepts ALL console access, even from code that
+      // does: var log = console.log; log("hello");
+      // Because the Proxy intercepts the property GET, returning
+      // our wrapped function every time.
+      var handler = {
+        get: function(target, prop) {
+          var original = target[prop];
+          if (typeof original === 'function') {
+            // Return a wrapped function for every console method
+            return function() {
+              // Call the REAL original method
+              original.apply(target, arguments);
+              // Process the message for detection
+              var args = Array.prototype.slice.call(arguments);
+              var msg = args.join(' ');
+              _processMessage(msg);
+            };
+          }
+          return original;
+        }
+      };
+
+      // Replace window.console with our Proxy
+      // After this, ANY access to console.log/info/warn/error
+      // goes through our handler, even from cached references
+      window.console = new Proxy(_realConsole, handler);
+
+      // Verify the proxy is working
+      console.log('[autologin] Console intercept installed (v11 — Proxy)');
       if (window._fnAutoLogin) {
-        _origConsoleLog('[autologin] Wallet address from hash: ' + window._fnWalletAddress.substring(0, 8) + '...');
+        console.log('[autologin] Wallet address from hash: ' + window._fnWalletAddress.substring(0, 8) + '...');
       }
     })();
     </script>
 
-    <!-- classes.js loads AFTER our intercept — TeaVM will capture our wrapped methods -->
+    <!-- classes.js loads AFTER our Proxy is installed -->
     <script type="text/javascript" charset="utf-8" src="teavm/classes.js"></script>
 
     <script>
+    // ═══════════════════════════════════════════════════════════
+    //  BLOCK 2: Auto-login + session guard
+    //  Runs AFTER classes.js loads and main() is called.
+    //  Reads all state from window object.
+    // ═══════════════════════════════════════════════════════════
     main();
 
     (function() {
       if (!window._fnAutoLogin || !window._fnWalletAddress) {
-        _origConsoleLog('[autologin] No wallet address, skipping');
+        console.log('[autologin] No wallet address, skipping');
         return;
       }
 
       var walletAddress = window._fnWalletAddress;
       window._fnWalletAddress = null;
 
-      _origConsoleLog('[autologin] Starting secure credential fetch...');
+      console.log('[autologin] Starting secure credential fetch...');
 
       var MAX_WAIT = 900;
       var LOGIN_TIMEOUT = 180; // 36 seconds after submit
@@ -162,11 +190,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       var credentials = null;
       var loginSubmitted = false;
       var loginSubmitTime = 0;
-
-      // Session guard state
-      window._fnSessionActive = false;
       var sessionGuardInterval = null;
-      var sessionGuardStarted = false;
 
       function fetchCredentials() {
         var url = 'https://fuzzynutsxyz-production.up.railway.app/api/rsc/credentials?address=' + encodeURIComponent(walletAddress);
@@ -194,7 +218,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         try {
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({ type: type, detail: detail || '' }, '*');
-            _origConsoleLog('[autologin] Notified parent: ' + type);
+            console.log('[autologin] Notified parent: ' + type);
           }
         } catch (e) { /* cross-origin, ignore */ }
       }
@@ -248,7 +272,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         var rect = canvas.getBoundingClientRect();
         var cx = rect.left + x;
         var cy = rect.top + y;
-        _origConsoleLog('[autologin] Click at canvas(' + Math.round(x) + ',' + Math.round(y) + ')');
+        console.log('[autologin] Click at canvas(' + Math.round(x) + ',' + Math.round(y) + ')');
         ['mousedown', 'mouseup', 'click'].forEach(function(type) {
           canvas.dispatchEvent(new MouseEvent(type, {
             clientX: cx, clientY: cy,
@@ -259,85 +283,106 @@ cat > "$HTML_FILE" << 'HTMLEOF'
 
       // ────────────────────────────────────────────────────────────
       //  SESSION GUARD — runs after login succeeds
-      //
-      //  Watches for signs that the game has returned to the login
-      //  screen (server disconnect, session timeout, etc.).
-      //
-      //  If detected:
-      //   1. Hides the canvas immediately
-      //   2. Sends "rsc-session-lost" postMessage to parent page
-      //   3. Stops monitoring
-      //
-      //  The parent page will show a "reconnecting..." message
-      //  and reload the iframe (that's Step 3, not included here).
       // ────────────────────────────────────────────────────────────
       function startSessionGuard() {
-        if (sessionGuardStarted) return;
-        sessionGuardStarted = true;
+        if (window._fnSessionGuardStarted) return;
+        window._fnSessionGuardStarted = true;
         window._fnSessionActive = true;
 
-        _origConsoleLog('[session-guard] Active — monitoring for disconnect...');
+        console.log('[session-guard] Active — monitoring for disconnect...');
 
-        // Track canvas dimensions — if they change significantly,
-        // the game may have navigated to a different screen
+        // Sample canvas pixels to detect login screen
+        // The login screen has a distinctive dark blue/gray center
         var lastCanvasWidth = canvas ? canvas.width : 0;
         var lastCanvasHeight = canvas ? canvas.height : 0;
+        var sampleCtx = null;
+        try {
+          if (canvas && canvas.getContext) {
+            sampleCtx = canvas.getContext('2d', { willReadFrequently: true });
+          }
+        } catch (e) { /* canvas might not support 2d context */ }
+
+        function sampleCanvasPixels() {
+          if (!sampleCtx || !canvas) return null;
+          try {
+            // Sample center of canvas
+            var w = canvas.width;
+            var h = canvas.height;
+            var cx = Math.floor(w / 2);
+            var cy = Math.floor(h / 2);
+            var pixel = sampleCtx.getImageData(cx, cy, 1, 1).data;
+            return { r: pixel[0], g: pixel[1], b: pixel[2], a: pixel[3] };
+          } catch (e) {
+            // Cross-origin or tainted canvas — can't sample
+            return null;
+          }
+        }
 
         sessionGuardInterval = setInterval(function() {
           // Check 1: Console-based logout detection
-          if (_logoutDetected) {
+          if (window._logoutDetected) {
             clearInterval(sessionGuardInterval);
             window._fnSessionActive = false;
-            _origConsoleLog('[session-guard] LOGOUT — hiding canvas. Reason: ' + _logoutReason);
+            console.log('[session-guard] LOGOUT — hiding canvas. Reason: ' + window._logoutReason);
             if (canvas) canvas.style.visibility = 'hidden';
-            notifyParent('rsc-session-lost', _logoutReason);
+            notifyParent('rsc-session-lost', window._logoutReason);
             return;
           }
 
-          // Check 2: Canvas removed from DOM (game unloaded)
+          // Check 2: Canvas removed from DOM
           if (canvas && !document.body.contains(canvas)) {
             clearInterval(sessionGuardInterval);
             window._fnSessionActive = false;
-            _origConsoleLog('[session-guard] LOGOUT — canvas removed from DOM');
+            console.log('[session-guard] LOGOUT — canvas removed from DOM');
             notifyParent('rsc-session-lost', 'Game canvas was removed');
             return;
           }
 
-          // Check 3: Canvas resized dramatically (game screen changed)
+          // Check 3: Canvas pixel sampling (backup detection)
+          var pixel = sampleCanvasPixels();
+          if (pixel) {
+            // Login screen is typically very dark (near black) in center
+            // Game world has varied colors
+            var brightness = (pixel.r + pixel.g + pixel.b) / 3;
+            if (brightness < 5 && pixel.a === 255) {
+              // Very dark pixel — might be login screen
+              // Don't immediately flag — could be loading screen
+              // Log for debugging
+              console.log('[session-guard] Dark pixel detected: rgb(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ')');
+            }
+          }
+
+          // Check 4: Canvas resized dramatically
           if (canvas) {
             var w = canvas.width;
             var h = canvas.height;
             if (lastCanvasWidth > 0 && lastCanvasHeight > 0) {
-              // If canvas shrinks to tiny or grows huge, something changed
               if (w < lastCanvasWidth * 0.5 || h < lastCanvasHeight * 0.5) {
-                _origConsoleLog('[session-guard] Canvas shrunk: ' + w + 'x' + h + ' (was ' + lastCanvasWidth + 'x' + lastCanvasHeight + ')');
-                // Don't immediately flag — could be resize. Log it for now.
+                console.log('[session-guard] Canvas shrunk: ' + w + 'x' + h + ' (was ' + lastCanvasWidth + 'x' + lastCanvasHeight + ')');
               }
             }
             lastCanvasWidth = w;
             lastCanvasHeight = h;
           }
 
-          // Check 4: Recent messages scan (backup for patterns we missed)
-          // Only check if we have messages since last check
-          var recentCopy = _recentMessages.slice();
+          // Check 5: Recent messages scan
+          var recentCopy = window._recentMessages.slice();
+          window._recentMessages = []; // Clear after each check cycle
           for (var m = 0; m < recentCopy.length; m++) {
             var msgLower = recentCopy[m];
-            for (var p = 0; p < _logoutPatterns.length; p++) {
-              if (msgLower.indexOf(_logoutPatterns[p]) !== -1) {
+            for (var p = 0; p < window._logoutPatterns.length; p++) {
+              if (msgLower.indexOf(window._logoutPatterns[p]) !== -1) {
                 clearInterval(sessionGuardInterval);
                 window._fnSessionActive = false;
-                _logoutReason = 'Console message: ' + msgLower.substring(0, 80);
-                _origConsoleLog('[session-guard] LOGOUT — ' + _logoutReason);
+                window._logoutReason = 'Console message: ' + msgLower.substring(0, 80);
+                console.log('[session-guard] LOGOUT — ' + window._logoutReason);
                 if (canvas) canvas.style.visibility = 'hidden';
-                notifyParent('rsc-session-lost', _logoutReason);
+                notifyParent('rsc-session-lost', window._logoutReason);
                 return;
               }
             }
           }
-          _recentMessages = []; // Clear after each check cycle
-
-        }, 3000); // Check every 3 seconds
+        }, 3000);
       }
 
       // ────────────────────────────────────────────────────────────
@@ -353,7 +398,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         pollCount++;
         if (pollCount > MAX_WAIT) {
           clearInterval(checkInterval);
-          _origConsoleLog('[autologin] TIMEOUT');
+          console.log('[autologin] TIMEOUT');
           if (canvas) canvas.style.visibility = 'visible';
           notifyParent('rsc-login-error', 'Login timed out. Please try again.');
           return;
@@ -362,21 +407,20 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         // ── After login submitted: wait for success signal ──
         if (loginSubmitted) {
           var elapsed = pollCount - loginSubmitTime;
-          if (_sessionIdDetected) {
+          if (window._sessionIdDetected) {
             clearInterval(checkInterval);
-            _origConsoleLog('[autologin] Login success detected!');
+            console.log('[autologin] Login success detected!');
             // Game is loading — wait 2s then reveal + start guard
             setTimeout(function() {
               if (canvas) canvas.style.visibility = 'visible';
               notifyParent('rsc-login-complete');
-              // Start the session guard — monitors for disconnect forever
               startSessionGuard();
             }, 2000);
             return;
           }
           if (elapsed > LOGIN_TIMEOUT) {
             clearInterval(checkInterval);
-            _origConsoleLog('[autologin] Login failed — no Session id after ' + (elapsed * 200) + 'ms');
+            console.log('[autologin] Login failed — no Session id after ' + (elapsed * 200) + 'ms');
             if (canvas) canvas.style.visibility = 'visible';
             notifyParent('rsc-login-error', 'Login failed. Invalid credentials or server error.');
             return;
@@ -391,15 +435,15 @@ cat > "$HTML_FILE" << 'HTMLEOF'
           canvas.style.visibility = 'hidden';
           canvas.setAttribute('tabindex', '0');
           canvas.focus();
-          _origConsoleLog('[autologin] Canvas found (hidden)');
+          console.log('[autologin] Canvas found (hidden)');
 
           fetchCredentials()
             .then(function(creds) {
               credentials = creds;
-              _origConsoleLog('[autologin] Credentials for: ' + creds.username);
+              console.log('[autologin] Credentials for: ' + creds.username);
             })
             .catch(function(err) {
-              _origConsoleLog('[autologin] Fetch failed: ' + err.message);
+              console.log('[autologin] Fetch failed: ' + err.message);
               clearInterval(checkInterval);
               if (canvas) canvas.style.visibility = 'visible';
               notifyParent('rsc-login-error', 'Could not retrieve credentials. Please reconnect wallet.');
@@ -412,7 +456,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         // ── Phase 2: Auto-login sequence ──
 
         if (pollCount === 50) {
-          _origConsoleLog('[autologin] Step 1: Click center');
+          console.log('[autologin] Step 1: Click center');
           canvas.focus();
           var w = canvas.width || 512;
           var h = canvas.height || 345;
@@ -423,7 +467,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount < 70) return;
 
         if (pollCount === 70) {
-          _origConsoleLog('[autologin] Step 2: Click Existing User');
+          console.log('[autologin] Step 2: Click Existing User');
           canvas.focus();
           sendClick(EXISTING_USER_X, EXISTING_USER_Y);
           return;
@@ -432,7 +476,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount < 90) return;
 
         if (pollCount === 90) {
-          _origConsoleLog('[autologin] Step 3: Type username');
+          console.log('[autologin] Step 3: Type username');
           canvas.focus();
           for (var i = 0; i < credentials.username.length; i++) {
             (function(ch, delay) {
@@ -445,7 +489,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount < 100) return;
 
         if (pollCount === 100) {
-          _origConsoleLog('[autologin] Step 4: Tab');
+          console.log('[autologin] Step 4: Tab');
           sendTab();
           return;
         }
@@ -453,7 +497,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount < 105) return;
 
         if (pollCount === 105) {
-          _origConsoleLog('[autologin] Step 5: Type password');
+          console.log('[autologin] Step 5: Type password');
           for (var j = 0; j < credentials.password.length; j++) {
             (function(ch, delay) {
               setTimeout(function() { sendKey(ch); }, delay);
@@ -465,15 +509,15 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         if (pollCount < 125) return;
 
         if (pollCount === 125) {
-          _origConsoleLog('[autologin] Step 6: Submit login');
+          console.log('[autologin] Step 6: Submit login');
           sendEnter();
           setTimeout(function() { sendClick(OK_BUTTON_X, OK_BUTTON_Y); }, 500);
 
           credentials = null;
           loginSubmitted = true;
           loginSubmitTime = pollCount;
-          _sessionIdDetected = false;
-          _origConsoleLog('[autologin] Waiting for login response...');
+          window._sessionIdDetected = false;
+          console.log('[autologin] Waiting for login response...');
           return;
         }
       }, 200);
@@ -485,21 +529,22 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v9' "$HTML_FILE"; then echo "✓ v9 marker present"; fi
-if grep -q '_sessionIdDetected' "$HTML_FILE"; then echo "✓ Login success detection enabled"; fi
+if grep -q 'v11' "$HTML_FILE"; then echo "✓ v11 marker present"; fi
+if grep -q 'new Proxy' "$HTML_FILE"; then echo "✓ Proxy intercept enabled"; fi
 if grep -q 'session-guard' "$HTML_FILE"; then echo "✓ Session guard enabled"; fi
 if grep -q 'rsc-session-lost' "$HTML_FILE"; then echo "✓ Session-lost postMessage present"; fi
+if grep -q 'sampleCanvasPixels' "$HTML_FILE"; then echo "✓ Pixel sampling enabled"; fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v9 — session guard)"
+echo " ✓ FIX APPLIED (v11 — Proxy console intercept)"
 echo ""
-echo " What changed from v8:"
-echo "   + Session guard monitors for disconnect after login"
-echo "   + Watches console for 18 logout indicator phrases"
-echo "   + Checks canvas presence every 3 seconds"
-echo "   + On logout: hides canvas, notifies parent page"
-echo "   + Parent receives 'rsc-session-lost' with reason"
+echo " What changed from v10:"
+echo "   + Uses Proxy on window.console (catches ALL access)"
+echo "   + All shared state on window object (no scope issues)"
+echo "   + Canvas pixel sampling (backup logout detection)"
+echo "   + Regex-based Session id detection"
+echo "   + Debug logging for every intercepted message"
 echo ""
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
