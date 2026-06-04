@@ -1,38 +1,41 @@
 # FuzzyNuts Project State
-Last updated: 2026-06-03
-Current focus: End-to-end testing of RSC wallet auto-login flow
+Last updated: 2026-06-04
+Current focus: RSC auto-login + session guard fully working (v12 deployed)
 
 ## Done
 - API routes: `POST /api/rsc/claim-username`, `GET /api/rsc/credentials` (MongoDB + AES-256-GCM)
-- RSC endpoints accept wallet address from request body (no JWT required for standalone page)
-- XRPL address regex fixed (`a-km-z` not `a-k-z`)
-- `server.ts` resilient to missing env vars, lazy-loaded routers with try/catch
-- Railway Express API deployed and healthy (all 4 env vars present)
+- Wallet auth JWT middleware (`walletAuth.ts`)
+- Server mounts RSC routes at `/api/rsc` gated by wallet JWT
 - Vercel rewrite: `/api/rsc/*` → Railway Express API
-- RSC landing page reads wallet from localStorage (fallback from cookie)
-- RSC landing page passes wallet address in API requests
-- TeaVM classes.js patched on VPS (3 critical fixes: send(e), data.set)
-- nginx reloaded on VPS to serve patched client
-- VPS host key updated after rebuild
+- RSC landing page with wallet connect flow, claim modal, iframe launcher
+- TeaVM auto-login: canvas hidden, keyboard simulation (keyCode/which/charCode), click at pixel coords
+- Session ID detection: Proxy on window.console catches ALL output including classes.js (TeaVM)
+- Session guard: monitors console for 17 logout patterns, hides canvas, notifies parent via postMessage
+- Parent page handles `rsc-session-lost`: shows overlay, reloads iframe after 2s, 3-reload-in-60s loop protection
+- VPS script: `tools/fix-teavm-js-autologin.sh` (v12, deployed to /var/www/rsc-client/index.html)
 
 ## In Progress
-- User testing: wallet connect → claim username → auto-login into game
+- Nothing actively being worked on — session guard is complete and tested
 
 ## Blocked / Next
-- Delete `cooperative-caring` Railway service (duplicate, wrong config)
-- Set real values for WALLET_JWT_SECRET and GAME_SESSION_SECRET (currently placeholders)
-- Clean up test data in MongoDB (TestUser mapping)
+- Railway Express API container crash (env vars not injecting into Docker) — not blocking RSC since auto-login works via direct VPS
+- Account server on VPS (`/opt/account-server/` port 3001) — separate from this work
+- Test logout detection in production (session guard monitors but hasn't been triggered yet)
 
 ## Manual Steps Pending (for me)
-1. Railway dashboard → cooperative-caring → Settings → Delete Service
-2. Set real WALLET_JWT_SECRET and GAME_SESSION_SECRET in Railway Variables
+- None — v12 deployed and tested, working end-to-end
 
 ## Key File Map
-- `apps/api/src/server.ts` — Express bootstrap, lazy-loaded routers, graceful degradation
-- `apps/api/src/routes/rsc.ts` — wallet-to-username mapping + credential endpoints (accepts body address)
-- `apps/web-arcade/public/games/rsc/index.html` — RSC landing + wallet flow + iframe
-- `apps/web-arcade/vercel.json` — rewrites /api/rsc/* to Railway
-- `Dockerfile.api` — Docker build for Railway (WORKDIR /app, tsx from source)
-- `railway.toml` — Railway config (nixpacks builder, startCommand without cd)
-- `tools/patch-rsc-teavm-client.sh` — VPS script for TeaVM auto-login injection
-- `docs/FIX_RAILWAY_CRASH.md` — Railway crash diagnosis and fix
+- `tools/fix-teavm-js-autologin.sh` — VPS script (v12): Proxy console intercept, auto-login, session guard
+- `apps/web-arcade/public/games/rsc/index.html` — Parent page: wallet flow, claim modal, session-lost handler
+- `apps/api/src/routes/rsc.ts` — claim-username + credentials endpoints
+- `apps/api/src/middleware/walletAuth.ts` — JWT cookie verification
+- `apps/api/src/server.ts` — Express bootstrap, mounts RSC routes
+- `/var/www/rsc-client/index.html` — Live on VPS (v12), game.fuzzynuts.xyz
+
+## Technical Notes
+- TeaVM captures console references at load time → must install Proxy BEFORE classes.js
+- `Function.prototype.call.bind` pattern crashes in some browsers → use `.bind(console)` instead
+- All shared state must be on `window` object (not `var` in IIFE) for cross-script-block access
+- Session guard detects logout via console message patterns + canvas pixel sampling (backup)
+- Parent page reload limit: 3 reloads in 60 seconds, then shows "Connection issues" error
