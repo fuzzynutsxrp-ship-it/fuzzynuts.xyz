@@ -24,6 +24,7 @@ interface ChatMessage {
   createdAt: string;
   shadowed?: boolean;
   linkStripped?: boolean;
+  aiFlagged?: boolean;
 }
 
 interface OnlineUser {
@@ -135,7 +136,11 @@ export function ChatWidget() {
       socket.on("message:shadowed", (msg: ChatMessage) => {
         if (cancelled) return;
         // Shadow messages get a unique ID, always show to sender
-        setMessages((prev) => [...prev, { ...msg, shadowed: true }]);
+        // Preserve aiFlagged from server (Tier 2) for distinct styling
+        setMessages((prev) => [
+          ...prev,
+          { ...msg, shadowed: true, aiFlagged: msg.aiFlagged ?? false },
+        ]);
       });
 
       socket.on("message:link-stripped", (msg: ChatMessage) => {
@@ -270,11 +275,13 @@ export function ChatWidget() {
             <div className="flex items-baseline gap-2">
               <span
                 className={`text-xs font-semibold ${
-                  msg.shadowed
-                    ? "text-[#ef4444]"
-                    : msg.linkStripped
-                      ? "text-[#3B82F6]"
-                      : "text-[#7c3aed]"
+                  msg.shadowed && msg.aiFlagged
+                    ? "text-[#e8943a]"
+                    : msg.shadowed
+                      ? "text-[#ef4444]"
+                      : msg.linkStripped
+                        ? "text-[#3B82F6]"
+                        : "text-[#7c3aed]"
                 }`}
                 style={{ fontFamily: "var(--font-display)" }}
               >
@@ -286,16 +293,24 @@ export function ChatWidget() {
             </div>
             <p
               className={`mt-0.5 text-[13px] leading-relaxed ${
-                msg.shadowed
-                  ? "text-[#ef4444]/70 line-through"
-                  : msg.linkStripped
-                    ? "text-white/70"
-                    : "text-white/80"
+                msg.shadowed && msg.aiFlagged
+                  ? "text-[#e8943a]/70 line-through"
+                  : msg.shadowed
+                    ? "text-[#ef4444]/70 line-through"
+                    : msg.linkStripped
+                      ? "text-white/70"
+                      : "text-white/80"
               }`}
             >
               {msg.content}
             </p>
-            {msg.shadowed && (
+            {msg.shadowed && msg.aiFlagged && (
+              <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#e8943a]/50">
+                <AlertTriangle size={10} />
+                Only you can see this — flagged by AI moderation
+              </p>
+            )}
+            {msg.shadowed && !msg.aiFlagged && (
               <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#ef4444]/50">
                 <AlertTriangle size={10} />
                 Only you can see this — flagged by moderation

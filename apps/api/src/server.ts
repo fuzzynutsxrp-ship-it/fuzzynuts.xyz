@@ -34,6 +34,7 @@ const MONGODB_URI = optionalEnv("MONGODB_URI");
 const RSC_PASSWORD_SECRET = optionalEnv("RSC_PASSWORD_SECRET");
 const VPS_ACCOUNT_URL = optionalEnv("VPS_ACCOUNT_URL");
 const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
+const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.get("/healthz", (_req, res) => {
     GAME_SESSION_SECRET: !!GAME_SESSION_SECRET,
     MONGODB_URI: !!MONGODB_URI,
     RSC_PASSWORD_SECRET: !!RSC_PASSWORD_SECRET,
+    OPENAI_API_KEY: !!OPENAI_API_KEY,
   };
   res.json({ ok: true, rsc: true, version: "2.1", env: envStatus });
 });
@@ -154,6 +156,7 @@ async function bootstrap() {
         WALLET_JWT_SECRET,
         ALLOWED_ORIGINS,
         walletMappingsCollection: "wallet_mappings",
+        OPENAI_API_KEY: OPENAI_API_KEY || undefined,
       });
 
       httpServer.listen(PORT, () => {

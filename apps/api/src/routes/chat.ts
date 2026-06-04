@@ -143,6 +143,67 @@ function moderate(content: string): { clean: boolean; reason?: string } {
   return { clean: true };
 }
 
+// ── Tier 2 — OpenAI Moderation API ─────────────────────────────
+const AI_MODERATION_THRESHOLD = 0.8;
+const AI_CATEGORIES = ["hate", "violence", "sexual", "self-harm", "harassment"];
+
+async function moderateWithAI(
+  content: string,
+  apiKey: string,
+): Promise<{ flagged: boolean; categories: string[] }> {
+  try {
+    console.log("[chat:ai] Checking message with OpenAI Moderation API");
+    const res = await fetch("https://api.openai.com/v1/moderations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({ model: "omni-moderation-latest", input: content }),
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!res.ok) {
+      console.error("[chat:ai] OpenAI API error:", res.status, res.statusText);
+      return { flagged: false, categories: [] }; // fail open
+    }
+
+    const data = (await res.json()) as {
+      results?: Array<{
+        flagged?: boolean;
+        categories?: Record<string, boolean>;
+        category_scores?: Record<string, number>;
+      }>;
+    };
+
+    const result = data.results?.[0];
+    if (!result) return { flagged: false, categories: [] };
+
+    // Check which categories exceed threshold
+    const flagged: string[] = [];
+    for (const cat of AI_CATEGORIES) {
+      const score = result.category_scores?.[cat] ?? 0;
+      if (score > AI_MODERATION_THRESHOLD) {
+        flagged.push(cat);
+      }
+    }
+
+    const isFlagged = flagged.length > 0;
+    if (isFlagged) {
+      console.log(
+        `[chat:ai] Flagged — categories: ${flagged.join(", ")}`,
+      );
+    } else {
+      console.log("[chat:ai] Passed — no categories flagged");
+    }
+
+    return { flagged: isFlagged, categories: flagged };
+  } catch (err) {
+    console.error("[chat:ai] Moderation API call failed:", err);
+    return { flagged: false, categories: [] }; // fail open
+  }
+}
+
 // ── MongoDB ────────────────────────────────────────────────────
 let _db: Db | null = null;
 let _client: MongoClient | null = null;
@@ -183,6 +244,7 @@ export function initChat(
     WALLET_JWT_SECRET: string;
     ALLOWED_ORIGINS: string[];
     walletMappingsCollection: string; // e.g. "wallet_mappings"
+    OPENAI_API_KEY?: string;
   },
 ) {
   const io = new Server(httpServer, {
@@ -311,14 +373,14 @@ export function initChat(
           }
         }
 
-        // Moderate content
+        // Moderate content (Tier 1 — regex)
         const modResult = moderate(finalContent);
         if (!modResult.clean) {
           // Shadow mode: show message to sender only, hide from everyone else
           socket.emit("message:shadowed", {
             id: `shadow-${Date.now()}`,
             username,
-            content,
+            content: finalContent,
             createdAt: new Date().toISOString(),
             shadowed: true,
           });
@@ -326,6 +388,26 @@ export function initChat(
             `[chat] Shadow-blocked ${username}: ${modResult.reason}`,
           );
           return;
+        }
+
+        // Tier 2 — OpenAI Moderation API (only if API key is set)
+        if (opts.OPENAI_API_KEY) {
+          const aiResult = await moderateWithAI(finalContent, opts.OPENAI_API_KEY);
+          if (aiResult.flagged) {
+            socket.emit("message:shadowed", {
+              id: `ai-${Date.now()}`,
+              username,
+              content: finalContent,
+              createdAt: new Date().toISOString(),
+              shadowed: true,
+              aiFlagged: true,
+              aiCategories: aiResult.categories,
+            });
+            console.log(
+              `[chat] AI-flagged ${username}: ${aiResult.categories.join(", ")}`,
+            );
+            return;
+          }
         }
 
         // Save to MongoDB
