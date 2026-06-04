@@ -26,6 +26,7 @@ interface ChatMessage {
   linkStripped?: boolean;
   aiFlagged?: boolean;
   isSystem?: boolean;
+  muted?: boolean;
 }
 
 interface OnlineUser {
@@ -154,6 +155,12 @@ export function ChatWidget() {
         if (cancelled) return;
         // Report confirmation: show as system message
         setMessages((prev) => [...prev, { ...msg, isSystem: true }]);
+      });
+
+      socket.on("message:muted", (msg: ChatMessage) => {
+        if (cancelled) return;
+        // Muted user: show message only to sender with yellow indicator
+        setMessages((prev) => [...prev, { ...msg, muted: true }]);
       });
 
       socket.on("message:error", (data: { error: string }) => {
@@ -294,13 +301,15 @@ export function ChatWidget() {
                 <div className="flex items-baseline gap-2">
                   <span
                     className={`text-xs font-semibold ${
-                      msg.shadowed && msg.aiFlagged
-                        ? "text-[#e8943a]"
-                        : msg.shadowed
-                          ? "text-[#ef4444]"
-                          : msg.linkStripped
-                            ? "text-[#3B82F6]"
-                            : "text-[#7c3aed]"
+                      msg.muted
+                        ? "text-[#FBBF24]"
+                        : msg.shadowed && msg.aiFlagged
+                          ? "text-[#e8943a]"
+                          : msg.shadowed
+                            ? "text-[#ef4444]"
+                            : msg.linkStripped
+                              ? "text-[#3B82F6]"
+                              : "text-[#7c3aed]"
                     }`}
                     style={{ fontFamily: "var(--font-display)" }}
                   >
@@ -312,17 +321,25 @@ export function ChatWidget() {
                 </div>
                 <p
                   className={`mt-0.5 text-[13px] leading-relaxed ${
-                    msg.shadowed && msg.aiFlagged
-                      ? "text-[#e8943a]/70 line-through"
-                      : msg.shadowed
-                        ? "text-[#ef4444]/70 line-through"
-                        : msg.linkStripped
-                          ? "text-white/70"
-                          : "text-white/80"
+                    msg.muted
+                      ? "text-[#FBBF24]/70 line-through"
+                      : msg.shadowed && msg.aiFlagged
+                        ? "text-[#e8943a]/70 line-through"
+                        : msg.shadowed
+                          ? "text-[#ef4444]/70 line-through"
+                          : msg.linkStripped
+                            ? "text-white/70"
+                            : "text-white/80"
                   }`}
                 >
                   {msg.content}
                 </p>
+                {msg.muted && (
+                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#FBBF24]/50">
+                    <AlertTriangle size={10} />
+                    Only you can see this — you are muted
+                  </p>
+                )}
                 {msg.shadowed && msg.aiFlagged && (
                   <p className="mt-0.5 flex items-center gap-1 text-[10px] text-[#e8943a]/50">
                     <AlertTriangle size={10} />

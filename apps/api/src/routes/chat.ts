@@ -239,6 +239,15 @@ async function ensureIndexes(uri: string): Promise<void> {
     { expiresAt: 1 },
     { expireAfterSeconds: 0 },
   );
+  // Mutes collection — TTL index for auto-expiry
+  await db.collection("chat_mutes").createIndex(
+    { expiresAt: 1 },
+    { expireAfterSeconds: 0 },
+  );
+  await db.collection("chat_mutes").createIndex(
+    { walletAddress: 1 },
+    { unique: true },
+  );
 }
 
 // ── Init — attach Socket.io to the HTTP server ─────────────────
@@ -250,6 +259,7 @@ export function initChat(
     ALLOWED_ORIGINS: string[];
     walletMappingsCollection: string; // e.g. "wallet_mappings"
     OPENAI_API_KEY?: string;
+    ADMIN_WALLET_ADDRESS?: string;
   },
 ) {
   const io = new Server(httpServer, {
@@ -316,6 +326,18 @@ export function initChat(
     } catch (err) {
       console.error("[chat:report] Error:", err);
       return { ok: false, error: "Failed to submit report" };
+    }
+  }
+
+  /** Check if a wallet address is currently muted */
+  async function isMuted(walletAddress: string): Promise<boolean> {
+    try {
+      const db = await getDb(opts.MONGODB_URI);
+      const mutes = db.collection("chat_mutes");
+      const mute = await mutes.findOne({ walletAddress });
+      return !!mute;
+    } catch {
+      return false; // fail open
     }
   }
 
@@ -412,6 +434,19 @@ export function initChat(
             socket.emit("message:error", { error: result.error || "Report failed" });
           }
           return; // Don't broadcast /report as a chat message
+        }
+
+        // Mute check — shadow muted users' messages
+        if (await isMuted(wallet)) {
+          socket.emit("message:muted", {
+            id: `muted-${Date.now()}`,
+            username,
+            content: finalContent,
+            createdAt: new Date().toISOString(),
+            muted: true,
+          });
+          console.log(`[chat] Muted user ${username} attempted to send message`);
+          return;
         }
 
         // Rate limit check
@@ -547,6 +582,142 @@ export function buildChatHistoryRouter(MONGODB_URI: string): Router {
     } catch (err) {
       console.error("[chat] History error:", err);
       res.status(500).json({ error: "Failed to load chat history" });
+    }
+  });
+
+  return router;
+}
+
+// ── Express router: Admin endpoints ─────────────────────────────
+export function buildAdminChatRouter(
+  MONGODB_URI: string,
+  WALLET_JWT_SECRET: string,
+  ADMIN_WALLET_ADDRESS: string,
+): Router {
+  const router = Router();
+  const COOKIE_NAME = "fuzzy_wallet_session";
+
+  /** Middleware: verify admin wallet from JWT cookie */
+  async function requireAdmin(
+    req: import("express").Request,
+    res: import("express").Response,
+    next: import("express").NextFunction,
+  ) {
+    try {
+      const cookieHeader = req.headers.cookie;
+      if (!cookieHeader) return res.status(401).json({ error: "No session" });
+
+      const match = cookieHeader.match(
+        new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`),
+      );
+      if (!match) return res.status(401).json({ error: "No session" });
+
+      const { jwtVerify } = await import("jose");
+      const { payload } = await jwtVerify(
+        match[1],
+        new TextEncoder().encode(WALLET_JWT_SECRET),
+        { issuer: "fuzzynuts.xyz" },
+      );
+
+      const address = typeof payload.address === "string" ? payload.address : "";
+      if (address !== ADMIN_WALLET_ADDRESS) {
+        return res.status(403).json({ error: "Forbidden — admin only" });
+      }
+
+      next();
+    } catch {
+      return res.status(401).json({ error: "Invalid session" });
+    }
+  }
+
+  // GET /admin/reports — last 50 reports
+  router.get("/reports", requireAdmin, async (_req, res) => {
+    try {
+      const db = await getDb(MONGODB_URI);
+      const reports = await db
+        .collection("chat_reports")
+        .find({}, { projection: { expiresAt: 0 } })
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .toArray();
+      res.json({ reports });
+    } catch (err) {
+      console.error("[chat:admin] Reports error:", err);
+      res.status(500).json({ error: "Failed to fetch reports" });
+    }
+  });
+
+  // GET /admin/mutes — currently muted users
+  router.get("/mutes", requireAdmin, async (_req, res) => {
+    try {
+      const db = await getDb(MONGODB_URI);
+      const mutes = await db
+        .collection("chat_mutes")
+        .find({}, { projection: { expiresAt: 0 } })
+        .sort({ createdAt: -1 })
+        .toArray();
+      res.json({ mutes });
+    } catch (err) {
+      console.error("[chat:admin] Mutes error:", err);
+      res.status(500).json({ error: "Failed to fetch mutes" });
+    }
+  });
+
+  // POST /admin/mute — mute a user
+  router.post("/mute", requireAdmin, async (req, res) => {
+    try {
+      const { walletAddress, username, durationHours } = req.body;
+      if (!walletAddress || typeof walletAddress !== "string") {
+        return res.status(400).json({ error: "walletAddress required" });
+      }
+
+      const hours = typeof durationHours === "number" && durationHours > 0 ? durationHours : 24;
+      const db = await getDb(MONGODB_URI);
+      const mutes = db.collection("chat_mutes");
+      const now = new Date();
+
+      await mutes.updateOne(
+        { walletAddress },
+        {
+          $set: {
+            walletAddress,
+            username: username || "unknown",
+            mutedBy: "admin",
+            createdAt: now,
+            expiresAt: new Date(now.getTime() + hours * 60 * 60 * 1000),
+          },
+        },
+        { upsert: true },
+      );
+
+      console.log(`[chat:admin] Muted ${walletAddress} for ${hours}h`);
+      res.json({ ok: true, walletAddress, durationHours: hours });
+    } catch (err) {
+      console.error("[chat:admin] Mute error:", err);
+      res.status(500).json({ error: "Failed to mute user" });
+    }
+  });
+
+  // POST /admin/unmute — unmute a user
+  router.post("/unmute", requireAdmin, async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      if (!walletAddress || typeof walletAddress !== "string") {
+        return res.status(400).json({ error: "walletAddress required" });
+      }
+
+      const db = await getDb(MONGODB_URI);
+      const result = await db.collection("chat_mutes").deleteOne({ walletAddress });
+
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ error: "User not muted" });
+      }
+
+      console.log(`[chat:admin] Unmuted ${walletAddress}`);
+      res.json({ ok: true, walletAddress });
+    } catch (err) {
+      console.error("[chat:admin] Unmute error:", err);
+      res.status(500).json({ error: "Failed to unmute user" });
     }
   });
 

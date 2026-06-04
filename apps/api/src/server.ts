@@ -35,6 +35,7 @@ const RSC_PASSWORD_SECRET = optionalEnv("RSC_PASSWORD_SECRET");
 const VPS_ACCOUNT_URL = optionalEnv("VPS_ACCOUNT_URL");
 const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
+const ADMIN_WALLET_ADDRESS=option...);
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.get("/healthz", (_req, res) => {
     MONGODB_URI: !!MONGODB_URI,
     RSC_PASSWORD_SECRET: !!RSC_PASSWORD_SECRET,
     OPENAI_API_KEY: !!OPENAI_API_KEY,
+    ADMIN_WALLET_ADDRESS: !!ADMIN_WALLET_ADDRESS,
   };
   res.json({ ok: true, rsc: true, version: "2.1", env: envStatus });
 });
@@ -157,7 +159,22 @@ async function bootstrap() {
         ALLOWED_ORIGINS,
         walletMappingsCollection: "wallet_mappings",
         OPENAI_API_KEY: OPENAI_API_KEY || undefined,
+        ADMIN_WALLET_ADDRESS: ADMIN_WALLET_ADDRESS || undefined,
       });
+
+      // Admin chat routes (protected by JWT + admin wallet check)
+      if (ADMIN_WALLET_ADDRESS) {
+        try {
+          const { buildAdminChatRouter } = await import("./routes/chat");
+          app.use("/api/chat/admin", buildAdminChatRouter(
+            MONGODB_URI,
+            WALLET_JWT_SECRET,
+            ADMIN_WALLET_ADDRESS,
+          ));
+        } catch (e) {
+          console.error("[api] Failed to load admin chat router:", e);
+        }
+      }
 
       httpServer.listen(PORT, () => {
         console.log(`@fuzzynuts/api listening on :${PORT} (with chat)`);
