@@ -2,7 +2,10 @@
 # ═══════════════════════════════════════════════════════════════════
 #  fix-teavm-js-autologin.sh — Silent auto-login + session guard
 #
-#  v13b: Canvas pixel sampling + iframe-side redirect on logout.
+#  v14: Captcha-aware session guard. Pauses canvas monitoring during
+#  in-game sleep/captcha screens. Stricter login detection (brightness
+#  < 10, extended stale period). Tab visibility check reduces false
+#  positives from background throttling.
 #  Intercepts WebGL context to force preserveDrawingBuffer.
 #  Detects login screen via brightness analysis + stale canvas.
 #  Monitors WebSocket disconnection. Catches bright-to-dark transition.
@@ -18,7 +21,7 @@ HTML_FILE="/var/www/rsc-client/index.html"
 BACKUP="/var/www/rsc-client/backup-autologin-$(date +%Y%m%d-%H%M%S).html"
 
 echo "═══════════════════════════════════════════════════════"
-echo " Fix TeaVM Auto-Login (v13b — canvas + iframe redirect)"
+echo " Fix TeaVM Auto-Login (v14 — captcha-aware session guard)"
 echo "═══════════════════════════════════════════════════════"
 
 mkdir -p "$(dirname "$BACKUP")"
@@ -34,7 +37,7 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     <style>body{margin:0;background-color: black;}</style>
   </head>
   <body>
-    <!-- fuzzynuts-autologin: v13b — canvas pixel sampling + iframe redirect -->
+    <!-- fuzzynuts-autologin: v14 — captcha-aware session guard -->
     <script>
     // ═══════════════════════════════════════════════════════════
     //  BLOCK 1: Initialize ALL shared state FIRST (before any
@@ -54,6 +57,8 @@ cat > "$HTML_FILE" << 'HTMLEOF'
     window._msgCount = 0;
     window._wsDisconnected = false;
     window._wsInstances = [];
+    window._fnShowingCaptcha = false;
+    window._fnCaptchaTime = 0;
 
     window._logoutPatterns = [
       'disconnected',
@@ -151,6 +156,19 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         // Check for logout indicators (only after session is active)
         if (window._fnSessionActive) {
           var msgLower = msg.toLowerCase();
+
+          // Detect sleep/captcha (in-game anti-bot check)
+          if (/sleeping|captcha|enter the word|rest in|lie down|fell asleep|wake up|drift off/i.test(msg)) {
+            if (!window._fnShowingCaptcha) {
+              window._fnShowingCaptcha = true;
+              window._fnCaptchaTime = Date.now();
+              window._origLog('[session-guard] Captcha detected — pausing visual logout monitoring');
+            }
+          }
+
+          // Don't check logout patterns while captcha is active
+          if (window._fnShowingCaptcha) return;
+
           for (var i = 0; i < window._logoutPatterns.length; i++) {
             if (msgLower.indexOf(window._logoutPatterns[i]) !== -1) {
               window._logoutDetected = true;
@@ -283,11 +301,25 @@ cat > "$HTML_FILE" << 'HTMLEOF'
       //   2. Canvas content is frozen (pixel hash unchanged = stale)
       //   3. Bright-to-dark transition (was playing, now dark)
       function _checkLoginScreen() {
+        // Skip canvas checks during captcha (anti-bot sleep check)
+        if (window._fnShowingCaptcha) {
+          // Auto-clear captcha after 120 seconds (safety timeout)
+          if (Date.now() - window._fnCaptchaTime > 120000) {
+            window._fnShowingCaptcha = false;
+            window._origLog('[session-guard] Captcha timeout — resuming monitoring');
+          } else {
+            // Reset stale counters so they don't accumulate during captcha
+            _pixelStaleCount = 0;
+            _consecutiveDarkReadings = 0;
+            return false;
+          }
+        }
+
         var sample = _sampleCanvas();
         if (!sample) return false;
 
-        var isDark = sample.avg < 20;
-        var isDim = sample.avg < 35;
+        var isDark = sample.avg < 15;  // Stricter: was 20
+        var isDim = sample.avg < 30;   // Stricter: was 35
 
         // Stale detection: pixel hash unchanged
         if (sample.hash === _pixelCache && _pixelCache !== '') {
@@ -301,31 +333,42 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         var wasBright = _brightnessWasBright;
         _brightnessWasBright = sample.avg > 40;
 
-        // Signal 1: Canvas is very dark AND stale (frozen login screen)
-        if (isDark && _pixelStaleCount >= 3) {
-          window._origLog('[session-guard] Canvas dark+stale: avg=' + sample.avg.toFixed(1) + ' stale=' + _pixelStaleCount);
-          return true;
+        // REFINED Signal 1: Canvas very dark AND stale for extended period
+        // Was 3 checks (6s), now 12 checks (24s) — avoids captcha false positive
+        if (isDark && _pixelStaleCount >= 12) {
+          // Extra check: brightness must be VERY dark (< 10) for login screen
+          // Captcha screens typically have brightness 15-30 due to text rendering
+          if (sample.avg < 10) {
+            window._origLog('[session-guard] Canvas very dark+stale: avg=' + sample.avg.toFixed(1) + ' stale=' + _pixelStaleCount);
+            return true;
+          }
         }
 
-        // Signal 2: Bright-to-dark transition (game world → login screen)
+        // REFINED Signal 2: Bright-to-dark transition (game world → login screen)
+        // Need more consecutive dark readings (5 instead of 2) AND very dark
         if (wasBright && isDark) {
           _consecutiveDarkReadings++;
-          if (_consecutiveDarkReadings >= 2) {
+          if (_consecutiveDarkReadings >= 5 && sample.avg < 10) {
             window._origLog('[session-guard] Bright→dark transition: avg=' + sample.avg.toFixed(1));
             return true;
           }
         } else if (!isDark) {
           _consecutiveDarkReadings = 0;
+          // If we see bright pixels, clear captcha flag (game resumed)
+          if (window._fnShowingCaptcha && sample.avg > 30) {
+            window._fnShowingCaptcha = false;
+            window._origLog('[session-guard] Captcha cleared — resuming full monitoring');
+          }
         }
 
-        // Signal 3: Very dark AND dim for a while (loading/login screen)
+        // REFINED Signal 3: Very dark AND dim for extended period
         if (isDark) {
           _consecutiveDarkReadings++;
         }
 
         // Debug logging every 15 checks (30 seconds)
         if (window._msgCount % 15 === 0) {
-          window._origLog('[session-guard] Canvas avg=' + sample.avg.toFixed(1) + ' stale=' + _pixelStaleCount + ' darkrun=' + _consecutiveDarkReadings);
+          window._origLog('[session-guard] Canvas avg=' + sample.avg.toFixed(1) + ' stale=' + _pixelStaleCount + ' darkrun=' + _consecutiveDarkReadings + ' captcha=' + window._fnShowingCaptcha);
         }
 
         return false;
@@ -434,6 +477,20 @@ cat > "$HTML_FILE" << 'HTMLEOF'
         var lastCanvasHeight = canvas ? canvas.height : 0;
 
         sessionGuardInterval = setInterval(function() {
+          // Tab visibility check: reduce false positives from background throttling
+          if (document.visibilityState === 'hidden') {
+            // Only check WS disconnect when tab is hidden (skip canvas checks)
+            if (window._wsDisconnected) {
+              handleLogout('WebSocket connection closed');
+              return;
+            }
+            if (window._logoutDetected) {
+              handleLogout('Game message: ' + window._logoutReason);
+              return;
+            }
+            return; // Skip canvas analysis when tab is backgrounded
+          }
+
           // ── Check 1: Console-based logout detection ──
           if (window._logoutDetected) {
             handleLogout('Game message: ' + window._logoutReason);
@@ -656,7 +713,7 @@ HTMLEOF
 
 echo "✓ Patched index.html written"
 
-if grep -q 'v13b' "$HTML_FILE"; then echo "✓ v13b marker present"; fi
+if grep -q 'v14' "$HTML_FILE"; then echo "✓ v14 marker present"; fi
 if grep -q 'new Proxy' "$HTML_FILE"; then echo "✓ Proxy intercept enabled"; fi
 if grep -q 'session-guard' "$HTML_FILE"; then echo "✓ Session guard enabled"; fi
 if grep -q 'preserveDrawingBuffer' "$HTML_FILE"; then echo "✓ WebGL interceptor enabled"; fi
@@ -665,12 +722,15 @@ if grep -q '_wsDisconnected' "$HTML_FILE"; then echo "✓ WebSocket monitor enab
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo " ✓ FIX APPLIED (v13b — canvas + iframe redirect)"
+echo " ✓ FIX APPLIED (v14 — captcha-aware session guard)"
 echo ""
-echo " Changes from v13:"
-echo "   + handleLogout() centralizes all logout paths"
-echo "   + Iframe redirects parent to / via window.top.location.href"
-echo "   + Works even if parent page is stale/cached"
+echo " Changes from v13b:"
+echo "   + Captcha detection: monitors console for sleep/captcha keywords"
+echo "   + Canvas monitoring paused during captcha (anti-bot checks)"
+echo "   + Login screen requires brightness < 10 (was < 20) + 24s stale"
+echo "   + Bright-to-dark needs 5 consecutive dark readings (was 2)"
+echo "   + Tab visibility check: skips canvas when tab is backgrounded"
+echo "   + Captcha auto-clears after 120s safety timeout"
 echo ""
 echo " Backup at: $BACKUP"
 echo "═══════════════════════════════════════════════════════"
