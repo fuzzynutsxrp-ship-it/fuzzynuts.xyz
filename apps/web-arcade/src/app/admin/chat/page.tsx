@@ -23,7 +23,7 @@ const CHAT_API =
   process.env.NEXT_PUBLIC_CHAT_API ||
   "https://fuzzynutsxyz-production.up.railway.app";
 
-const ADMIN_WALLET = process.env.NEXT_PUBLIC_ADMIN_WALLET || "";
+const ADMIN_WALLET = process.env.NEXT_PUBLIC_ADMIN_WALLET || "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
 
 interface Report {
   _id: string;
