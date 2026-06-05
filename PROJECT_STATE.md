@@ -26,12 +26,15 @@ Current focus: Logout detection + redirect fully working (v13b on VPS, parent pa
 - Community Chat Phase 1B: React ChatWidget component, real-time messages, mobile-responsive
 - Community Chat Step 2A: Trust score (account age), link stripping for <24h accounts
 - Community Chat Step 2B: Tier 2 AI moderation via OpenAI Moderation API (free tier)
+- Community Chat Step 2C: /report command with MongoDB storage + report acknowledgements
+- Community Chat Step 2D: Admin moderation dashboard (/admin/chat) with mute/unmute, JWT-protected API
 
 ## In Progress
-- Community Chat Phase 2 — Step 2B (Tier 2 AI moderation) deployed, awaiting OPENAI_API_KEY on Railway
-- Next: Step 2C (/report command), Step 2D (moderation dashboard)
+- Nothing — Phase 2 complete
 
 ## Blocked / Next
+- Phase 3 ideas: chat reactions, pinned messages, slow mode, user muting UI improvements
+- Verify OpenAI Tier 2 moderation working (needs OPENAI_API_KEY confirmed active)
 - Railway Express API container crash (env vars not injecting into Docker) — not blocking RSC since auto-login works via direct VPS
 - Account server on VPS (`/opt/account-server/` port 3001) — separate from this work
 - Verify v13 pixel sampling works with Open-RSC's WebGL canvas (may need threshold tuning)
