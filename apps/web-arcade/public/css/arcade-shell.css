@@ -199,11 +199,35 @@ a { color: inherit; }
   color: #ffd280;
 }
 
+/* Chat button */
+.arcade-nav__chat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid rgba(124,58,237,0.3);
+  border-radius: 0.5rem;
+  background: rgba(124,58,237,0.1);
+  color: #c4b5fd;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.arcade-nav__chat:hover {
+  background: rgba(124,58,237,0.25);
+  border-color: rgba(124,58,237,0.5);
+  color: #ddd6fe;
+}
+
 /* Nav responsive */
 @media (max-width: 400px) {
   .arcade-nav { padding: 0 0.5rem; }
   .arcade-nav__back { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
   .arcade-nav__link { display: none; }
+  .arcade-nav__chat { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
