@@ -79,6 +79,7 @@ export function ChatWidget() {
   const [dmMessages, setDmMessages] = useState<DirectMessage[]>([]);
   const [dmInput, setDmInput] = useState("");
   const [unreadDms, setUnreadDms] = useState(0);
+  const [lastDmSender, setLastDmSender] = useState<{ wallet: string; username: string } | null>(null);
   const dmEndRef = useRef<HTMLDivElement>(null);
   const dmInputRef = useRef<HTMLInputElement>(null);
 
@@ -219,8 +220,9 @@ export function ChatWidget() {
           // Mark as read since panel is open
           socket.emit("dm:read", { fromWallet: msg.fromWallet });
         } else {
-          // Increment unread count
+          // Increment unread count and track sender
           setUnreadDms((prev) => prev + 1);
+          setLastDmSender({ wallet: msg.fromWallet, username: msg.fromUsername });
         }
       });
 
@@ -499,14 +501,12 @@ export function ChatWidget() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          {unreadDms > 0 && (
+          {unreadDms > 0 && lastDmSender && (
             <button
-              onClick={() => {
-                // Open DMs with first unread — for now just show count
-                // Users click DM buttons in the message list
-              }}
-              className="flex items-center gap-1 text-xs text-[#22d3ee]"
-              title="Unread DMs"
+              onClick={() => openDm(lastDmSender.wallet, lastDmSender.username)}
+              className="flex items-center gap-1 text-xs text-[#22d3ee] transition-colors hover:text-[#06b6d4]"
+              title={`DM from ${lastDmSender.username}`}
+              aria-label="Open unread DM"
             >
               <Mail size={14} />
               <span className="font-bold">{unreadDms}</span>
