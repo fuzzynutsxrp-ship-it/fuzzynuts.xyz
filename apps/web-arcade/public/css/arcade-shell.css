@@ -209,24 +209,22 @@ a { color: inherit; }
   align-items: center;
   gap: 0.4rem;
   padding: 0.6rem 1.2rem;
-  border: 1px solid rgba(124,58,237,0.4);
+  border: 1px solid rgba(124,58,237,0.6);
   border-radius: 9999px;
-  background: rgba(18,10,34,0.9);
-  color: #c4b5fd;
+  background: #7c3aed;
+  color: #fff;
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 20px rgba(124,58,237,0.2);
+  box-shadow: 0 0 20px rgba(124,58,237,0.5), 0 4px 12px rgba(0,0,0,0.4);
 }
 .arcade-chat-float:hover {
-  background: rgba(124,58,237,0.25);
-  border-color: rgba(124,58,237,0.6);
-  color: #ddd6fe;
-  box-shadow: 0 0 30px rgba(124,58,237,0.3);
+  background: #6d28d9;
+  border-color: rgba(124,58,237,0.8);
+  box-shadow: 0 0 30px rgba(124,58,237,0.6), 0 4px 16px rgba(0,0,0,0.5);
   transform: scale(1.05);
 }
 
