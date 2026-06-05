@@ -29,11 +29,13 @@ Current focus: Logout detection + redirect fully working (v13b on VPS, parent pa
 - Community Chat Step 2C: /report command with MongoDB storage + report acknowledgements
 - Community Chat Step 2D: Admin moderation dashboard (/admin/chat) with mute/unmute, JWT-protected API
 
+- Community Chat Step 3A: Private messages (DMs) with moderation + unread badges
+- Community Chat Step 3B: Admin commands (/mute, /unmute, /ban, /unban, /clear)
+
 ## In Progress
-- Nothing — Phase 2 complete
+- Phase 3: Steps 3C (message search), 3D (user profiles), 3E (emoji reactions) remaining
 
 ## Blocked / Next
-- Phase 3 ideas: chat reactions, pinned messages, slow mode, user muting UI improvements
 - Verify OpenAI Tier 2 moderation working (needs OPENAI_API_KEY confirmed active)
 - Railway Express API container crash (env vars not injecting into Docker) — not blocking RSC since auto-login works via direct VPS
 - Account server on VPS (`/opt/account-server/` port 3001) — separate from this work
