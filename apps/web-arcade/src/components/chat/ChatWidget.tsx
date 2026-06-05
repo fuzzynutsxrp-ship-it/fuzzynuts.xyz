@@ -78,6 +78,7 @@ export function ChatWidget() {
   const [dmTargetUsername, setDmTargetUsername] = useState<string | null>(null);
   const [dmMessages, setDmMessages] = useState<DirectMessage[]>([]);
   const [dmInput, setDmInput] = useState("");
+  const [dmLoading, setDmLoading] = useState(false);
   const [unreadDms, setUnreadDms] = useState(0);
   const [lastDmSender, setLastDmSender] = useState<{ wallet: string; username: string } | null>(null);
   const dmEndRef = useRef<HTMLDivElement>(null);
@@ -105,7 +106,12 @@ export function ChatWidget() {
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    scrollDmToBottom();
+    if (dmMessages.length > 0) {
+      // Small delay to ensure DOM has rendered before scrolling
+      requestAnimationFrame(() => {
+        scrollDmToBottom();
+      });
+    }
   }, [dmMessages, scrollDmToBottom]);
 
   // Focus input when panel opens
@@ -298,10 +304,12 @@ export function ChatWidget() {
       setDmTargetUsername(targetUsername);
       setDmMessages([]);
       setDmOpen(true);
+      setDmLoading(true);
 
       // Mark as read
       if (socketRef.current?.connected) {
         socketRef.current.emit("dm:read", { fromWallet: targetWallet });
+        setUnreadDms(0);
       }
 
       // Load DM history
@@ -316,6 +324,7 @@ export function ChatWidget() {
       } catch {
         // Not fatal
       }
+      setDmLoading(false);
     },
     [address],
   );
@@ -401,7 +410,12 @@ export function ChatWidget() {
 
         {/* DM Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-3 scrollbar-thin">
-          {dmMessages.length === 0 && (
+          {dmLoading && (
+            <div className="flex h-full items-center justify-center text-xs text-white/30">
+              Loading conversation...
+            </div>
+          )}
+          {!dmLoading && dmMessages.length === 0 && (
             <div className="flex h-full items-center justify-center text-xs text-white/30">
               No messages yet. Say hello!
             </div>
