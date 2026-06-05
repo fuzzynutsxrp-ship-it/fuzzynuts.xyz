@@ -248,6 +248,15 @@ async function ensureIndexes(uri: string): Promise<void> {
     { walletAddress: 1 },
     { unique: true },
   );
+  // Bans collection — TTL index for auto-expiry (permanent bans have far future date)
+  await db.collection("chat_bans").createIndex(
+    { expiresAt: 1 },
+    { expireAfterSeconds: 0 },
+  );
+  await db.collection("chat_bans").createIndex(
+    { walletAddress: 1 },
+    { unique: true },
+  );
   // Private messages — TTL index (90 days) + compound index for history queries
   await db.collection("private_messages").createIndex(
     { expiresAt: 1 },
@@ -355,6 +364,38 @@ export function initChat(
     }
   }
 
+  /** Check if a wallet address is banned from chat */
+  async function isBanned(walletAddress: string): Promise<boolean> {
+    try {
+      const db = await getDb(opts.MONGODB_URI);
+      const bans = db.collection("chat_bans");
+      const ban = await bans.findOne({ walletAddress });
+      return !!ban;
+    } catch {
+      return false; // fail open
+    }
+  }
+
+  /** Check if a wallet is the admin */
+  function isAdmin(walletAddress: string): boolean {
+    return !!opts.ADMIN_WALLET_ADDRESS && walletAddress === opts.ADMIN_WALLET_ADDRESS;
+  }
+
+  /** Look up wallet address by username from wallet_mappings */
+  async function findWalletByUsername(targetUsername: string): Promise<string | null> {
+    try {
+      const db = await getDb(opts.MONGODB_URI);
+      const mappings = db.collection(opts.walletMappingsCollection);
+      const mapping = await mappings.findOne<{ walletAddress: string }>(
+        { username: targetUsername },
+        { projection: { walletAddress: 1 } },
+      );
+      return mapping?.walletAddress ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   // ── Auth middleware — resolve wallet → username on connect ──
   io.use(async (socket, next) => {
     try {
@@ -454,6 +495,112 @@ export function initChat(
             socket.emit("message:error", { error: result.error || "Report failed" });
           }
           return; // Don't broadcast /report as a chat message
+        }
+
+        // ── Admin commands — /mute, /ban, /unmute, /unban, /clear ──
+        if (content.startsWith('/') && isAdmin(wallet)) {
+          const parts = content.trim().split(/\s+/);
+          const cmd = parts[0].toLowerCase();
+          const targetName = parts[1] || '';
+          const param = parts[2] || '';
+
+          if (cmd === '/mute' && targetName) {
+            const targetWallet = await findWalletByUsername(targetName);
+            if (!targetWallet) {
+              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              return;
+            }
+            const minutes = parseInt(param, 10) || 60;
+            const db = await getDb(opts.MONGODB_URI);
+            const now = new Date();
+            await db.collection('chat_mutes').updateOne(
+              { walletAddress: targetWallet },
+              { $set: { walletAddress: targetWallet, username: targetName, mutedBy: username, createdAt: now, expiresAt: new Date(now.getTime() + minutes * 60 * 1000) } },
+              { upsert: true },
+            );
+            io.emit('message:new', {
+              id: `sys-${Date.now()}`, username: 'System',
+              content: `${targetName} has been muted for ${minutes} minutes by ${username}`,
+              createdAt: now.toISOString(), isSystem: true,
+            });
+            console.log(`[chat:admin] ${username} muted ${targetName} for ${minutes}m`);
+            return;
+          }
+
+          if (cmd === '/unmute' && targetName) {
+            const targetWallet = await findWalletByUsername(targetName);
+            if (!targetWallet) {
+              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              return;
+            }
+            const db = await getDb(opts.MONGODB_URI);
+            await db.collection('chat_mutes').deleteOne({ walletAddress: targetWallet });
+            io.emit('message:new', {
+              id: `sys-${Date.now()}`, username: 'System',
+              content: `${targetName} has been unmuted by ${username}`,
+              createdAt: new Date().toISOString(), isSystem: true,
+            });
+            console.log(`[chat:admin] ${username} unmuted ${targetName}`);
+            return;
+          }
+
+          if (cmd === '/ban' && targetName) {
+            const targetWallet = await findWalletByUsername(targetName);
+            if (!targetWallet) {
+              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              return;
+            }
+            const db = await getDb(opts.MONGODB_URI);
+            const now = new Date();
+            // Ban for 10 years (effectively permanent)
+            await db.collection('chat_bans').updateOne(
+              { walletAddress: targetWallet },
+              { $set: { walletAddress: targetWallet, username: targetName, bannedBy: username, createdAt: now, expiresAt: new Date(now.getTime() + 10 * 365 * 24 * 60 * 60 * 1000) } },
+              { upsert: true },
+            );
+            io.emit('message:new', {
+              id: `sys-${Date.now()}`, username: 'System',
+              content: `${targetName} has been banned from chat by ${username}`,
+              createdAt: now.toISOString(), isSystem: true,
+            });
+            console.log(`[chat:admin] ${username} banned ${targetName}`);
+            return;
+          }
+
+          if (cmd === '/unban' && targetName) {
+            const targetWallet = await findWalletByUsername(targetName);
+            if (!targetWallet) {
+              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              return;
+            }
+            const db = await getDb(opts.MONGODB_URI);
+            await db.collection('chat_bans').deleteOne({ walletAddress: targetWallet });
+            io.emit('message:new', {
+              id: `sys-${Date.now()}`, username: 'System',
+              content: `${targetName} has been unbanned by ${username}`,
+              createdAt: new Date().toISOString(), isSystem: true,
+            });
+            console.log(`[chat:admin] ${username} unbanned ${targetName}`);
+            return;
+          }
+
+          if (cmd === '/clear') {
+            const db = await getDb(opts.MONGODB_URI);
+            await db.collection('chat_messages').deleteMany({});
+            io.emit('chat:clear', { clearedBy: username, at: new Date().toISOString() });
+            console.log(`[chat:admin] ${username} cleared all messages`);
+            return;
+          }
+
+          // Unknown admin command
+          socket.emit('message:error', { error: 'Unknown command. Use /mute, /unmute, /ban, /unban, /clear' });
+          return;
+        }
+
+        // Ban check — banned users cannot send messages
+        if (await isBanned(wallet)) {
+          socket.emit('message:error', { error: 'You are banned from chat' });
+          return;
         }
 
         // Mute check — shadow muted users' messages

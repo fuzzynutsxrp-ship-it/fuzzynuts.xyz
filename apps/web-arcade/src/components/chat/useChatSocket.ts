@@ -41,6 +41,12 @@ export function useChatSocket(walletAddress: string | null | undefined) {
   const socketRef = useRef<Socket | null>(null);
   const seenIdsRef = useRef(new Set<string>());
 
+  // Clear all messages (admin /clear command)
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    seenIdsRef.current.clear();
+  }, []);
+
   useEffect(() => {
     if (!walletAddress) return;
     if (socketRef.current?.connected) return;
@@ -130,6 +136,14 @@ export function useChatSocket(walletAddress: string | null | undefined) {
       socket.on("users:online", (users: OnlineUser[]) => {
         if (!cancelled) setOnlineUsers(users);
       });
+
+      // Admin /clear command — wipe all messages
+      socket.on("chat:clear", () => {
+        if (!cancelled) {
+          setMessages([]);
+          seenIdsRef.current.clear();
+        }
+      });
     };
 
     connect();
@@ -154,5 +168,5 @@ export function useChatSocket(walletAddress: string | null | undefined) {
     setError(null);
   }, []);
 
-  return { messages, onlineUsers, connected, error, sendMessage, setError };
+  return { messages, onlineUsers, connected, error, sendMessage, setError, clearMessages };
 }

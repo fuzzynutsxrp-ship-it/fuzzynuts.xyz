@@ -225,6 +225,14 @@ export function ChatWidget() {
         if (!cancelled) setOnlineUsers(users);
       });
 
+      // Admin /clear command — wipe all messages
+      socket.on("chat:clear", () => {
+        if (!cancelled) {
+          setMessages([]);
+          seenIdsRef.current.clear();
+        }
+      });
+
       // ── DM events ─────────────────────────────────────────
       socket.on("dm:receive", (msg: DirectMessage) => {
         if (cancelled) return;
