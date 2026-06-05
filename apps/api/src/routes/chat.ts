@@ -248,6 +248,17 @@ async function ensureIndexes(uri: string): Promise<void> {
     { walletAddress: 1 },
     { unique: true },
   );
+  // Private messages — TTL index (90 days) + compound index for history queries
+  await db.collection("private_messages").createIndex(
+    { expiresAt: 1 },
+    { expireAfterSeconds: 0 },
+  );
+  await db.collection("private_messages").createIndex(
+    { fromWallet: 1, toWallet: 1, createdAt: -1 },
+  );
+  await db.collection("private_messages").createIndex(
+    { toWallet: 1, read: 1, createdAt: -1 },
+  );
 }
 
 // ── Init — attach Socket.io to the HTTP server ─────────────────
@@ -282,6 +293,9 @@ export function initChat(
 
   // Track last message per wallet (for /report context)
   const lastMessages = new Map<string, { username: string; content: string; at: Date }>();
+
+  // Track socket IDs per wallet (for DM delivery to multi-tab users)
+  const walletSockets = new Map<string, Set<string>>();
 
   /** Handle /report command — store report, notify reporter */
   async function handleReport(
@@ -389,6 +403,12 @@ export function initChat(
       walletAddress: wallet,
       connectedAt: Date.now(),
     });
+
+    // Track socket ID for this wallet (multi-tab support)
+    if (!walletSockets.has(wallet)) {
+      walletSockets.set(wallet, new Set());
+    }
+    walletSockets.get(wallet)!.add(socket.id);
 
     // Broadcast updated online list to everyone
     io.emit("users:online", Array.from(onlineUsers.values()));
@@ -538,6 +558,7 @@ export function initChat(
         const outgoing = {
           id: result.insertedId.toString(),
           username,
+          walletAddress: wallet,
           content: finalContent,
           createdAt: now.toISOString(),
           ...(linksStripped && { linkStripped: true }),
@@ -552,10 +573,163 @@ export function initChat(
       }
     });
 
+    // ── DM: Send private message ──────────────────────────────
+    socket.on("dm:send", async (data: { toWallet?: unknown; content?: unknown }) => {
+      try {
+        if (
+          !data ||
+          typeof data.toWallet !== "string" ||
+          typeof data.content !== "string" ||
+          data.content.trim().length === 0
+        ) {
+          return;
+        }
+
+        const toWallet = data.toWallet.trim();
+        const content = data.content.trim();
+
+        // Can't DM yourself
+        if (toWallet === wallet) {
+          socket.emit("dm:error", { error: "You cannot message yourself" });
+          return;
+        }
+
+        // Validate length
+        if (content.length > 500) {
+          socket.emit("dm:error", { error: "Message too long (max 500 chars)" });
+          return;
+        }
+
+        // Rate limit (reuse existing limiter)
+        if (!checkRateLimit(wallet)) {
+          socket.emit("dm:error", { error: "Slow down — max 5 messages per 10 seconds" });
+          return;
+        }
+
+        // Look up recipient username from wallet_mappings
+        const db = await getDb(opts.MONGODB_URI);
+        const mappings = db.collection(opts.walletMappingsCollection);
+        const recipient = await mappings.findOne<{ username: string }>(
+          { walletAddress: toWallet },
+          { projection: { username: 1 } },
+        );
+        if (!recipient) {
+          socket.emit("dm:error", { error: "User not found" });
+          return;
+        }
+
+        // Moderate DM content (Tier 1 + Tier 2)
+        const modResult = moderate(content);
+        if (!modResult.clean) {
+          socket.emit("dm:blocked", {
+            id: `dm-blocked-${Date.now()}`,
+            toWallet,
+            toUsername: recipient.username,
+            content,
+            createdAt: new Date().toISOString(),
+            reason: modResult.reason,
+          });
+          console.log(`[chat:dm] Blocked DM from ${username} to ${recipient.username}: ${modResult.reason}`);
+          return;
+        }
+
+        if (opts.OPENAI_API_KEY) {
+          const aiResult = await moderateWithAI(content, opts.OPENAI_API_KEY);
+          if (aiResult.flagged) {
+            socket.emit("dm:blocked", {
+              id: `dm-ai-${Date.now()}`,
+              toWallet,
+              toUsername: recipient.username,
+              content,
+              createdAt: new Date().toISOString(),
+              reason: `AI flagged: ${aiResult.categories.join(", ")}`,
+            });
+            console.log(`[chat:dm] AI-blocked DM from ${username} to ${recipient.username}`);
+            return;
+          }
+        }
+
+        // Save to MongoDB
+        const now = new Date();
+        const dmCol = db.collection("private_messages");
+        const result = await dmCol.insertOne({
+          fromWallet: wallet,
+          fromUsername: username,
+          toWallet,
+          toUsername: recipient.username,
+          content,
+          read: false,
+          createdAt: now,
+          expiresAt: new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000), // 90 days
+        });
+
+        const outgoing = {
+          id: result.insertedId.toString(),
+          fromWallet: wallet,
+          fromUsername: username,
+          toWallet,
+          toUsername: recipient.username,
+          content,
+          createdAt: now.toISOString(),
+        };
+
+        // Send to recipient (all their open sockets)
+        const recipientSockets = walletSockets.get(toWallet);
+        if (recipientSockets) {
+          for (const sid of recipientSockets) {
+            io.to(sid).emit("dm:receive", outgoing);
+          }
+        }
+
+        // Confirm to sender
+        socket.emit("dm:sent", outgoing);
+        console.log(`[chat:dm] ${username} → ${recipient.username}: ${content.slice(0, 50)}`);
+      } catch (err) {
+        console.error("[chat:dm] Error:", err);
+        socket.emit("dm:error", { error: "Failed to send message" });
+      }
+    });
+
+    // ── DM: Mark conversation as read ─────────────────────────
+    socket.on("dm:read", async (data: { fromWallet?: unknown }) => {
+      try {
+        if (typeof data?.fromWallet !== "string") return;
+        const db = await getDb(opts.MONGODB_URI);
+        await db.collection("private_messages").updateMany(
+          { fromWallet: data.fromWallet, toWallet: wallet, read: false },
+          { $set: { read: true } },
+        );
+      } catch (err) {
+        console.error("[chat:dm:read] Error:", err);
+      }
+    });
+
+    // ── DM: Get unread count ──────────────────────────────────
+    socket.on("dm:unread", async () => {
+      try {
+        const db = await getDb(opts.MONGODB_URI);
+        const count = await db.collection("private_messages").countDocuments({
+          toWallet: wallet,
+          read: false,
+        });
+        socket.emit("dm:unread-count", { count });
+      } catch (err) {
+        console.error("[chat:dm:unread] Error:", err);
+      }
+    });
+
     // ── Disconnect ──────────────────────────────────────────
     socket.on("disconnect", () => {
       console.log(`[chat] ${username} disconnected`);
       onlineUsers.delete(socket.id);
+
+      // Clean up walletSockets
+      const sockets = walletSockets.get(wallet);
+      if (sockets) {
+        sockets.delete(socket.id);
+        if (sockets.size === 0) walletSockets.delete(wallet);
+      }
+
       io.emit("users:online", Array.from(onlineUsers.values()));
     });
   });
@@ -572,7 +746,7 @@ export function buildChatHistoryRouter(MONGODB_URI: string): Router {
     try {
       const col = await getChatCollection(MONGODB_URI);
       const messages = await col
-        .find({}, { projection: { walletAddress: 0, expiresAt: 0 } })
+        .find({}, { projection: { expiresAt: 0 } })
         .sort({ createdAt: -1 })
         .limit(50)
         .toArray();
@@ -582,6 +756,37 @@ export function buildChatHistoryRouter(MONGODB_URI: string): Router {
     } catch (err) {
       console.error("[chat] History error:", err);
       res.status(500).json({ error: "Failed to load chat history" });
+    }
+  });
+
+  // GET /dms/history?wallet1=...&wallet2=... — last 50 DMs between two users
+  router.get("/dms/history", async (req, res) => {
+    try {
+      const { wallet1, wallet2 } = req.query;
+      if (typeof wallet1 !== "string" || typeof wallet2 !== "string") {
+        return res.status(400).json({ error: "wallet1 and wallet2 required" });
+      }
+
+      const db = await getDb(MONGODB_URI);
+      const dmCol = db.collection("private_messages");
+      const messages = await dmCol
+        .find(
+          {
+            $or: [
+              { fromWallet: wallet1, toWallet: wallet2 },
+              { fromWallet: wallet2, toWallet: wallet1 },
+            ],
+          },
+          { projection: { expiresAt: 0, read: 0 } },
+        )
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .toArray();
+
+      res.json({ messages: messages.reverse() });
+    } catch (err) {
+      console.error("[chat] DM history error:", err);
+      res.status(500).json({ error: "Failed to load DM history" });
     }
   });
 
