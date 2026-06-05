@@ -78,7 +78,6 @@
       '</div>' +
       '<div class="arcade-nav__right">' +
         '<a class="arcade-nav__link" href="' + BASE + '">fuzzynuts.xyz</a>' +
-        '<button class="arcade-nav__chat" id="arcadeChatBtn" title="Community Chat">💬 Chat</button>' +
         '<a class="arcade-nav__brand" href="' + BASE + 'arcade/" title="Fuzzynuts Arcade">🕹️ ARCADE</a>' +
       '</div>';
 
@@ -240,19 +239,22 @@
       injectNav();
       setupNavAutoHide();
 
-      // Chat button — open main site chat in popup window
-      var chatBtn = document.getElementById('arcadeChatBtn');
-      if (chatBtn) {
-        chatBtn.addEventListener('click', function () {
-          var chatUrl = window.location.origin + '/';
-          var popup = window.open(
-            chatUrl,
-            'fuzzynuts-chat',
-            'width=420,height=600,resizable=yes,scrollbars=no,status=no,menubar=no,toolbar=no'
-          );
-          if (popup) popup.focus();
-        });
-      }
+      // Chat button — floating element, always visible (not inside nav)
+      var chatBtn = document.createElement('button');
+      chatBtn.id = 'arcadeChatBtn';
+      chatBtn.className = 'arcade-chat-float';
+      chatBtn.title = 'Community Chat';
+      chatBtn.textContent = '💬 Chat';
+      chatBtn.addEventListener('click', function () {
+        var chatUrl = window.location.origin + '/';
+        var popup = window.open(
+          chatUrl,
+          'fuzzynuts-chat',
+          'width=420,height=600,resizable=yes,scrollbars=no,status=no,menubar=no,toolbar=no'
+        );
+        if (popup) popup.focus();
+      });
+      document.body.appendChild(chatBtn);
     } else {
       document.body.classList.add('in-iframe');
     }
