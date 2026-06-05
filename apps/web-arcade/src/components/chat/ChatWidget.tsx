@@ -83,6 +83,14 @@ export function ChatWidget() {
   const dmEndRef = useRef<HTMLDivElement>(null);
   const dmInputRef = useRef<HTMLInputElement>(null);
 
+  // Refs for socket listener (avoids stale closures)
+  const dmOpenRef = useRef(false);
+  const dmTargetRef = useRef<string | null>(null);
+
+  // Keep refs in sync with state
+  useEffect(() => { dmOpenRef.current = dmOpen; }, [dmOpen]);
+  useEffect(() => { dmTargetRef.current = dmTarget; }, [dmTarget]);
+
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -214,13 +222,11 @@ export function ChatWidget() {
       // ── DM events ─────────────────────────────────────────
       socket.on("dm:receive", (msg: DirectMessage) => {
         if (cancelled) return;
-        // If DM panel is open with this sender, add to thread
-        if (dmOpen && dmTarget === msg.fromWallet) {
+        // Use refs to avoid stale closures
+        if (dmOpenRef.current && dmTargetRef.current === msg.fromWallet) {
           setDmMessages((prev) => [...prev, msg]);
-          // Mark as read since panel is open
           socket.emit("dm:read", { fromWallet: msg.fromWallet });
         } else {
-          // Increment unread count and track sender
           setUnreadDms((prev) => prev + 1);
           setLastDmSender({ wallet: msg.fromWallet, username: msg.fromUsername });
         }
