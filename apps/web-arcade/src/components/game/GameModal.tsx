@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { gameRegistry } from "@/lib/gameRegistry";
 import type { GameMetadata } from "@/lib/gameRegistry";
+import { useChatSocket } from "@/components/chat/useChatSocket";
+import { useWalletStore } from "@/store/wallet";
 
 /* ═══════════════════════════════════════════════════════════════
    GameModal — CrazyGames-style lightbox for instant game play
@@ -94,16 +96,11 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     return false;
   });
 
-  // DEGEN CHAT START — collapsible live chat state
+  // DEGEN CHAT START — live chat via Socket.io
+  const { address } = useWalletStore();
+  const { messages: chatMessages, onlineUsers: chatOnlineUsers, connected: chatConnected, sendMessage: sendChatMessage } = useChatSocket(address);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
-  const PLACEHOLDER_MESSAGES = [
-    { id: 1, user: "NutWhale", text: "just hit 42k on survivors lmao", time: "2m ago", color: "#4ade80" },
-    { id: 2, user: "DegenApe", text: "that golf game is rigged i swear", time: "1m ago", color: "#f97316" },
-    { id: 3, user: "XRPL_Chad", text: "whos ready for monday payout 🥜", time: "45s ago", color: "#22d3ee" },
-    { id: 4, user: "SquirrelArmy", text: "top secret game when?? 👀", time: "30s ago", color: "#a855f7" },
-    { id: 5, user: "BagHolder420", text: "nut up or shut up 🐿️", time: "12s ago", color: "#f43f5e" },
-  ];
   const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   // DEGEN CHAT END
 
@@ -501,7 +498,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             >
               <MessageCircle size={13} />
               <span>Live Chat</span>
-              <span className="sidebar-chat__count">5</span>
+              {chatConnected && (
+                <span className="sidebar-chat__count">{chatOnlineUsers.length || ""}</span>
+              )}
+              {!chatConnected && (
+                <span className="sidebar-chat__count" style={{ opacity: 0.4 }}>...</span>
+              )}
               <ChevronDown
                 size={13}
                 className={`sidebar-chat__chevron ${chatOpen ? "sidebar-chat__chevron--open" : ""}`}
@@ -520,16 +522,27 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                 >
                   {/* Message list */}
                   <div className="sidebar-chat__messages">
-                    {PLACEHOLDER_MESSAGES.map((msg) => (
+                    {chatMessages.length === 0 && (
+                      <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: "0.7rem", padding: "1rem" }}>
+                        {chatConnected ? "No messages yet" : "Connecting..."}
+                      </div>
+                    )}
+                    {chatMessages.map((msg) => (
                       <div key={msg.id} className="sidebar-chat__msg">
                         <span
                           className="sidebar-chat__user"
-                          style={{ color: msg.color }}
+                          style={{
+                            color: msg.muted ? "#FBBF24" : msg.shadowed ? "#ef4444" : "#7c3aed"
+                          }}
                         >
-                          {msg.user}
+                          {msg.username}
                         </span>
-                        <span className="sidebar-chat__text">{msg.text}</span>
-                        <span className="sidebar-chat__time">{msg.time}</span>
+                        <span className="sidebar-chat__text" style={{
+                          textDecoration: (msg.shadowed || msg.muted) ? "line-through" : "none",
+                          opacity: msg.shadowed ? 0.6 : 1
+                        }}>
+                          {msg.content}
+                        </span>
                       </div>
                     ))}
                     <div ref={chatMessagesEndRef} />
@@ -540,21 +553,25 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                     className="sidebar-chat__input-row"
                     onSubmit={(e) => {
                       e.preventDefault();
-                      setChatInput("");
+                      if (chatInput.trim()) {
+                        sendChatMessage(chatInput);
+                        setChatInput("");
+                      }
                     }}
                   >
                     <input
                       className="sidebar-chat__input"
-                      placeholder="Type a message…"
+                      placeholder={chatConnected ? "Type a message…" : "Connecting..."}
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      maxLength={200}
+                      maxLength={500}
+                      disabled={!chatConnected}
                     />
                     <button
                       type="submit"
                       className="sidebar-chat__send"
                       aria-label="Send message"
-                      disabled={!chatInput.trim()}
+                      disabled={!chatInput.trim() || !chatConnected}
                     >
                       <Send size={13} />
                     </button>
