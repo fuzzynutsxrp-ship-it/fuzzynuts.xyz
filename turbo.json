@@ -21,11 +21,9 @@
       ],
       "env": [
         "NEXT_PUBLIC_*",
-        "MONGO_URL",
         "XRPL_NETWORK",
         "NUT_ISSUER",
         "NUT_DISTRIBUTOR",
-        "XUMM_API_KEY",
         "WALLET_JWT_SECRET",
         "GAME_SESSION_SECRET",
         "OPENRSC_GAME_ENDPOINT"
