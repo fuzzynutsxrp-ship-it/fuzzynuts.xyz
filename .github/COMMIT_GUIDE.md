@@ -15,7 +15,7 @@ feat: complete Open-RSC auth scaffold + VPS deploy script (32 tests green)
 - `/play/rsc` page with provisioning fallback state
 - `tools/deploy-openrsc-vps.sh` — one-command VPS setup script
 - `.env.example` with all required env vars documented
-- `docs/HANDOFF_VPS_SETUP.md` — plain-language handoff guide
+- `docs/how-to/vps-setup.md` — plain-language handoff guide
 - 32 tests green (15 vitest + 17 game-auth integration)
 
 ## Optional tag
@@ -54,7 +54,7 @@ git tag v0.1.0-rsc-scaffold
 | `turbo.json` | Added GAME_SERVER_READY to globalEnv |
 | `.env.example` | All env vars documented |
 | `README.md` | Added Open-RSC Status section |
-| `docs/HANDOFF_VPS_SETUP.md` | Non-technical handoff guide |
+| `docs/how-to/vps-setup.md` | Non-technical handoff guide |
 | `docs/how-to/deploy-openrsc-vps.md` | Full VPS deploy guide |
 | `docs/explanation/rsc-client-distribution.md` | Client distribution options |
 | `docs/reference/xrpl-distributor-setup.md` | Distributor key setup with xrpl.js code |

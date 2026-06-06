@@ -50,7 +50,7 @@ If you see that JSON — the API is live and correctly in provisioning mode.
 
 The game server (where RuneScape Classic actually runs) isn't set up yet. That's expected. The website and API are live — they're just waiting for the game server to be deployed on a separate VPS.
 
-When you're ready to set up the game server, follow the guide in docs/HANDOFF_VPS_SETUP.md.
+When you're ready to set up the game server, follow the guide in docs/how-to/vps-setup.md.
 
 ---
 
