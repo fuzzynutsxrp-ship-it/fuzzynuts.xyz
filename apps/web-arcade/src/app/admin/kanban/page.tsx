@@ -360,10 +360,10 @@ export default function KanbanPage() {
                         style={{
                           backgroundColor: PRIORITY_CONFIG[p].bg,
                           color: PRIORITY_CONFIG[p].color,
-                          ringColor:
+                          outline:
                             createPriority === p
-                              ? PRIORITY_CONFIG[p].color
-                              : "transparent",
+                              ? `1px solid ${PRIORITY_CONFIG[p].color}`
+                              : "none",
                         }}
                       >
                         {p === "high" ? (
