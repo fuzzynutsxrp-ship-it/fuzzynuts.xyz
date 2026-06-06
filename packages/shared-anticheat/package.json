@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@fuzzynuts/tsconfig": "workspace:*",
-    "@types/node": "^20",
+    "@types/node": "^25",
     "typescript": "^5.6.0",
     "vitest": "^2.1.9"
   }
