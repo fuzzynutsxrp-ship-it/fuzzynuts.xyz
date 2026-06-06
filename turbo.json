@@ -48,11 +48,6 @@
       "inputs": ["src/**", "tests/**", "package.json", "tsconfig.json"],
       "outputs": ["coverage/**"]
     },
-    "test:e2e": {
-      "dependsOn": ["build"],
-      "cache": false,
-      "outputs": ["playwright-report/**", "test-results/**"]
-    },
     "clean": {
       "cache": false
     }
