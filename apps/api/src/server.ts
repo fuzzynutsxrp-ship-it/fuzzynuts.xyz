@@ -36,6 +36,7 @@ const VPS_ACCOUNT_URL = optionalEnv("VPS_ACCOUNT_URL");
 const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
 const ADMIN_WALLET_ADDRESS = optionalEnv("ADMIN_WALLET_ADDRESS");
+const DISCORD_WEBHOOK_URL = optionalEnv("DISCORD_WEBHOOK_URL");
 
 const app = express();
 
@@ -144,6 +145,36 @@ async function bootstrap() {
     app.use("/api/rsc", (_req, res) => {
       res.status(503).json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
     });
+  }
+
+  // Monitoring route (admin-only health check history)
+  if (MONGODB_URI && ADMIN_WALLET_ADDRESS) {
+    try {
+      const { buildMonitoringRouter } = await import("./routes/monitoring");
+      app.use(
+        "/api/monitoring",
+        buildMonitoringRouter({ MONGODB_URI, ADMIN_WALLET_ADDRESS }),
+      );
+    } catch (e) {
+      console.error("[api] Failed to load monitoring router:", e);
+      app.use("/api/monitoring", (_req, res) => {
+        res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+      });
+    }
+  }
+
+  // Start health monitor cron (production only)
+  if (MONGODB_URI && process.env.NODE_ENV !== "test") {
+    try {
+      const { startHealthMonitor } = await import("./cron/health-monitor");
+      startHealthMonitor({
+        MONGODB_URI,
+        PORT,
+        DISCORD_WEBHOOK_URL: DISCORD_WEBHOOK_URL || undefined,
+      });
+    } catch (e) {
+      console.error("[api] Failed to start health monitor:", e);
+    }
   }
 
   // Community Chat (Socket.io + history endpoint)
