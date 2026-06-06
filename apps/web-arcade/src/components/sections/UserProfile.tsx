@@ -11,7 +11,9 @@ import {
   WifiOff,
   TrendingUp,
   Calendar,
+  Shield,
 } from "lucide-react";
+import Link from "next/link";
 import { useWalletStore } from "@/store/wallet";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { ClaimRewards } from "@/components/sections/ClaimRewards";
@@ -755,7 +757,59 @@ export function UserProfile() {
             )}
           </div>
         </motion.div>
+
+        {/* Admin Quick Links — visible only to admin wallet */}
+        <AdminLinks />
       </div>
     </section>
+  );
+}
+
+function AdminLinks() {
+  const { address, isConnected } = useWalletStore();
+  const ADMIN =
+    process.env.NEXT_PUBLIC_ADMIN_WALLET ||
+    "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
+
+  if (!isConnected || !address) return null;
+  if (address.toLowerCase() !== ADMIN.toLowerCase()) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.3 }}
+      className="mt-6 rounded-xl border border-[#7c3aed]/20 bg-[#120a22] p-4"
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <Shield size={14} className="text-[#7c3aed]" />
+        <span
+          className="text-sm font-semibold text-[#7c3aed]"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          Admin Tools
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/admin/kanban"
+          className="rounded-lg bg-[#7c3aed]/10 px-4 py-2 text-xs font-semibold text-[#7c3aed] transition-colors hover:bg-[#7c3aed]/20"
+        >
+          Kanban Board
+        </Link>
+        <Link
+          href="/admin/chat"
+          className="rounded-lg bg-[#e8943a]/10 px-4 py-2 text-xs font-semibold text-[#e8943a] transition-colors hover:bg-[#e8943a]/20"
+        >
+          Chat Moderation
+        </Link>
+        <Link
+          href="/admin/monitoring"
+          className="rounded-lg bg-[#10B981]/10 px-4 py-2 text-xs font-semibold text-[#10B981] transition-colors hover:bg-[#10B981]/20"
+        >
+          Health Monitor
+        </Link>
+      </div>
+    </motion.div>
   );
 }

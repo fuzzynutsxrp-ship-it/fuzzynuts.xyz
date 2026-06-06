@@ -163,6 +163,22 @@ async function bootstrap() {
     }
   }
 
+  // Kanban task board (admin + agent endpoints)
+  if (MONGODB_URI && ADMIN_WALLET_ADDRESS) {
+    try {
+      const { buildKanbanRouter } = await import("./routes/kanban");
+      app.use(
+        "/api/kanban",
+        buildKanbanRouter({ MONGODB_URI, ADMIN_WALLET_ADDRESS }),
+      );
+    } catch (e) {
+      console.error("[api] Failed to load kanban router:", e);
+      app.use("/api/kanban", (_req, res) => {
+        res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+      });
+    }
+  }
+
   // Start health monitor cron (production only)
   if (MONGODB_URI && process.env.NODE_ENV !== "test") {
     try {
