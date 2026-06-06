@@ -1,6 +1,6 @@
 # VPS Setup — RSC Wallet Auto-Login
 
-> **Live production game server: `67.205.132.6`** (DigitalOcean droplet `fuzzynuts-game`, NYC1, Open-RSC on port `43594`). This droplet is **actively in use for live gameplay** — do not decommission it. (An older IP `137.184.194.158` appears in some historical notes and is **stale/retired**; always use `67.205.132.6`.)
+> **Live production game server: `67.205.132.6`** (DigitalOcean droplet `fuzzynuts-game`, NYC1, Open-RSC on port `43594`). This droplet is **actively in use for live gameplay** — do not decommission it. (An older IP `67.205.132.6` appears in some historical notes and is **stale/retired**; always use `67.205.132.6`.)
 
 ## What Changed
 
