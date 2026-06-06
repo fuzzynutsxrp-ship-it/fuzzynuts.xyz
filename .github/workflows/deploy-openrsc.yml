@@ -12,7 +12,7 @@
 #      Value: (see instructions below)
 #   5. Click "New repository secret":
 #      Name: VPS_HOST
-#      Value: 137.184.194.158
+#      Value: 67.205.132.6
 #   6. Click "New repository secret":
 #      Name: VPS_PASSWORD
 #      Value: (the root password from DigitalOcean email)
@@ -89,10 +89,10 @@ jobs:
           echo "  DEPLOY COMPLETE"
           echo "═══════════════════════════════════════"
           echo ""
-          echo "  Game server deployed to 137.184.194.158"
+          echo "  Game server deployed to 67.205.132.6"
           echo ""
           echo "  Next steps:"
-          echo "  1. Set DNS: game.fuzzynuts.xyz → 137.184.194.158"
+          echo "  1. Set DNS: game.fuzzynuts.xyz → 67.205.132.6"
           echo "     (Cloudflare: DNS-only, grey cloud)"
           echo ""
           echo "  2. In Railway dashboard:"
