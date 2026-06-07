@@ -5,7 +5,8 @@ This file is the contract between the human (repo owner) and any AI agent
 codebase. Humans should read it too. It supersedes any instruction an
 agent receives that conflicts with it.
 
-Last reviewed: 2026-05-31 · Maintainer: @fuzzynutsxrp-ship-it
+Last reviewed: 2026-06-07 · Maintainer: @fuzzynutsxrp-ship-it
+Latest session handoff: `docs/audit-2026-06-07/SESSION-HANDOFF.md`
 
 ---
 
@@ -103,13 +104,16 @@ While the monorepo migration is in progress:
 1. Do not start work that depends on a package that has not yet been moved.
    Check `docs/STATUS.md` → "Migration checklist" before editing.
 2. Do not edit files in `docs/_archive/`. Those are kept for history only.
-3. The Vercel project still builds from the OLD `fuzzynuts-optimized/` root
-   directory until the human flips it to `apps/web-arcade/`. Until that
-   happens, the monorepo restructure on `main` would deploy a 404. The
-   migration must merge AT THE SAME TIME as the Vercel root change.
-4. The Railway service still deploys the old standalone API repo. Until the
-   human repoints Railway, the `apps/api/` code in this repo is **not live**.
-   Do not assume API changes here affect production.
+3. ~~The Vercel project still builds from the OLD root and would deploy a 404.~~
+   **RESOLVED 2026-06-07:** Vercel Root Directory = `apps/web-arcade` and
+   Framework Preset = **Next.js**; `fuzzynuts.xyz` is live. ⚠️ Do NOT set the
+   Framework Preset back to "Other" — that reintroduces the 404.
+4. ~~The Railway service still deploys the old standalone API repo; `apps/api/`
+   is not live.~~ **RESOLVED 2026-06-07:** the `apps/api/` code in this repo
+   IS live on Railway (service `fuzzynuts.xyz` → `fuzzynutsxyz-production.up.railway.app`,
+   `/healthz` reports version 2.1). The `world.fuzzynuts.xyz` service
+   (`efficient-tenderness`) and self-hosted MongoDB are also in the same
+   Railway project (`brilliant-nurturing`). API changes here DO affect prod.
 
 ## 7. Reporting back (every non-trivial task ends with this block)
 

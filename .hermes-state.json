@@ -1,26 +1,48 @@
 {
-  "lastUpdated": "2026-06-03T00:00:00Z",
-  "currentPhase": "wallet-autologin-implementation",
+  "lastUpdated": "2026-06-07T03:00:00Z",
+  "currentPhase": "infra-audit-and-deploy-stabilization",
+  "handoffDoc": "docs/audit-2026-06-07/SESSION-HANDOFF.md",
   "completed": [
-    "api-routes-rsc.ts-implemented",
-    "api-middleware-walletAuth.ts-implemented",
-    "tools-patch-rsc-teavm-client.sh-created",
-    "web-arcade-rsc-index.html-updated"
+    "vercel-site-fixed-framework-preset-Other-to-Nextjs-and-clean-redeploy",
+    "vercel-live-fuzzynuts.xyz-serving",
+    "railway-api-verified-live-healthz-version-2.1",
+    "api-typescript-deploy-blockers-fixed-rsc-chat-kanban",
+    "railway.toml-buildCommand-fixed-pnpm-workspace",
+    "package.json-build-vercel-script-added",
+    "repo-cleanup-detrack-public-games-orphans-stubs-dockerfiles",
+    "env-example-rewritten-MONGODB_URI-drop-XUMM",
+    "docs-reorg-howto-runbooks-and-audit-archive",
+    "vps-ip-corrected-to-67.205.132.6-everywhere",
+    "github-pages-unpublished-and-gh-pages-branch-deleted",
+    "dependabot-prs-9-10-11-13-14-closed",
+    "9-stale-remote-branches-deleted",
+    "github-secret-VPS_HOST-updated-to-67.205.132.6",
+    "main-branch-protection-enabled-no-force-push-no-delete"
   ],
   "pending": [
-    "rebuild-api-dist",
-    "add-vercel-rewrite-for-rsc",
-    "set-railway-env-vars",
-    "run-teavm-patch-on-vps",
-    "end-to-end-test"
+    "reown-add-apex-https-fuzzynuts.xyz-to-allowlist",
+    "set-real-GAME_SESSION_SECRET-on-efficient-tenderness-service",
+    "investigate-efficient-tenderness-failed-build",
+    "optional-scope-vercel-install-to-avoid-better-sqlite3-compile-error",
+    "verify-teavm-autologin-end-to-end-on-vps-CARRIED-OVER-UNVERIFIED",
+    "optional-take-digitalocean-safety-snapshot"
   ],
-  "blockers": [
-    "api-dist-is-stale-needs-rebuild",
-    "teavm-patch-not-run-on-vps-yet"
-  ],
-  "nextAction": "rebuild-api-dist-and-add-vercel-rewrites",
+  "blockers": [],
+  "nextAction": "reown-add-apex-domain-to-allowlist",
   "manualStepsRequired": [
-    "set-MONGODB_URI-and-RSC_PASSWORD_SECRET-in-railway",
-    "run-curl-command-to-patch-teavm-on-vps"
-  ]
+    "reown-dashboard-add-https://fuzzynuts.xyz-domain",
+    "railway-efficient-tenderness-set-real-GAME_SESSION_SECRET",
+    "digitalocean-optional-snapshot-of-fuzzynuts-game-67.205.132.6"
+  ],
+  "criticalFacts": {
+    "liveVpsIp": "67.205.132.6",
+    "retiredVpsIp": "137.184.194.158",
+    "dnsHost": "porkbun-NOT-cloudflare",
+    "vercelFrameworkPreset": "Next.js-must-not-revert-to-Other-or-site-404s",
+    "vercelRootDirectory": "apps/web-arcade",
+    "apiHealthz": "https://fuzzynutsxyz-production.up.railway.app/healthz",
+    "reownProjectId": "238a1bd9e657a0efbe275e457e73c426",
+    "xamanKeyIsTestKey": true,
+    "gameServerReadyMustBeTrueInRailwayProd": true
+  }
 }
