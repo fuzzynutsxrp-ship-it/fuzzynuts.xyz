@@ -64,3 +64,26 @@ Deleted 9 merged local branches (recoverable via recorded SHAs and `remotes/orig
 ## Not done (out of scope / requires push or dashboards)
 - Git **history** rewrite to purge large blobs (separate, riskier op).
 - Remote branch deletions, Dependabot PRs, VPS teardown, secret rotation — covered in `EXTERNAL_CLEANUP_ACTION_PLAN.md` (Phase 5).
+
+---
+
+## Post-audit follow-ups (after the live dashboard audit)
+
+These commits landed after the original audit/cleanup, prompted by the live dashboard inspection and the owner's correction that the Open-RSC VPS is **live, not stale**.
+
+### VPS configuration-drift fixes — `638bb19` + `4bad84e`
+Context: the live audit found the only DigitalOcean droplet is `fuzzynuts-game` @ **`67.205.132.6`** (actively used for gameplay), while the repo hardcoded the retired IP `137.184.194.158`.
+- **`638bb19`** `fix(infra): correct stale VPS IP and document live GAME_SERVER_READY state` — updated `.github/workflows/deploy-openrsc.yml` (3 IP references → `67.205.132.6`), added a "live production game server" callout to `docs/how-to/vps-setup.md`, and documented on `.env.example` that `GAME_SERVER_READY` must be `true` in Railway prod for live gameplay. (3 files)
+- **`4bad84e`** `fix(infra): update stale VPS IP to live 67.205.132.6` — follow-up touch to `docs/how-to/vps-setup.md` (1 line). *Kept as a separate commit by owner decision — not squashed/rebased (history is pushed; rewriting would require a force-push that violates the new `main` branch protection).*
+
+### Deploy build fixes — `60bc906`
+`fix(deploy): resolve pre-existing TS errors and optimize monorepo build scripts` — unblocked the Railway/Vercel builds:
+- `apps/api/src/routes/rsc.ts` — guarded `jwtVerify` token (`match?.[1]` + null check) [the original Phase-2-flagged error].
+- `apps/api/src/routes/chat.ts` — fixed 3 strict-null/ordering errors (`parts[0] ?? ''`, mute echo uses raw `content` instead of pre-declaration `finalContent`, `jwtVerify` token guard).
+- `apps/api/src/routes/kanban.ts` — `if (!id || !ObjectId.isValid(id))` in both handlers.
+- `package.json` — added `build:vercel` = `turbo run build --filter=@fuzzynuts/web-arcade...` (frontend-only, skips Rust/Tauri).
+- `railway.toml` — `buildCommand` → `pnpm install --frozen-lockfile && cd apps/api && pnpm build` (root workspace install + API build; still nixpacks, no Dockerfile refs).
+- Verified: `npx tsc -p tsconfig.json` and `pnpm build:api` both exit 0.
+
+### Changelog — `6f3df7e`
+`docs(audit): add comprehensive changelog of the 2026-06-06 infrastructure audit` — added this file to the repo. (This "Post-audit follow-ups" section was appended in a subsequent commit.)
