@@ -102,11 +102,12 @@ async function getWalletFromCookie(
   const match = cookieHeader.match(
     new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`),
   );
-  if (!match) return null;
+  const token = match?.[1];
+  if (!token) return null;
 
   try {
     const { payload } = await jwtVerify(
-      match[1],
+      token,
       new TextEncoder().encode(secret),
       { issuer: "fuzzynuts.xyz" },
     );

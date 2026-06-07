@@ -500,7 +500,7 @@ export function initChat(
         // ── Admin commands — /mute, /ban, /unmute, /unban, /clear ──
         if (content.startsWith('/') && isAdmin(wallet)) {
           const parts = content.trim().split(/\s+/);
-          const cmd = parts[0].toLowerCase();
+          const cmd = (parts[0] ?? '').toLowerCase();
           const targetName = parts[1] || '';
           const param = parts[2] || '';
 
@@ -608,7 +608,7 @@ export function initChat(
           socket.emit("message:muted", {
             id: `muted-${Date.now()}`,
             username,
-            content: finalContent,
+            content,
             createdAt: new Date().toISOString(),
             muted: true,
           });
@@ -962,11 +962,12 @@ export function buildAdminChatRouter(
       const match = cookieHeader.match(
         new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`),
       );
-      if (!match) return res.status(401).json({ error: "No session" });
+      const token = match?.[1];
+      if (!token) return res.status(401).json({ error: "No session" });
 
       const { jwtVerify } = await import("jose");
       const { payload } = await jwtVerify(
-        match[1],
+        token,
         new TextEncoder().encode(WALLET_JWT_SECRET),
         { issuer: "fuzzynuts.xyz" },
       );

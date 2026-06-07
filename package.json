@@ -15,6 +15,7 @@
     "dev:games": "turbo run dev --filter=@fuzzynuts/games-build",
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@fuzzynuts/web-arcade...",
+    "build:vercel": "turbo run build --filter=@fuzzynuts/web-arcade...",
     "build:api": "turbo run build --filter=@fuzzynuts/api...",
     "build:games": "turbo run build --filter=@fuzzynuts/games-build...",
     "build:desktop": "turbo run build --filter=@fuzzynuts/desktop-tauri...",

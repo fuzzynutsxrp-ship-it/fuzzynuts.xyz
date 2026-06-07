@@ -113,7 +113,7 @@ export function buildKanbanRouter(env: {
   router.patch("/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      if (!ObjectId.isValid(id)) {
+      if (!id || !ObjectId.isValid(id)) {
         res.status(400).json({ error: "E_SCHEMA", detail: "invalid id" });
         return;
       }
@@ -158,7 +158,7 @@ export function buildKanbanRouter(env: {
   router.delete("/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
-      if (!ObjectId.isValid(id)) {
+      if (!id || !ObjectId.isValid(id)) {
         res.status(400).json({ error: "E_SCHEMA", detail: "invalid id" });
         return;
       }

@@ -1,6 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd apps/api && pnpm install"
+# Install the whole pnpm workspace from the root (so @fuzzynuts/* workspace
+# deps resolve), then type-check/build the API package. Runtime still runs
+# tsx on the source, but building here fails the deploy on TS errors.
+buildCommand = "pnpm install --frozen-lockfile && cd apps/api && pnpm build"
 
 [deploy]
 startCommand = "npx tsx apps/api/src/server.ts"
