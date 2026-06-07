@@ -308,14 +308,14 @@ function LedgerEntry({
 const TRUST_CHIPS = [
   {
     icon: Bot,
-    title: "Bots Get Rekt",
-    desc: "Score caps, minimum play durations, rate limits, and wallet verification keep the arcade fair — no scripts, no cheese.",
+    title: "Anti-Cheat",
+    desc: "Score caps, minimum play durations, rate limits, and verification keep the arcade fair — no scripts, no exploits.",
     color: "#3B82F6",
   },
   {
     icon: Users,
-    title: "Degen-Governed",
-    desc: "The 18% Community Nut Jar funds airdrops, rewards, and whatever the degens build next.",
+    title: "Community-Governed",
+    desc: "The community shapes what games come next, what features matter, and how the platform evolves.",
     color: "#a855f7",
   },
 ];
@@ -350,12 +350,12 @@ export function Trust() {
               10+22 px; text-degen-crisp adds antialiasing + paint-order so the
               gold gradient-clip text stays razor sharp under the halo.) */}
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
-            Don&apos;t Trust. Verify.
+            Built to Last
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            321 billion $NUT. Fixed forever. Issuer blackholed — nobody mints
-            more, not even us. Don&apos;t take our word for it: every number is
-            public on the XRP Ledger. Receipts below. 🐿️
+            Fair play, transparent systems, and a community-first approach.
+            Every score is verified, every leaderboard is public, and every
+            player competes on equal footing.
           </p>
           {/* DEGEN OVERHAUL END */}
         </motion.div>

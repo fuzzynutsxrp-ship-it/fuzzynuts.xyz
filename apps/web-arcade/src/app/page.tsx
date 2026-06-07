@@ -35,9 +35,9 @@ const Trust = dynamic(() =>
     default: m.Trust,
   })),
 );
-const HowToGet = dynamic(() =>
-  import("@/components/sections/HowToGet").then((m) => ({
-    default: m.HowToGet,
+const Community = dynamic(() =>
+  import("@/components/sections/Community").then((m) => ({
+    default: m.Community,
   })),
 );
 const Footer = dynamic(() =>
@@ -69,10 +69,10 @@ export default function Home() {
         <Trust />
       </main>
 
-      {/* howto-bg.jpg + dark overlay removed — HowToGet and Footer
+      {/* howto-bg.jpg + dark overlay removed — Community and Footer
           now render directly over the page-level herobackground3.jpg. */}
       <div className="relative z-10">
-        <HowToGet />
+        <Community />
         <Footer />
       </div>
 

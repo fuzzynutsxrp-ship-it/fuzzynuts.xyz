@@ -4,6 +4,7 @@ import "./globals.css";
 import { JoeyProvider } from "@/components/providers/JoeyProvider";
 import { AppMount } from "@/components/providers/AppMount";
 import { MotionProvider } from "@/components/providers/MotionProvider";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 
 const inter = Inter({
@@ -46,24 +47,22 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Fuzzynuts — Play. Earn. Own. | $NUT on XRPL",
-    template: "%s | Fuzzynuts",
+    default: "FuzzyNuts — Free Web Games & Leaderboards",
+    template: "%s | FuzzyNuts",
   },
   description:
-    "The nuttiest meme coin on the XRP Ledger. Play 6 arcade games, earn real $NUT tokens, and join a community of degens. 321B fixed supply, blackholed issuer, 80% liquidity.",
+    "Play free arcade games, compete on global leaderboards, and unlock achievements. Join the FuzzyNuts gaming community — no wallet required.",
   keywords: [
-    "Fuzzynuts",
-    "$NUT",
-    "NUT token",
-    "XRPL",
-    "XRP Ledger",
-    "meme coin",
-    "play to earn",
-    "crypto arcade",
-    "XRPL token",
-    "blockchain gaming",
-    "XRPL meme coin",
-    "play-to-earn XRPL",
+    "FuzzyNuts",
+    "free web games",
+    "online arcade",
+    "browser games",
+    "leaderboard",
+    "gaming community",
+    "arcade games",
+    "competitive gaming",
+    "achievements",
+    "free to play",
   ],
   authors: [{ name: "Fuzzynuts", url: SITE_URL }],
   creator: "Fuzzynuts",
@@ -77,15 +76,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: "Fuzzynuts",
-    title: "Fuzzynuts — Play. Earn. Own. | $NUT on XRPL",
+    title: "FuzzyNuts — Free Web Games & Leaderboards",
     description:
-      "The nuttiest meme coin on XRPL. Play 6 arcade games, earn $NUT tokens. 321B fixed supply, blackholed issuer, 80% liquidity locked.",
+      "Play free arcade games, compete on global leaderboards, and unlock achievements. No wallet required.",
     images: [
       {
         url: "/images/og/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Fuzzynuts — The nuttiest meme coin on XRPL. Squirrel mascot with golden acorns.",
+        alt: "FuzzyNuts — Free Web Games & Leaderboards",
         type: "image/png",
       },
     ],
@@ -94,12 +93,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@fuzzynutsxrp",
     creator: "@fuzzynutsxrp",
-    title: "Fuzzynuts — Play. Earn. Own. | $NUT on XRPL",
+    title: "FuzzyNuts — Free Web Games & Leaderboards",
     description:
-      "🐿️ The nuttiest meme coin on XRPL. 6 arcade games, real $NUT prizes, 321B fixed supply. Play free, earn crypto!",
+      "🐿️ Play free arcade games, compete on global leaderboards, unlock achievements. No wallet needed!",
     images: {
       url: "/images/og/og-image.png",
-      alt: "Fuzzynuts — Play. Earn. Own.",
+      alt: "FuzzyNuts — Free Web Games & Leaderboards",
     },
   },
   robots: ALLOW_INDEXING
@@ -162,6 +161,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="font-body antialiased">
+        <SessionProvider>
         <MotionProvider>
           <JoeyProvider>
             <AppMount />
@@ -169,6 +169,7 @@ export default function RootLayout({
             <ChatWidget />
           </JoeyProvider>
         </MotionProvider>
+        </SessionProvider>
       </body>
     </html>
   );

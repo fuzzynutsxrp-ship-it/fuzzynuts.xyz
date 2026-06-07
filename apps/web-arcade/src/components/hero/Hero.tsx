@@ -1,15 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Gamepad2, Globe } from "lucide-react";
 import Image from "next/image";
 import { gameRegistry } from "@/lib/gameRegistry";
-// DEGEN OVERHAUL — formatter from the lean @/lib/format module
-import { formatUsd } from "@/lib/format";
-import { API_REWARDS } from "@/features/arcade/constants";
-import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
-import { PriceTicker } from "@/components/home/PriceTicker";
 
 /* ─────────────────────────────────────────────────────────────
    Hero — Foreground content only.
@@ -31,22 +25,6 @@ const FLOAT_ANIMATION = {
 };
 
 export function Hero() {
-  // Live weekly prize pool from the Monday snapshot (keeps the pill in sync
-  // with the Prizes section instead of a hardcoded number).
-  const [weekTiers, setWeekTiers] = useState<WeeklyTiersResponse | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`${API_REWARDS}/tiers`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled) setWeekTiers(d); })
-      .catch(() => { if (!cancelled) setWeekTiers(null); });
-    return () => { cancelled = true; };
-  }, []);
-  // USD-fixed pool (the NUT amount is recalculated weekly from the snapshot,
-  // so the pill must show the USD value, not a "fixed NUT" number).
-  const poolUsd = (weekTiers?.tiers ?? []).reduce((s, t) => s + (t.usd_value || 0), 0);
-  const poolLabel = weekTiers?.tiers ? formatUsd(poolUsd) : "Real $NUT";
-
   return (
     <section
       id="hero"
@@ -121,14 +99,13 @@ export function Hero() {
         </motion.div>
 
         {/* ── Tagline ── */}
-        {/* DEGEN OVERHAUL START — gradient tagline + degen kicker */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           className="text-lg sm:text-2xl md:text-3xl font-display font-black gradient-text-gold mb-1"
         >
-          Go Nuts. Get Paid.
+          Play Free. Climb the Board.
         </motion.p>
         <motion.p
           initial={{ opacity: 0 }}
@@ -136,9 +113,8 @@ export function Hero() {
           transition={{ delay: 0.65 }}
           className="font-mono text-[11px] sm:text-sm uppercase tracking-[0.35em] text-[var(--color-hot-pink)] text-pink-glow mb-3"
         >
-          Nut up or shut up
+          No wallet needed — just skill
         </motion.p>
-        {/* DEGEN OVERHAUL END */}
 
         {/* ── Description ── */}
         <motion.p
@@ -147,10 +123,9 @@ export function Hero() {
           transition={{ delay: 0.7 }}
           className="text-sm sm:text-base md:text-lg text-[var(--color-cream)] max-w-2xl mx-auto mb-8 leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]"
         >
-          {/* DEGEN OVERHAUL — edgier copy, same facts (free arcade, XRPL, weekly $NUT) */}
-          Free-to-play arcade on the XRP Ledger that pays out real $NUT every
-          single week. The nuttiest coin in crypto, built by degens who refuse
-          to take it seriously. Top the board, bag the bag.
+          Free arcade games, global leaderboards, and weekly competitions.
+          Sign in with Google, pick a game, and start climbing. No crypto
+          knowledge required — just pure gaming skill. 🐿️
         </motion.p>
 
         {/* ── CTAs ── */}
@@ -213,12 +188,9 @@ export function Hero() {
           className="mt-10 grid grid-cols-3 gap-3 max-w-lg mx-auto"
         >
           {[
-            { value: "321B", label: "Total Supply" },
-            {
-              value: String(gameRegistry.getAllLive().length),
-              label: "Games Live",
-            },
-            { value: "80%", label: "In Liquidity" },
+            { value: String(gameRegistry.getAllLive().length), label: "Free Games" },
+            { value: "∞", label: "Leaderboard" },
+            { value: "0$", label: "Entry Fee" },
           ].map((stat) => (
             <div
               key={stat.label}
@@ -235,11 +207,7 @@ export function Hero() {
           ))}
         </motion.div>
 
-        {/* ── Live price / market cap + Chart & Buy CTAs ── */}
-        <PriceTicker />
-
-        {/* ── Prize teaser (compact) ── the full Top-3 pitch + connect CTA
-              live in the Prizes section; the hero just points there. */}
+        {/* ── Prize teaser (compact) ── */}
         <motion.a
           href="#prizes"
           initial={{ opacity: 0, y: 20 }}
@@ -247,14 +215,12 @@ export function Hero() {
           transition={{ delay: 1.2, duration: 0.6 }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          // DEGEN OVERHAUL — weekly prize teaser ("$0.10 in weekly prizes — top 3 split the pool"):
-          // kill glass pill. Solid degen-950, thick 2 px gold border, sharp 6 px corners, outer gold glow.
           className="group mt-9 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-md bg-degen-950 border-2 border-[var(--color-gold)] text-sm sm:text-base shadow-[0_0_18px_rgba(251,191,36,0.35)]"
         >
           <span className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
           <span className="text-[var(--color-cream)]">
-            <span className="font-bold text-[var(--color-gold)]">{poolLabel}</span>{" "}
-            in weekly prizes — top 3 split the pool
+            <span className="font-bold text-[var(--color-gold)]">Weekly leaderboards</span>{" "}
+            — compete and climb the ranks
           </span>
           <ArrowRight
             size={15}

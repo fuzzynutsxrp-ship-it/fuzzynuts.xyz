@@ -14,8 +14,11 @@ import {
   Trophy,
   User,
   AlertCircle,
+  LogIn,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
+import { useSession, signOut } from "next-auth/react";
+import { LoginModal } from "@/components/auth/LoginModal";
 // DEGEN OVERHAUL — formatter from the lean @/lib/format module
 import { truncateAddress } from "@/lib/format";
 import Image from "next/image";
@@ -26,9 +29,7 @@ import { ProfileModal } from "@/components/game/ProfileModal";
 const NAV_LINKS = [
   { href: "/#games", label: "Arcade" },
   { href: "/leaderboard/", label: "Leaderboard", icon: "trophy" },
-  { href: "/#prizes", label: "Prizes" },
-  { href: "/#tokenomics", label: "Tokenomics" },
-  { href: "/#how-to-get", label: "Get $NUT" },
+  { href: "/#community", label: "Community" },
 ];
 
 export function Navbar() {
@@ -37,6 +38,7 @@ export function Navbar() {
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const {
     address,
     isConnected,
@@ -48,6 +50,7 @@ export function Navbar() {
     error,
     setError,
   } = useWalletStore();
+  const { data: session } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [hasClaimable, setHasClaimable] = useState(false);
 
@@ -249,11 +252,32 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Wallet + Mobile Toggle */}
+          {/* Auth + Mobile Toggle */}
           <div className="flex items-center gap-3">
-            {/* Wallet Button */}
+            {/* Auth Button — Web2 primary, Web3 secondary */}
             <div className="relative" ref={dropdownRef}>
-              {isConnected && address ? (
+              {session ? (
+                <motion.button
+                  onClick={() => setWalletMenuOpen(!walletMenuOpen)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0f0a00] border-2 border-brand-gold/30 text-brand-gold hover:border-brand-gold/50 transition-all text-sm font-medium"
+                  style={{ boxShadow: "0 0 15px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.1)" }}
+                >
+                  {session.user?.image ? (
+                    <img src={session.user.image} alt="" className="w-5 h-5 rounded-full" />
+                  ) : (
+                    <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
+                  )}
+                  <span className="hidden sm:inline truncate max-w-[120px]">
+                    {session.user?.name ?? "Player"}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform ${walletMenuOpen ? "rotate-180" : ""}`}
+                  />
+                </motion.button>
+              ) : isConnected && address ? (
                 <motion.button
                   onClick={() => setWalletMenuOpen(!walletMenuOpen)}
                   whileHover={{ scale: 1.03 }}
@@ -275,31 +299,24 @@ export function Navbar() {
                 </motion.button>
               ) : (
                 <motion.button
-                  onClick={() => setWalletMenuOpen(!walletMenuOpen)}
-                  disabled={isConnecting}
+                  onClick={() => setLoginModalOpen(true)}
                   whileHover={{
                     scale: 1.05,
                     boxShadow: "0 0 30px rgba(251,191,36,0.45), 0 0 60px rgba(251,191,36,0.2)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold to-amber-500 text-forest-dark font-black text-sm transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold to-amber-500 text-forest-dark font-black text-sm transition-all cursor-pointer"
                   style={{
-                    animation: !isConnecting
-                      ? "pulse-gold 2.6s ease-in-out infinite"
-                      : "none",
+                    animation: "pulse-gold 2.6s ease-in-out infinite",
                   }}
                 >
-                  <Wallet size={16} />
-                  <span className="hidden sm:inline">
-                    {isConnecting ? "Connecting…" : "Connect Wallet"}
-                  </span>
-                  <span className="sm:hidden">
-                    {isConnecting ? "…" : "Connect"}
-                  </span>
+                  <LogIn size={16} />
+                  <span className="hidden sm:inline">Sign In</span>
+                  <span className="sm:hidden">Login</span>
                 </motion.button>
               )}
 
-              {/* Wallet Dropdown */}
+              {/* User / Wallet Dropdown */}
               <AnimatePresence>
                 {walletMenuOpen && (
                   <motion.div
@@ -309,9 +326,65 @@ export function Navbar() {
                     transition={{ duration: 0.15 }}
                     className="absolute right-0 top-full mt-2 w-72 rounded-xl bg-[#0a0a0a] border-2 border-brand-gold/30 p-3 shadow-[0_0_30px_rgba(251,191,36,0.1),0_0_60px_rgba(251,191,36,0.05),0_8px_32px_rgba(0,0,0,0.6)]"
                   >
-                    {isConnected ? (
+                    {session ? (
                       <div className="space-y-2">
-                        {/* Address display */}
+                        {/* User display */}
+                        <div className="px-3 py-2.5 rounded-lg bg-[#0f0a00] border border-brand-gold/20">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs text-[var(--color-cream-dim)]">
+                              Signed in as
+                            </p>
+                            <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)]" />
+                          </div>
+                          <p className="text-sm font-bold text-brand-gold truncate">
+                            {session.user?.name ?? session.user?.email ?? "Player"}
+                          </p>
+                          {session.user?.email && (
+                            <p className="text-[11px] text-[var(--color-cream-dim)] mt-0.5 truncate">
+                              {session.user.email}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Wallet status */}
+                        {isConnected && address && (
+                          <div className="px-3 py-2 rounded-lg bg-[#0f0a00]/50 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Wallet size={14} className="text-brand-gold" />
+                              <span className="text-xs text-[var(--color-cream-dim)]">
+                                Wallet linked
+                              </span>
+                            </div>
+                            <span className="text-xs font-mono text-brand-gold">
+                              {truncateAddress(address)}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <button
+                          onClick={() => { setWalletMenuOpen(false); setProfileOpen(true); }}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neon-green hover:bg-[rgba(16,185,129,0.08)] rounded-lg transition-colors cursor-pointer"
+                        >
+                          <User size={14} />
+                          Profile
+                        </button>
+                        <div className="h-px bg-brand-gold/10 mx-1" />
+                        <button
+                          onClick={() => {
+                            disconnect();
+                            signOut({ callbackUrl: "/" });
+                            setWalletMenuOpen(false);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <LogOut size={14} />
+                          Sign Out
+                        </button>
+                      </div>
+                    ) : isConnected && address ? (
+                      <div className="space-y-2">
+                        {/* Wallet-only user */}
                         <div className="px-3 py-2.5 rounded-lg bg-[#0f0a00] border border-brand-gold/20">
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-xs text-[var(--color-cream-dim)] capitalize">
@@ -324,23 +397,6 @@ export function Navbar() {
                           </p>
                         </div>
 
-                        {/* NUT Balance */}
-                        <div className="px-3 py-2 rounded-lg bg-[#0f0a00]/50 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Coins
-                              size={14}
-                              className="text-brand-gold"
-                            />
-                            <span className="text-xs text-[var(--color-cream-dim)]">
-                              $NUT Balance
-                            </span>
-                          </div>
-                          <span className="text-sm font-bold text-brand-gold">
-                            {nutBalance || "—"}
-                          </span>
-                        </div>
-
-                        {/* Actions */}
                         <button
                           onClick={() => { setWalletMenuOpen(false); setProfileOpen(true); }}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neon-green hover:bg-[rgba(16,185,129,0.08)] rounded-lg transition-colors cursor-pointer"
@@ -369,77 +425,14 @@ export function Navbar() {
                           Disconnect
                         </button>
                       </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <p className="text-xs text-[var(--color-cream-dim)] px-2 pb-2 font-medium">
-                          Choose wallet
-                        </p>
-
-                        {/* Inline error in dropdown */}
-                        {error && (
-                          <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 mb-1">
-                            <AlertCircle
-                              size={14}
-                              className="text-red-400 mt-0.5 shrink-0"
-                            />
-                            <div className="text-xs text-red-400 leading-relaxed">
-                              {error}
-                              {error.includes("installed") ||
-                              error.includes("not found") ? (
-                                <>
-                                  {" "}
-                                  <a
-                                    href="https://xaman.app"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline text-brand-gold hover:text-gold-light font-semibold"
-                                  >
-                                    Get Xaman →
-                                  </a>
-                                </>
-                              ) : null}
-                            </div>
-                          </div>
-                        )}
-
-                        {[
-                          {
-                            id: "xaman" as const,
-                            name: "Xaman (Xumm)",
-                            icon: "📱",
-                            desc: "Mobile / Desktop",
-                          },
-                          {
-                            id: "joey" as const,
-                            name: "Joey Wallet",
-                            icon: "🦘",
-                            desc: "Mobile / WalletConnect",
-                          },
-                        ].map((w) => (
-                          <motion.button
-                            key={w.id}
-                            onClick={() => handleConnect(w.id)}
-                            disabled={isConnecting}
-                            whileHover={{ x: 4 }}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-[var(--color-cream)] hover:text-brand-gold hover:bg-[rgba(251,191,36,0.08)] rounded-lg transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                          >
-                            <span className="text-xl w-8 text-center">
-                              {w.icon}
-                            </span>
-                            <div className="text-left">
-                              <div className="font-medium">{w.name}</div>
-                              <div className="text-xs text-[var(--color-cream-dim)]">
-                                {w.desc}
-                              </div>
-                            </div>
-                          </motion.button>
-                        ))}
-                      </div>
-                    )}
+                    ) : null}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Login Modal */}
+            <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
 
             {/* Mobile hamburger */}
             <button

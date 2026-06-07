@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Trophy,
-  Wallet,
   Gift,
   TrendingUp,
   ArrowRight,
   ShieldCheck,
+  LogIn,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 // DEGEN OVERHAUL — formatters from the lean @/lib/format module
@@ -120,13 +120,13 @@ export function Prizes() {
               swaps text-hero-glow → text-hero-glow-crisp for tighter 10+22 px
               blur + text-degen-crisp for antialiasing on the gradient-clip text.
               Glow language and colour identical, just sharp. */}
-          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🥜 The Weekly Nut Hoard 🐿️</span>
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🥜 Weekly Competitions 🐿️</span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
-            {totalUsdLabel} Hoard, Split Every Week
+            Climb the Leaderboard
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            Crack the weekly leaderboard&apos;s top 3 and split the hoard. Free
-            to play — no buy-in, no catch, no cap. Skill in, $NUT out. 🥜
+            Every week, the top players are recognized. Free to play, no
+            buy-in, no catch. Skill in, glory out. 🥜
           </p>
           {/* DEGEN OVERHAUL END */}
           <p className="text-xs sm:text-sm font-mono mt-3 text-[var(--color-cream-dim)]">
@@ -267,23 +267,23 @@ export function Prizes() {
           ) : (
             <>
               <motion.button
-                onClick={() => connect("xaman")}
-                disabled={isConnecting}
-                // DEGEN OVERHAUL START — gold→hot-pink banger CTA (flow unchanged)
+                onClick={() => {
+                  // Open the login modal (will be handled by Navbar state)
+                  document.dispatchEvent(new CustomEvent("open-login-modal"));
+                }}
                 whileHover={{
                   scale: 1.03,
                   boxShadow: "0 0 34px rgba(255,46,136,0.55)",
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-display font-black text-base sm:text-lg tracking-wide transition-all disabled:opacity-50 cursor-pointer"
+                className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-display font-black text-base sm:text-lg tracking-wide transition-all cursor-pointer"
               >
-                <Wallet size={22} strokeWidth={2.5} />
+                <LogIn size={22} strokeWidth={2.5} />
                 <span>
-                  {isConnecting ? "Connecting…" : "Bag the Bag — Am I Top 3? 🥜"}
+                  Sign In & Start Playing
                 </span>
                 <ArrowRight size={18} strokeWidth={2.5} />
               </motion.button>
-              {/* DEGEN OVERHAUL END */}
 
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4">
                 <div className="flex items-center gap-1.5 text-[var(--color-cream-dim)]">
@@ -292,14 +292,9 @@ export function Prizes() {
                     className="text-[var(--color-neon-green)]"
                   />
                   <span className="text-xs">
-                    Free · read-only · no transactions
+                    Free · no wallet required · instant play
                   </span>
                 </div>
-                {/* DEGEN OVERHAUL — stale wallet list (GemWallet/Crossmark are
-                    LEGACY per CLAUDE.md); live providers are Xaman + Joey. */}
-                <span className="text-xs text-[var(--color-cream-dim)] opacity-50">
-                  Xaman · Joey
-                </span>
               </div>
             </>
           )}
