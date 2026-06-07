@@ -4,7 +4,8 @@ Free-to-play browser arcade on the XRP Ledger. Five HTML5 games, live
 weekly leaderboards, real $NUT prize payouts.
 
 - **Web**: <https://fuzzynuts.xyz> (Vercel, Next.js static export)
-- **API**: <https://world.fuzzynuts.xyz> (Railway, Node/Express)
+- **API**: <https://world.fuzzynuts.xyz> (Railway, Kaetram MMORPG game server)
+- **Express API**: Deployed to Railway (`fuzzynuts.xyz` service) — no custom domain assigned
 - **Token**: `NUT` issued by `rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7`
 
 ## Quick start
@@ -22,6 +23,15 @@ pnpm dev:api    # http://localhost:4000
 Full walkthrough: [docs/tutorials/01-run-the-arcade-locally.md](./docs/tutorials/01-run-the-arcade-locally.md).
 
 ## Architecture
+
+| Component | URL / Location | Stack |
+|-----------|----------------|-------|
+| **fuzzynuts.xyz** (Vercel) | <https://fuzzynuts.xyz> | Next.js 15 static arcade frontend |
+| **world.fuzzynuts.xyz** (Railway `efficient-tenderness`) | <https://world.fuzzynuts.xyz> | Kaetram MMORPG game server (from [`fuzzynuts-world`](https://github.com/fuzzynutsxrp-ship-it/fuzzynuts-world) repo) |
+| **Railway `fuzzynuts.xyz` service** | `fuzzynutsxyz-production.up.railway.app` | Express API backend (from monorepo, no custom domain) |
+| **VPS 67.205.132.6** | `game.fuzzynuts.xyz` :43594 / :43494 | Open-RSC RuneScape Classic game server (Java 8, systemd) |
+
+### Mermaid diagram
 
 ```mermaid
 flowchart LR
