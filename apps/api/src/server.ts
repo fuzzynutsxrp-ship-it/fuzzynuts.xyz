@@ -191,6 +191,18 @@ async function bootstrap() {
     } catch (e) {
       console.error("[api] Failed to start health monitor:", e);
     }
+
+    // Weekly Discord winners announcement (Monday 00:00 UTC)
+    try {
+      const { startWeeklyDiscordWinners } = await import(
+        "./cron/weekly-discord-winners"
+      );
+      startWeeklyDiscordWinners({
+        DISCORD_WEBHOOK_URL: DISCORD_WEBHOOK_URL || undefined,
+      });
+    } catch (e) {
+      console.error("[api] Failed to start weekly Discord cron:", e);
+    }
   }
 
   // Community Chat (Socket.io + history endpoint)
