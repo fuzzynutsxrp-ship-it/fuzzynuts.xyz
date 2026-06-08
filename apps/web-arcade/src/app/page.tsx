@@ -1,11 +1,12 @@
-// Poki-style Homepage — compact top bar + category tabs + dense game grid
+// Poki-style Homepage — sectioned rows + coming soon density
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { TopNav } from "@/components/layout/TopNav";
 import { CategoryTabs } from "@/components/game/CategoryTabs";
 import { PokiGameCard } from "@/components/game/PokiGameCard";
+import { ComingSoonCard } from "@/components/game/ComingSoonCard";
 import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
 
@@ -14,30 +15,93 @@ const Footer = dynamic(() =>
 );
 
 /* ═══════════════════════════════════════════════════════════════
-   Category → Game matching
+   Curated sections — manually ordered for visual impact.
+   Each section picks specific game IDs from the GAMES registry.
+   ═══════════════════════════════════════════════════════════════ */
+
+const TRENDING_IDS = ["fuzzynuts-world", "mario", "survivors"];
+const NEW_IDS = ["minigolf", "racer", "rsc"];
+const TOP_RATED_IDS = ["mario", "fuzzynuts-world", "minigolf", "rsc", "survivors", "racer"];
+
+const COMING_SOON = [
+  { title: "Fuzzy Kart", genre: "Racing" },
+  { title: "Nut Royale", genre: "Battle Royale" },
+  { title: "Squirrel Tycoon", genre: "Sim / Tycoon" },
+  { title: "Dungeon Nuts", genre: "Roguelike" },
+  { title: "Fuzzy Chess", genre: "Board Game" },
+  { title: "Acorn Builder", genre: "Puzzle" },
+  { title: "Nut Defense", genre: "Tower Defense" },
+  { title: "Fuzzy Soccer", genre: "Sports" },
+  { title: "Pixel Nuts", genre: "Platformer" },
+  { title: "Fuzzy Poker", genre: "Card Game" },
+  { title: "Sky Nuts", genre: "Endless Runner" },
+  { title: "Fuzzy Farm", genre: "Farming Sim" },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   Category → Game matching (for tab filtering)
    ═══════════════════════════════════════════════════════════════ */
 
 function matchesCategory(game: (typeof GAMES)[number], category: string): boolean {
   if (category === "all") return true;
   const id = game.id;
-  const type = game.type.toLowerCase();
-  const tags = game.tags?.map((t) => t.toLowerCase()) ?? [];
-
   switch (category) {
-    case "multiplayer":
-      return id === "fuzzynuts-world" || id === "rsc";
-    case "arcade":
-      return id === "mario" || id === "survivors";
-    case "racing":
-      return id === "racer";
-    case "chill":
-      return id === "minigolf";
-    case "classic":
-      return id === "rsc" || id === "mario";
-    default:
-      return type.includes(category) || tags.some((t) => t.includes(category));
+    case "multiplayer": return id === "fuzzynuts-world" || id === "rsc";
+    case "arcade": return id === "mario" || id === "survivors";
+    case "racing": return id === "racer";
+    case "chill": return id === "minigolf";
+    case "classic": return id === "rsc" || id === "mario";
+    default: return false;
   }
 }
+
+function gamesByIds(ids: string[]) {
+  return ids.map((id) => GAMES.find((g) => g.id === id)).filter(Boolean) as typeof GAMES;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Section row component — horizontal scroll on mobile, grid on desktop
+   ═══════════════════════════════════════════════════════════════ */
+
+function GameRow({
+  title,
+  emoji,
+  games,
+  onPlay,
+  priorityStart = false,
+}: {
+  title: string;
+  emoji: string;
+  games: typeof GAMES;
+  onPlay: (id: string) => void;
+  priorityStart?: boolean;
+}) {
+  return (
+    <section className="mb-8">
+      <h2 className="font-display text-base sm:text-lg font-black text-cream mb-3 flex items-center gap-2">
+        <span>{emoji}</span> {title}
+      </h2>
+      {/* Horizontal scroll on mobile, grid on desktop */}
+      <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 md:overflow-visible md:pb-0"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {games.map((game, i) => (
+          <div key={game.id} className="shrink-0 w-[44vw] sm:w-[30vw] md:w-auto">
+            <PokiGameCard
+              game={game}
+              onPlay={onPlay}
+              priority={priorityStart && i < 3}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Main page
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -45,7 +109,9 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
 
-  // Filter by category then search
+  // When searching or filtering, show flat filtered grid
+  const isFiltering = activeCategory !== "all" || searchQuery.trim().length > 0;
+
   const filteredGames = useMemo(() => {
     let games = GAMES.filter((g) => matchesCategory(g, activeCategory));
     if (searchQuery.trim()) {
@@ -59,6 +125,10 @@ export default function Home() {
     }
     return games;
   }, [activeCategory, searchQuery]);
+
+  const trending = gamesByIds(TRENDING_IDS);
+  const justAdded = gamesByIds(NEW_IDS);
+  const topRated = gamesByIds(TOP_RATED_IDS);
 
   return (
     <div className="min-h-screen bg-[#0a0613] flex flex-col">
@@ -75,37 +145,58 @@ export default function Home() {
         onCategoryChange={setActiveCategory}
       />
 
-      {/* Game Grid — starts immediately, no hero, no marketing */}
+      {/* Main content */}
       <main className="flex-1 px-3 md:px-5 py-4 pb-32">
-        {filteredGames.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {filteredGames.map((game, i) => (
-              <PokiGameCard
-                key={game.id}
-                game={game}
-                onPlay={setActiveGameId}
-                priority={i < 6}
-              />
-            ))}
-          </div>
+        {isFiltering ? (
+          /* ── Filtered / Search results: flat grid ── */
+          filteredGames.length > 0 ? (
+            <section>
+              <h2 className="font-display text-base sm:text-lg font-black text-cream mb-3">
+                {searchQuery.trim()
+                  ? `Results for "${searchQuery}"`
+                  : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Games`}
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+                {filteredGames.map((game, i) => (
+                  <PokiGameCard key={game.id} game={game} onPlay={setActiveGameId} priority={i < 6} />
+                ))}
+              </div>
+            </section>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <p className="text-4xl mb-3">🔍</p>
+              <p className="text-[var(--color-cream-dim)] text-sm">No games found.</p>
+              <button
+                onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
+                className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
+              >
+                Show all games
+              </button>
+            </div>
+          )
         ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="text-[var(--color-cream-dim)] text-sm">No games found.</p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory("all");
-              }}
-              className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
-            >
-              Show all games
-            </button>
-          </div>
+          /* ── Default view: sectioned rows ── */
+          <>
+            <GameRow title="Trending Now" emoji="🔥" games={trending} onPlay={setActiveGameId} priorityStart />
+            <GameRow title="Just Added" emoji="🆕" games={justAdded} onPlay={setActiveGameId} />
+            <GameRow title="Top Rated" emoji="🏆" games={topRated} onPlay={setActiveGameId} />
+
+            {/* Coming Soon — density filler */}
+            <section className="mb-8">
+              <h2 className="font-display text-base sm:text-lg font-black text-cream/60 mb-3 flex items-center gap-2">
+                <span>🔒</span> Coming Soon
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+                {COMING_SOON.map((item) => (
+                  <ComingSoonCard key={item.title} title={item.title} genre={item.genre} />
+                ))}
+              </div>
+            </section>
+          </>
         )}
 
-        {/* Minimal footer */}
-        <div className="mt-16">
+        {/* Footer */}
+        <div className="mt-12">
           <Footer />
         </div>
       </main>
