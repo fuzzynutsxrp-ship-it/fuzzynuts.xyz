@@ -160,6 +160,8 @@ export default function RootLayout({
         )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Plausible Analytics — privacy-friendly, no cookie banner needed */}
+        <script defer data-domain="fuzzynuts.xyz" src="https://plausible.io/js/script.js"></script>
       </head>
       <body className="font-body antialiased">
         <SessionProvider>

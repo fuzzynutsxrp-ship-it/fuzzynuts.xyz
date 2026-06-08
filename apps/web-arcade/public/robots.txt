@@ -1,12 +1,20 @@
 # Fuzzynuts — https://fuzzynuts.xyz
-# Optimized for search engine crawling
+# Web2 gaming portal — clean sitemap, block crypto/internal routes
 
 User-agent: *
 Allow: /
 
-# Static sitemap
+# Sitemap
 Sitemap: https://fuzzynuts.xyz/sitemap.xml
 
 # Block internal/dev paths
 Disallow: /_next/
 Disallow: /api/
+Disallow: /admin/
+
+# Block crypto routes from indexing (Web3 receipts, not for search)
+Disallow: /tokenomics/
+Disallow: /play/
+
+# Old crypto routes that may have been indexed — redirect to homepage
+# (Google will drop these from index once they return 404 or noindex)

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Wallet, LogIn, Loader2 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useWalletStore } from "@/store/wallet";
+import { trackSignIn } from "@/lib/analytics";
 
 /**
  * Unified Login Modal — Web2-first with Web3 secondary.
@@ -30,6 +31,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
     setGoogleLoading(true);
     setError(null);
     try {
+      trackSignIn("google");
       await signIn("google", { callbackUrl: "/" });
     } catch {
       setError("Google sign-in failed. Please try again.");
@@ -41,6 +43,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
     async (provider: "xaman" | "joey") => {
       setError(null);
       try {
+        trackSignIn("wallet");
         await connect(provider);
         onClose();
       } catch {

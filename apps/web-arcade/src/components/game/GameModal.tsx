@@ -25,6 +25,7 @@ import {
 import { gameRegistry } from "@/lib/gameRegistry";
 import type { GameMetadata } from "@/lib/gameRegistry";
 import { useChatSocket } from "@/components/chat/useChatSocket";
+import { trackGameStart, trackScoreSubmitted, trackDiscordClick } from "@/lib/analytics";
 import { useWalletStore } from "@/store/wallet";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -116,6 +117,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
         if (score && score > 0) {
           setLastScore({ score, game: game?.title ?? "this game" });
           setShowVictory(true);
+          if (game?.slug) trackScoreSubmitted(game.slug, score);
           // Auto-hide after 30 seconds
           setTimeout(() => setShowVictory(false), 30_000);
         }
@@ -230,7 +232,8 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   // ── Handlers ──
   const handleIframeLoad = useCallback(() => {
     setIsLoading(false);
-  }, []);
+    if (game?.slug) trackGameStart(game.slug);
+  }, [game?.slug]);
 
   const handleClose = useCallback(() => {
     // Exit fullscreen if active
@@ -530,6 +533,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 mx-3 mt-2 mb-1 px-3 py-2.5 rounded-lg bg-[#5865F2]/15 border border-[#5865F2]/30 hover:bg-[#5865F2]/25 hover:border-[#5865F2]/50 transition-all group"
             aria-label="Join our Discord community"
+            onClick={() => trackDiscordClick("sidebar")}
           >
             <svg
               width="16"

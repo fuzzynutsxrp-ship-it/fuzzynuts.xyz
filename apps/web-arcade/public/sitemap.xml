@@ -1,33 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage — game grid, category filters -->
   <url>
     <loc>https://fuzzynuts.xyz/</loc>
-    <lastmod>2026-05-12</lastmod>
+    <lastmod>2026-06-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Leaderboard — weekly tournaments -->
   <url>
-    <loc>https://fuzzynuts.xyz/games/fuzzynuts-world/</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://fuzzynuts.xyz/leaderboard/</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
+
+  <!-- Prizes — tournament info -->
   <url>
-    <loc>https://fuzzynuts.xyz/games/mario/</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://fuzzynuts.xyz/prizes/</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
+
+  <!-- Profile — player stats (requires auth, but good for crawl) -->
   <url>
-    <loc>https://fuzzynuts.xyz/games/fuzzy-survivors/</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://fuzzynuts.xyz/profile/</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
-  <url>
-    <loc>https://fuzzynuts.xyz/games/minigolf/</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+
+  <!--
+    EXCLUDED ROUTES (intentionally omitted):
+    - /tokenomics/   — Web3 receipts, noindex via robots.txt
+    - /play/rsc/     — game iframe, no SEO value
+    - /admin/*       — internal, blocked by robots.txt
+    - /api/*         — backend, blocked by robots.txt
+    - /games/*       — empty directory, no pages exist
+  -->
 </urlset>

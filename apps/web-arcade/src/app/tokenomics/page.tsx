@@ -13,6 +13,10 @@ export const metadata: Metadata = {
     siteName: "Fuzzynuts.xyz",
     type: "website",
   },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function TokenomicsPage() {
