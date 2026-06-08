@@ -143,7 +143,7 @@ function ArcadeCabinet({
         {/* Insert coin footer */}
         {!isComingSoon && (
           <p className="text-center text-[9px] font-mono text-acid/50 uppercase tracking-[0.2em] mt-1.5 animate-pulse">
-            Insert Coin — Free to Play
+            Play Now — Free to Play
           </p>
         )}
       </div>

@@ -22,21 +22,21 @@ const Footer = dynamic(() =>
 
 // Category mapping: filter tab → matching game type or tags
 function matchesCategory(game: (typeof GAMES)[number], category: string): boolean {
-  if (category === "All Games") return true;
+  if (category === "All") return true;
   // Check type field
   if (game.type.toLowerCase().includes(category.toLowerCase())) return true;
   // Check tags
   if (game.tags?.some((t) => t.toLowerCase().includes(category.toLowerCase()))) return true;
   // Special mappings
-  if (category === "Roguelite" && game.id === "survivors") return true;
-  if (category === "Mini Golf" && game.id === "minigolf") return true;
+  if (category === "Arcade" && (game.id === "survivors" || game.id === "minigolf" || game.id === "racer")) return true;
   if (category === "Racing" && game.id === "racer") return true;
   if (category === "Platformer" && game.id === "mario") return true;
+  if (category === "Classic" && (game.id === "rsc" || game.id === "mario")) return true;
   return false;
 }
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState("All Games");
+  const [activeCategory, setActiveCategory] = useState("All");
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
 
   const filteredGames = useMemo(
@@ -87,7 +87,7 @@ export default function Home() {
                 No games in this category yet.
               </p>
               <button
-                onClick={() => setActiveCategory("All Games")}
+                onClick={() => setActiveCategory("All")}
                 className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
               >
                 Show all games

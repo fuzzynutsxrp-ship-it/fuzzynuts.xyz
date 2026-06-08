@@ -37,7 +37,7 @@ export function HowToGet() {
           className="text-center mb-12 md:mb-16"
         >
           {/* DEGEN OVERHAUL START — neon header, irreverent subcopy */}
-          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🐿️ Zero to degen</span>
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🐿️ Zero to hero</span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             How to Get $NUT
           </h2>

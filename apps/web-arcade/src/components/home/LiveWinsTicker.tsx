@@ -28,12 +28,12 @@ const TICKER_GAME = "fuzzynuts-world";
 
 /** Hype lines shown when the live feed has nothing yet. */
 const HYPE: string[] = [
-  "🥜 Nut up or shut up",
+  "🥜 Jump in and play",
   "🚀 Top 3 split the pool every Monday",
-  "🎰 Free to play · real $NUT on the line",
-  "🔥 Degenerate responsibly… nah",
-  "🐿️ The nuttiest coin on XRPL",
-  "⚡ Climb the board · bag the bag",
+  "🎰 Free to play · real prizes on the line",
+  "🔥 Play responsibly… or don't",
+  "🐿️ The nuttiest games online",
+  "⚡ Climb the board · win prizes",
 ];
 
 export function LiveWinsTicker({ game = TICKER_GAME }: { game?: string }) {
@@ -43,7 +43,7 @@ export function LiveWinsTicker({ game = TICKER_GAME }: { game?: string }) {
 
   const items = useMemo(() => {
     const wins = (scores ?? []).slice(0, 12).map((s, i) => {
-      const who = s.name || (s.wallet ? truncateAddress(s.wallet) : "Anon degen");
+      const who = s.name || (s.wallet ? truncateAddress(s.wallet) : "Anonymous player");
       return (
         <span key={`${s.wallet ?? s.session ?? i}-${s.score}`} className="neon-chip">
           🥜 <span className="text-[var(--color-cream)]">{who}</span>

@@ -195,14 +195,14 @@ export function Leaderboard() {
           <span
             className="neon-chip text-degen-crisp mb-4 animate-glitch-skew"
           >
-            🏆 Hall of Degens
+            🏆 Weekly Leaderboard Tournaments
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             Leaderboard
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            Boards wipe every Monday 00:00 UTC. Climb the ranks, bag real $NUT,
-            flex on the timeline. Paper hands need not apply.
+            Boards wipe every Monday 00:00 UTC. Climb the ranks, win real prizes,
+            and prove you&apos;re the best. Every player gets a fair shot.
           </p>
           {isCurrentWeek && (
             <p className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-cream-dim"} countdown-pulse`}>
@@ -630,7 +630,7 @@ export function Leaderboard() {
                 </p>
                 {isCurrentWeek && (
                   <button className="cta-nut-pulse px-8 py-3 rounded-xl font-display font-black text-forest-dark text-base bg-gradient-to-r from-neon-green to-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.4),0_0_60px_rgba(16,185,129,0.15)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6),0_0_80px_rgba(16,185,129,0.2)] transition-shadow">
-                    🐿️ NUT UP — PLAY NOW
+                    🐿️ PLAY NOW
                   </button>
                 )}
               </div>

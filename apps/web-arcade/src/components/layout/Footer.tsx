@@ -68,7 +68,7 @@ export function Footer() {
           <p className="flex items-center gap-1">
             © {new Date().getFullYear()} FuzzyNuts. Built with{" "}
             <Heart size={10} className="text-[var(--color-hot-pink)] inline" fill="currentColor" />{" "}
-            not financial advice.
+            all games free to play.
           </p>
           <p>
             Powered by{" "}
@@ -78,7 +78,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className="text-brand-gold hover:underline"
             >
-              XRP Ledger
+              Browser
             </a>
           </p>
         </div>

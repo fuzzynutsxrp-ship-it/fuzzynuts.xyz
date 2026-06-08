@@ -567,7 +567,7 @@ export function UserProfile() {
             </div>
             <p className="text-[11px] text-cream-dim mt-2">
               {unlockedAchievements.size === ACHIEVEMENTS.length
-                ? "All achievements unlocked! You're a true degen."
+                ? "All achievements unlocked! You're a true legend."
                 : `${ACHIEVEMENTS.length - unlockedAchievements.size} more to unlock — keep playing!`}
             </p>
           </div>

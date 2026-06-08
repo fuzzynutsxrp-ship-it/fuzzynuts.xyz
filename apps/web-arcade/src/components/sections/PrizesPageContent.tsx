@@ -28,7 +28,7 @@ import { CyberCard } from "@/components/ui/CyberCard";
 
    Same DNA as the Leaderboard page: solid dark cards (#0a0a0a /
    #0f0a0a), neon borders/glows, floating nut particles, and the
-   chaotic degen squirrel energy. Just different content.
+   chaotic gaming squirrel energy. Just different content.
    ═══════════════════════════════════════════════════════════════ */
 
 /** Sub-cent price formatter — matches Leaderboard.tsx */
@@ -141,7 +141,7 @@ export function PrizesPageContent() {
           <span className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none" style={{ animationDelay: "1.4s" }}>🥜</span>
 
           <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">
-            🥜 Hall of Degens
+            🥜 Weekly Leaderboard Tournaments
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             Prizes &amp; Payouts
@@ -336,7 +336,7 @@ export function PrizesPageContent() {
             {/* Header row */}
             <div className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-cream-dim border-b border-hot-pink/20 bg-degen-950">
               <span className="w-8 text-center">Rank</span>
-              <span className="flex-1">Degen</span>
+              <span className="flex-1">Player</span>
               <span className="hidden sm:block w-28">Game</span>
               <span className="w-16 text-right">Week</span>
               <span className="w-16 text-right">Prize</span>

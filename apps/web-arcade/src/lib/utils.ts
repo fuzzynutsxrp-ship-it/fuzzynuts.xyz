@@ -23,7 +23,7 @@ export const XRPL_CONFIG = {
 
 export const TOKENOMICS = [
   {
-    label: "AMM Liquidity Pool",
+    label: "Prize Pool",
     percentage: 80,
     amount: "256.8B NUT",
     color: "#FBBF24",

@@ -8,7 +8,7 @@ import { CyberCard } from "@/components/ui/CyberCard";
 import { TOKENOMICS, XRPL_CONFIG } from "@/lib/utils";
 
 /* ─────────────────────────────────────────────────────────────
-   Trust — "Don't Trust. Verify."
+   Trust — "Fair Play Guarantee"
 
    Merges the old Tokenomics + OnChainVerification sections and the
    two trust-flavored items rescued from the cut Features grid
@@ -124,7 +124,7 @@ function DonutChart({
         viewBox="0 0 200 200"
         className="w-full h-full overflow-visible"
         role="img"
-        aria-label="Token distribution: 80% AMM Liquidity, 18% Community Nut Jar, 2% Founder"
+        aria-label="Token distribution: 80% Prize Pool, 18% Community Nut Jar, 2% Founder"
       >
         <title>Tokenomics Distribution</title>
         <motion.g
@@ -404,7 +404,7 @@ export function Trust() {
                   </div>
                   <div>
                     <p className="text-[var(--color-cream-dim)]">Issuer Status</p>
-                    <p className="font-bold text-red-400">💀 Blackholed</p>
+                    <p className="font-bold text-red-400">🔒 Guaranteed</p>
                   </div>
                   <div>
                     <p className="text-[var(--color-cream-dim)]">DEX</p>
@@ -442,7 +442,7 @@ export function Trust() {
             <LedgerEntry
               index={1}
               label="Issuer"
-              tag="Blackholed"
+              tag="Guaranteed"
               address={XRPL_CONFIG.issuer}
               explorerUrl={`https://xrpscan.com/account/${XRPL_CONFIG.issuer}`}
               accentColor={LEDGER_ACCENTS.issuer}
@@ -458,7 +458,7 @@ export function Trust() {
             />
             <LedgerEntry
               index={3}
-              label="AMM Liquidity Pool"
+              label="Prize Pool"
               address={XRPL_CONFIG.ammPool}
               explorerUrl={`https://xrpscan.com/account/${XRPL_CONFIG.ammPool}`}
               accentColor={LEDGER_ACCENTS.amm}

@@ -3,12 +3,12 @@
 import { useRef, useState, useEffect } from "react";
 
 const CATEGORIES = [
-  "All Games",
+  "All",
   "MMORPG",
   "Platformer",
-  "Roguelite",
-  "Mini Golf",
+  "Arcade",
   "Racing",
+  "Classic",
 ];
 
 interface CategoryFiltersProps {

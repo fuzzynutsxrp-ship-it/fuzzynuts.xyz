@@ -114,7 +114,7 @@ export function Navbar() {
               <button
                 onClick={() => setLoginModalOpen(true)}
                 className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-cream-dim)] hover:text-brand-gold border border-transparent hover:border-brand-gold/20 transition-all cursor-pointer"
-                aria-label="Connect XRPL Wallet"
+                aria-label="Connect Wallet"
               >
                 <Wallet size={14} />
                 <span>Wallet</span>
