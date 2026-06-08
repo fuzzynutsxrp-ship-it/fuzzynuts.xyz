@@ -297,7 +297,7 @@ export function LeaderboardClient() {
       <TopNav
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+        onMenuToggle={() => setSidebarOpen((o) => !o)}
       />
 
       {/* Main layout */}

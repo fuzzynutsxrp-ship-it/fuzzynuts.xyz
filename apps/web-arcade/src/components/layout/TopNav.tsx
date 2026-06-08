@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LogOut,
   ChevronDown,
   User,
   Trophy,
+  Menu,
+  X,
   LogIn,
   Search,
-  Menu,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { useSession, signOut } from "next-auth/react";
@@ -21,10 +22,10 @@ import Link from "next/link";
 interface TopNavProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onToggleSidebar: () => void;
+  onMenuToggle: () => void;
 }
 
-export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavProps) {
+export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { address, isConnected, disconnect } = useWalletStore();
@@ -34,10 +35,7 @@ export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavP
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     };
@@ -50,68 +48,54 @@ export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavP
   return (
     <>
       <nav
-        className="sticky top-0 z-50 h-14 md:h-16 bg-[#0a0613]/95 backdrop-blur-md border-b border-white/5 flex items-center px-4 md:px-6 gap-3"
+        className="sticky top-0 z-50 h-[52px] md:h-[60px] bg-[#0a0613]/95 backdrop-blur-md border-b border-white/5 flex items-center px-3 md:px-5 gap-2"
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Left: Hamburger (mobile) + Logo */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Left: hamburger + logo (compact) */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
-            onClick={onToggleSidebar}
-            className="lg:hidden p-2 -ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-cream-dim)] hover:text-brand-gold cursor-pointer"
-            aria-label="Toggle sidebar menu"
+            onClick={onMenuToggle}
+            className="p-2 -ml-1 min-h-[40px] min-w-[40px] flex items-center justify-center text-[var(--color-cream-dim)] hover:text-brand-gold cursor-pointer rounded-lg hover:bg-white/5 transition-colors"
+            aria-label="Toggle menu"
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
-          <Link
-            href="/"
-            className="flex items-center gap-2 shrink-0 group"
-            aria-label="FuzzyNuts Home"
-          >
-            <Image
-              src="/images/branding/logo-nav.webp"
-              alt=""
-              width={32}
-              height={22}
-              className="rounded-md"
-              priority
-            />
-            <span className="hidden sm:inline font-display text-lg font-black text-cream group-hover:text-brand-gold transition-colors">
+          <Link href="/" className="flex items-center gap-1.5 shrink-0 group" aria-label="FuzzyNuts Home">
+            <Image src="/images/branding/logo-nav.webp" alt="" width={28} height={20} className="rounded" priority />
+            <span className="hidden md:inline font-display text-sm font-black text-cream group-hover:text-brand-gold transition-colors">
               FuzzyNuts
             </span>
           </Link>
         </div>
 
-        {/* Center: Search bar */}
-        <div className="flex-1 flex justify-center max-w-xl mx-auto">
+        {/* Center: search bar (prominent, 60% width) */}
+        <div className="flex-1 flex justify-center max-w-[60%] mx-auto">
           <div className="relative w-full">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-cream-dim)]/40 pointer-events-none"
-            />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-cream-dim)]/40 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search 6 games..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-cream placeholder-[var(--color-cream-dim)]/40 outline-none transition-all focus:bg-white/8 focus:border-brand-gold/30 focus:ring-1 focus:ring-brand-gold/20"
+              placeholder="Search games..."
+              className="w-full pl-9 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-cream placeholder-[var(--color-cream-dim)]/40 outline-none transition-all focus:bg-white/8 focus:border-brand-gold/30 focus:ring-1 focus:ring-brand-gold/20"
               aria-label="Search games"
             />
           </div>
         </div>
 
-        {/* Right: Auth */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Logged out → Sign in */}
+        {/* Right: auth */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Logged out → Sign in (icon-only on desktop, text on mobile) */}
           {!session && !isConnected && (
             <motion.button
               onClick={() => setLoginModalOpen(true)}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white text-gray-900 font-bold text-sm cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-gray-900 font-bold text-sm cursor-pointer"
             >
               <LogIn size={16} />
-              <span className="hidden sm:inline">Sign in</span>
+              <span className="sm:inline">Sign in</span>
             </motion.button>
           )}
 
@@ -120,33 +104,23 @@ export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavP
             <div className="relative" ref={dropdownRef}>
               <motion.button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-brand-gold/20 hover:border-brand-gold/40 transition-all cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-brand-gold/20 hover:border-brand-gold/40 transition-all cursor-pointer"
               >
                 {session?.user?.image ? (
-                  <img
-                    src={session.user.image}
-                    alt=""
-                    className="w-6 h-6 rounded-full"
-                  />
+                  <img src={session.user.image} alt="" className="w-6 h-6 rounded-full" />
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-brand-gold/20 flex items-center justify-center">
                     <User size={14} className="text-brand-gold" />
                   </div>
                 )}
-                <span className="hidden sm:inline text-sm font-medium text-cream max-w-[100px] truncate">
+                <span className="hidden md:inline text-xs font-medium text-cream max-w-[80px] truncate">
                   {session?.user?.name ?? (address ? truncateAddress(address) : "Player")}
                 </span>
-                <ChevronDown
-                  size={14}
-                  className={`text-[var(--color-cream-dim)] transition-transform ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
+                <ChevronDown size={12} className={`text-[var(--color-cream-dim)] transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
               </motion.button>
 
-              {/* Dropdown menu */}
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.div
@@ -154,13 +128,11 @@ export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavP
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-[#0a0613] border border-brand-gold/20 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+                    className="absolute right-0 top-full mt-2 w-52 rounded-xl bg-[#0a0613] border border-brand-gold/20 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
                   >
                     {session && (
                       <div className="px-3 py-2 mb-1">
-                        <p className="text-xs text-[var(--color-cream-dim)]">
-                          Signed in as
-                        </p>
+                        <p className="text-xs text-[var(--color-cream-dim)]">Signed in as</p>
                         <p className="text-sm font-bold text-cream truncate">
                           {session.user?.name ?? session.user?.email ?? "Player"}
                         </p>
@@ -168,21 +140,13 @@ export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavP
                     )}
 
                     {session && (
-                      <Link
-                        href="/profile/"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
-                      >
+                      <Link href="/profile/" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors">
                         <User size={14} />
                         Profile
                       </Link>
                     )}
 
-                    <Link
-                      href="/leaderboard/"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
-                    >
+                    <Link href="/leaderboard/" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors">
                       <Trophy size={14} />
                       Leaderboard
                     </Link>
@@ -214,10 +178,7 @@ export function TopNav({ searchQuery, onSearchChange, onToggleSidebar }: TopNavP
         </div>
       </nav>
 
-      <LoginModal
-        open={loginModalOpen}
-        onClose={() => setLoginModalOpen(false)}
-      />
+      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </>
   );
 }
