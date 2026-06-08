@@ -82,15 +82,32 @@ async function bootstrap() {
     { address: string; challenge: string; exp: number }
   >();
 
-  // Session router (no xrpl dependency)
+  // Session router (supports both Web2 NextAuth + Web3 wallet)
   try {
     const { buildSessionRouter } = await import("./routes/session");
-    app.use("/api/session", buildSessionRouter({ GAME_SESSION_SECRET }));
+    app.use("/api/session", buildSessionRouter({ GAME_SESSION_SECRET, WALLET_JWT_SECRET }));
   } catch (e) {
     console.error("[api] Failed to load session router:", e);
     app.use("/api/session", (_req, res) => {
       res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
     });
+  }
+
+  // Scores router (unified Web2 + Web3 score submission)
+  if (MONGODB_URI) {
+    try {
+      const { buildScoresRouter } = await import("./routes/scores");
+      app.use("/api/scores", buildScoresRouter({
+        MONGODB_URI,
+        GAME_SESSION_SECRET,
+        WALLET_JWT_SECRET,
+      }));
+    } catch (e) {
+      console.error("[api] Failed to load scores router:", e);
+      app.use("/api/scores", (_req, res) => {
+        res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+      });
+    }
   }
 
   // Auth router (depends on xrpl-token-utils)

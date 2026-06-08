@@ -104,6 +104,27 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   // DEGEN CHAT END
 
+  // ── Victory detection — listen for score submissions from iframe ──
+  const [lastScore, setLastScore] = useState<{ score: number; game: string } | null>(null);
+  const [showVictory, setShowVictory] = useState(false);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.data || typeof event.data !== "object") return;
+      if (event.data.type === "FUZZY_SCORE_SUBMITTED" && event.data.success) {
+        const score = event.data.score as number | undefined;
+        if (score && score > 0) {
+          setLastScore({ score, game: game?.title ?? "this game" });
+          setShowVictory(true);
+          // Auto-hide after 30 seconds
+          setTimeout(() => setShowVictory(false), 30_000);
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [game?.title]);
+
   // ── Play Next recommendations (all live games except current) ──
   const recommendations = useMemo(() => {
     if (!game) return [];
@@ -486,6 +507,21 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
               </motion.button>
             ))}
           </div>
+
+          {/* Victory banner — shows after a score is submitted */}
+          {showVictory && lastScore && (
+            <div className="mx-3 mt-2 mb-1 px-3 py-3 rounded-lg bg-gradient-to-r from-brand-gold/15 to-[var(--color-hot-pink)]/15 border border-brand-gold/30">
+              <p className="text-xs font-bold text-brand-gold mb-1">
+                🏆 Score Submitted!
+              </p>
+              <p className="text-[11px] text-[var(--color-cream)]">
+                {lastScore.score.toLocaleString()} on {lastScore.game}
+              </p>
+              <p className="text-[10px] text-[var(--color-cream-dim)] mt-1">
+                Check the leaderboard to see your rank
+              </p>
+            </div>
+          )}
 
           {/* Discord CTA — capture engaged players */}
           <a

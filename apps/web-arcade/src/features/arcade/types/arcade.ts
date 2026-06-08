@@ -17,6 +17,9 @@ export interface ScoreEntry {
   session?: string;
   hasTrustline?: boolean;
   eligible?: boolean;
+  /** Unified identity — present for both Web2 (Google) and Web3 (wallet) users */
+  userId?: string;
+  displayName?: string;
 }
 
 /** Eligibility data returned by /api/rewards/eligibility */

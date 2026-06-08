@@ -14,7 +14,7 @@
  * Follows the same pattern as health-monitor.ts.
  */
 
-import { MongoClient, type Db } from "mongodb";
+import { MongoClient, type Db, ObjectId } from "mongodb";
 import cron from "node-cron";
 
 // ── Constants ──────────────────────────────────────────────────
@@ -22,6 +22,7 @@ import cron from "node-cron";
 const SCHEDULE = "0 0 * * 1"; // Monday 00:00 UTC
 const SCORES_COLLECTION = "arcade_scores";
 const WALLETS_COLLECTION = "wallet_mappings";
+const USERS_COLLECTION = "users";
 const DISCORD_EMBED_COLOR_GOLD = 0xfbbf24; // brand-gold
 const MEDAL_EMOJIS = ["🥇", "🥈", "🥉"];
 const RANK_LABELS = ["1st Place", "2nd Place", "3rd Place"];
@@ -76,7 +77,8 @@ async function getDb(uri: string): Promise<Db> {
 // ── Data Fetching ──────────────────────────────────────────────
 
 interface WinnerEntry {
-  wallet: string;
+  userId: string;
+  wallet?: string;
   displayName: string;
   totalScore: number;
   rank: number;
@@ -97,39 +99,67 @@ async function getWeeklyWinners(weekKey: string): Promise<WinnerEntry[]> {
 
   if (scores.length === 0) return [];
 
-  // Aggregate total score per wallet
-  const playerMap = new Map<string, number>();
+  // Aggregate total score per userId (unified identity)
+  // Fall back to wallet for legacy scores without userId
+  const playerMap = new Map<string, { total: number; wallet?: string }>();
   for (const entry of scores) {
-    if (!entry.wallet) continue;
-    const existing = playerMap.get(entry.wallet) ?? 0;
-    playerMap.set(entry.wallet, existing + (entry.score ?? 0));
+    const key = entry.userId ?? entry.wallet;
+    if (!key) continue;
+    const existing = playerMap.get(key);
+    if (existing) {
+      existing.total += entry.score ?? 0;
+    } else {
+      playerMap.set(key, {
+        total: entry.score ?? 0,
+        wallet: entry.wallet,
+      });
+    }
   }
 
   // Sort descending, take top 3
   const top3 = Array.from(playerMap.entries())
-    .map(([wallet, total]) => ({ wallet, total }))
+    .map(([key, data]) => ({ userId: key, wallet: data.wallet, total: data.total }))
     .sort((a, b) => b.total - a.total)
     .slice(0, 3);
 
-  // Resolve display names from wallet_mappings
-  const wallets = top3.map((w) => w.wallet);
-  const mappings = await db
-    .collection(WALLETS_COLLECTION)
-    .find({ wallet: { $in: wallets } })
+  // Resolve display names from unified users collection
+  const userIds = top3.map((w) => w.userId);
+  const wallets = top3.map((w) => w.wallet).filter(Boolean);
+
+  // Try users collection first (unified identity)
+  // Convert string IDs to ObjectId where possible for _id lookup
+  const objectIds: ObjectId[] = [];
+  for (const id of userIds) {
+    try { objectIds.push(new ObjectId(id)); } catch { /* not a valid ObjectId */ }
+  }
+
+  const users = await db
+    .collection(USERS_COLLECTION)
+    .find({
+      $or: [
+        { _id: { $in: objectIds } },
+        { walletAddress: { $in: wallets } },
+        { googleId: { $in: userIds } },
+      ],
+    })
     .toArray();
 
   const nameMap = new Map<string, string>();
-  for (const m of mappings) {
-    if (m.wallet && m.displayName) {
-      nameMap.set(m.wallet, m.displayName);
-    }
+  for (const u of users) {
+    if (u._id && u.name) nameMap.set(String(u._id), u.name);
+    if (u.walletAddress && u.name) nameMap.set(u.walletAddress, u.name);
+    if (u.googleId && u.name) nameMap.set(u.googleId, u.name);
   }
 
   return top3.map((entry, i) => ({
+    userId: entry.userId,
     wallet: entry.wallet,
     displayName:
-      nameMap.get(entry.wallet) ??
-      `${entry.wallet.slice(0, 6)}…${entry.wallet.slice(-4)}`,
+      nameMap.get(entry.userId) ??
+      (entry.wallet ? nameMap.get(entry.wallet) : undefined) ??
+      (entry.wallet
+        ? `${entry.wallet.slice(0, 6)}…${entry.wallet.slice(-4)}`
+        : `Player_${entry.userId.slice(0, 8)}`),
     totalScore: entry.total,
     rank: i + 1,
   }));
@@ -153,7 +183,7 @@ async function postToDiscord(
 ): Promise<void> {
   const fields: DiscordEmbedField[] = winners.map((w) => ({
     name: `${MEDAL_EMOJIS[w.rank - 1]} ${RANK_LABELS[w.rank - 1]}`,
-    value: `**${w.displayName}**\nScore: ${w.totalScore.toLocaleString()}`,
+    value: `**${w.displayName}**\nScore: ${w.totalScore.toLocaleString()}${w.wallet ? "" : " (Google)"}`,
     inline: true,
   }));
 
@@ -258,7 +288,7 @@ async function handleWeeklyReset(webhookUrl: string): Promise<void> {
 
     await postToDiscord(webhookUrl, weekKey, winners);
     console.log(
-      `[weekly-discord] ✅ Posted winners for ${weekKey}: ${winners.map((w) => `${w.displayName} (${w.totalScore})`).join(", ")}`,
+      `[weekly-discord] ✅ Posted winners for ${weekKey}: ${winners.map((w) => `${w.displayName} (${w.totalScore}${w.wallet ? ", wallet" : ", google"})`).join(", ")}`,
     );
   } catch (err) {
     console.error("[weekly-discord] ❌ Failed:", err);
