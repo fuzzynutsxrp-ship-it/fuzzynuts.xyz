@@ -26,7 +26,11 @@
         "NUT_DISTRIBUTOR",
         "WALLET_JWT_SECRET",
         "GAME_SESSION_SECRET",
-        "OPENRSC_GAME_ENDPOINT"
+        "OPENRSC_GAME_ENDPOINT",
+        "NEXTAUTH_URL",
+        "NEXTAUTH_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET"
       ]
     },
     "dev": {

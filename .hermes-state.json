@@ -17,23 +17,19 @@
     "dependabot-prs-9-10-11-13-14-closed",
     "9-stale-remote-branches-deleted",
     "github-secret-VPS_HOST-updated-to-67.205.132.6",
-    "main-branch-protection-enabled-no-force-push-no-delete"
+    "main-branch-protection-enabled-no-force-push-no-delete",
+    "reown-apex-https-fuzzynuts.xyz-already-in-allowlist",
+    "game-session-secret-set-on-efficient-tenderness",
+    "digitalocean-snapshot-of-fuzzynuts-game-taken"
   ],
   "pending": [
-    "reown-add-apex-https-fuzzynuts.xyz-to-allowlist",
-    "set-real-GAME_SESSION_SECRET-on-efficient-tenderness-service",
     "investigate-efficient-tenderness-failed-build",
     "optional-scope-vercel-install-to-avoid-better-sqlite3-compile-error",
-    "verify-teavm-autologin-end-to-end-on-vps-CARRIED-OVER-UNVERIFIED",
-    "optional-take-digitalocean-safety-snapshot"
+    "verify-teavm-autologin-end-to-end-on-vps-CARRIED-OVER-UNVERIFIED"
   ],
   "blockers": [],
-  "nextAction": "reown-add-apex-domain-to-allowlist",
-  "manualStepsRequired": [
-    "reown-dashboard-add-https://fuzzynuts.xyz-domain",
-    "railway-efficient-tenderness-set-real-GAME_SESSION_SECRET",
-    "digitalocean-optional-snapshot-of-fuzzynuts-game-67.205.132.6"
-  ],
+  "nextAction": "investigate-efficient-tenderness-failed-build",
+  "manualStepsRequired": [],
   "criticalFacts": {
     "liveVpsIp": "67.205.132.6",
     "retiredVpsIp": "137.184.194.158",
