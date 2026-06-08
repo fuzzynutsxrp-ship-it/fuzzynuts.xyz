@@ -1,99 +1,36 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu,
-  X,
   Wallet,
   LogOut,
   ChevronDown,
-  ExternalLink,
-  Gift,
-  Coins,
-  Trophy,
   User,
-  AlertCircle,
+  Trophy,
+  Menu,
+  X,
   LogIn,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { useSession, signOut } from "next-auth/react";
 import { LoginModal } from "@/components/auth/LoginModal";
-// DEGEN OVERHAUL — formatter from the lean @/lib/format module
 import { truncateAddress } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
-import { LeaderboardModal } from "@/components/game/LeaderboardModal";
-import { ProfileModal } from "@/components/game/ProfileModal";
-
-const NAV_LINKS = [
-  { href: "/#games", label: "Arcade" },
-  { href: "/leaderboard/", label: "Leaderboard", icon: "trophy" },
-  { href: "/#community", label: "Community" },
-];
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [walletMenuOpen, setWalletMenuOpen] = useState(false);
-  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const {
-    address,
-    isConnected,
-    isConnecting,
-    connect,
-    disconnect,
-    provider,
-    nutBalance,
-    error,
-    setError,
-  } = useWalletStore();
+  const { address, isConnected, connect, disconnect, provider } =
+    useWalletStore();
   const { data: session } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [hasClaimable, setHasClaimable] = useState(false);
-
-  // Lightweight eligibility check for notification dot
-  useEffect(() => {
-    if (!isConnected || !address) {
-      setHasClaimable(false);
-      return;
-    }
-
-    const checkRewards = async () => {
-      try {
-        const now = new Date();
-        const d = new Date(
-          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-        );
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        const weekNum = Math.ceil(
-          ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
-        );
-        const week = `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
-
-        const res = await fetch(
-          `https://world.fuzzynuts.xyz/api/rewards/eligibility?wallet=${encodeURIComponent(address)}&week=${week}`,
-          { signal: AbortSignal.timeout(5000) },
-        );
-        if (!res.ok) {
-          setHasClaimable(false);
-          return;
-        }
-        const data = await res.json();
-        setHasClaimable(data.eligible === true && !data.claimed);
-      } catch {
-        setHasClaimable(false);
-      }
-    };
-
-    checkRewards();
-  }, [isConnected, address]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -105,334 +42,196 @@ export function Navbar() {
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
       ) {
-        setWalletMenuOpen(false);
+        setDropdownOpen(false);
       }
     };
-    if (walletMenuOpen) {
+    if (dropdownOpen) {
       document.addEventListener("mousedown", handleClick);
       return () => document.removeEventListener("mousedown", handleClick);
     }
-  }, [walletMenuOpen]);
-
-  // Auto-dismiss wallet errors after 8s
-  useEffect(() => {
-    if (!error) return;
-    const timer = setTimeout(() => setError(null), 8000);
-    return () => clearTimeout(timer);
-  }, [error, setError]);
+  }, [dropdownOpen]);
 
   const handleConnect = useCallback(
     async (prov: "xaman" | "joey") => {
-      setWalletMenuOpen(false);
-      setError(null); // Clear any previous error
       await connect(prov);
     },
-    [connect, setError],
+    [connect],
   );
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 pt-[env(safe-area-inset-top)] ${
           scrolled
-            ? // Solid dark bar with intense warm neon underglow — matches Leaderboard prize cards
-              "bg-[#0a0a0a] border-b-2 border-brand-gold/40 shadow-[0_4px_30px_rgba(0,0,0,0.5),0_0_30px_rgba(251,191,36,0.15),0_0_60px_rgba(251,191,36,0.08),0_1px_0_rgba(251,191,36,0.2)]"
-            : "bg-[#0a0a0a]/80"
+            ? "bg-[#0a0613]/95 backdrop-blur-md border-b border-brand-gold/10 shadow-[0_2px_20px_rgba(0,0,0,0.4)]"
+            : "bg-[#0a0613]/80"
         }`}
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="container-main flex items-center justify-between h-16 md:h-[72px] relative">
-          {/* Floating nut particles — subtle, only when scrolled */}
-          {scrolled && (
-            <>
-              <span className="absolute -top-1 left-[15%] text-xs float-nut-1 opacity-40 pointer-events-none hidden md:block">🥜</span>
-              <span className="absolute top-2 right-[20%] text-[10px] float-nut-2 opacity-30 pointer-events-none hidden md:block" style={{ animationDelay: "0.9s" }}>🥜</span>
-              <span className="absolute -bottom-1 left-[55%] text-[10px] float-nut-3 opacity-25 pointer-events-none hidden md:block" style={{ animationDelay: "1.7s" }}>🥜</span>
-            </>
-          )}
-
-          {/* Logo — squirrel emblem + wordmark with warm neon glow */}
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between h-14 md:h-16 px-4 md:px-6">
+          {/* Left: Logo + mascot */}
           <Link
             href="/"
-            className="flex items-center gap-2 group shrink-0"
-            aria-label="Fuzzynuts Home"
+            className="flex items-center gap-2 shrink-0 group"
+            aria-label="FuzzyNuts Home"
           >
-            <motion.div
-              whileHover={{ scale: 1.08 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center gap-2"
-            >
-              <Image
-                src="/images/branding/logo-nav.webp"
-                alt=""
-                width={54}
-                height={36}
-                className="logo-degen rounded-md"
-                priority
-              />
-              <Image
-                src="/images/branding/wordmarks/text_logo.png"
-                alt="Fuzzynuts"
-                width={160}
-                height={32}
-                className="h-7 md:h-8 w-auto"
-                priority
-              />
-            </motion.div>
+            <Image
+              src="/images/branding/logo-nav.webp"
+              alt=""
+              width={36}
+              height={24}
+              className="rounded-md"
+              priority
+            />
+            <Image
+              src="/images/branding/wordmarks/text_logo.png"
+              alt="FuzzyNuts"
+              width={120}
+              height={24}
+              className="h-6 md:h-7 w-auto"
+              priority
+            />
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => {
-              const isRoute =
-                link.href.startsWith("/") && !link.href.startsWith("/#");
-              const isLeaderboard = link.icon === "trophy";
-              const classes = `px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-brand-gold transition-colors rounded-lg hover:bg-[rgba(251,191,36,0.07)] flex items-center gap-1.5 relative`;
-
-              if (isRoute && isLeaderboard) {
-                return (
-                  <button
-                    key={link.href}
-                    onClick={() => setLeaderboardOpen(true)}
-                    className={classes}
-                  >
-                    <Trophy
-                      size={14}
-                      className={
-                        hasClaimable
-                          ? "text-brand-gold"
-                          : "text-brand-gold opacity-70"
-                      }
-                    />
-                    {link.label}
-                    {hasClaimable && (
-                      <span className="ml-1 text-[9px] font-black uppercase tracking-wider bg-brand-gold/15 text-brand-gold border border-brand-gold/30 px-1.5 py-0.5 rounded-full animate-pulse">
-                        Top 3!
-                      </span>
-                    )}
-                  </button>
-                );
-              }
-              if (isRoute) {
-                return (
-                  <Link key={link.href} href={link.href} className={classes}>
-                    {link.label}
-                  </Link>
-                );
-              }
-              return (
-                <Link key={link.href} href={link.href} className={classes}>
-                  {link.label}
-                </Link>
-              );
-            })}
-
-            {/* Profile link — only visible when wallet is connected */}
-            {isConnected && (
-              <button
-                onClick={() => setProfileOpen(true)}
-                className="relative px-4 py-2 text-sm font-medium text-[var(--color-cream-dim)] hover:text-neon-green transition-colors rounded-lg hover:bg-[rgba(16,185,129,0.07)] flex items-center gap-1.5"
-              >
-                {hasClaimable ? (
-                  <Gift size={14} className="text-brand-gold" />
-                ) : (
-                  <User size={14} className="text-neon-green opacity-70" />
-                )}
-                {hasClaimable ? "Claim Rewards" : "Profile"}
-                {hasClaimable && (
-                  <span className="text-[9px] font-black bg-brand-gold text-forest-dark px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)] animate-pulse">
-                    $NUT
-                  </span>
-                )}
-              </button>
-            )}
+          {/* Center: Search bar placeholder (future) */}
+          <div className="hidden lg:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="Search games..."
+                disabled
+                className="w-full px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-[var(--color-cream-dim)] placeholder-[var(--color-cream-dim)]/40 outline-none cursor-not-allowed opacity-50"
+                aria-label="Search games (coming soon)"
+              />
+            </div>
           </div>
 
-          {/* Auth + Mobile Toggle */}
-          <div className="flex items-center gap-3">
-            {/* Auth Button — Web2 primary, Web3 secondary */}
-            <div className="relative" ref={dropdownRef}>
-              {session ? (
-                <motion.button
-                  onClick={() => setWalletMenuOpen(!walletMenuOpen)}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0f0a00] border-2 border-brand-gold/30 text-brand-gold hover:border-brand-gold/50 transition-all text-sm font-medium"
-                  style={{ boxShadow: "0 0 15px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.1)" }}
-                >
-                  {session.user?.image ? (
-                    <img src={session.user.image} alt="" className="w-5 h-5 rounded-full" />
-                  ) : (
-                    <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
-                  )}
-                  <span className="hidden sm:inline truncate max-w-[120px]">
-                    {session.user?.name ?? "Player"}
-                  </span>
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform ${walletMenuOpen ? "rotate-180" : ""}`}
-                  />
-                </motion.button>
-              ) : isConnected && address ? (
-                <motion.button
-                  onClick={() => setWalletMenuOpen(!walletMenuOpen)}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#0f0a00] border-2 border-brand-gold/30 text-brand-gold hover:border-brand-gold/50 transition-all text-sm font-medium"
-                  style={{ boxShadow: "0 0 15px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.1)" }}
-                >
-                  <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
-                  <span className="hidden sm:inline">
-                    {truncateAddress(address)}
-                  </span>
-                  <span className="sm:hidden">
-                    <Wallet size={16} />
-                  </span>
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform ${walletMenuOpen ? "rotate-180" : ""}`}
-                  />
-                </motion.button>
-              ) : (
-                <motion.button
-                  onClick={() => setLoginModalOpen(true)}
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 0 30px rgba(251,191,36,0.45), 0 0 60px rgba(251,191,36,0.2)",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold to-amber-500 text-forest-dark font-black text-sm transition-all cursor-pointer"
-                  style={{
-                    animation: "pulse-gold 2.6s ease-in-out infinite",
-                  }}
-                >
-                  <LogIn size={16} />
-                  <span className="hidden sm:inline">Sign In</span>
-                  <span className="sm:hidden">Login</span>
-                </motion.button>
-              )}
+          {/* Right: Auth + Wallet + Mobile toggle */}
+          <div className="flex items-center gap-2">
+            {/* Connect Wallet — muted secondary action */}
+            {!isConnected && (
+              <button
+                onClick={() => setLoginModalOpen(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-cream-dim)] hover:text-brand-gold border border-transparent hover:border-brand-gold/20 transition-all cursor-pointer"
+                aria-label="Connect XRPL Wallet"
+              >
+                <Wallet size={14} />
+                <span>Wallet</span>
+              </button>
+            )}
 
-              {/* User / Wallet Dropdown */}
-              <AnimatePresence>
-                {walletMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-72 rounded-xl bg-[#0a0a0a] border-2 border-brand-gold/30 p-3 shadow-[0_0_30px_rgba(251,191,36,0.1),0_0_60px_rgba(251,191,36,0.05),0_8px_32px_rgba(0,0,0,0.6)]"
-                  >
-                    {session ? (
-                      <div className="space-y-2">
-                        {/* User display */}
-                        <div className="px-3 py-2.5 rounded-lg bg-[#0f0a00] border border-brand-gold/20">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-[var(--color-cream-dim)]">
-                              Signed in as
-                            </p>
-                            <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)]" />
-                          </div>
-                          <p className="text-sm font-bold text-brand-gold truncate">
+            {/* Auth: Logged out → Sign in button */}
+            {!session && !isConnected && (
+              <motion.button
+                onClick={() => setLoginModalOpen(true)}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white text-gray-900 font-bold text-sm cursor-pointer"
+              >
+                <LogIn size={16} />
+                <span className="hidden sm:inline">Sign in</span>
+              </motion.button>
+            )}
+
+            {/* Auth: Logged in → Avatar + dropdown */}
+            {(session || isConnected) && (
+              <div className="relative" ref={dropdownRef}>
+                <motion.button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-brand-gold/20 hover:border-brand-gold/40 transition-all cursor-pointer"
+                >
+                  {session?.user?.image ? (
+                    <img
+                      src={session.user.image}
+                      alt=""
+                      className="w-6 h-6 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-brand-gold/20 flex items-center justify-center">
+                      <User size={14} className="text-brand-gold" />
+                    </div>
+                  )}
+                  <span className="hidden sm:inline text-sm font-medium text-cream max-w-[100px] truncate">
+                    {session?.user?.name ?? (address ? truncateAddress(address) : "Player")}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-[var(--color-cream-dim)] transition-transform ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </motion.button>
+
+                {/* Dropdown menu */}
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-[#0a0613] border border-brand-gold/20 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+                    >
+                      {session && (
+                        <div className="px-3 py-2 mb-1">
+                          <p className="text-xs text-[var(--color-cream-dim)]">
+                            Signed in as
+                          </p>
+                          <p className="text-sm font-bold text-cream truncate">
                             {session.user?.name ?? session.user?.email ?? "Player"}
                           </p>
-                          {session.user?.email && (
-                            <p className="text-[11px] text-[var(--color-cream-dim)] mt-0.5 truncate">
-                              {session.user.email}
-                            </p>
-                          )}
                         </div>
+                      )}
 
-                        {/* Wallet status */}
-                        {isConnected && address && (
-                          <div className="px-3 py-2 rounded-lg bg-[#0f0a00]/50 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Wallet size={14} className="text-brand-gold" />
-                              <span className="text-xs text-[var(--color-cream-dim)]">
-                                Wallet linked
-                              </span>
-                            </div>
-                            <span className="text-xs font-mono text-brand-gold">
-                              {truncateAddress(address)}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Actions */}
-                        <button
-                          onClick={() => { setWalletMenuOpen(false); setProfileOpen(true); }}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neon-green hover:bg-[rgba(16,185,129,0.08)] rounded-lg transition-colors cursor-pointer"
+                      {session && (
+                        <Link
+                          href="/profile/"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
                         >
                           <User size={14} />
                           Profile
-                        </button>
-                        <div className="h-px bg-brand-gold/10 mx-1" />
-                        <button
-                          onClick={() => {
-                            disconnect();
-                            signOut({ callbackUrl: "/" });
-                            setWalletMenuOpen(false);
-                          }}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <LogOut size={14} />
-                          Sign Out
-                        </button>
-                      </div>
-                    ) : isConnected && address ? (
-                      <div className="space-y-2">
-                        {/* Wallet-only user */}
-                        <div className="px-3 py-2.5 rounded-lg bg-[#0f0a00] border border-brand-gold/20">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-[var(--color-cream-dim)] capitalize">
-                              Connected via {provider}
-                            </p>
-                            <div className="w-2 h-2 rounded-full bg-[var(--color-accent-green)]" />
-                          </div>
-                          <p className="text-xs font-mono text-brand-gold break-all leading-relaxed">
-                            {address}
-                          </p>
+                        </Link>
+                      )}
+
+                      <Link
+                        href="/leaderboard/"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        <Trophy size={14} />
+                        Leaderboard
+                      </Link>
+
+                      {/* Wallet status */}
+                      {isConnected && address && (
+                        <div className="flex items-center gap-2 px-3 py-2 text-xs text-[var(--color-cream-dim)]">
+                          <Wallet size={14} className="text-brand-gold" />
+                          <span className="font-mono">{truncateAddress(address)}</span>
                         </div>
+                      )}
 
-                        <button
-                          onClick={() => { setWalletMenuOpen(false); setProfileOpen(true); }}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neon-green hover:bg-[rgba(16,185,129,0.08)] rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Gift size={14} />
-                          {hasClaimable ? "Claim Rewards 🔔" : "Claim Rewards"}
-                        </button>
-                        <a
-                          href={`https://xrpscan.com/account/${address}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-brand-gold hover:bg-[rgba(251,191,36,0.05)] rounded-lg transition-colors"
-                        >
-                          <ExternalLink size={14} />
-                          View on XRPScan
-                        </a>
-                        <div className="h-px bg-brand-gold/10 mx-1" />
-                        <button
-                          onClick={() => {
-                            disconnect();
-                            setWalletMenuOpen(false);
-                          }}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <LogOut size={14} />
-                          Disconnect
-                        </button>
-                      </div>
-                    ) : null}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      <div className="h-px bg-white/5 my-1" />
 
-            {/* Login Modal */}
-            <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+                      <button
+                        onClick={() => {
+                          disconnect();
+                          if (session) signOut({ callbackUrl: "/" });
+                          setDropdownOpen(false);
+                        }}
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <LogOut size={14} />
+                        {session ? "Sign Out" : "Disconnect"}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
 
             {/* Mobile hamburger */}
             <button
@@ -440,29 +239,7 @@ export function Navbar() {
               className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-cream)] hover:text-brand-gold cursor-pointer"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
-              <AnimatePresence mode="wait">
-                {mobileOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <X size={24} />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <Menu size={24} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -474,130 +251,46 @@ export function Navbar() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden bg-[#0a0a0a] border-b-2 border-brand-gold/30"
-              style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.5), 0 0 20px rgba(251,191,36,0.08)" }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden overflow-hidden bg-[#0a0613] border-b border-brand-gold/10"
             >
-              <div className="container-main py-4 space-y-1">
-                {/* Floating nuts in mobile menu */}
-                <span className="absolute top-4 right-8 text-sm float-nut-1 opacity-30 pointer-events-none">🥜</span>
-                <span className="absolute bottom-6 left-12 text-xs float-nut-2 opacity-20 pointer-events-none" style={{ animationDelay: "1.2s" }}>🥜</span>
-
-                {NAV_LINKS.map((link, i) => {
-                  const isRoute =
-                    link.href.startsWith("/") && !link.href.startsWith("/#");
-                  const classes =
-                    "flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-brand-gold hover:bg-[rgba(251,191,36,0.07)] rounded-lg transition-colors min-h-[44px]";
-
-                  if (isRoute && link.icon === "trophy") {
-                    return (
-                      <motion.div
-                        key={link.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        <button
-                          onClick={() => { setMobileOpen(false); setLeaderboardOpen(true); }}
-                          className={classes}
-                        >
-                          <Trophy
-                            size={16}
-                            className="text-brand-gold opacity-70"
-                          />
-                          {link.label}
-                        </button>
-                      </motion.div>
-                    );
-                  }
-                  if (isRoute) {
-                    return (
-                      <motion.div
-                        key={link.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        <Link
-                          href={link.href}
-                          onClick={() => setMobileOpen(false)}
-                          className={classes}
-                        >
-                          {link.label}
-                        </Link>
-                      </motion.div>
-                    );
-                  }
-                  return (
-                    <motion.div
-                      key={link.href}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      <Link
-                        href={link.href}
-                        onClick={() => setMobileOpen(false)}
-                        className={classes}
-                      >
-                        {link.label}
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-
-                {/* Profile — mobile, only when connected */}
-                {isConnected && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: NAV_LINKS.length * 0.05 }}
+              <div className="px-4 py-4 space-y-1">
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  🎮 Games
+                </Link>
+                <Link
+                  href="/leaderboard/"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <Trophy size={16} />
+                  Leaderboard
+                </Link>
+                {!isConnected && (
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setLoginModalOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[var(--color-cream-dim)] hover:text-brand-gold hover:bg-white/5 rounded-lg transition-colors w-full text-left cursor-pointer"
                   >
-                    <button
-                      onClick={() => { setMobileOpen(false); setProfileOpen(true); }}
-                      className="relative flex items-center gap-2 px-4 py-3 text-base font-medium text-[var(--color-cream-dim)] hover:text-neon-green hover:bg-[rgba(16,185,129,0.07)] rounded-lg transition-colors min-h-[44px]"
-                    >
-                      {hasClaimable ? (
-                        <Gift size={16} className="text-brand-gold" />
-                      ) : (
-                        <User
-                          size={16}
-                          className="text-neon-green opacity-70"
-                        />
-                      )}
-                      {hasClaimable ? "Claim Rewards!" : "My Profile"}
-                      {hasClaimable && (
-                        <span className="text-[10px] font-black bg-brand-gold text-forest-dark px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)] animate-pulse">
-                          $NUT
-                        </span>
-                      )}
-                    </button>
-                  </motion.div>
+                    <Wallet size={16} />
+                    Connect Wallet
+                  </button>
                 )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.nav>
+      </nav>
 
-      {/* Leaderboard modal — opens from nav "Leaderboard" button */}
-      <LeaderboardModal
-        isOpen={leaderboardOpen}
-        onClose={() => setLeaderboardOpen(false)}
-        onGameSelect={() => {
-          setLeaderboardOpen(false);
-          window.location.href = "/#games";
-        }}
-      />
-
-      {/* Profile modal — opens from nav "Profile" button */}
-      <ProfileModal
-        isOpen={profileOpen}
-        onClose={() => setProfileOpen(false)}
-        onGameSelect={() => {
-          setProfileOpen(false);
-          window.location.href = "/#games";
-        }}
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
       />
     </>
   );

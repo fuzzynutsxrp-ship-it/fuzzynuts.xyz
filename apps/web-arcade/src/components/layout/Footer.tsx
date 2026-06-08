@@ -1,189 +1,82 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { XRPL_CONFIG } from "@/lib/utils";
-import { Heart, Trophy } from "lucide-react";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-const SOCIAL_LINKS = [
-  { icon: "𝕏", label: "X / Twitter", href: "https://x.com/fuzzynutsxrp" },
-  { icon: "💬", label: "Discord", href: "#" },
-  { icon: "✈️", label: "Telegram", href: "https://t.me/FuzzynutsXRP" },
-];
-
-const XRPL_LINKS = [
-  {
-    label: "XPMarket",
-    href: `https://xpmarket.com/token/NUT-${XRPL_CONFIG.issuer}`,
-  },
-  {
-    label: "XRPScan",
-    href: `https://xrpscan.com/account/${XRPL_CONFIG.issuer}`,
-  },
-  {
-    label: "DEX Trading",
-    href: `https://xpmarket.com/dex/NUT-${XRPL_CONFIG.issuer}/XRP`,
-  },
+const FOOTER_LINKS = [
+  { label: "Games", href: "/" },
+  { label: "Leaderboard", href: "/leaderboard/" },
+  { label: "Discord", href: "https://discord.gg/fuzzynuts", external: true },
+  { label: "Twitter / X", href: "https://x.com/fuzzynutsxrp", external: true },
+  { label: "Web3 Integration", href: "/tokenomics" },
 ];
 
 export function Footer() {
   return (
     <footer
-      className="relative pt-20 pb-8 border-t-2 border-hot-pink/20 overflow-hidden"
+      className="relative border-t border-white/5 bg-[#0a0613]"
       role="contentinfo"
     >
-      {/* Floating nut particles */}
-      <span className="absolute top-8 left-[15%] text-xl float-nut-1 opacity-30 pointer-events-none" aria-hidden="true">🥜</span>
-      <span className="absolute top-16 right-[20%] text-lg float-nut-2 opacity-25 pointer-events-none" aria-hidden="true">🌰</span>
-      <span className="absolute bottom-20 left-[35%] text-sm float-nut-3 opacity-20 pointer-events-none" aria-hidden="true">🥜</span>
-      <div className="container-main">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Brand */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              {/* DEGEN OVERHAUL — interactive footer mascot */}
-              <Image
-                src="/images/branding/logo-nav.webp"
-                alt=""
-                width={48}
-                height={32}
-                className="logo-degen rounded-md"
-                loading="lazy"
-              />
-              <Image
-                src="/images/branding/wordmarks/text_logo.png"
-                alt="Fuzzynuts"
-                width={473}
-                height={89}
-                className="h-8 w-auto"
-                loading="lazy"
-              />
-            </div>
-            <p className="text-sm text-[var(--color-cream-dim)] leading-relaxed mb-6">
-              The nuttiest meme coin on XRPL. Play games, earn $NUT, and join a
-              community that refuses to take crypto seriously.
-            </p>
-            <div className="flex gap-3">
-              {SOCIAL_LINKS.map((link) => (
-                <motion.a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.15, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-degen-950 border-2 border-gold/30 hover:bg-degen-900 hover:border-gold/50 hover:shadow-[0_0_16px_rgba(251,191,36,0.25)] transition-all"
-                  aria-label={link.label}
-                >
-                  {link.icon}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
+          <div className="flex items-center gap-2">
+            <Image
+              src="/images/branding/logo-nav.webp"
+              alt=""
+              width={28}
+              height={20}
+              className="rounded"
+              loading="lazy"
+            />
+            <span className="text-sm font-display font-bold text-cream">
+              FuzzyNuts
+            </span>
+          </div>
 
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ delay: 0.1 }}
-          >
-            <h4 className="font-display font-bold text-sm uppercase tracking-wider text-[var(--color-gold)] mb-4">
-              Quick Links
-            </h4>
-            <ul className="space-y-2">
-              {[
-                { label: "Arcade", href: "#games" },
-                { label: "Leaderboard", href: "/leaderboard/", route: true },
-                { label: "Tokenomics", href: "#tokenomics" },
-                { label: "Get $NUT", href: "#how-to-get" },
-                { label: "Litepaper", href: "/litepaper.html" },
-              ].map((link) => (
+          {/* Links */}
+          <nav aria-label="Footer navigation">
+            <ul className="flex flex-wrap items-center gap-4 sm:gap-6">
+              {FOOTER_LINKS.map((link) => (
                 <li key={link.label}>
-                  {link.route ? (
-                    <Link
-                      href={link.href}
-                      className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-neon-green)] transition-colors inline-flex items-center gap-1.5 group"
-                    >
-                      <Trophy
-                        size={13}
-                        className="opacity-60 group-hover:opacity-100 transition-opacity"
-                      />
-                      {link.label}
-                    </Link>
-                  ) : (
+                  {link.external ? (
                     <a
                       href={link.href}
-                      className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors inline-flex items-center gap-1 group"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[var(--color-cream-dim)] hover:text-cream transition-colors"
                     >
-                      <span className="w-0 group-hover:w-2 transition-all overflow-hidden text-[var(--color-gold)]">
-                        →
-                      </span>
                       {link.label}
                     </a>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className="text-xs text-[var(--color-cream-dim)] hover:text-cream transition-colors"
+                    >
+                      {link.label}
+                    </Link>
                   )}
                 </li>
               ))}
             </ul>
-          </motion.div>
-
-          {/* XRPL Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h4 className="font-display font-bold text-sm uppercase tracking-wider text-[var(--color-gold)] mb-4">
-              On-Chain
-            </h4>
-            <ul className="space-y-2">
-              {XRPL_LINKS.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-gold)] transition-colors inline-flex items-center gap-1"
-                  >
-                    {link.label}
-                    <span className="text-xs">↗</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+          </nav>
         </div>
 
-        {/* Divider */}
-        <div className="section-divider mb-6" />
-
-        {/* Bottom */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-cream-dim)]">
-          {/* DEGEN OVERHAUL — degen sign-off, disclaimer kept */}
+        {/* Bottom bar */}
+        <div className="mt-6 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[var(--color-cream-dim)]/50">
           <p className="flex items-center gap-1">
-            © {new Date().getFullYear()} Fuzzynuts. Degenerate responsibly… nah.
-            Built with
-            <Heart
-              size={12}
-              className="text-[var(--color-hot-pink)] inline"
-              fill="currentColor"
-            />
+            © {new Date().getFullYear()} FuzzyNuts. Built with{" "}
+            <Heart size={10} className="text-[var(--color-hot-pink)] inline" fill="currentColor" />{" "}
             not financial advice.
           </p>
-          {/* DEGEN OVERHAUL END */}
-          <p className="flex items-center gap-1">
-            Powered by
+          <p>
+            Powered by{" "}
             <a
               href="https://xrpl.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--color-gold)] hover:underline font-bold"
+              className="text-brand-gold hover:underline"
             >
               XRP Ledger
             </a>
