@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd apps/web-arcade && pnpm build",
+  "outputDirectory": "apps/web-arcade/.next",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "rootDirectory": "apps/web-arcade"
+}
