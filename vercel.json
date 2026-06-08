@@ -1,6 +1,0 @@
-{
-  "buildCommand": "pnpm --filter=@fuzzynuts/web-arcade build",
-  "outputDirectory": "apps/web-arcade/.next",
-  "installCommand": "pnpm install",
-  "framework": "nextjs"
-}
