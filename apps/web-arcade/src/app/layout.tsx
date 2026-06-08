@@ -37,7 +37,6 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fuzzynuts.xyz";
 const ALLOW_INDEXING = process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true";
 
 export const viewport: Viewport = {
-  // DEGEN OVERHAUL — deep degen black/purple chrome tint
   themeColor: "#0a0613",
   colorScheme: "dark",
   width: "device-width",
@@ -128,14 +127,11 @@ export const metadata: Metadata = {
         },
       },
   icons: {
-    // DEGEN OVERHAUL START — promote the mascot emblem to the favicon slot
-    // (modern browsers prefer the webp mascot; favicon.ico stays as fallback)
     icon: [
       { url: "/images/branding/logo-nav.webp", type: "image/webp" },
       { url: "/favicon.ico", sizes: "any" },
     ],
     shortcut: "/images/branding/logo-nav.webp",
-    // DEGEN OVERHAUL END
     apple: "/images/og/og-image.png",
   },
   category: "Gaming",
@@ -149,9 +145,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
-        {/* Extra belt-and-suspenders noindex tags while locked down. These are
-            omitted once NEXT_PUBLIC_ALLOW_INDEXING=true so they can't override
-            the indexable robots metadata above. */}
         {!ALLOW_INDEXING && (
           <>
             <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
@@ -160,7 +153,6 @@ export default function RootLayout({
         )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Plausible Analytics — privacy-friendly, no cookie banner needed */}
         <script defer data-domain="fuzzynuts.xyz" src="https://plausible.io/js/script.js"></script>
       </head>
       <body className="font-body antialiased">

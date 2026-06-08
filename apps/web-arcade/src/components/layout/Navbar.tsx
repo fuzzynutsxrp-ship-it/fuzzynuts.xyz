@@ -109,18 +109,6 @@ export function Navbar() {
 
           {/* Right: Auth + Wallet + Mobile toggle */}
           <div className="flex items-center gap-2">
-            {/* Connect Wallet — muted secondary action */}
-            {!isConnected && (
-              <button
-                onClick={() => setLoginModalOpen(true)}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-cream-dim)] hover:text-brand-gold border border-transparent hover:border-brand-gold/20 transition-all cursor-pointer"
-                aria-label="Connect Wallet"
-              >
-                <Wallet size={14} />
-                <span>Wallet</span>
-              </button>
-            )}
-
             {/* Auth: Logged out → Sign in button */}
             {!session && !isConnected && (
               <motion.button
@@ -270,18 +258,6 @@ export function Navbar() {
                   <Trophy size={16} />
                   Leaderboard
                 </Link>
-                {!isConnected && (
-                  <button
-                    onClick={() => {
-                      setMobileOpen(false);
-                      setLoginModalOpen(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[var(--color-cream-dim)] hover:text-brand-gold hover:bg-white/5 rounded-lg transition-colors w-full text-left cursor-pointer"
-                  >
-                    <Wallet size={16} />
-                    Connect Wallet
-                  </button>
-                )}
               </div>
             </motion.div>
           )}

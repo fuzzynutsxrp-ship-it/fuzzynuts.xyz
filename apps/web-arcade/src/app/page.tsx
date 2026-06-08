@@ -1,11 +1,12 @@
-// CRO Scrub v2 - Web2 Metadata - Force Redeploy
+// Poki-style Homepage — TopNav + Sidebar + Game Grid
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { Navbar } from "@/components/layout/Navbar";
-import { CategoryFilters } from "@/components/game/CategoryFilters";
-import { GameCard } from "@/components/game/GameCard";
+import { TopNav } from "@/components/layout/TopNav";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { FeaturedBanner } from "@/components/game/FeaturedBanner";
+import { PokiGameCard } from "@/components/game/PokiGameCard";
 import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
 
@@ -14,99 +15,162 @@ const Footer = dynamic(() =>
 );
 
 /* ═══════════════════════════════════════════════════════════════
-   Homepage — Poki-style layout
-
-   Clean, minimal, game-card-first design. No hero section,
-   no marketing fluff — games start immediately below the nav.
-   ChatWidget is rendered in layout.tsx and is not touched here.
+   Category → Game matching
+   Maps sidebar category values to game IDs / types / tags.
    ═══════════════════════════════════════════════════════════════ */
 
-// Category mapping: filter tab → matching game type or tags
 function matchesCategory(game: (typeof GAMES)[number], category: string): boolean {
-  if (category === "All") return true;
-  // Check type field
-  if (game.type.toLowerCase().includes(category.toLowerCase())) return true;
-  // Check tags
-  if (game.tags?.some((t) => t.toLowerCase().includes(category.toLowerCase()))) return true;
-  // Special mappings
-  if (category === "Arcade" && (game.id === "survivors" || game.id === "minigolf" || game.id === "racer")) return true;
-  if (category === "Racing" && game.id === "racer") return true;
-  if (category === "Platformer" && game.id === "mario") return true;
-  if (category === "Classic" && (game.id === "rsc" || game.id === "mario")) return true;
-  return false;
+  if (category === "popular") return true; // "Popular" shows all
+  const id = game.id;
+  const type = game.type.toLowerCase();
+  const tags = game.tags?.map((t) => t.toLowerCase()) ?? [];
+
+  switch (category) {
+    case "multiplayer":
+      return id === "fuzzynuts-world" || id === "rsc";
+    case "arcade":
+      return id === "mario" || id === "survivors";
+    case "racing":
+      return id === "racer";
+    case "chill":
+      return id === "minigolf";
+    default:
+      // Fallback: check type and tags
+      return type.includes(category) || tags.some((t) => t.includes(category));
+  }
 }
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("popular");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
 
-  const filteredGames = useMemo(
-    () => GAMES.filter((g) => matchesCategory(g, activeCategory)),
-    [activeCategory],
-  );
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+
+  // Filter by category first, then by search query
+  const filteredGames = useMemo(() => {
+    let games = GAMES.filter((g) => matchesCategory(g, activeCategory));
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      games = games.filter(
+        (g) =>
+          g.title.toLowerCase().includes(q) ||
+          g.type.toLowerCase().includes(q) ||
+          g.tags?.some((t) => t.toLowerCase().includes(q)),
+      );
+    }
+    return games;
+  }, [activeCategory, searchQuery]);
+
+  // Split: featured (fuzzynuts-world) + the rest
+  const featuredGame = GAMES.find((g) => g.id === "fuzzynuts-world");
+  const gridGames = filteredGames.filter((g) => g.id !== "fuzzynuts-world");
 
   return (
-    <>
-      <Navbar />
+    <div className="min-h-screen bg-[#0a0613] flex flex-col">
+      {/* Top Navigation Bar */}
+      <TopNav
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+      />
 
-      <main
-        id="main-content"
-        className="relative z-10 min-h-screen bg-[#0a0613]"
-      >
-        {/* Spacer for fixed navbar */}
-        <div className="h-14 md:h-16" />
+      {/* Main layout: Sidebar + Content */}
+      <div className="flex flex-1">
+        {/* Left Sidebar */}
+        <Sidebar
+          open={sidebarOpen}
+          onClose={closeSidebar}
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+        />
 
-        {/* Category filters */}
-        <div className="sticky top-14 md:top-16 z-30 bg-[#0a0613]/95 backdrop-blur-md border-b border-white/5">
-          <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-3">
-            <CategoryFilters
-              active={activeCategory}
-              onChange={setActiveCategory}
-            />
-          </div>
-        </div>
-
-        {/* Game grid */}
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 pb-32">
-          {/* Responsive grid: 5 cols desktop, 3 tablet, 2 mobile */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
-            {filteredGames.map((game, i) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                onPlay={setActiveGameId}
-                priority={i < 5}
-              />
-            ))}
-          </div>
-
-          {/* Empty state */}
-          {filteredGames.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <p className="text-2xl mb-2">🥜</p>
-              <p className="text-[var(--color-cream-dim)] text-sm">
-                No games in this category yet.
-              </p>
-              <button
-                onClick={() => setActiveCategory("All")}
-                className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
-              >
-                Show all games
-              </button>
-            </div>
+        {/* Main Content Area */}
+        <main
+          id="main-content"
+          className="flex-1 min-w-0 px-4 md:px-6 lg:px-8 py-6 pb-32"
+        >
+          {/* Featured Game Banner — only show when not searching and on "popular" */}
+          {activeCategory === "popular" && !searchQuery.trim() && featuredGame && (
+            <section className="mb-8">
+              <FeaturedBanner onPlay={setActiveGameId} />
+            </section>
           )}
-        </div>
 
-        {/* Footer */}
-        <Footer />
-      </main>
+          {/* Section heading */}
+          <section>
+            <h2 className="font-display text-xl sm:text-2xl font-black text-cream mb-4">
+              {activeCategory === "popular" && !searchQuery.trim()
+                ? "Popular Right Now"
+                : searchQuery.trim()
+                  ? `Results for "${searchQuery}"`
+                  : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Games`}
+            </h2>
 
-      {/* Game modal — CrazyGames-style lightbox */}
+            {/* Game grid — responsive: 2 cols mobile, 3 tablet, 4 desktop, 5 wide */}
+            {gridGames.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+                {gridGames.map((game, i) => (
+                  <PokiGameCard
+                    key={game.id}
+                    game={game}
+                    onPlay={setActiveGameId}
+                    priority={i < 4}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <p className="text-3xl mb-3">🔍</p>
+                <p className="text-[var(--color-cream-dim)] text-sm">
+                  No games found.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setActiveCategory("popular");
+                  }}
+                  className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
+                >
+                  Show all games
+                </button>
+              </div>
+            )}
+          </section>
+
+          {/* Recently Played / Newest Additions */}
+          {activeCategory === "popular" && !searchQuery.trim() && (
+            <section className="mt-10">
+              <h2 className="font-display text-xl sm:text-2xl font-black text-cream mb-4">
+                Newest Additions
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+                {[...GAMES].reverse().slice(0, 3).map((game, i) => (
+                  <PokiGameCard
+                    key={game.id}
+                    game={game}
+                    onPlay={setActiveGameId}
+                    priority={false}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Footer */}
+          <div className="mt-12">
+            <Footer />
+          </div>
+        </main>
+      </div>
+
+      {/* Game modal — lightbox overlay for playing games */}
       <GameModal
         gameId={activeGameId}
         onClose={() => setActiveGameId(null)}
         onGameSwitch={setActiveGameId}
       />
-    </>
+    </div>
   );
 }
