@@ -1,3 +1,4 @@
+// CRO Scrub v2 - Web2 Metadata - Force Redeploy
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -47,11 +48,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "FuzzyNuts — Free Web Games & Leaderboards",
+    default: "Fuzzynuts — Play 6 Free Browser Games Instantly",
     template: "%s | FuzzyNuts",
   },
   description:
-    "Play free arcade games, compete on global leaderboards, and unlock achievements. Join the FuzzyNuts gaming community — no wallet required.",
+    "Compete in weekly tournaments, climb the global leaderboard, and unlock achievements. No downloads required.",
   keywords: [
     "FuzzyNuts",
     "free web games",
@@ -76,15 +77,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: "Fuzzynuts",
-    title: "FuzzyNuts — Free Web Games & Leaderboards",
+    title: "Fuzzynuts — Play 6 Free Browser Games Instantly",
     description:
-      "Play free arcade games, compete on global leaderboards, and unlock achievements. No wallet required.",
+      "Compete in weekly tournaments, climb the global leaderboard, and unlock achievements. No downloads required.",
     images: [
       {
         url: "/images/og/og-image.png",
         width: 1200,
         height: 630,
-        alt: "FuzzyNuts — Free Web Games & Leaderboards",
+        alt: "Fuzzynuts — Play 6 Free Browser Games Instantly",
         type: "image/png",
       },
     ],
@@ -93,12 +94,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@fuzzynutsxrp",
     creator: "@fuzzynutsxrp",
-    title: "FuzzyNuts — Free Web Games & Leaderboards",
+    title: "Fuzzynuts — Play 6 Free Browser Games Instantly",
     description:
-      "🐿️ Play free arcade games, compete on global leaderboards, unlock achievements. No wallet needed!",
+      "🐿️ Compete in weekly tournaments, climb the leaderboard, and unlock achievements. No downloads needed!",
     images: {
       url: "/images/og/og-image.png",
-      alt: "FuzzyNuts — Free Web Games & Leaderboards",
+      alt: "Fuzzynuts — Play 6 Free Browser Games Instantly",
     },
   },
   robots: ALLOW_INDEXING
