@@ -1,0 +1,283 @@
+/* ============================================================
+     CAROUSEL TOKENS — extending the nav-bar token set
+     ============================================================ */
+  :root {
+    /* Card dimensions */
+    --fn-card-width: 220px;
+    --fn-card-radius: 16px;
+    --fn-thumb-radius: 8px;
+
+    /* Section heading */
+    --fn-heading-size: 24px;
+    --fn-heading-weight: 700;
+
+    /* Card title */
+    --fn-card-title-size: 14px;
+    --fn-card-title-weight: 700;
+
+    /* Arrow button */
+    --fn-arrow-size: 40px;
+    --fn-arrow-bg: rgba(255, 255, 255, 0.85);
+    --fn-arrow-bg-hover: rgba(255, 255, 255, 0.95);
+    --fn-arrow-color: #002b50;
+
+    /* Gap between cards */
+    --fn-carousel-gap: 16px;
+  }
+
+  /* ============================================================
+     SECTION WRAPPER
+     ============================================================ */
+  .fn-carousel-section {
+    padding: 32px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ============================================================
+     SECTION HEADING — "Popular this week"
+     Poki: 24px, Torus, 700, blue-1
+     ============================================================ */
+  .fn-carousel-section__heading {
+    font-family: var(--fn-font);
+    font-size: var(--fn-heading-size);
+    font-weight: var(--fn-heading-weight);
+    color: var(--fn-text);
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ============================================================
+     CAROUSEL CONTAINER — the scroll track
+     Poki mechanics: overflow-x: auto, scroll-snap, hidden scrollbar
+     ============================================================ */
+  .fn-carousel {
+    position: relative;
+  }
+
+  .fn-carousel__track {
+    display: flex;
+    gap: var(--fn-carousel-gap);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 12px; /* 4px top/bottom breathing room for card hover lift */
+    margin: -4px 0 -12px;
+
+    /* Hide scrollbar — all browsers */
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE/Edge */
+  }
+
+  .fn-carousel__track::-webkit-scrollbar {
+    display: none;                  /* Chrome/Safari/Opera */
+  }
+
+  /* ============================================================
+     GAME CARD
+     Poki: block display, no text-decoration, cursor pointer
+     transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)
+     ============================================================ */
+  .fn-card {
+    flex: 0 0 var(--fn-card-width);
+    width: var(--fn-card-width);
+    scroll-snap-align: start;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: var(--fn-card-radius);
+    transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    outline: none;
+  }
+
+  .fn-card:hover,
+  .fn-card:focus-visible {
+    transform: scale(1.04);
+  }
+
+  .fn-card:focus-visible {
+    box-shadow: 0 0 0 3px rgba(0, 156, 255, 0.3);
+  }
+
+  /* ============================================================
+     THUMBNAIL — 16:9 aspect ratio, 8px border-radius
+     ============================================================ */
+  .fn-card__thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--fn-thumb-radius);
+    overflow: hidden;
+    background: #e6ecf5; /* loading placeholder color */
+  }
+
+  .fn-card__thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--fn-thumb-radius);
+    transition: opacity 0.2s ease;
+  }
+
+  /* Placeholder gradient when no image is available */
+  .fn-card__thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--fn-font);
+    font-size: 28px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: -0.5px;
+    user-select: none;
+  }
+
+  /* Per-game placeholder gradients — subtle, Poki-aligned palette */
+  .fn-card__thumb-placeholder--1 { background: linear-gradient(135deg, #0074e0, #054a91); }
+  .fn-card__thumb-placeholder--2 { background: linear-gradient(135deg, #c977e8, #d490f2); }
+  .fn-card__thumb-placeholder--3 { background: linear-gradient(135deg, #15c8d1, #17d7d8); }
+  .fn-card__thumb-placeholder--4 { background: linear-gradient(135deg, #ff9e00, #ffd100); }
+  .fn-card__thumb-placeholder--5 { background: linear-gradient(135deg, #ff7690, #ff8aa6); }
+  .fn-card__thumb-placeholder--6 { background: linear-gradient(135deg, #3cf7dc, #4dffe1); }
+
+  /* ============================================================
+     GAME TITLE — below image, clean bold sans-serif
+     ============================================================ */
+  .fn-card__title {
+    font-family: var(--fn-font);
+    font-size: var(--fn-card-title-size);
+    font-weight: var(--fn-card-title-weight);
+    color: var(--fn-text);
+    line-height: 1.3;
+    margin-top: 8px;
+    padding: 0 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ============================================================
+     ARROW BUTTONS — fade in on carousel hover
+     Poki-style: semi-transparent bg, subtle shadow, circular
+     ============================================================ */
+  .fn-carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--fn-arrow-size);
+    height: var(--fn-arrow-size);
+    border-radius: 50%;
+    border: none;
+    background: var(--fn-arrow-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    color: var(--fn-arrow-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, background-color 0.15s ease;
+    padding: 0;
+  }
+
+  .fn-carousel__arrow svg {
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  .fn-carousel__arrow:hover {
+    background: var(--fn-arrow-bg-hover);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+
+  .fn-carousel__arrow:active {
+    transform: translateY(-50%) scale(0.94);
+  }
+
+  /* Left arrow */
+  .fn-carousel__arrow--left {
+    left: -8px;
+  }
+
+  /* Right arrow */
+  .fn-carousel__arrow--right {
+    right: -8px;
+  }
+
+  /* Fade in arrows on carousel hover */
+  .fn-carousel:hover .fn-carousel__arrow,
+  .fn-carousel:focus-within .fn-carousel__arrow {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Hide left arrow when at start (add .is-at-start via JS) */
+  .fn-carousel__arrow--left.is-at-start {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide right arrow when at end (add .is-at-end via JS) */
+  .fn-carousel__arrow--right.is-at-end {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* ============================================================
+     RESPONSIVE — shrink card width on smaller viewports
+     ============================================================ */
+  @media (max-width: 768px) {
+    :root {
+      --fn-card-width: 160px;
+      --fn-carousel-gap: 12px;
+      --fn-heading-size: 20px;
+    }
+
+    .fn-carousel-section {
+      padding: 24px 16px 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --fn-card-width: 140px;
+      --fn-carousel-gap: 10px;
+    }
+
+    .fn-carousel__arrow {
+      width: 34px;
+      height: 34px;
+    }
+
+    .fn-carousel__arrow svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  /* ============================================================
+     REDUCED MOTION — respect user preference
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    .fn-card {
+      transition: none;
+    }
+
+    .fn-carousel__track {
+      scroll-behavior: auto;
+    }
+
+    .fn-carousel__arrow {
+      transition: opacity 0.01ms, visibility 0.01ms;
+    }
+  }

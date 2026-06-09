@@ -1,0 +1,138 @@
+/* ============================================================
+     CATEGORY SECTION TOKENS
+     Poki category card bg: white, border-radius: 16px
+     Poki footer pills: border-radius: 100px, font-size: 14px
+     User spec: surface grey, 8px radius, 150px min, 16px gap
+     Merged: 8px radius per spec, grey bg per spec
+     ============================================================ */
+  :root {
+    --fn-cat-min: 150px;
+    --fn-cat-gap: 16px;
+    --fn-cat-radius: 8px;
+    --fn-cat-bg: #f0f5fc;         /* grey-7 — subtle surface grey */
+    --fn-cat-bg-hover: #e6ecf5;   /* darker shift on hover */
+    --fn-cat-text: #002b50;       /* blue-1 — default text */
+    --fn-cat-text-hover: #009cff; /* poki-blue — hover text */
+    --fn-cat-padding: 14px 16px;
+    --fn-cat-font-size: 15px;
+    --fn-cat-font-weight: 600;
+  }
+
+  /* ============================================================
+     SECTION WRAPPER
+     Matches Poki section pattern: flex column, gap, padding
+     ============================================================ */
+  .fn-categories {
+    padding: 48px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ============================================================
+     SECTION HEADING
+     Poki: 24px, Torus, 700, blue-1
+     ============================================================ */
+  .fn-categories__heading {
+    font-family: var(--fn-font);
+    font-size: var(--fn-heading-size, 24px);
+    font-weight: var(--fn-heading-weight, 700);
+    color: var(--fn-text);
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ============================================================
+     CATEGORY GRID
+     User spec: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px
+     ============================================================ */
+  .fn-categories__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--fn-cat-min), 1fr));
+    gap: var(--fn-cat-gap);
+  }
+
+  /* ============================================================
+     CATEGORY PILL / CARD
+     Poki mechanics: block link, no text-decoration, cursor pointer
+     transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)
+     User spec: 8px radius, surface grey bg, centered text
+     ============================================================ */
+  .fn-cat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--fn-cat-padding);
+    background: var(--fn-cat-bg);
+    border-radius: var(--fn-cat-radius);
+    text-decoration: none;
+    color: var(--fn-cat-text);
+    font-family: var(--fn-font);
+    font-size: var(--fn-cat-font-size);
+    font-weight: var(--fn-cat-font-weight);
+    line-height: 1.2;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+
+    /* Poki exact transition curve */
+    transition:
+      background-color 0.2s ease,
+      color 0.15s ease,
+      transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+      box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .fn-cat:hover {
+    background: var(--fn-cat-bg-hover);
+    color: var(--fn-cat-text-hover);
+    transform: scale(1.03);
+    box-shadow: 0 2px 8px rgba(93, 107, 132, 0.12);
+  }
+
+  .fn-cat:active {
+    transform: scale(0.98);
+    box-shadow: none;
+  }
+
+  .fn-cat:focus-visible {
+    box-shadow: 0 0 0 3px rgba(0, 156, 255, 0.25);
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 640px) {
+    :root {
+      --fn-cat-min: 120px;
+      --fn-cat-gap: 12px;
+      --fn-cat-font-size: 14px;
+      --fn-cat-padding: 12px 14px;
+    }
+
+    .fn-categories {
+      padding: 36px 16px 0;
+    }
+  }
+
+  @media (max-width: 400px) {
+    :root {
+      --fn-cat-min: 100px;
+    }
+  }
+
+  /* ============================================================
+     REDUCED MOTION
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    .fn-cat {
+      transition: background-color 0.01ms, color 0.01ms;
+    }
+
+    .fn-cat:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }

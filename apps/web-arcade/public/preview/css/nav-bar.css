@@ -1,0 +1,295 @@
+/* ============================================================
+     DESIGN TOKENS — mapped from Poki's :root variables
+     ============================================================ */
+  :root {
+    /* Surface */
+    --fn-surface: #ffffff;
+
+    /* Text */
+    --fn-text: #002b50;
+    --fn-text-secondary: #939db3;
+
+    /* Accent */
+    --fn-accent: #009cff;
+
+    /* Background */
+    --fn-bg: #f9fbff;
+
+    /* Shadows — Poki exact values */
+    --fn-shadow-close: 0px 3px 5px 3px rgba(93, 107, 132, 0.2);
+    --fn-shadow-mid: 0px 7px 10px 4px rgba(93, 107, 132, 0.3);
+    --fn-shadow-far: 0px 20px 24px 14px rgba(93, 107, 132, 0.24);
+
+    /* Spacing */
+    --fn-spacing-2xs: 4px;
+    --fn-spacing-xs: 8px;
+    --fn-spacing-s: 12px;
+    --fn-spacing-m: 16px;
+    --fn-spacing-l: 24px;
+
+    /* Radius */
+    --fn-radius-pill: 24px;
+    --fn-radius-lg: 16px;
+    --fn-radius-sm: 8px;
+
+    /* Font */
+    --fn-font: "Torus", "Proxima Nova", "Open Sans", "Gill Sans MT", Arial, sans-serif;
+  }
+
+  /* ============================================================
+     NAV — sticky top bar
+     ============================================================ */
+  .fn-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--fn-surface);
+    box-shadow: var(--fn-shadow-close);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--fn-spacing-m);
+    z-index: 10;
+    font-family: var(--fn-font);
+  }
+
+  /* ============================================================
+     LEFT — Logo
+     ============================================================ */
+  .fn-nav__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--fn-spacing-xs);
+    text-decoration: none;
+    flex-shrink: 0;
+    margin-right: var(--fn-spacing-l);
+  }
+
+  .fn-nav__logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--fn-radius-sm);
+    background: var(--fn-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fn-nav__logo-mark svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .fn-nav__logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fn-text);
+    letter-spacing: -0.3px;
+  }
+
+  /* ============================================================
+     CENTER — Search Bar (pill)
+     ============================================================ */
+  .fn-nav__center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .fn-search {
+    position: relative;
+    width: 100%;
+    height: 42px;
+  }
+
+  .fn-search__icon {
+    position: absolute;
+    left: var(--fn-spacing-s);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--fn-text-secondary);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fn-search__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .fn-search__input {
+    width: 100%;
+    height: 100%;
+    background: var(--fn-bg);
+    border: 2px solid transparent;
+    border-radius: var(--fn-radius-pill);
+    padding: 0 var(--fn-spacing-l) 0 calc(var(--fn-spacing-s) + 24px);
+    font-family: var(--fn-font);
+    font-size: 15px;
+    color: var(--fn-text);
+    outline: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .fn-search__input::placeholder {
+    color: var(--fn-text-secondary);
+    font-weight: 400;
+  }
+
+  .fn-search__input:hover {
+    background: #eef2f9;
+  }
+
+  .fn-search__input:focus {
+    background: var(--fn-surface);
+    border-color: var(--fn-accent);
+    box-shadow: 0 0 0 3px rgba(0, 156, 255, 0.15);
+    cursor: text;
+  }
+
+  /* ============================================================
+     RIGHT — Avatar + Dropdown
+     ============================================================ */
+  .fn-nav__right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: var(--fn-spacing-l);
+    position: relative;
+  }
+
+  .fn-avatar-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--fn-bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .fn-avatar-btn:hover {
+    background: #e6ecf5;
+  }
+
+  .fn-avatar-btn:focus-visible {
+    outline: 2px solid var(--fn-accent);
+    outline-offset: 2px;
+  }
+
+  .fn-avatar-btn svg {
+    width: 22px;
+    height: 22px;
+    color: var(--fn-text);
+  }
+
+  /* ============================================================
+     DROPDOWN — Profile menu
+     Poki mechanics: surface bg, subtle shadow, 8px radius, 8px padding
+     Visibility toggled via .fn-avatar-btn:focus + .fn-dropdown
+     ============================================================ */
+  .fn-dropdown {
+    position: absolute;
+    top: calc(100% + var(--fn-spacing-xs));
+    right: 0;
+    width: 220px;
+    background: var(--fn-surface);
+    border-radius: var(--fn-radius-sm);
+    box-shadow: var(--fn-shadow-far);
+    padding: var(--fn-spacing-xs);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    z-index: 1;
+    list-style: none;
+    margin: 0;
+  }
+
+  /* Toggle: when avatar button receives focus, show dropdown */
+  .fn-avatar-btn:focus + .fn-dropdown,
+  .fn-dropdown:focus-within {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Dropdown items */
+  .fn-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: var(--fn-spacing-s);
+    padding: var(--fn-spacing-xs) var(--fn-spacing-s);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--fn-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+    line-height: 1;
+  }
+
+  .fn-dropdown__item:hover {
+    background: var(--fn-bg);
+  }
+
+  .fn-dropdown__item:active {
+    background: #e6ecf5;
+  }
+
+  .fn-dropdown__item svg {
+    width: 18px;
+    height: 18px;
+    color: var(--fn-text-secondary);
+    flex-shrink: 0;
+  }
+
+  .fn-dropdown__item:hover svg {
+    color: var(--fn-text);
+  }
+
+  /* Separator line between groups */
+  .fn-dropdown__sep {
+    height: 1px;
+    background: #e6ecf5;
+    margin: var(--fn-spacing-2xs) 0;
+  }
+
+  /* Log Out — subtle danger affordance */
+  .fn-dropdown__item--logout {
+    color: #c94040;
+  }
+
+  .fn-dropdown__item--logout svg {
+    color: #c94040;
+  }
+
+  .fn-dropdown__item--logout:hover {
+    background: #fff0f0;
+  }
+
+  .fn-dropdown__item--logout:hover svg {
+    color: #c94040;
+  }
+
+  /* ============================================================
+     CONTENT SPACER — push page below fixed nav
+     ============================================================ */
+  .fn-nav-spacer {
+    height: 64px;
+  }
