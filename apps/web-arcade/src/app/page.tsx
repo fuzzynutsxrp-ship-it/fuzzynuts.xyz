@@ -69,24 +69,26 @@ function GameRow({
   games,
   onPlay,
   priorityStart = false,
+  tileSize = "small",
 }: {
   title: string;
   emoji: string;
   games: typeof GAMES;
   onPlay: (id: string) => void;
   priorityStart?: boolean;
+  tileSize?: "large" | "small";
 }) {
   return (
     <section className="mb-8">
-      <h2 className="font-display text-base sm:text-lg font-black text-cream mb-3 flex items-center gap-2">
+      <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream mb-3 flex items-center gap-2">
         <span>{emoji}</span> {title}
       </h2>
-      {/* Horizontal scroll on mobile, grid on desktop */}
-      <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 md:overflow-visible md:pb-0"
+      {/* Horizontal scroll on mobile, mosaic grid on desktop */}
+      <div className="game-grid-mosaic flex overflow-x-auto scrollbar-none pb-2 md:grid md:overflow-visible md:pb-0"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {games.map((game, i) => (
-          <div key={game.id} className="shrink-0 w-[44vw] sm:w-[30vw] md:w-auto">
+          <div key={game.id} className={`shrink-0 w-[44vw] sm:w-[30vw] md:w-auto tile-${tileSize}`}>
             <PokiGameCard
               game={game}
               onPlay={onPlay}
@@ -151,12 +153,12 @@ export default function Home() {
           /* ── Filtered / Search results: flat grid ── */
           filteredGames.length > 0 ? (
             <section>
-              <h2 className="font-display text-base sm:text-lg font-black text-cream mb-3">
+              <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream mb-3">
                 {searchQuery.trim()
                   ? `Results for "${searchQuery}"`
                   : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Games`}
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+              <div className="game-grid-fluid">
                 {filteredGames.map((game, i) => (
                   <PokiGameCard key={game.id} game={game} onPlay={setActiveGameId} priority={i < 6} />
                 ))}
@@ -177,18 +179,20 @@ export default function Home() {
         ) : (
           /* ── Default view: sectioned rows ── */
           <>
-            <GameRow title="Trending Now" emoji="🔥" games={trending} onPlay={setActiveGameId} priorityStart />
-            <GameRow title="Just Added" emoji="🆕" games={justAdded} onPlay={setActiveGameId} />
-            <GameRow title="Top Rated" emoji="🏆" games={topRated} onPlay={setActiveGameId} />
+            <GameRow title="Trending Now" emoji="🔥" games={trending} onPlay={setActiveGameId} priorityStart tileSize="large" />
+            <GameRow title="Just Added" emoji="🆕" games={justAdded} onPlay={setActiveGameId} tileSize="large" />
+            <GameRow title="Top Rated" emoji="🏆" games={topRated} onPlay={setActiveGameId} tileSize="small" />
 
             {/* Coming Soon — density filler */}
             <section className="mb-8">
-              <h2 className="font-display text-base sm:text-lg font-black text-cream/60 mb-3 flex items-center gap-2">
+              <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream/60 mb-3 flex items-center gap-2">
                 <span>🔒</span> Coming Soon
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+              <div className="game-grid-mosaic">
                 {COMING_SOON.map((item) => (
-                  <ComingSoonCard key={item.title} title={item.title} genre={item.genre} />
+                  <div key={item.title} className="tile-small">
+                    <ComingSoonCard title={item.title} genre={item.genre} />
+                  </div>
                 ))}
               </div>
             </section>
