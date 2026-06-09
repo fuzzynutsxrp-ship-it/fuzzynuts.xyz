@@ -20,248 +20,206 @@
 
   <!-- ============================== Nav Bar ============================== -->
   <nav class="fn-nav" role="navigation" aria-label="Main navigation">
-
-    <!-- LEFT: Logo -->
     <a href="/" class="fn-nav__logo" aria-label="FuzzyNuts Home">
       <span class="fn-nav__logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-          <line x1="9" y1="9" x2="9.01" y2="9"/>
-          <line x1="15" y1="9" x2="15.01" y2="9"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
       </span>
       <span class="fn-nav__logo-text">FuzzyNuts</span>
     </a>
-
-    <!-- CENTER: Search -->
     <div class="fn-nav__center">
       <div class="fn-search">
-        <span class="fn-search__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </span>
+        <span class="fn-search__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <input type="search" class="fn-search__input" placeholder="Search for games..." aria-label="Search for games" autocomplete="off">
       </div>
     </div>
-
-    <!-- RIGHT: Avatar + Dropdown -->
     <div class="fn-nav__right">
       <button class="fn-avatar-btn" aria-label="Profile menu" aria-haspopup="true" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </button>
-
       <ul class="fn-dropdown" role="menu" aria-label="Profile menu">
-        <li role="none">
-          <a href="/profile" class="fn-dropdown__item" role="menuitem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            User Profile
-          </a>
-        </li>
-        <li role="none">
-          <a href="/wallet" class="fn-dropdown__item" role="menuitem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M16 14h2"/></svg>
-            Wallet Connect
-          </a>
-        </li>
-        <li role="none">
-          <a href="/leaderboard" class="fn-dropdown__item" role="menuitem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-            Leaderboard
-          </a>
-        </li>
+        <li role="none"><a href="/profile" class="fn-dropdown__item" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> User Profile</a></li>
+        <li role="none"><a href="/wallet" class="fn-dropdown__item" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M16 14h2"/></svg> Wallet Connect</a></li>
+        <li role="none"><a href="/leaderboard" class="fn-dropdown__item" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> Leaderboard</a></li>
         <div class="fn-dropdown__sep"></div>
-        <li role="none">
-          <a href="/settings" class="fn-dropdown__item" role="menuitem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            Settings
-          </a>
-        </li>
-        <li role="none">
-          <a href="/logout" class="fn-dropdown__item fn-dropdown__item--logout" role="menuitem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Log Out
-          </a>
-        </li>
+        <li role="none"><a href="/settings" class="fn-dropdown__item" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</a></li>
+        <li role="none"><a href="/logout" class="fn-dropdown__item fn-dropdown__item--logout" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Log Out</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- Spacer so page content sits below the fixed nav -->
   <div class="fn-nav-spacer"></div>
 
-  <!-- Main Content -->
   <main class="fn-dashboard">
 
-    <!-- ============================== INSERTION 1: Hero Intro ============================== -->
+    <!-- ============================== Hero Intro ============================== -->
     <section class="fn-hero" aria-label="Welcome">
       <h1 class="fn-hero__heading">Cozy &amp; Chaotic Indie Games</h1>
       <p class="fn-hero__subtext">Play instantly in your browser. No installs, just nuts. Discover a massive library of multiplayer, racing, and tycoon games.</p>
     </section>
 
-    <!-- ============================== Popular This Week Carousel ============================== -->
+    <!-- ============================== Carousel 1: Popular this week ============================== -->
     <section class="fn-carousel-section" aria-label="Popular this week">
-
       <h2 class="fn-carousel-section__heading">Popular this week</h2>
-
       <div class="fn-carousel">
-
-        <!-- Left Arrow -->
         <button class="fn-carousel__arrow fn-carousel__arrow--left" aria-label="Scroll left" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-
-        <!-- Scroll Track -->
-        <div class="fn-carousel__track" role="list">
-
-          <!-- Card 1: Fuzzy Kart -->
+        <div class="fn-carousel__track" role="list" style="display: flex; overflow-x: auto; gap: 16px; scroll-snap-type: x mandatory; padding-bottom: 16px;">
           <a href="/game/fuzzy-kart" class="fn-card" role="listitem">
-            <div class="fn-card__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Kart" class="fn-card__thumb-img">
-            </div>
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Kart" alt="Fuzzy Kart" class="fn-card__thumb-img"></div>
             <div class="fn-card__title">Fuzzy Kart</div>
           </a>
-
-          <!-- Card 2: Nut Royale -->
           <a href="/game/nut-royale" class="fn-card" role="listitem">
-            <div class="fn-card__thumb">
-              <img src="placeholder.jpg" alt="Nut Royale" class="fn-card__thumb-img">
-            </div>
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Nut+Royale" alt="Nut Royale" class="fn-card__thumb-img"></div>
             <div class="fn-card__title">Nut Royale</div>
           </a>
-
-          <!-- Card 3: Squirrel Tycoon -->
           <a href="/game/squirrel-tycoon" class="fn-card" role="listitem">
-            <div class="fn-card__thumb">
-              <img src="placeholder.jpg" alt="Squirrel Tycoon" class="fn-card__thumb-img">
-            </div>
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Squirrel+Tycoon" alt="Squirrel Tycoon" class="fn-card__thumb-img"></div>
             <div class="fn-card__title">Squirrel Tycoon</div>
           </a>
-
-          <!-- Card 4: Dungeon Nuts -->
           <a href="/game/dungeon-nuts" class="fn-card" role="listitem">
-            <div class="fn-card__thumb">
-              <img src="placeholder.jpg" alt="Dungeon Nuts" class="fn-card__thumb-img">
-            </div>
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Dungeon+Nuts" alt="Dungeon Nuts" class="fn-card__thumb-img"></div>
             <div class="fn-card__title">Dungeon Nuts</div>
           </a>
-
-          <!-- Card 5: Fuzzy Chess -->
           <a href="/game/fuzzy-chess" class="fn-card" role="listitem">
-            <div class="fn-card__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Chess" class="fn-card__thumb-img">
-            </div>
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Chess" alt="Fuzzy Chess" class="fn-card__thumb-img"></div>
             <div class="fn-card__title">Fuzzy Chess</div>
           </a>
-
-          <!-- Card 6: Acorn Builder -->
           <a href="/game/acorn-builder" class="fn-card" role="listitem">
-            <div class="fn-card__thumb">
-              <img src="placeholder.jpg" alt="Acorn Builder" class="fn-card__thumb-img">
-            </div>
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Acorn+Builder" alt="Acorn Builder" class="fn-card__thumb-img"></div>
             <div class="fn-card__title">Acorn Builder</div>
           </a>
-
         </div>
-
-        <!-- Right Arrow -->
         <button class="fn-carousel__arrow fn-carousel__arrow--right" aria-label="Scroll right" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-
       </div>
     </section>
 
-    <!-- ============================== INSERTION 2: Top Rated List ============================== -->
+    <!-- ============================== Carousel 2: New & Trending ============================== -->
+    <section class="fn-carousel-section" aria-label="New and Trending">
+      <h2 class="fn-carousel-section__heading">New &amp; Trending</h2>
+      <div class="fn-carousel">
+        <button class="fn-carousel__arrow fn-carousel__arrow--left" aria-label="Scroll left" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="fn-carousel__track" role="list" style="display: flex; overflow-x: auto; gap: 16px; scroll-snap-type: x mandatory; padding-bottom: 16px;">
+          <a href="/game/nut-defense" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/c977e8/ffffff/png?text=Nut+Defense" alt="Nut Defense" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Nut Defense</div>
+          </a>
+          <a href="/game/fuzzy-soccer" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/c977e8/ffffff/png?text=Fuzzy+Soccer" alt="Fuzzy Soccer" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Fuzzy Soccer</div>
+          </a>
+          <a href="/game/pixel-nuts" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/c977e8/ffffff/png?text=Pixel+Nuts" alt="Pixel Nuts" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Pixel Nuts</div>
+          </a>
+          <a href="/game/sky-nuts" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/c977e8/ffffff/png?text=Sky+Nuts" alt="Sky Nuts" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Sky Nuts</div>
+          </a>
+          <a href="/game/fuzzy-farm" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/c977e8/ffffff/png?text=Fuzzy+Farm" alt="Fuzzy Farm" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Fuzzy Farm</div>
+          </a>
+          <a href="/game/fuzzy-poker" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/c977e8/ffffff/png?text=Fuzzy+Poker" alt="Fuzzy Poker" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Fuzzy Poker</div>
+          </a>
+        </div>
+        <button class="fn-carousel__arrow fn-carousel__arrow--right" aria-label="Scroll right" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================== Carousel 3: FuzzyNuts Exclusives ============================== -->
+    <section class="fn-carousel-section" aria-label="FuzzyNuts Exclusives">
+      <h2 class="fn-carousel-section__heading">FuzzyNuts Exclusives</h2>
+      <div class="fn-carousel">
+        <button class="fn-carousel__arrow fn-carousel__arrow--left" aria-label="Scroll left" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="fn-carousel__track" role="list" style="display: flex; overflow-x: auto; gap: 16px; scroll-snap-type: x mandatory; padding-bottom: 16px;">
+          <a href="/game/dungeon-nuts" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/3cf7dc/002b50/png?text=Dungeon+Nuts" alt="Dungeon Nuts" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Dungeon Nuts</div>
+          </a>
+          <a href="/game/squirrel-tycoon" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/3cf7dc/002b50/png?text=Squirrel+Tycoon" alt="Squirrel Tycoon" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Squirrel Tycoon</div>
+          </a>
+          <a href="/game/acorn-builder" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/3cf7dc/002b50/png?text=Acorn+Builder" alt="Acorn Builder" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Acorn Builder</div>
+          </a>
+          <a href="/game/fuzzy-kart" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/3cf7dc/002b50/png?text=Fuzzy+Kart" alt="Fuzzy Kart" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Fuzzy Kart</div>
+          </a>
+          <a href="/game/nut-royale" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/3cf7dc/002b50/png?text=Nut+Royale" alt="Nut Royale" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Nut Royale</div>
+          </a>
+          <a href="/game/fuzzy-chess" class="fn-card" role="listitem">
+            <div class="fn-card__thumb"><img src="https://placehold.co/400x225/3cf7dc/002b50/png?text=Fuzzy+Chess" alt="Fuzzy Chess" class="fn-card__thumb-img"></div>
+            <div class="fn-card__title">Fuzzy Chess</div>
+          </a>
+        </div>
+        <button class="fn-carousel__arrow fn-carousel__arrow--right" aria-label="Scroll right" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================== Trending List ============================== -->
     <section class="fn-top-list" aria-label="Trending in the Forest">
-
       <div class="fn-top-list__inner">
-
         <h2 class="fn-top-list__heading">Trending in the Forest</h2>
 
-        <!-- 1. Nut Royale -->
         <a href="/game/nut-royale" class="fn-top-item">
           <span class="fn-top-item__rank">1</span>
-          <div class="fn-top-item__thumb">
-            <img src="placeholder.jpg" alt="Nut Royale" class="fn-top-item__thumb-img">
-          </div>
-          <div class="fn-top-item__info">
-            <h3 class="fn-top-item__title">Nut Royale</h3>
-            <p class="fn-top-item__genre">Battle Royale</p>
-          </div>
+          <div class="fn-top-item__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Nut+Royale" alt="Nut Royale" class="fn-top-item__thumb-img"></div>
+          <div class="fn-top-item__info"><h3 class="fn-top-item__title">Nut Royale</h3><p class="fn-top-item__genre">Battle Royale</p></div>
           <span class="fn-top-item__badge">Coming Soon</span>
         </a>
 
-        <!-- 2. Fuzzy Kart -->
         <a href="/game/fuzzy-kart" class="fn-top-item">
           <span class="fn-top-item__rank">2</span>
-          <div class="fn-top-item__thumb">
-            <img src="placeholder.jpg" alt="Fuzzy Kart" class="fn-top-item__thumb-img">
-          </div>
-          <div class="fn-top-item__info">
-            <h3 class="fn-top-item__title">Fuzzy Kart</h3>
-            <p class="fn-top-item__genre">Racing</p>
-          </div>
+          <div class="fn-top-item__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Kart" alt="Fuzzy Kart" class="fn-top-item__thumb-img"></div>
+          <div class="fn-top-item__info"><h3 class="fn-top-item__title">Fuzzy Kart</h3><p class="fn-top-item__genre">Racing</p></div>
           <span class="fn-top-item__badge">Coming Soon</span>
         </a>
 
-        <!-- 3. Squirrel Tycoon -->
         <a href="/game/squirrel-tycoon" class="fn-top-item">
           <span class="fn-top-item__rank">3</span>
-          <div class="fn-top-item__thumb">
-            <img src="placeholder.jpg" alt="Squirrel Tycoon" class="fn-top-item__thumb-img">
-          </div>
-          <div class="fn-top-item__info">
-            <h3 class="fn-top-item__title">Squirrel Tycoon</h3>
-            <p class="fn-top-item__genre">Sim / Tycoon</p>
-          </div>
+          <div class="fn-top-item__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Squirrel+Tycoon" alt="Squirrel Tycoon" class="fn-top-item__thumb-img"></div>
+          <div class="fn-top-item__info"><h3 class="fn-top-item__title">Squirrel Tycoon</h3><p class="fn-top-item__genre">Sim / Tycoon</p></div>
           <span class="fn-top-item__badge">Coming Soon</span>
         </a>
 
-        <!-- 4. Dungeon Nuts -->
         <a href="/game/dungeon-nuts" class="fn-top-item">
           <span class="fn-top-item__rank">4</span>
-          <div class="fn-top-item__thumb">
-            <img src="placeholder.jpg" alt="Dungeon Nuts" class="fn-top-item__thumb-img">
-          </div>
-          <div class="fn-top-item__info">
-            <h3 class="fn-top-item__title">Dungeon Nuts</h3>
-            <p class="fn-top-item__genre">Roguelike</p>
-          </div>
+          <div class="fn-top-item__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Dungeon+Nuts" alt="Dungeon Nuts" class="fn-top-item__thumb-img"></div>
+          <div class="fn-top-item__info"><h3 class="fn-top-item__title">Dungeon Nuts</h3><p class="fn-top-item__genre">Roguelike</p></div>
           <span class="fn-top-item__badge">Coming Soon</span>
         </a>
 
-        <!-- 5. Fuzzy Chess -->
         <a href="/game/fuzzy-chess" class="fn-top-item">
           <span class="fn-top-item__rank">5</span>
-          <div class="fn-top-item__thumb">
-            <img src="placeholder.jpg" alt="Fuzzy Chess" class="fn-top-item__thumb-img">
-          </div>
-          <div class="fn-top-item__info">
-            <h3 class="fn-top-item__title">Fuzzy Chess</h3>
-            <p class="fn-top-item__genre">Board Game</p>
-          </div>
+          <div class="fn-top-item__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Chess" alt="Fuzzy Chess" class="fn-top-item__thumb-img"></div>
+          <div class="fn-top-item__info"><h3 class="fn-top-item__title">Fuzzy Chess</h3><p class="fn-top-item__genre">Board Game</p></div>
           <span class="fn-top-item__badge">Coming Soon</span>
         </a>
-
       </div>
     </section>
 
-    <!-- ============================== Browse by Category ============================== -->
+    <!-- ============================== Categories ============================== -->
     <section class="fn-categories" aria-label="Browse by category">
-
       <h2 class="fn-categories__heading">Browse by Category</h2>
-
-      <div class="fn-categories__grid" role="list">
+      <div class="fn-categories__grid" role="list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;">
         <a href="/category/racing" class="fn-cat" role="listitem">Racing</a>
         <a href="/category/battle-royale" class="fn-cat" role="listitem">Battle Royale</a>
         <a href="/category/sim-tycoon" class="fn-cat" role="listitem">Sim / Tycoon</a>
@@ -271,190 +229,93 @@
         <a href="/category/tower-defense" class="fn-cat" role="listitem">Tower Defense</a>
         <a href="/category/sports" class="fn-cat" role="listitem">Sports</a>
       </div>
-
     </section>
 
-    <!-- ============================== INSERTION 3: All Games Grid ============================== -->
+    <!-- ============================== All Games Grid ============================== -->
     <section class="fn-game-grid" aria-label="All games coming soon">
-
       <div class="fn-game-grid__inner">
-
         <h2 class="fn-game-grid__heading">All Games Coming Soon</h2>
+        <div class="fn-game-grid__grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
 
-        <div class="fn-game-grid__grid">
-
-          <!-- 1. Fuzzy Kart -->
           <a href="/game/fuzzy-kart" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Kart" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Fuzzy Kart</h3>
-              <p class="fn-game-grid__genre">Racing</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Kart" alt="Fuzzy Kart" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Fuzzy Kart</h3><p class="fn-game-grid__genre">Racing</p></div>
           </a>
 
-          <!-- 2. Nut Royale -->
           <a href="/game/nut-royale" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Nut Royale" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Nut Royale</h3>
-              <p class="fn-game-grid__genre">Battle Royale</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Nut+Royale" alt="Nut Royale" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Nut Royale</h3><p class="fn-game-grid__genre">Battle Royale</p></div>
           </a>
 
-          <!-- 3. Squirrel Tycoon -->
           <a href="/game/squirrel-tycoon" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Squirrel Tycoon" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Squirrel Tycoon</h3>
-              <p class="fn-game-grid__genre">Sim / Tycoon</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Squirrel+Tycoon" alt="Squirrel Tycoon" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Squirrel Tycoon</h3><p class="fn-game-grid__genre">Sim / Tycoon</p></div>
           </a>
 
-          <!-- 4. Dungeon Nuts -->
           <a href="/game/dungeon-nuts" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Dungeon Nuts" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Dungeon Nuts</h3>
-              <p class="fn-game-grid__genre">Roguelike</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Dungeon+Nuts" alt="Dungeon Nuts" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Dungeon Nuts</h3><p class="fn-game-grid__genre">Roguelike</p></div>
           </a>
 
-          <!-- 5. Fuzzy Chess -->
           <a href="/game/fuzzy-chess" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Chess" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Fuzzy Chess</h3>
-              <p class="fn-game-grid__genre">Board Game</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Chess" alt="Fuzzy Chess" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Fuzzy Chess</h3><p class="fn-game-grid__genre">Board Game</p></div>
           </a>
 
-          <!-- 6. Acorn Builder -->
           <a href="/game/acorn-builder" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Acorn Builder" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Acorn Builder</h3>
-              <p class="fn-game-grid__genre">Puzzle</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Acorn+Builder" alt="Acorn Builder" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Acorn Builder</h3><p class="fn-game-grid__genre">Puzzle</p></div>
           </a>
 
-          <!-- 7. Nut Defense -->
           <a href="/game/nut-defense" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Nut Defense" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Nut Defense</h3>
-              <p class="fn-game-grid__genre">Tower Defense</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Nut+Defense" alt="Nut Defense" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Nut Defense</h3><p class="fn-game-grid__genre">Tower Defense</p></div>
           </a>
 
-          <!-- 8. Fuzzy Soccer -->
           <a href="/game/fuzzy-soccer" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Soccer" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Fuzzy Soccer</h3>
-              <p class="fn-game-grid__genre">Sports</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Soccer" alt="Fuzzy Soccer" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Fuzzy Soccer</h3><p class="fn-game-grid__genre">Sports</p></div>
           </a>
 
-          <!-- 9. Pixel Nuts -->
           <a href="/game/pixel-nuts" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Pixel Nuts" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Pixel Nuts</h3>
-              <p class="fn-game-grid__genre">Roguelike</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Pixel+Nuts" alt="Pixel Nuts" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Pixel Nuts</h3><p class="fn-game-grid__genre">Roguelike</p></div>
           </a>
 
-          <!-- 10. Fuzzy Poker -->
           <a href="/game/fuzzy-poker" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Poker" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Fuzzy Poker</h3>
-              <p class="fn-game-grid__genre">Board Game</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Poker" alt="Fuzzy Poker" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Fuzzy Poker</h3><p class="fn-game-grid__genre">Board Game</p></div>
           </a>
 
-          <!-- 11. Sky Nuts -->
           <a href="/game/sky-nuts" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Sky Nuts" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Sky Nuts</h3>
-              <p class="fn-game-grid__genre">Racing</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Sky+Nuts" alt="Sky Nuts" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Sky Nuts</h3><p class="fn-game-grid__genre">Racing</p></div>
           </a>
 
-          <!-- 12. Fuzzy Farm -->
           <a href="/game/fuzzy-farm" class="fn-game-grid__card">
-            <div class="fn-game-grid__thumb">
-              <img src="placeholder.jpg" alt="Fuzzy Farm" class="fn-game-grid__thumb-img">
-              <span class="fn-game-grid__badge">SOON</span>
-            </div>
-            <div class="fn-game-grid__info">
-              <h3 class="fn-game-grid__title">Fuzzy Farm</h3>
-              <p class="fn-game-grid__genre">Sim / Tycoon</p>
-            </div>
+            <div class="fn-game-grid__thumb"><img src="https://placehold.co/400x225/009cff/ffffff/png?text=Fuzzy+Farm" alt="Fuzzy Farm" class="fn-game-grid__thumb-img"><span class="fn-game-grid__badge">SOON</span></div>
+            <div class="fn-game-grid__info"><h3 class="fn-game-grid__title">Fuzzy Farm</h3><p class="fn-game-grid__genre">Sim / Tycoon</p></div>
           </a>
 
         </div>
-
       </div>
     </section>
 
     <!-- ============================== SEO Section ============================== -->
     <section class="fn-seo" aria-label="About FuzzyNuts">
-
       <div class="fn-seo__grid">
-
-        <!-- Column 1: Play with friends -->
         <div class="fn-seo__col">
           <h2 class="fn-seo__heading">Play with friends</h2>
           <p class="fn-seo__text">Grab a friend and play on the same keyboard or set up a private room to play online from anywhere. Compete against players in Nut Royale, or pass the keyboard for a match of Fuzzy Soccer. No waiting, no matchmaking, just instant multiplayer chaos.</p>
         </div>
-
-        <!-- Column 2: Challenge yourself -->
         <div class="fn-seo__col">
           <h2 class="fn-seo__heading">Challenge yourself</h2>
           <p class="fn-seo__text">Do you have what it takes to take on the most challenging games on FuzzyNuts? Test your driving skills in Fuzzy Kart, survive the permadeath dungeons of Dungeon Nuts, or see how far you can run in Sky Nuts. Every run is about staying in control when things get messy.</p>
         </div>
-
-        <!-- Column 3: Games to relax -->
         <div class="fn-seo__col">
           <h2 class="fn-seo__heading">Games to relax</h2>
           <p class="fn-seo__text">Enjoy playing games where you can take your time and unwind. Let your creativity flourish in Squirrel Tycoon, manage your crops in Fuzzy Farm, or solve physics puzzles in Acorn Builder. Zero stress, no timers, just cozy gameplay at your own pace.</p>
         </div>
-
       </div>
     </section>
 
