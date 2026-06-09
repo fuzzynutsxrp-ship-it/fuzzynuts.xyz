@@ -1,0 +1,156 @@
+/* ============================================================
+   TOP LIST — "Trending in the Forest" numbered vertical list
+   ============================================================ */
+.fn-top-list {
+  padding: 0 20px;
+}
+
+.fn-top-list__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fn-top-list__heading {
+  font-family: var(--fn-font);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fn-text);
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+}
+
+/* Single row item */
+.fn-top-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--fn-surface);
+  border-radius: var(--fn-radius-s);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+    box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.fn-top-item:hover {
+  background: var(--fn-surface-hover);
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(93, 107, 132, 0.12);
+}
+
+.fn-top-item:active {
+  transform: scale(0.99);
+}
+
+/* Rank number */
+.fn-top-item__rank {
+  font-family: var(--fn-font);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--fn-text);
+  width: 40px;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Thumbnail */
+.fn-top-item__thumb {
+  width: 120px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--fn-radius-s);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #e6ecf5;
+}
+
+.fn-top-item__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Text block */
+.fn-top-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fn-top-item__title {
+  font-family: var(--fn-font);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fn-text);
+  line-height: 1.3;
+  margin: 0 0 2px 0;
+}
+
+.fn-top-item__genre {
+  font-family: var(--fn-font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--fn-text-muted);
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* Coming Soon pill */
+.fn-top-item__badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--fn-surface-hover);
+  color: var(--fn-accent);
+  font-family: var(--fn-font);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--fn-radius-pill);
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fn-top-item__thumb {
+    width: 88px;
+  }
+
+  .fn-top-item__rank {
+    font-size: 22px;
+    width: 30px;
+  }
+
+  .fn-top-item {
+    gap: 12px;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fn-top-item__thumb {
+    width: 64px;
+  }
+
+  .fn-top-item__badge {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fn-top-item {
+    transition: background-color 0.01ms;
+  }
+
+  .fn-top-item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}

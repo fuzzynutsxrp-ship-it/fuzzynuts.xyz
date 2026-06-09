@@ -1,0 +1,42 @@
+/* ============================================================
+   HERO INTRO — H1 + subtitle above the carousel
+   ============================================================ */
+.fn-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.fn-hero__heading {
+  font-family: var(--fn-font);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--fn-text);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin: 0 0 12px 0;
+}
+
+.fn-hero__subtext {
+  font-family: var(--fn-font);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--fn-text-muted);
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .fn-hero__heading {
+    font-size: 28px;
+  }
+
+  .fn-hero__subtext {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* no animations here, pattern consistency */
+}
