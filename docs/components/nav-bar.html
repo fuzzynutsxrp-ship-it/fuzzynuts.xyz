@@ -1,0 +1,425 @@
+<!-- ============================================================
+     FUZZYNUTS — Sticky Top Nav Bar
+     Traced from Poki.com exact DOM + CSS mechanics
+     Tokens: --fn-surface, --fn-shadow-close, --fn-text, etc.
+     No frameworks. No invention. Pure CSS Variables.
+     ============================================================ -->
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS — mapped from Poki's :root variables
+     ============================================================ */
+  :root {
+    /* Surface */
+    --fn-surface: #ffffff;
+
+    /* Text */
+    --fn-text: #002b50;
+    --fn-text-secondary: #939db3;
+
+    /* Accent */
+    --fn-accent: #009cff;
+
+    /* Background */
+    --fn-bg: #f9fbff;
+
+    /* Shadows — Poki exact values */
+    --fn-shadow-close: 0px 3px 5px 3px rgba(93, 107, 132, 0.2);
+    --fn-shadow-mid: 0px 7px 10px 4px rgba(93, 107, 132, 0.3);
+    --fn-shadow-far: 0px 20px 24px 14px rgba(93, 107, 132, 0.24);
+
+    /* Spacing */
+    --fn-spacing-2xs: 4px;
+    --fn-spacing-xs: 8px;
+    --fn-spacing-s: 12px;
+    --fn-spacing-m: 16px;
+    --fn-spacing-l: 24px;
+
+    /* Radius */
+    --fn-radius-pill: 24px;
+    --fn-radius-lg: 16px;
+    --fn-radius-sm: 8px;
+
+    /* Font */
+    --fn-font: "Torus", "Proxima Nova", "Open Sans", "Gill Sans MT", Arial, sans-serif;
+  }
+
+  /* ============================================================
+     NAV — sticky top bar
+     ============================================================ */
+  .fn-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--fn-surface);
+    box-shadow: var(--fn-shadow-close);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--fn-spacing-m);
+    z-index: 10;
+    font-family: var(--fn-font);
+  }
+
+  /* ============================================================
+     LEFT — Logo
+     ============================================================ */
+  .fn-nav__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--fn-spacing-xs);
+    text-decoration: none;
+    flex-shrink: 0;
+    margin-right: var(--fn-spacing-l);
+  }
+
+  .fn-nav__logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--fn-radius-sm);
+    background: var(--fn-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fn-nav__logo-mark svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .fn-nav__logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fn-text);
+    letter-spacing: -0.3px;
+  }
+
+  /* ============================================================
+     CENTER — Search Bar (pill)
+     ============================================================ */
+  .fn-nav__center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .fn-search {
+    position: relative;
+    width: 100%;
+    height: 42px;
+  }
+
+  .fn-search__icon {
+    position: absolute;
+    left: var(--fn-spacing-s);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--fn-text-secondary);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fn-search__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .fn-search__input {
+    width: 100%;
+    height: 100%;
+    background: var(--fn-bg);
+    border: 2px solid transparent;
+    border-radius: var(--fn-radius-pill);
+    padding: 0 var(--fn-spacing-l) 0 calc(var(--fn-spacing-s) + 24px);
+    font-family: var(--fn-font);
+    font-size: 15px;
+    color: var(--fn-text);
+    outline: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .fn-search__input::placeholder {
+    color: var(--fn-text-secondary);
+    font-weight: 400;
+  }
+
+  .fn-search__input:hover {
+    background: #eef2f9;
+  }
+
+  .fn-search__input:focus {
+    background: var(--fn-surface);
+    border-color: var(--fn-accent);
+    box-shadow: 0 0 0 3px rgba(0, 156, 255, 0.15);
+    cursor: text;
+  }
+
+  /* ============================================================
+     RIGHT — Avatar + Dropdown
+     ============================================================ */
+  .fn-nav__right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: var(--fn-spacing-l);
+    position: relative;
+  }
+
+  .fn-avatar-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--fn-bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .fn-avatar-btn:hover {
+    background: #e6ecf5;
+  }
+
+  .fn-avatar-btn:focus-visible {
+    outline: 2px solid var(--fn-accent);
+    outline-offset: 2px;
+  }
+
+  .fn-avatar-btn svg {
+    width: 22px;
+    height: 22px;
+    color: var(--fn-text);
+  }
+
+  /* ============================================================
+     DROPDOWN — Profile menu
+     Poki mechanics: surface bg, subtle shadow, 8px radius, 8px padding
+     Visibility toggled via .fn-avatar-btn:focus + .fn-dropdown
+     ============================================================ */
+  .fn-dropdown {
+    position: absolute;
+    top: calc(100% + var(--fn-spacing-xs));
+    right: 0;
+    width: 220px;
+    background: var(--fn-surface);
+    border-radius: var(--fn-radius-sm);
+    box-shadow: var(--fn-shadow-far);
+    padding: var(--fn-spacing-xs);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    z-index: 1;
+    list-style: none;
+    margin: 0;
+  }
+
+  /* Toggle: when avatar button receives focus, show dropdown */
+  .fn-avatar-btn:focus + .fn-dropdown,
+  .fn-dropdown:focus-within {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Dropdown items */
+  .fn-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: var(--fn-spacing-s);
+    padding: var(--fn-spacing-xs) var(--fn-spacing-s);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--fn-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+    line-height: 1;
+  }
+
+  .fn-dropdown__item:hover {
+    background: var(--fn-bg);
+  }
+
+  .fn-dropdown__item:active {
+    background: #e6ecf5;
+  }
+
+  .fn-dropdown__item svg {
+    width: 18px;
+    height: 18px;
+    color: var(--fn-text-secondary);
+    flex-shrink: 0;
+  }
+
+  .fn-dropdown__item:hover svg {
+    color: var(--fn-text);
+  }
+
+  /* Separator line between groups */
+  .fn-dropdown__sep {
+    height: 1px;
+    background: #e6ecf5;
+    margin: var(--fn-spacing-2xs) 0;
+  }
+
+  /* Log Out — subtle danger affordance */
+  .fn-dropdown__item--logout {
+    color: #c94040;
+  }
+
+  .fn-dropdown__item--logout svg {
+    color: #c94040;
+  }
+
+  .fn-dropdown__item--logout:hover {
+    background: #fff0f0;
+  }
+
+  .fn-dropdown__item--logout:hover svg {
+    color: #c94040;
+  }
+
+  /* ============================================================
+     CONTENT SPACER — push page below fixed nav
+     ============================================================ */
+  .fn-nav-spacer {
+    height: 64px;
+  }
+</style>
+
+<!-- ============================================================
+     NAV COMPONENT
+     ============================================================ -->
+<nav class="fn-nav" role="navigation" aria-label="Main navigation">
+
+  <!-- LEFT: Logo -->
+  <a href="/" class="fn-nav__logo" aria-label="FuzzyNuts Home">
+    <span class="fn-nav__logo-mark">
+      <!-- FuzzyNuts mark — replace with actual logo SVG -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+        <line x1="9" y1="9" x2="9.01" y2="9"/>
+        <line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+    </span>
+    <span class="fn-nav__logo-text">FuzzyNuts</span>
+  </a>
+
+  <!-- CENTER: Search -->
+  <div class="fn-nav__center">
+    <div class="fn-search">
+      <span class="fn-search__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
+      <input
+        type="search"
+        class="fn-search__input"
+        placeholder="Search for games..."
+        aria-label="Search for games"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+
+  <!-- RIGHT: Avatar + Dropdown -->
+  <div class="fn-nav__right">
+    <button class="fn-avatar-btn" aria-label="Profile menu" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </button>
+
+    <!-- Dropdown menu — toggled by .fn-avatar-btn:focus -->
+    <ul class="fn-dropdown" role="menu" aria-label="Profile menu">
+
+      <!-- 1. User Profile -->
+      <li role="none">
+        <a href="/profile" class="fn-dropdown__item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          User Profile
+        </a>
+      </li>
+
+      <!-- 2. Wallet Connect -->
+      <li role="none">
+        <a href="/wallet" class="fn-dropdown__item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="14" rx="2"/>
+            <path d="M2 10h20"/>
+            <path d="M16 14h2"/>
+          </svg>
+          Wallet Connect
+        </a>
+      </li>
+
+      <!-- 3. Leaderboard -->
+      <li role="none">
+        <a href="/leaderboard" class="fn-dropdown__item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+          Leaderboard
+        </a>
+      </li>
+
+      <div class="fn-dropdown__sep"></div>
+
+      <!-- 4. Settings -->
+      <li role="none">
+        <a href="/settings" class="fn-dropdown__item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Settings
+        </a>
+      </li>
+
+      <!-- 5. Log Out -->
+      <li role="none">
+        <a href="/logout" class="fn-dropdown__item fn-dropdown__item--logout" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Log Out
+        </a>
+      </li>
+
+    </ul>
+  </div>
+
+</nav>
+
+<!-- Spacer so page content sits below the fixed nav -->
+<div class="fn-nav-spacer"></div>

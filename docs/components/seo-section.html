@@ -1,0 +1,136 @@
+<!-- ============================================================
+     FUZZYNUTS — "What is FuzzyNuts?" SEO Text Section
+     Traced from Poki.com article/SEO section mechanics
+     Tokens: --fn-* (inherited from nav-bar)
+     ============================================================ -->
+
+<style>
+  /* ============================================================
+     SEO SECTION TOKENS
+     Poki h2/h3: 16px / 700 / Proxima Nova / blue-1 / lh 24px
+     Poki p:     16px / 400 / Proxima Nova / blue-1 / lh 24px
+     Poki article: bg white, padding 24px, margin 24px 0, shadow
+     User spec: lighter grey for p, 3-col grid, 1200px max, top border
+     ============================================================ */
+  :root {
+    --fn-seo-max: 1200px;
+    --fn-seo-col-max: 800px;
+    --fn-seo-heading-color: #3b4456;   /* dark grey — softer than blue-1 */
+    --fn-seo-text-color: #68748a;      /* lighter grey for body text */
+    --fn-seo-border: #e6ecf5;          /* grey-7 — subtle separator */
+  }
+
+  /* ============================================================
+     SECTION CONTAINER
+     Max-width 1200px, centered, top border separator
+     ============================================================ */
+  .fn-seo {
+    max-width: var(--fn-seo-max);
+    margin: 0 auto;
+    padding: 48px 24px 0;
+    border-top: 1px solid var(--fn-seo-border);
+  }
+
+  /* ============================================================
+     3-COLUMN GRID
+     Poki article: display grid (adapted to 3-col)
+     ============================================================ */
+  .fn-seo__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  /* ============================================================
+     COLUMN — each text block
+     Poki: block display, no max-width on single col
+     User spec: max-width 800px per column for readability
+     ============================================================ */
+  .fn-seo__col {
+    max-width: var(--fn-seo-col-max);
+  }
+
+  /* ============================================================
+     H2 — column headings
+     Poki: 16px / 700 / Proxima Nova / blue-1 / lh 24px / mb 16px
+     User spec: dark grey
+     ============================================================ */
+  .fn-seo__heading {
+    font-family: var(--fn-font);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--fn-seo-heading-color);
+    line-height: 24px;
+    margin: 0 0 16px 0;
+    padding: 0;
+  }
+
+  /* ============================================================
+     PARAGRAPH — body text
+     Poki: 16px / 400 / Proxima Nova / blue-1 / lh 24px / mb 16px
+     User spec: lighter grey, line-height 1.6
+     ============================================================ */
+  .fn-seo__text {
+    font-family: var(--fn-font);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--fn-seo-text-color);
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+    padding: 0;
+  }
+
+  .fn-seo__text:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 900px) {
+    .fn-seo__grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .fn-seo {
+      padding: 36px 16px 0;
+    }
+  }
+
+  /* ============================================================
+     REDUCED MOTION — no animations to disable here,
+     but included for pattern consistency
+     ============================================================ */
+</style>
+
+<!-- ============================================================
+     SEO SECTION COMPONENT
+     ============================================================ -->
+<section class="fn-seo" aria-label="About FuzzyNuts">
+
+  <div class="fn-seo__grid">
+
+    <!-- Column 1: Play with friends -->
+    <div class="fn-seo__col">
+      <h2 class="fn-seo__heading">Play with friends</h2>
+      <p class="fn-seo__text">[SEO Text Placeholder]</p>
+    </div>
+
+    <!-- Column 2: Challenge yourself -->
+    <div class="fn-seo__col">
+      <h2 class="fn-seo__heading">Challenge yourself</h2>
+      <p class="fn-seo__text">[SEO Text Placeholder]</p>
+    </div>
+
+    <!-- Column 3: Games to relax -->
+    <div class="fn-seo__col">
+      <h2 class="fn-seo__heading">Games to relax</h2>
+      <p class="fn-seo__text">[SEO Text Placeholder]</p>
+    </div>
+
+  </div>
+
+</section>
