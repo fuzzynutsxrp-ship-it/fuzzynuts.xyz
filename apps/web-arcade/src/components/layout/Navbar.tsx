@@ -16,7 +16,7 @@ import { useWalletStore } from "@/store/wallet";
 import { useSession, signOut } from "next-auth/react";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { truncateAddress } from "@/lib/format";
-import Image from "next/image";
+import { PokiLogo } from "./PokiLogo";
 import Link from "next/link";
 
 export function Navbar() {
@@ -70,29 +70,8 @@ export function Navbar() {
         aria-label="Main navigation"
       >
         <div className="max-w-[1400px] mx-auto flex items-center justify-between h-14 md:h-16 px-4 md:px-6">
-          {/* Left: Logo + mascot */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 shrink-0 group"
-            aria-label="FuzzyNuts Home"
-          >
-            <Image
-              src="/images/branding/logo-nav.webp"
-              alt=""
-              width={36}
-              height={24}
-              className="rounded-md"
-              priority
-            />
-            <Image
-              src="/images/branding/wordmarks/text_logo.png"
-              alt="FuzzyNuts"
-              width={120}
-              height={24}
-              className="h-6 md:h-7 w-auto"
-              priority
-            />
-          </Link>
+          {/* Left: Poki-style logo badge */}
+          <PokiLogo />
 
           {/* Center: Search bar placeholder (future) */}
           <div className="hidden lg:flex flex-1 max-w-md mx-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LogOut,
@@ -8,7 +8,6 @@ import {
   User,
   Trophy,
   Menu,
-  X,
   LogIn,
   Search,
 } from "lucide-react";
@@ -16,7 +15,7 @@ import { useWalletStore } from "@/store/wallet";
 import { useSession, signOut } from "next-auth/react";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { truncateAddress } from "@/lib/format";
-import Image from "next/image";
+import { PokiLogo } from "./PokiLogo";
 import Link from "next/link";
 
 interface TopNavProps {
@@ -52,7 +51,7 @@ export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProp
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Left: hamburger + logo (compact) */}
+        {/* Left: hamburger + Poki-style logo badge */}
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={onMenuToggle}
@@ -61,24 +60,18 @@ export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProp
           >
             <Menu size={20} />
           </button>
-          <Link href="/" className="flex items-center gap-1.5 shrink-0 group" aria-label="FuzzyNuts Home">
-            <Image src="/images/branding/logo-nav.webp" alt="" width={28} height={20} className="rounded" priority />
-            <span className="hidden md:inline font-display text-sm font-black text-cream group-hover:text-brand-gold transition-colors">
-              FuzzyNuts
-            </span>
-          </Link>
+          <PokiLogo />
         </div>
 
-        {/* Center: search bar (prominent, 60% width) */}
-        <div className="flex-1 flex justify-center max-w-[60%] mx-auto">
-          <div className="relative w-full">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-cream-dim)]/40 pointer-events-none" />
+        {/* Center: Poki-style white pill search bar */}
+        <div className="flex-1 flex justify-center max-w-[55%] mx-auto">
+          <div className="poki-search relative w-full flex items-center px-4 py-2">
+            <Search size={16} className="search-icon mr-2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search games..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-cream placeholder-[var(--color-cream-dim)]/40 outline-none transition-all focus:bg-white/8 focus:border-brand-gold/30 focus:ring-1 focus:ring-brand-gold/20"
+              placeholder="What are you playing today?"
               aria-label="Search games"
             />
           </div>
@@ -86,7 +79,7 @@ export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProp
 
         {/* Right: auth */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Logged out → Sign in (icon-only on desktop, text on mobile) */}
+          {/* Logged out → Sign in */}
           {!session && !isConnected && (
             <motion.button
               onClick={() => setLoginModalOpen(true)}
