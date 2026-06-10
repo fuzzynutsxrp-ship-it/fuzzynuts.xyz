@@ -14,8 +14,8 @@ const API_URL = 'https://www.freetogame.com/api/games?platform=browser';
 const LIMIT = 40;
 
 const ROOT = path.resolve(__dirname, '..');
-const IMG_DIR = path.join(ROOT, 'apps', 'web-arcade', 'public', 'preview', 'images', 'thumbnails');
-const DATA_DIR = path.join(ROOT, 'apps', 'web-arcade', 'public', 'preview', 'data');
+const IMG_DIR = path.join(ROOT, 'apps', 'web-arcade', 'public', 'images', 'thumbnails');
+const DATA_DIR = path.join(ROOT, 'apps', 'web-arcade', 'public', 'data');
 const MANIFEST = path.join(DATA_DIR, 'games.json');
 
 async function ensureDir(dir) {
@@ -60,7 +60,7 @@ async function main() {
   for (const game of subset) {
     const filename = `game-${game.id}.jpg`;
     const destPath = path.join(IMG_DIR, filename);
-    const relThumb = `/preview/images/thumbnails/${filename}`;
+    const relThumb = `/images/thumbnails/${filename}`;
 
     process.stdout.write(`[${game.id}] ${game.title}... `);
     const ok = await downloadImage(game.thumbnail, destPath);
