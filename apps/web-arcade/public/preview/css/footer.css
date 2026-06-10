@@ -1,0 +1,195 @@
+/* Z-index stack: Cookie Banner (100) > Nav (50) > Drawer (40) > Sidebar (20) */
+
+/* Tokens inherited from global.css */
+
+/* ============================================================
+   FOOTER — dark multi-column footer
+   ============================================================ */
+.fn-footer {
+  background: var(--fn-text);
+  color: rgba(255, 255, 255, 0.8);
+  /* Break out of .fn-container padding + .fn-dashboard padding */
+  margin: 0 calc(-1 * var(--fn-spacing-l));
+  padding: var(--fn-spacing-2xl) var(--fn-spacing-xl) var(--fn-spacing-m);
+  /* Extend left to fill the sidebar rail gap */
+  margin-left: calc(-1 * var(--fn-spacing-l) - 72px);
+  padding-left: calc(var(--fn-spacing-xl) + 72px);
+}
+
+.fn-footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--fn-spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   COLUMN — Brand (wider)
+   ============================================================ */
+.fn-footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fn-spacing-s);
+}
+
+.fn-footer__logo {
+  font-family: var(--fn-font);
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  text-decoration: none;
+}
+
+.fn-footer__tagline {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 280px;
+}
+
+.fn-footer__socials {
+  display: flex;
+  gap: var(--fn-spacing-xs);
+  margin-top: var(--fn-spacing-xs);
+}
+
+.fn-footer__social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--fn-radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.fn-footer__social:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.fn-footer__social svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================
+   COLUMN — Link lists
+   ============================================================ */
+.fn-footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fn-spacing-xs);
+}
+
+.fn-footer__heading {
+  font-family: var(--fn-font);
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--fn-spacing-xs);
+}
+
+.fn-footer__link {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.12s ease;
+  line-height: 1.4;
+}
+
+.fn-footer__link:hover {
+  color: #ffffff;
+}
+
+/* ============================================================
+   LANGUAGE SELECT
+   ============================================================ */
+.fn-footer__lang-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  max-width: 160px;
+  padding: var(--fn-spacing-xs) var(--fn-spacing-s);
+  padding-right: 32px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--fn-radius-sm);
+  font-family: var(--fn-font);
+  font-size: 14px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.15s ease;
+}
+
+.fn-footer__lang-select:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.fn-footer__lang-select:focus {
+  outline: 2px solid var(--fn-primary);
+  outline-offset: 2px;
+}
+
+.fn-footer__lang-select option {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+/* ============================================================
+   BOTTOM BAR — copyright
+   ============================================================ */
+.fn-footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: var(--fn-spacing-xl);
+  padding-top: var(--fn-spacing-m);
+  text-align: center;
+}
+
+.fn-footer__copyright {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   RESPONSIVE — stack on mobile
+   ============================================================ */
+@media (max-width: 768px) {
+  .fn-footer {
+    padding: var(--fn-spacing-xl) var(--fn-spacing-m) var(--fn-spacing-m);
+  }
+
+  .fn-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--fn-spacing-xl) var(--fn-spacing-m);
+  }
+
+  .fn-footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .fn-footer__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fn-footer__social,
+  .fn-footer__link,
+  .fn-footer__lang-select {
+    transition: none;
+  }
+}

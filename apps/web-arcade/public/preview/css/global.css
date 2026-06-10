@@ -1,18 +1,87 @@
+/* ============================================================
+   DESIGN TOKENS — single source of truth
+   ============================================================ */
 :root {
-  --fn-bg: #ffffff;
-  --fn-surface: #f9fbff;
-  --fn-surface-hover: #f0f5fc;
-  --fn-text: #002b50;
-  --fn-text-muted: #68748a;
-  --fn-accent: #009cff;
-  --fn-danger: #c94040;
-  --fn-shadow-close: 0px 3px 5px 3px rgba(93,107,132,0.2);
-  --fn-shadow-far: 0px 20px 24px 14px rgba(93,107,132,0.24);
-  --fn-radius-s: 8px;
-  --fn-radius-m: 16px;
+  /* Background & Surface */
+  --fn-bg: #f8fafc;
+  --fn-surface: #ffffff;
+  --fn-surface-hover: #f1f5f9;
+
+  /* Text */
+  --fn-text: #0f172a;
+  --fn-text-secondary: #64748b;
+  --fn-text-muted: #94a3b8;
+
+  /* Accent */
+  --fn-primary: #6366f1;
+  --fn-primary-hover: #4f46e5;
+  --fn-secondary: #ec4899;
+  --fn-tertiary: #14b8a6;
+  --fn-accent: #6366f1;          /* legacy alias */
+  --fn-danger: #ef4444;
+
+  /* Shadows */
+  --fn-shadow-close: 0 1px 3px 0 rgba(15, 23, 42, 0.08),
+                     0 1px 2px -1px rgba(15, 23, 42, 0.08);
+  --fn-shadow-mid:   0 4px 6px -1px rgba(15, 23, 42, 0.1),
+                     0 2px 4px -2px rgba(15, 23, 42, 0.1);
+  --fn-shadow-far:   0 10px 15px -3px rgba(15, 23, 42, 0.1),
+                     0 4px 6px -4px rgba(15, 23, 42, 0.1);
+
+  /* Spacing (4px scale) */
+  --fn-spacing-2xs: 4px;
+  --fn-spacing-xs:  8px;
+  --fn-spacing-s:   12px;
+  --fn-spacing-m:   16px;
+  --fn-spacing-l:   24px;
+  --fn-spacing-xl:  32px;
+  --fn-spacing-2xl: 48px;
+
+  /* Radius */
+  --fn-radius-s:    4px;
+  --fn-radius-sm:   8px;
+  --fn-radius-m:    12px;
+  --fn-radius-lg:   16px;
   --fn-radius-pill: 100px;
-  --fn-font: "Torus", "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Typography */
+  --fn-font: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI",
+             Roboto, "Helvetica Neue", Arial, sans-serif;
 }
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--fn-font); background: var(--fn-bg); color: var(--fn-text); -webkit-font-smoothing: antialiased; }
-.fn-dashboard { max-width: 1400px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 48px; }
+
+body {
+  font-family: var(--fn-font);
+  background: var(--fn-bg);
+  color: var(--fn-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   LAYOUT — sidebar-aware container
+   ============================================================ */
+.fn-container {
+  padding-left: 72px;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .fn-container {
+    padding-left: 0;
+  }
+}
+
+.fn-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--fn-spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fn-spacing-2xl);
+}

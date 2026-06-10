@@ -1,0 +1,104 @@
+/* Tokens inherited from global.css */
+
+/* ============================================================
+   SIDEBAR RAIL — fixed left icon rail (desktop only)
+   ============================================================ */
+.fn-sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 72px;
+  height: calc(100vh - 64px);
+  background: var(--fn-surface);
+  border-right: 1px solid var(--fn-surface-hover);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--fn-spacing-s) 0;
+  gap: var(--fn-spacing-2xs);
+  overflow-y: auto;
+}
+
+/* Individual nav item */
+.fn-sidebar__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--fn-radius-sm);
+  text-decoration: none;
+  color: var(--fn-text-secondary);
+  background: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.fn-sidebar__item:hover,
+.fn-sidebar__item:focus-visible {
+  background: var(--fn-surface-hover);
+  color: var(--fn-primary);
+}
+
+.fn-sidebar__item:focus-visible {
+  outline: 2px solid var(--fn-primary);
+  outline-offset: 2px;
+}
+
+.fn-sidebar__item.is-active {
+  color: var(--fn-primary);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.fn-sidebar__item svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Tooltip on hover */
+.fn-sidebar__item::after {
+  content: attr(aria-label);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--fn-text);
+  color: #ffffff;
+  font-family: var(--fn-font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 25;
+}
+
+.fn-sidebar__item:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================================
+   MOBILE — hidden (drawer handles nav)
+   ============================================================ */
+@media (max-width: 768px) {
+  .fn-sidebar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fn-sidebar__item {
+    transition: none;
+  }
+
+  .fn-sidebar__item::after {
+    transition: none;
+  }
+}

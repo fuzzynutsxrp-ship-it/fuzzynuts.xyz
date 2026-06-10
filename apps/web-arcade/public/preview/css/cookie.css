@@ -1,0 +1,134 @@
+/* Z-index stack: Cookie Banner (100) > Nav (50) > Drawer (40) > Sidebar (20) */
+
+/* Tokens inherited from global.css */
+
+/* ============================================================
+   COOKIE CONSENT BANNER — fixed bottom bar
+   ============================================================ */
+.fn-cookie {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--fn-surface);
+  border-top: 1px solid var(--fn-surface-hover);
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.12);
+  padding: var(--fn-spacing-m) var(--fn-spacing-xl);
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+}
+
+.fn-cookie.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.fn-cookie__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fn-spacing-xl);
+}
+
+/* Text */
+.fn-cookie__text {
+  font-family: var(--fn-font);
+  font-size: 14px;
+  color: var(--fn-text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.fn-cookie__text a {
+  color: var(--fn-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fn-cookie__text a:hover {
+  color: var(--fn-primary-hover);
+}
+
+/* Buttons */
+.fn-cookie__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--fn-spacing-xs);
+  flex-shrink: 0;
+}
+
+.fn-cookie__btn {
+  font-family: var(--fn-font);
+  font-size: 14px;
+  font-weight: 700;
+  padding: var(--fn-spacing-xs) var(--fn-spacing-m);
+  border-radius: var(--fn-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  min-height: 40px;
+  line-height: 1;
+}
+
+/* Accept — solid primary */
+.fn-cookie__btn--accept {
+  background: var(--fn-primary);
+  color: #ffffff;
+  border: 2px solid var(--fn-primary);
+}
+
+.fn-cookie__btn--accept:hover {
+  background: var(--fn-primary-hover);
+  border-color: var(--fn-primary-hover);
+}
+
+/* Manage — ghost outline */
+.fn-cookie__btn--manage {
+  background: transparent;
+  color: var(--fn-text-secondary);
+  border: 2px solid var(--fn-surface-hover);
+}
+
+.fn-cookie__btn--manage:hover {
+  border-color: var(--fn-text-secondary);
+  color: var(--fn-text);
+}
+
+.fn-cookie__btn:focus-visible {
+  outline: 2px solid var(--fn-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   RESPONSIVE — stack on mobile
+   ============================================================ */
+@media (max-width: 640px) {
+  .fn-cookie {
+    padding: var(--fn-spacing-m);
+  }
+
+  .fn-cookie__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fn-spacing-s);
+  }
+
+  .fn-cookie__actions {
+    width: 100%;
+  }
+
+  .fn-cookie__btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fn-cookie {
+    transition: none;
+  }
+}

@@ -1,42 +1,157 @@
+/* Tokens inherited from global.css */
+
 /* ============================================================
-   HERO INTRO — H1 + subtitle above the carousel
+   HERO SPOTLIGHT — Nut Royale banner
    ============================================================ */
-.fn-hero {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 20px;
+.fn-hero-banner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--fn-spacing-l);
+  background: var(--fn-surface);
+  border-radius: var(--fn-radius-lg);
+  box-shadow: var(--fn-shadow-close);
+  overflow: hidden;
+  min-height: 320px;
 }
 
-.fn-hero__heading {
-  font-family: var(--fn-font);
-  font-size: 36px;
+/* --- Left: Text content --- */
+.fn-hero-banner__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--fn-spacing-m);
+  padding: var(--fn-spacing-2xl) var(--fn-spacing-xl);
+}
+
+.fn-hero-banner__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fn-spacing-2xs);
+  width: fit-content;
+  padding: var(--fn-spacing-2xs) var(--fn-spacing-s);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.12) 100%);
+  color: var(--fn-primary);
+  font-size: 12px;
   font-weight: 700;
-  color: var(--fn-text);
-  line-height: 1.2;
-  letter-spacing: -0.5px;
-  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-radius: var(--fn-radius-pill);
 }
 
-.fn-hero__subtext {
+.fn-hero-banner__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--fn-text);
+  letter-spacing: -0.5px;
+}
+
+.fn-hero-banner__subtitle {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--fn-text-secondary);
+  max-width: 420px;
+}
+
+.fn-hero-banner__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fn-spacing-xs);
+  width: fit-content;
+  padding: var(--fn-spacing-s) var(--fn-spacing-xl);
+  background: var(--fn-primary);
+  color: #ffffff;
   font-family: var(--fn-font);
   font-size: 16px;
-  font-weight: 400;
-  color: var(--fn-text-muted);
-  line-height: 1.6;
-  max-width: 640px;
-  margin: 0;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--fn-radius-pill);
+  cursor: pointer;
+  transition: background-color 0.15s ease,
+              transform 0.15s ease,
+              box-shadow 0.15s ease;
+  min-height: 48px;
 }
 
+.fn-hero-banner__cta:hover {
+  background: var(--fn-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+}
+
+.fn-hero-banner__cta:active {
+  transform: translateY(0);
+}
+
+.fn-hero-banner__cta svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Right: Visual --- */
+.fn-hero-banner__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+}
+
+.fn-hero-banner__visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+}
+
+.fn-hero-banner__emoji {
+  font-size: clamp(5rem, 10vw, 8rem);
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  animation: hero-bounce 3s ease-in-out infinite;
+}
+
+@keyframes hero-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Decorative floating shapes inside visual */
+.fn-hero-banner__visual::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  bottom: -30px;
+  right: -30px;
+}
+
+/* ============================================================
+   MOBILE — stacked layout
+   ============================================================ */
 @media (max-width: 768px) {
-  .fn-hero__heading {
-    font-size: 28px;
+  .fn-hero-banner {
+    grid-template-columns: 1fr;
+    min-height: auto;
   }
 
-  .fn-hero__subtext {
-    font-size: 15px;
+  .fn-hero-banner__content {
+    padding: var(--fn-spacing-xl) var(--fn-spacing-m);
+    text-align: center;
+    align-items: center;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  /* no animations here, pattern consistency */
+  .fn-hero-banner__subtitle {
+    max-width: none;
+  }
+
+  .fn-hero-banner__visual {
+    min-height: 200px;
+  }
 }
