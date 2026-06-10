@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/seo.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/cookie.css">
+  <link rel="stylesheet" href="css/game-overlay.css">
 </head>
 <body>
 
@@ -703,6 +704,41 @@
 
   <!-- Auth Bridge -->
   <script src="/js/auth.js" defer></script>
+
+  <!-- ============================== Game Overlay ============================== -->
+  <div class="fn-game-overlay" id="game-overlay" role="dialog" aria-label="Game player" aria-hidden="true">
+
+    <!-- Header -->
+    <div class="fn-game-overlay__header">
+      <button class="fn-game-overlay__back" id="game-overlay-back" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Arcade
+      </button>
+
+      <span class="fn-game-overlay__title" id="game-overlay-title"></span>
+
+      <button class="fn-game-overlay__fullscreen" id="game-overlay-fs" type="button" aria-label="Toggle fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
+    </div>
+
+    <!-- Stage -->
+    <div class="fn-game-overlay__stage" id="game-overlay-stage">
+      <div class="fn-game-overlay__loader" id="game-overlay-loader">
+        <div class="fn-game-overlay__spinner"></div>
+        <div class="fn-game-overlay__loader-text" id="game-overlay-loader-text">Connecting...</div>
+      </div>
+
+      <div class="fn-game-overlay__viewport" id="game-overlay-viewport" style="display: none;">
+        <div class="fn-game-overlay__viewport-title" id="game-overlay-viewport-title"></div>
+        <div class="fn-game-overlay__viewport-sub">Game canvas will render here</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Game Loader -->
+  <script src="/js/game-loader.js" defer></script>
 
 </body>
 </html>
