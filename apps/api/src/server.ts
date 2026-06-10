@@ -10,6 +10,7 @@
 import { createServer } from "node:http";
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 
 const PORT = Number(process.env.PORT ?? 4000);
 
@@ -39,6 +40,19 @@ const ADMIN_WALLET_ADDRESS = optionalEnv("ADMIN_WALLET_ADDRESS");
 const DISCORD_WEBHOOK_URL = optionalEnv("DISCORD_WEBHOOK_URL");
 
 const app = express();
+
+// ── CSP frame-ancestors — allow lobby to embed this server in iframes ──
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      frameAncestors: [
+        "'self'",
+        "https://www.fuzzynuts.xyz",
+        "http://localhost:3000",
+      ],
+    },
+  }),
+);
 
 // ── CORS — allow the frontend origin to call this API ──────────
 const ALLOWED_ORIGINS = [
