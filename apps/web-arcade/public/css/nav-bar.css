@@ -465,6 +465,51 @@
 /* ============================================================
    MOBILE RESPONSIVE — @media ≤ 768px
    ============================================================ */
+/* ============================================================
+   AUTH STATES — loading & avatar initials
+   ============================================================ */
+
+/* Loading spinner on Connect Wallet buttons */
+.is-loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent !important;
+}
+
+.is-loading::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 50%;
+  margin: -9px 0 0 -9px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: fn-spin 0.6s linear infinite;
+}
+
+@keyframes fn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Avatar initials (replaces SVG when authenticated) */
+.fn-avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fn-primary);
+  color: #ffffff;
+  font-family: var(--fn-font);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
 @media (max-width: 768px) {
   /* Show hamburger, hide desktop search & avatar dropdown */
   .fn-nav__hamburger {
