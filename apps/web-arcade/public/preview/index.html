@@ -631,5 +631,60 @@
   })();
   </script>
 
+  <!-- Game Data Loader -->
+  <script>
+  (() => {
+    const THUMB_MAP = {
+      "Popular this Week":   [0, 1, 2, 3, 4, 5],
+      "New Releases":        [6, 7, 8, 9, 10, 11],
+      "Play with Friends":   [12, 13, 14, 15, 16, 17],
+    };
+
+    function buildCard(game) {
+      const a = document.createElement('a');
+      a.href = '/game/' + game.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      a.className = 'fn-game-card';
+      a.setAttribute('role', 'listitem');
+      a.innerHTML =
+        '<div class="fn-game-card__thumb">' +
+          '<img src="' + game.thumbnail + '" alt="' + game.title + '" class="fn-game-card__img" loading="lazy">' +
+        '</div>' +
+        '<div class="fn-game-card__title">' + game.title + '</div>';
+      return a;
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/preview/data/games.json');
+        if (!res.ok) return;
+        const games = await res.json();
+
+        document.querySelectorAll('.fn-carousel-section').forEach(section => {
+          const heading = section.querySelector('.fn-carousel-section__heading');
+          const track = section.querySelector('.fn-carousel__track');
+          if (!heading || !track) return;
+
+          const label = heading.textContent.trim();
+          const indices = THUMB_MAP[label];
+          if (!indices) return;
+
+          track.innerHTML = '';
+          indices.forEach(i => {
+            if (games[i]) track.appendChild(buildCard(games[i]));
+          });
+        });
+      } catch (e) {
+        console.warn('[FuzzyNuts] Game data load failed:', e);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', load);
+    } else {
+      load();
+    }
+  })();
+  </script>
+
 </body>
 </html>
