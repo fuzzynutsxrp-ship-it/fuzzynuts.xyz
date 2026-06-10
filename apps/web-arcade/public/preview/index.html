@@ -634,19 +634,32 @@
   <!-- Game Data Loader -->
   <script>
   (() => {
-    const THUMB_MAP = {
-      "Popular this Week":   [0, 1, 2, 3, 4, 5],
-      "New Releases":        [6, 7, 8, 9, 10, 11],
-      "Play with Friends":   [12, 13, 14, 15, 16, 17],
+    // Build index arrays (15 games each, wrapping around 40-item manifest)
+    function range(start, count, max) {
+      const out = [];
+      for (let i = 0; i < count; i++) out.push((start + i) % max);
+      return out;
+    }
+
+    const CAROUSEL_MAP = {
+      'Popular this Week': { indices: range(0, 15, 40), badge: { index: 0, text: '🔥 HOT', cls: 'fn-game-card__badge--hot' } },
+      'New Releases':      { indices: range(15, 15, 40), badge: { index: 0, text: '✨ NEW', cls: 'fn-game-card__badge--new' } },
+      'Play with Friends':  { indices: range(30, 15, 40), badge: null },
     };
 
-    function buildCard(game) {
+    function buildCard(game, badge) {
       const a = document.createElement('a');
       a.href = '/game/' + game.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       a.className = 'fn-game-card';
       a.setAttribute('role', 'listitem');
+
+      const badgeHTML = badge
+        ? '<span class="fn-game-card__badge ' + badge.cls + '">' + badge.text + '</span>'
+        : '';
+
       a.innerHTML =
         '<div class="fn-game-card__thumb">' +
+          badgeHTML +
           '<img src="' + game.thumbnail + '" alt="' + game.title + '" class="fn-game-card__img" loading="lazy">' +
         '</div>' +
         '<div class="fn-game-card__title">' + game.title + '</div>';
@@ -665,12 +678,14 @@
           if (!heading || !track) return;
 
           const label = heading.textContent.trim();
-          const indices = THUMB_MAP[label];
-          if (!indices) return;
+          const config = CAROUSEL_MAP[label];
+          if (!config) return;
 
           track.innerHTML = '';
-          indices.forEach(i => {
-            if (games[i]) track.appendChild(buildCard(games[i]));
+          config.indices.forEach((i, pos) => {
+            if (!games[i]) return;
+            const badge = (config.badge && pos === config.badge.index) ? config.badge : null;
+            track.appendChild(buildCard(games[i], badge));
           });
         });
       } catch (e) {

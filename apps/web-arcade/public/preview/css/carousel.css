@@ -31,7 +31,7 @@
    ============================================================ */
 .fn-carousel__track {
   display: flex;
-  gap: var(--fn-spacing-m);
+  gap: var(--fn-spacing-s);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
