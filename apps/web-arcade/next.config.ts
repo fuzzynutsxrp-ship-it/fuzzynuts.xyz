@@ -5,6 +5,34 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+
+  /**
+   * ═══════════════════════════════════════════════════════════════
+   *  REWRITES — Serve the static HTML arcade at the root route.
+   *
+   *  The Poki-parity arcade lives at public/index.html as a fully
+   *  self-contained static build (HTML + CSS + JS + images + data).
+   *  Next.js App Router's page.tsx would normally shadow this file,
+   *  so we rewrite `/` → `/index.html` to bypass the React shell.
+   *
+   *  The legacy React dashboard is preserved at /legacy/.
+   *  All other App Router routes (/leaderboard, /admin/*, etc.)
+   *  continue to work normally.
+   * ═══════════════════════════════════════════════════════════════
+   */
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/index.html",
+      },
+      {
+        source: "/index",
+        destination: "/index.html",
+      },
+    ];
+  },
+
   /* ─────────────────────────────────────────────────────────────
      headers() — long-cache video + fallback image used by the
      hero. The hero MP4 is content-hashed by filename (we ship one
