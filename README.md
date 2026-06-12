@@ -1,6 +1,6 @@
 # Fuzzynuts
 
-Free-to-play browser arcade on the XRP Ledger. Five HTML5 games, live
+Free-to-play browser arcade on the XRP Ledger. Six HTML5 games, live
 weekly leaderboards, real $NUT prize payouts.
 
 - **Web**: <https://fuzzynuts.xyz> (Vercel, Next.js static export)
