@@ -1890,13 +1890,104 @@ body {
   min-height: 0;
 }
 
-/* ── Mobile: tighter header ── */
+/* ── Mobile: tighter header, stacked layout ── */
 @media (max-width: 639px) {
   .game-modal__header {
     height: 48px;
     padding: 0 8px;
   }
   .game-modal__genre-badge {
+    display: none;
+  }
+
+  /* Stack viewport + sidebar vertically on mobile */
+  .game-modal__body {
+    flex-direction: column;
+  }
+
+  /* Viewport takes full width, lock 16:9 aspect ratio */
+  .game-modal__viewport {
+    flex: none;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: calc(100dvh - 48px); /* header height */
+  }
+
+  /* Remove fixed min-height on mobile — aspect-ratio handles it */
+  .game-modal__iframe {
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Sidebar: horizontal scroll row below viewport */
+  .game-modal__sidebar {
+    width: 100%;
+    flex-direction: row;
+    border-left: none;
+    border-top: 1px solid rgba(255, 46, 136, 0.12);
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: 120px;
+  }
+
+  .game-modal__sidebar-header {
+    display: none;
+  }
+
+  .game-modal__sidebar-list {
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+  }
+
+  /* Play next cards: compact horizontal on mobile */
+  .play-next-card {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+
+  .play-next-card__thumb {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .play-next-card__info {
+    min-width: 0;
+  }
+
+  .play-next-card__title {
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+
+  .play-next-card__genre {
+    display: none;
+  }
+
+  .play-next-card__play {
+    display: none;
+  }
+
+  /* Hide chat on mobile — too cramped */
+  .sidebar-chat {
+    display: none;
+  }
+
+  /* Hide Discord CTA on mobile */
+  .game-modal__sidebar > a {
+    display: none;
+  }
+
+  /* Victory banner: compact */
+  .game-modal__sidebar > div:not(.sidebar-chat):not(.game-modal__sidebar-header):not(.game-modal__sidebar-list) {
     display: none;
   }
 }
