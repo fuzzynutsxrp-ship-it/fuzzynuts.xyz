@@ -116,7 +116,14 @@ function main(): void {
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-    if (cur !== out) {
+    // Normalize the generatedAt timestamp line before comparing,
+    // since it changes every run and isn't a staleness signal.
+    const normalizeTs = (s: string) =>
+      s.replace(
+        /_Generated \*\*[^*]+\*\* /,
+        "_Generated **TIMESTAMP** ",
+      );
+    if (normalizeTs(cur) !== normalizeTs(out)) {
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);
     }

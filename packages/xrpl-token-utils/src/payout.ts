@@ -96,6 +96,6 @@ export async function submitPayout(
     const wallet = Wallet.fromSeed(seeds.distributorSeed!);
     const prepared = await client.autofill(payment);
     const signed = wallet.sign(prepared);
-    return client.submitAndWait(signed.tx_blob);
+    return client.submitAndWait(signed.tx_blob) as unknown as Promise<SubmitResponse>;
   });
 }

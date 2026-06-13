@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-01T01:01:48.382Z** from `03b8c14` on `migration/monorepo`._
+_Generated **2026-06-13T10:58:49.231Z** from `04aa4c8` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -64,15 +64,14 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 ## Recent activity
 
-Last 10 commits on `migration/monorepo`:
+Last 10 commits on `main`:
 
-- `03b8c14` ci: GitHub Actions matrix + STATUS.md generator — _fuzzynutsxrp-ship-it, 27 minutes ago_
-- `2380738` docs: Diátaxis layout, community files, ADRs 0001/0003/0006 — _fuzzynutsxrp-ship-it, 30 minutes ago_
-- `034822b` feat(desktop+mobile): scaffold Tauri 2.x + Capacitor 7 shells — _fuzzynutsxrp-ship-it, 37 minutes ago_
-- `f9ae2da` feat(xrpl-token-utils): client + verify + AMM price + multisig-aware payout — _fuzzynutsxrp-ship-it, 39 minutes ago_
-- `f23571d` feat(games-build): scaffold the bundler that kills source drift — _fuzzynutsxrp-ship-it, 41 minutes ago_
-- `ff753d8` feat(auth): scaffold two-tier auth — shared-anticheat + wallet-client + api routers — _fuzzynutsxrp-ship-it, 43 minutes ago_
-- `bcfcf10` feat(arcade-core): single source of truth for SCORE_CAPS and slug aliases — _fuzzynutsxrp-ship-it, 48 minutes ago_
-- `8df53a0` chore(repo): restructure into monorepo (apps/, packages/, docs/) — _fuzzynutsxrp-ship-it, 52 minutes ago_
-- `b0931c9` fix(fuzzy-survivors): cache-bust styles.css for returning users — _fuzzynutsxrp-ship-it, 2 hours ago_
-- `700dd1e` fix(vercel): scope immutable cache to hashed assets only — _fuzzynutsxrp-ship-it, 2 hours ago_
+- `04aa4c8` Merge pull request #34 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 3 hours ago_
+- `ae3aa74` feat: add Batch 6 unique games (maze-escape, frogger, bomberman, capture-flag, tower-stack) — _fuzzynutsxrp-ship-it, 3 hours ago_
+- `6db0630` Merge pull request #32 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 3 hours ago_
+- `adabcce` feat: add Batch 5 sports/racing games (boxing, bowling, archery, surf-up, rally) — _fuzzynutsxrp-ship-it, 3 hours ago_
+- `1dded56` Merge pull request #31 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 4 hours ago_
+- `4703b13` feat: add Batch 4 action games (tank-battle, helicopter, fruit-ninja, tower-defense, space-invaders) — _fuzzynutsxrp-ship-it, 4 hours ago_
+- `a853b05` Merge pull request #30 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 4 hours ago_
+- `724c8ea` feat: add Batch 3 puzzle games (2048, memory, minesweeper, sudoku, wordle) — _fuzzynutsxrp-ship-it, 4 hours ago_
+- `786d101` Merge pull request #28 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 4 hours ago_
