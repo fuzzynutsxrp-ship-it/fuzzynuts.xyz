@@ -55,3 +55,32 @@ export const REFRESH_COOLDOWN_MS = 10_000;
 
 /** localStorage key used by the score-submitter for offline score storage */
 export const LOCAL_STORAGE_KEY = "fuzzy_arcade_scores";
+
+// ── postMessage origin validation ──
+
+/**
+ * Trusted origins for postMessage communication.
+ *
+ * All React-app games load from same-origin paths (/games/{slug}/),
+ * so the primary check is window.location.origin. The external game
+ * domains are included as defense-in-depth for legacy/future use.
+ */
+export const ALLOWED_MESSAGE_ORIGINS: ReadonlySet<string> = new Set([
+  "https://fuzzynuts.xyz",
+  "https://www.fuzzynuts.xyz",
+  "https://world.fuzzynuts.xyz",
+  "https://game.fuzzynuts.xyz",
+]);
+
+/**
+ * Returns true if the given origin is trusted for postMessage.
+ * At runtime, also accepts the current window origin (same-origin games).
+ * Always rejects empty/null origins.
+ */
+export function isAllowedMessageOrigin(origin: string): boolean {
+  if (!origin || origin === "null") return false;
+  if (ALLOWED_MESSAGE_ORIGINS.has(origin)) return true;
+  // Same-origin games (inline / same-domain iframes)
+  if (typeof window !== "undefined" && origin === window.location.origin) return true;
+  return false;
+}

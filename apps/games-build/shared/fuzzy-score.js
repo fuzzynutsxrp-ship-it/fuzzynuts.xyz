@@ -42,6 +42,11 @@
   }
 
   window.addEventListener("message", function (event) {
+    // ── Origin validation: only accept config from trusted parent ──
+    var origin = event.origin;
+    var allowed = ["https://fuzzynuts.xyz", "https://www.fuzzynuts.xyz"];
+    if (origin !== window.location.origin && allowed.indexOf(origin) === -1) return;
+
     if (event.data && event.data.type === "FUZZY_CONFIG") {
       if (event.data.hideNav) {
         hideNavElements();
