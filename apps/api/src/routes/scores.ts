@@ -380,12 +380,13 @@ export function buildScoresRouter(env: {
           );
           return res.status(401).json({
             error: "E_HMAC_REQUIRED",
-            message: "HMAC signature required. Please update your client.",
+            message:
+              "Your client is outdated. Please refresh the page to update, or reinstall the app.",
           });
         }
         // Backward compat: log deprecation warning
         console.warn(
-          `[scores] ⚠️ DEPRECATED: Score submitted without HMAC by ${authUser.displayName} on ${game}. HMAC will be required in a future release.`,
+          `[scores] ⚠️ DEPRECATED: Score submitted without HMAC by ${authUser.displayName} on ${game}. HMAC will be required after 2026-07-15.`,
         );
       }
 
