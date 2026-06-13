@@ -7,11 +7,16 @@ import { TopNav } from "@/components/layout/TopNav";
 import { CategoryTabs } from "@/components/game/CategoryTabs";
 import { PokiGameCard } from "@/components/game/PokiGameCard";
 import { ComingSoonCard } from "@/components/game/ComingSoonCard";
-import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
+import { GameModalSkeleton } from "@/components/game/GameModalSkeleton";
 
 const Footer = dynamic(() =>
   import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
+);
+
+const GameModal = dynamic(() =>
+  import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
+  { loading: () => <GameModalSkeleton />, ssr: false },
 );
 
 /* ═══════════════════════════════════════════════════════════════

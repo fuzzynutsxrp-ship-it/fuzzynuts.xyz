@@ -2,9 +2,15 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { GAMES } from "@/lib/utils";
-import { GameModal } from "@/components/game/GameModal";
+import { GameModalSkeleton } from "@/components/game/GameModalSkeleton";
+
+const GameModal = dynamic(() =>
+  import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
+  { loading: () => <GameModalSkeleton />, ssr: false },
+);
 
 /* ─────────────────────────────────────────────────────────────
    GamesShowcase — DEGEN OVERHAUL (v6 — modal launch)
