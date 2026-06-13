@@ -239,7 +239,7 @@ export const GAME_LIST: GameMetadata[] = [
     scoreCap: 999_999,
     minPlayTime: 15,
     controls: ["Arrow keys / WASD to move", "Space to shoot", "Touch to move and auto-fire"],
-    iconPath: "/icons/icon-world-pop.webp",
+    iconPath: "/icons/icon-cosmic-blaster-pop.webp",
     iframePath: "/games/cosmic-blaster/",
     sandbox: DEFAULT_SANDBOX,
     leaderboardEnabled: true,

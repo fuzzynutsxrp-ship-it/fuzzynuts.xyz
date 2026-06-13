@@ -126,7 +126,7 @@ export const GAMES = [
     type: "Arcade",
     description:
       "Blast through asteroids and enemy ships in this fast-paced space shooter!",
-    icon: "/icons/icon-world-pop.webp",
+    icon: "/icons/icon-cosmic-blaster-pop.webp",
     image: "🚀",
     color: "#06b6d4",
     tags: ["Arcade", "Shooter", "Endless"],
