@@ -135,6 +135,8 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.sha }}
       - uses: pnpm/action-setup@v4
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
