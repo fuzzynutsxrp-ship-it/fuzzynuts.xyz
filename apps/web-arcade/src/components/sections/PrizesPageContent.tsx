@@ -11,9 +11,6 @@ import {
   ArrowRight,
   ShieldCheck,
   Gift,
-  Clock,
-  Star,
-  Zap,
   Info,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";

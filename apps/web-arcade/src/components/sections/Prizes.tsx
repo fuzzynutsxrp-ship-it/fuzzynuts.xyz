@@ -63,7 +63,7 @@ const PERKS = [
 ];
 
 export function Prizes() {
-  const { isConnected, isConnecting, connect, address } = useWalletStore();
+  const { isConnected, address } = useWalletStore();
   const connected = isConnected && Boolean(address);
 
   // Weekly prize tiers from the Monday snapshot (USD-announced, NUT @ snapshot
