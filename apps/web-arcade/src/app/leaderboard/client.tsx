@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { TopNav } from "@/components/layout/TopNav";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { useWalletStore } from "@/store/wallet";
@@ -294,7 +294,8 @@ export function LeaderboardClient() {
   return (
     <div className="min-h-screen bg-[#0a0613] flex flex-col">
       {/* Top Navigation */}
-      <TopNav
+      <SiteHeader
+        variant="dark"
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onMenuToggle={() => setSidebarOpen((o) => !o)}

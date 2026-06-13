@@ -1,19 +1,13 @@
 // FuzzyNuts Arcade — homepage.
 // Light, Poki-style design driven by all 38 real games from GAMES, opening each
-// in the shared GameModal. Header restores the real login: Google sign-in +
-// wallet (via the existing LoginModal) and search (SearchPanel).
-// Styles are embedded + scoped under `.fnx` so they can't clash with app CSS.
+// in the shared GameModal. Header is the shared SiteHeader (light variant) — the
+// same component used across the site, so nav/login/search stay consistent.
+// Body styles are embedded + scoped under `.fnx`.
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
-import { Search, User, LogIn, LogOut, Trophy, Gift } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
-import { useWalletStore } from "@/store/wallet";
-import { LoginModal } from "@/components/auth/LoginModal";
-import { SearchPanel } from "@/components/layout/SearchPanel";
-import { truncateAddress } from "@/lib/format";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
 
@@ -76,24 +70,7 @@ function Card({ game, onPlay, i }: { game: Game; onPlay: (id: string) => void; i
 export default function Home() {
   const [activeCat, setActiveCat] = useState("all");
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const { address, isConnected, disconnect } = useWalletStore();
-  const { data: session } = useSession();
-
-  // Close account dropdown on outside click
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const onClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [dropdownOpen]);
 
   const featured = GAMES.find((g) => g.id === FEATURED_ID) ?? GAMES[0];
   const popular = gamesByIds(POPULAR_IDS);
@@ -104,72 +81,11 @@ export default function Home() {
     );
   }, [activeCat, searchQuery]);
 
-  const signedIn = Boolean(session) || isConnected;
-
   return (
     <div className="fnx">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      {/* ── Poki-style header: logo + nav + search + login ── */}
-      <header className="fnx-header">
-        <Link className="fnx-logo" href="/" aria-label="FuzzyNuts home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="fnx-logo__img" src="/images/branding/logo-nav.webp" alt="" />
-          <span className="fnx-logo__text">FuzzyNuts</span>
-        </Link>
-
-        <nav className="fnx-nav">
-          <Link href="/">Home</Link>
-          <Link href="/leaderboard">Leaderboard</Link>
-          <Link href="/prizes">Prizes</Link>
-        </nav>
-
-        <div className="fnx-actions">
-          <button className="fnx-icon-btn" onClick={() => setSearchOpen(true)} aria-label="Search games">
-            <Search size={18} />
-          </button>
-
-          {!signedIn ? (
-            <button className="fnx-signin" onClick={() => setLoginOpen(true)}>
-              <LogIn size={16} /> Sign in
-            </button>
-          ) : (
-            <div className="fnx-account" ref={dropdownRef}>
-              <button className="fnx-icon-btn" onClick={() => setDropdownOpen((o) => !o)} aria-label="Account menu">
-                {session?.user?.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img className="fnx-avatar" src={session.user.image} alt="" />
-                ) : (
-                  <User size={18} />
-                )}
-              </button>
-              {dropdownOpen && (
-                <div className="fnx-dropdown">
-                  {session && (
-                    <div className="fnx-dd-meta">
-                      <small>Signed in as</small>
-                      <div>{session.user?.name ?? session.user?.email ?? "Player"}</div>
-                    </div>
-                  )}
-                  {isConnected && address && (
-                    <div className="fnx-dd-meta"><small>Wallet</small><div>{truncateAddress(address)}</div></div>
-                  )}
-                  <Link href="/profile" onClick={() => setDropdownOpen(false)}><User size={15} /> Profile &amp; stats</Link>
-                  <Link href="/prizes" onClick={() => setDropdownOpen(false)}><Gift size={15} /> Rewards / Referrals</Link>
-                  <Link href="/leaderboard" onClick={() => setDropdownOpen(false)}><Trophy size={15} /> Leaderboard</Link>
-                  <div className="fnx-dd-sep" />
-                  <button
-                    className="fnx-dd-signout"
-                    onClick={() => { disconnect(); if (session) signOut({ callbackUrl: "/" }); setDropdownOpen(false); }}
-                  >
-                    <LogOut size={15} /> {session ? "Sign out" : "Disconnect"}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </header>
+      <SiteHeader variant="light" searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       <main className="fn-dashboard">
         {/* Hero */}
@@ -229,8 +145,6 @@ export default function Home() {
         <Footer />
       </main>
 
-      <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
       <GameModal gameId={activeGameId} onClose={() => setActiveGameId(null)} onGameSwitch={setActiveGameId} />
     </div>
   );
@@ -246,28 +160,6 @@ const CSS = `
   background:var(--fn-bg); color:var(--fn-text); font-family:var(--fn-font); min-height:100vh; line-height:1.5;
 }
 .fnx *,.fnx *::before,.fnx *::after{box-sizing:border-box;}
-.fnx-header{display:flex;align-items:center;gap:24px;padding:8px 24px;background:var(--fn-surface);box-shadow:var(--fn-shadow-close);position:sticky;top:0;z-index:30;}
-.fnx-logo{display:flex;flex-direction:column;align-items:center;gap:1px;text-decoration:none;flex-shrink:0;}
-.fnx-logo__img{height:34px;width:auto;display:block;}
-.fnx-logo__text{font-size:12px;font-weight:800;color:var(--fn-text);letter-spacing:-.2px;line-height:1;}
-.fnx-nav{display:flex;gap:18px;flex:1;}
-.fnx-nav a{color:var(--fn-text-secondary);text-decoration:none;font-weight:700;font-size:15px;}
-.fnx-nav a:hover{color:var(--fn-text);}
-.fnx-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.fnx-icon-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--fn-border);background:var(--fn-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fn-text-secondary);transition:background .15s,color .15s;padding:0;}
-.fnx-icon-btn:hover{background:#f1f5f9;color:var(--fn-text);}
-.fnx-signin{display:flex;align-items:center;gap:8px;background:var(--fn-primary);color:#fff;border:none;border-radius:100px;padding:11px 20px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;}
-.fnx-signin:hover{background:var(--fn-primary-hover);}
-.fnx-avatar{width:28px;height:28px;border-radius:50%;display:block;}
-.fnx-account{position:relative;}
-.fnx-dropdown{position:absolute;right:0;top:calc(100% + 8px);width:230px;background:var(--fn-surface);border:1px solid var(--fn-border);border-radius:12px;box-shadow:var(--fn-shadow-mid);padding:8px;z-index:40;}
-.fnx-dropdown a,.fnx-dropdown>button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:700;color:var(--fn-text);text-decoration:none;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit;}
-.fnx-dropdown a:hover,.fnx-dropdown>button:hover{background:#f1f5f9;}
-.fnx-dd-signout{color:#dc2626;}
-.fnx-dd-sep{height:1px;background:var(--fn-border);margin:6px 0;}
-.fnx-dd-meta{padding:6px 12px;}
-.fnx-dd-meta small{color:var(--fn-text-secondary);font-size:12px;}
-.fnx-dd-meta div{font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .fn-dashboard{max-width:1400px;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:40px;}
 .fn-hero-banner{display:grid;grid-template-columns:1fr 1fr;background:var(--fn-surface);border-radius:16px;box-shadow:var(--fn-shadow-close);overflow:hidden;min-height:300px;}
 .fn-hero-banner__content{display:flex;flex-direction:column;justify-content:center;gap:16px;padding:40px 32px;}
@@ -302,5 +194,5 @@ const CSS = `
 .fn-game-card__title{font-size:14px;font-weight:800;color:var(--fn-text);padding:10px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .fnx-empty{color:var(--fn-text-secondary);padding:24px 0;}
 @media (max-width:1024px){.fn-categories__grid{grid-template-columns:repeat(3,1fr);}}
-@media (max-width:768px){.fn-hero-banner{grid-template-columns:1fr;}.fnx-nav{display:none;}.fn-categories__grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:768px){.fn-hero-banner{grid-template-columns:1fr;}.fn-categories__grid{grid-template-columns:repeat(2,1fr);}}
 `;
