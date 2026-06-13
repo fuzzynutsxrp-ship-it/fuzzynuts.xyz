@@ -69,8 +69,9 @@ function buildPathPixels(){
   pathPixels.push(PATH_WAYPOINTS[PATH_WAYPOINTS.length-1]);
 }
 
+const pathSet = new Set(pathPixels.map(p => p.x + "," + p.y));
 function isOnPath(gx,gy){
-  return pathPixels.some(p=>p.x===gx&&p.y===gy);
+  return pathSet.has(gx + "," + gy);
 }
 
 function resetState(){

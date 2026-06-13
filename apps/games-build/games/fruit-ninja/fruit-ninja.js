@@ -552,18 +552,31 @@
     /* game-over overlay */
     const overEl = document.getElementById("game-over");
     if (overEl) {
-      overEl.innerHTML = `
-        <div style="text-align:center;color:#fff;padding:40px 20px;">
-          <h2 style="color:${ACCENT};font-size:2.2em;margin-bottom:8px;">Game Over</h2>
-          <p style="font-size:1.4em;">Score: <b>${score}</b></p>
-          <p style="font-size:1em;color:#aaa;">Best: ${getBest()}</p>
-          <p style="font-size:0.9em;color:#888;">Duration: ${duration}s</p>
-          <button id="btn-retry" style="margin-top:20px;padding:12px 36px;font-size:1.1em;
-            background:${ACCENT};color:#fff;border:none;border-radius:8px;cursor:pointer;">Play Again</button>
-        </div>`;
+      overEl.textContent = "";
+      const wrap = document.createElement("div");
+      wrap.style.cssText = "text-align:center;color:#fff;padding:40px 20px";
+      const h2 = document.createElement("h2");
+      h2.style.cssText = `color:${ACCENT};font-size:2.2em;margin-bottom:8px`;
+      h2.textContent = "Game Over";
+      const pScore = document.createElement("p");
+      pScore.style.cssText = "font-size:1.4em";
+      const b = document.createElement("b");
+      b.textContent = String(score);
+      pScore.append("Score: ", b);
+      const pBest = document.createElement("p");
+      pBest.style.cssText = "font-size:1em;color:#aaa";
+      pBest.textContent = `Best: ${getBest()}`;
+      const pDur = document.createElement("p");
+      pDur.style.cssText = "font-size:0.9em;color:#888";
+      pDur.textContent = `Duration: ${duration}s`;
+      const btn = document.createElement("button");
+      btn.id = "btn-retry";
+      btn.style.cssText = `margin-top:20px;padding:12px 36px;font-size:1.1em;background:${ACCENT};color:#fff;border:none;border-radius:8px;cursor:pointer`;
+      btn.textContent = "Play Again";
+      btn.addEventListener("click", startGame);
+      wrap.append(h2, pScore, pBest, pDur, btn);
+      overEl.appendChild(wrap);
       overEl.style.display = "flex";
-      const btn = document.getElementById("btn-retry");
-      if (btn) btn.addEventListener("click", startGame);
     }
   }
 
@@ -590,16 +603,26 @@
     /* start screen */
     const startEl = document.getElementById("start-screen");
     if (startEl) {
-      startEl.innerHTML = `
-        <div style="text-align:center;color:#fff;padding:40px 20px;">
-          <h1 style="font-size:2.6em;margin-bottom:6px;">🍉 Fruit Ninja 🍌</h1>
-          <p style="color:#aaa;font-size:1.1em;margin-bottom:24px;">Swipe to slice fruits • Avoid bombs!</p>
-          <p style="color:#666;font-size:0.85em;margin-bottom:8px;">Best: ${getBest()}</p>
-          <button id="btn-start" style="padding:14px 44px;font-size:1.2em;
-            background:${ACCENT};color:#fff;border:none;border-radius:8px;cursor:pointer;">Start</button>
-        </div>`;
+      startEl.textContent = "";
+      const wrap = document.createElement("div");
+      wrap.style.cssText = "text-align:center;color:#fff;padding:40px 20px";
+      const h1 = document.createElement("h1");
+      h1.style.cssText = "font-size:2.6em;margin-bottom:6px";
+      h1.textContent = "\ud83c\udf49 Fruit Ninja \ud83c\udf4c";
+      const pDesc = document.createElement("p");
+      pDesc.style.cssText = "color:#aaa;font-size:1.1em;margin-bottom:24px";
+      pDesc.textContent = "Swipe to slice fruits \u2022 Avoid bombs!";
+      const pBest = document.createElement("p");
+      pBest.style.cssText = "color:#666;font-size:0.85em;margin-bottom:8px";
+      pBest.textContent = `Best: ${getBest()}`;
+      const btn = document.createElement("button");
+      btn.id = "btn-start";
+      btn.style.cssText = `padding:14px 44px;font-size:1.2em;background:${ACCENT};color:#fff;border:none;border-radius:8px;cursor:pointer`;
+      btn.textContent = "Start";
+      btn.addEventListener("click", startGame);
+      wrap.append(h1, pDesc, pBest, btn);
+      startEl.appendChild(wrap);
       startEl.style.display = "flex";
-      document.getElementById("btn-start").addEventListener("click", startGame);
     } else {
       /* no start screen overlay – auto-start */
       startGame();

@@ -352,6 +352,7 @@
 
   function endGame() {
     state = "gameover";
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     gameOverTimer = 0;
     if (score > best) {
       best = score;
@@ -499,6 +500,7 @@
 
   /* ── game loop ── */
   let lastTime = 0;
+  let rafId = null;
   function loop(ts) {
     const dt = Math.min((ts - lastTime) / 1000, 0.05);
     lastTime = ts;
@@ -507,7 +509,7 @@
     update(dt);
     draw();
 
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
   }
 
   /* ── public API ── */

@@ -46,6 +46,7 @@
   let wave = 1;
   let bestScore = parseInt(localStorage.getItem('tank-battle_best')) || 0;
   let startTime = 0;
+  let gameStartTime = 0;
   let lastComboTime = 0;
   let comboCount = 0;
   let lastPowerupSpawn = 0;
@@ -834,6 +835,7 @@
     lastPowerupSpawn = Date.now();
     gameOver = false;
     startTime = Date.now();
+    gameStartTime = Date.now();
 
     canvas = document.getElementById('game-canvas');
     if (!canvas) return;
@@ -885,7 +887,7 @@
     updateHUD();
 
     // Submit score
-    var duration = Math.floor((Date.now() - startTime) / 1000);
+    var duration = Math.floor((Date.now() - gameStartTime) / 1000);
     if (typeof window.FuzzyScoreSubmit === 'function') {
       window.FuzzyScoreSubmit('tank-battle', score, duration);
     }
