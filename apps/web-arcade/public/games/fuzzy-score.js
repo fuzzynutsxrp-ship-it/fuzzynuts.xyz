@@ -41,7 +41,17 @@
     }
   }
 
+  var ALLOWED_ORIGINS = [
+    'https://fuzzynuts.xyz',
+    'https://www.fuzzynuts.xyz',
+    'https://world.fuzzynuts.xyz',
+    'http://localhost:3000'
+  ];
+
   window.addEventListener('message', function(event) {
+    // Validate origin — only accept config from known arcade origins
+    if (ALLOWED_ORIGINS.indexOf(event.origin) === -1) return;
+
     if (event.data && event.data.type === 'FUZZY_CONFIG') {
       if (event.data.hideNav) {
         hideNavElements();
@@ -77,8 +87,8 @@ var FuzzyScoreSubmit = (function() {
     'minigolf': 100000,
     'nut-racer': 2000000,
     'fuzzynuts-world': 10000000,
-    'top-secret': 1000000,
     'dragon-hoard': 999999,
+    'rsc': 99000000,
     // legacy aliases (DO NOT add to canonical list)
     'survivors': 5000000,
     'racer': 2000000,
@@ -104,7 +114,7 @@ var FuzzyScoreSubmit = (function() {
     try {
       var saved = JSON.parse(localStorage.getItem(WALLET_KEY) || '{}');
       if (saved.connected && saved.address) return saved;
-    } catch(e) {}
+    } catch(e) { console.warn('[FuzzyScore] getWalletState error:', e); }
     return null;
   }
 
@@ -122,6 +132,7 @@ var FuzzyScoreSubmit = (function() {
         lastSubmitTime: data.lastSubmitTime || {}
       };
     } catch(e) {
+      console.warn('[FuzzyScore] loadData error:', e);
       return { weekKey: getCurrentWeekKey(), scores: {}, personalBests: {}, lastSubmitTime: {} };
     }
   }
@@ -129,7 +140,7 @@ var FuzzyScoreSubmit = (function() {
   function saveData(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch(e) {}
+    } catch(e) { console.warn('[FuzzyScore] saveData error:', e); }
   }
 
   /**
@@ -158,16 +169,16 @@ var FuzzyScoreSubmit = (function() {
         console.log('[FuzzyScore] Backend synced:', game, Math.floor(score),
                     result.action === 'no_update' ? '(existing higher)' : '');
         // Notify parent GameWrapper of successful submission
-        try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: true }, '*'); } catch(e) {}
+        try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: true }, 'https://fuzzynuts.xyz'); } catch(e) {}
       } else {
         console.warn('[FuzzyScore] Backend rejected:', result.error);
         // Notify parent GameWrapper of failed submission
-        try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: false }, '*'); } catch(e) {}
+        try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: false }, 'https://fuzzynuts.xyz'); } catch(e) {}
       }
     }).catch(function(err) {
       console.warn('[FuzzyScore] Backend sync failed (offline?):', err.message);
       // Notify parent GameWrapper of network failure
-      try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: false }, '*'); } catch(e) {}
+      try { window.parent.postMessage({ type: 'FUZZY_SCORE_SUBMITTED', success: false }, 'https://fuzzynuts.xyz'); } catch(e) {}
     });
   }
 
@@ -263,7 +274,7 @@ var FuzzyScoreSubmit = (function() {
     return {
       success: true,
       personalBest: data.personalBests[game],
-      isNewBest: score >= data.personalBests[game]
+      isNewBest: score > data.personalBests[game]
     };
   }
 
