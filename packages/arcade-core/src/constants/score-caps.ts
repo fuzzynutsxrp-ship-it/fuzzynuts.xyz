@@ -44,6 +44,11 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   "minesweeper": 99_999,
   "sudoku": 99_999,
   "wordle": 1_000,
+  "tank-battle": 500000,
+  "helicopter": 99999,
+  "fruit-ninja": 999999,
+  "tower-defense": 999999,
+  "space-invaders": 99999,
 };
 
 /** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */

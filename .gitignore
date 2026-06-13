@@ -44,6 +44,11 @@ apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/asteroids/
 !apps/web-arcade/public/games/doodle-jump/
 !apps/web-arcade/public/games/wordle/
+!apps/web-arcade/public/games/space-invaders/
+!apps/web-arcade/public/games/tower-defense/
+!apps/web-arcade/public/games/fruit-ninja/
+!apps/web-arcade/public/games/helicopter/
+!apps/web-arcade/public/games/tank-battle/
 !apps/web-arcade/public/games/sudoku/
 !apps/web-arcade/public/games/minesweeper/
 !apps/web-arcade/public/games/memory/
