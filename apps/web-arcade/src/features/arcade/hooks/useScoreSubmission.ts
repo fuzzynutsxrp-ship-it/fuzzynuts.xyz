@@ -14,7 +14,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 
 import type { SubmissionStatus, ScoreSubmissionReturn } from "../types/arcade";
-import { SCORE_CAPS, MIN_PLAY_DURATION_MS, SUBMIT_COOLDOWN_MS } from "../constants";
+import { SCORE_CAPS, MIN_PLAY_DURATION_MS, SUBMIT_COOLDOWN_MS, isAllowedMessageOrigin } from "../constants";
 import { getCurrentWeekKey } from "../utils/scoreHelpers";
 
 /**
@@ -49,6 +49,9 @@ export function useScoreSubmission(slug: string): ScoreSubmissionReturn {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (!event.data || typeof event.data !== "object") return;
+
+      // ── Strict origin validation — reject untrusted origins ──
+      if (!isAllowedMessageOrigin(event.origin)) return;
 
       // ── Handle score error channel from iframe ──
       if (event.data.type === "SCORE_ERROR") {
