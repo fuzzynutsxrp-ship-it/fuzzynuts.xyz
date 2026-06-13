@@ -15,6 +15,11 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 
+// On GitHub Actions PRs, HEAD is a merge commit (refs/pull/N/merge).
+// Use the PR's head branch so the generated content matches what was committed.
+const CI_HEAD_REF = process.env.GITHUB_HEAD_REF;
+const HEAD_REF = CI_HEAD_REF ? `origin/${CI_HEAD_REF}` : "HEAD";
+
 const ROOT = execSync("git rev-parse --show-toplevel").toString().trim();
 const TEMPLATE = join(ROOT, "docs/STATUS.md.tmpl");
 const OUT = join(ROOT, "docs/STATUS.md");
@@ -98,7 +103,7 @@ function rootVersion(): string {
 function recentCommits(n = 10): string {
   const SEP = "\x1F"; // ASCII unit separator — safe from shell interpretation
   const formatStr = `%h${SEP}%s${SEP}%an${SEP}%ai`;
-  const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}'`);
+  const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}' ${HEAD_REF}`);
   if (!raw) return "";
   const lines = raw.split("\n").filter(Boolean);
   return lines
@@ -114,8 +119,8 @@ function main(): void {
   let out = readFileSync(TEMPLATE, "utf8");
 
   out = fill(out, "generatedAt", new Date().toISOString());
-  out = fill(out, "commitSha", sh("git rev-parse --short HEAD"));
-  out = fill(out, "branch", sh("git rev-parse --abbrev-ref HEAD"));
+  out = fill(out, "commitSha", sh(`git rev-parse --short ${HEAD_REF}`));
+  out = fill(out, "branch", sh(`git rev-parse --abbrev-ref ${HEAD_REF}`).replace(/^origin\//, ""));
   out = fill(out, "rootVersion", rootVersion());
   out = fill(out, "migrationPhase", state.migrationPhase);
 

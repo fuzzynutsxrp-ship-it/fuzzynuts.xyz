@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-13T13:25:45.650Z** from `3bb14e7` on `fix/ci-pipeline-fixes`._
+_Generated **2026-06-13T13:31:15.219Z** from `3f0bb15` on `fix/ci-pipeline-fixes`._
 
 `migration_phase: in-progress` · `version: 0.2.0`
 
@@ -66,6 +66,7 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `fix/ci-pipeline-fixes`:
 
+- `3f0bb15` fix(ci): regenerate STATUS.md and fix status:check prettier race — _Hermes Dev Worker, 2026-06-13 09:26:21 -0400_
 - `3bb14e7` fix(ci): regenerate STATUS.md for freshness check — _Hermes Dev Worker, 2026-06-13 09:15:53 -0400_
 - `b266b22` fix(ci): resolve lint, format, and STATUS.md freshness failures — _Hermes Dev Worker, 2026-06-13 08:53:11 -0400_
 - `4461977` fix: resolve CI pipeline failures — score-caps ceiling, ESLint flat config, typecheck, STATUS.md — _Hermes Dev Worker, 2026-06-13 07:00:14 -0400_
@@ -75,4 +76,3 @@ Last 10 commits on `fix/ci-pipeline-fixes`:
 - `adabcce` feat: add Batch 5 sports/racing games (boxing, bowling, archery, surf-up, rally) — _fuzzynutsxrp-ship-it, 2026-06-13 03:36:34 -0400_
 - `1dded56` Merge pull request #31 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 2026-06-13 03:26:01 -0400_
 - `4703b13` feat: add Batch 4 action games (tank-battle, helicopter, fruit-ninja, tower-defense, space-invaders) — _fuzzynutsxrp-ship-it, 2026-06-13 03:25:29 -0400_
-- `a853b05` Merge pull request #30 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 2026-06-13 03:17:14 -0400_
