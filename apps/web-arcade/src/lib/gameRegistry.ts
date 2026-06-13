@@ -204,6 +204,31 @@ export const GAME_LIST: GameMetadata[] = [
     ],
     touchHint: "Tap to move and interact — classic point-and-click controls",
   },
+  {
+    slug: "dragon-hoard",
+    title: "Dragon's Hoard",
+    genre: "Arcade",
+    color: "#f97316",
+    description:
+      "Collect treasure while dodging dragon fire! A fast-paced arcade game with combo scoring and increasing difficulty.",
+    scoreCap: 999_999,
+    minPlayTime: 15,
+    controls: ["Arrow keys / WASD to move", "Touch to move on mobile"],
+    iconPath: "/icons/icon-world-pop.webp",
+    iframePath: "/games/dragon-hoard/",
+    sandbox: DEFAULT_SANDBOX,
+    leaderboardEnabled: true,
+    achievementsEnabled: false,
+    status: "live",
+    scoreType: "high-score",
+    loadingTips: [
+      "Collect coins, gems, and treasure chests for points",
+      "Dodge fireballs — they get faster over time!",
+      "Build combos by collecting items quickly",
+      "Collect 10 items in a row for maximum multiplier!",
+    ],
+    touchHint: "Tap and drag to move your thief",
+  },
 ];
 
 /* ── Registry API ── */

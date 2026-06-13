@@ -40,6 +40,7 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
   minigolf: "cyan",
   racer: "orange",
   rsc: "green",
+  "dragon-hoard": "orange",
 };
 
 /** Map game IDs to emojis for the tab selector */
@@ -50,6 +51,7 @@ const GAME_EMOJIS: Record<string, string> = {
   minigolf: "⛳",
   racer: "🏎️",
   rsc: "⚔️",
+  "dragon-hoard": "🐉",
 };
 
 /** Week options for the week selector dropdown */

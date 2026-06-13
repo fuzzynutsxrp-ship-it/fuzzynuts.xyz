@@ -1,63 +1,119 @@
-# apps/games-build — Open-RSC Integration
+# Games Build Pipeline
 
-## Purpose
+Source directory for all FuzzyNuts arcade games. Each game is a self-contained folder with HTML, JS, CSS, and assets.
 
-Canonical source + build pipeline for RuneScape Classic private server
-(Open-RSC Core-Framework). This directory contains config templates, build
-scripts, and integration docs for wiring an Open-RSC game server into the
-Fuzzynuts arcade ecosystem.
-
-## Reality Check
-
-The Open-RSC game server (Java 11+) requires a **separate VPS** with a
-persistent TCP listener on port 43594. It cannot run on Vercel (static
-hosting) or Railway (stateless HTTP workers). This directory holds the
-scaffolding and documentation needed to set up and integrate that server —
-not the server itself.
-
-## Architecture
-
-```
-┌──────────────┐     ┌──────────────────┐     ┌────────────────────┐
-│  web-arcade  │────▶│   api (Railway)  │────▶│  game VPS :43594   │
-│  (Vercel)    │     │  /auth/game-sess │     │  Open-RSC Server   │
-│              │     │                  │     │  Java 11 + Ant     │
-│  Connect XRP │     │  Verify XRPL sig │     │                    │
-│  wallet      │◀────│  Issue session   │◀────│  Validate session  │
-│  Download JAR│     │  token           │     │  on connect        │
-└──────────────┘     └──────────────────┘     └────────────────────┘
-```
-
-## Directory Structure
+## Structure
 
 ```
 apps/games-build/
-├── openrsc/              # Open-RSC server config templates (after clone)
-│   ├── .gitkeep
-│   └── INTEGRATION_NOTES.md
-├── client-dist/          # Compiled Open_RSC_Client.jar output
-│   ├── .gitkeep
-│   └── README.md
-├── scripts/
-│   ├── build-client.sh   # Client build script (placeholder)
-│   └── deploy-vps-checklist.md
-├── auth/
-│   └── xrpl-game-auth.ts # XRPL wallet → game session bridge
-└── README.md             # This file
+├── README.md              ← This file
+├── template/              ← Starter template for new games
+│   ├── index.html
+│   ├── game.js
+│   ├── game.css
+│   └── service-worker.js
+├── games/                 ← Individual game folders
+│   ├── dragon-hoard/
+│   ├── nebula-drift/
+│   └── ...
+└── scripts/               ← Build and deploy scripts
+    └── deploy-game.sh     ← Copy game to public/games/
 ```
 
-## Quick Start
+## Creating a New Game
 
-1. Provision a VPS (see `scripts/deploy-vps-checklist.md`)
-2. Clone Open-RSC on the VPS: `git clone https://gitlab.com/openrsc/openrsc.git`
-3. Apply config overrides from `openrsc/INTEGRATION_NOTES.md`
-4. Open port 43594 TCP in firewall
-5. Start the server with `./Start-Linux.sh`
-6. Update DNS: `game.fuzzynuts.xyz → VPS IP` (DNS-only, no Cloudflare proxy)
-7. Enable the `/api/auth/game-session` endpoint on Railway
+1. Copy the `template/` folder to `games/<slug>/`
+2. Rename files: `game.js` → `<slug>.js`, `game.css` → `<slug>.css`
+3. Update `index.html` with game title, slug, and references
+4. Implement game logic in `<slug>.js`
+5. Register the game (see Registration Chain below)
+6. Deploy: copy to `apps/web-arcade/public/games/<slug>/`
 
-## Links
+## Registration Chain (4 files)
 
-- Official Open-RSC repo: https://gitlab.com/openrsc/openrsc
-- Open-RSC wiki: https://gitlab.com/openrsc/openrsc/-/wikis
-- VPS deploy guide: `scripts/deploy-vps-checklist.md`
+Every game must be registered in exactly 4 locations:
+
+1. **`packages/arcade-core/src/constants/slugs.ts`**
+   - Add to `GameSlug` type union
+   - Add to `GAME_SLUGS` array
+   - Add to `ID_TO_SLUG` map
+   - Add to `SLUG_TO_LEGACY_ID` map
+
+2. **`packages/arcade-core/src/constants/score-caps.ts`**
+   - Add score cap to `SCORE_CAPS` record
+
+3. **`apps/games-build/games/<slug>/`**
+   - Game source files (HTML, JS, CSS, assets)
+
+4. **`apps/web-arcade/src/lib/gameRegistry.ts`**
+   - Add `GameMetadata` entry to `GAME_LIST`
+
+## Game Architecture
+
+Each game uses the shared arcade shell:
+
+```html
+<!-- Shared shell -->
+<link rel="stylesheet" href="../../css/design-tokens.css">
+<link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
+<script src="../../js/arcade-shell.js?v=mobile-fix"></script>
+<script>
+  ArcadeShell.init({
+    slug: 'my-game',
+    title: 'My Game',
+    icon: '🎮',
+    accentColor: '#ff2e88',
+    hideNavOnPlay: true,
+    showLoader: false,
+  });
+</script>
+
+<!-- Score bridge -->
+<script src="../fuzzy-score.js"></script>
+```
+
+## Score Integration
+
+Games submit scores via `FuzzyScoreSubmit(slug, score, duration)`:
+
+```javascript
+// On game over
+FuzzyScoreSubmit('my-game', finalScore, playDurationSeconds);
+```
+
+The score bridge:
+- Writes to localStorage (instant, works offline)
+- POSTs to backend API (async, fire-and-forget)
+- Validates against SCORE_CAPS anti-cheat ceiling
+- Requires minimum 5-second play duration
+
+## Engine Options
+
+| Engine | Use Case | Example |
+|--------|----------|---------|
+| Vanilla Canvas 2D | Simple arcade games | Dragon's Hoard |
+| Kaboom.js | Platformers, complex games | Super Fuzzynuts |
+| Three.js | 3D games | Fuzzy Putt |
+| Custom | Specialized engines | Nut Racer |
+
+## Mobile Requirements
+
+- Viewport meta: `viewport-fit=cover, maximum-scale=1, user-scalable=no`
+- Touch controls: auto-detect with `'ontouchstart' in window`
+- Canvas scaling: `min(calc(100vw/W), calc(100dvh/H))`
+- Safe area insets: `env(safe-area-inset-*)`
+- `showLoader: false` if game has own start screen
+
+## Deployment
+
+```bash
+# Copy game to public directory
+cp -r apps/games-build/games/<slug> apps/web-arcade/public/games/<slug>
+
+# Force add (public/games/* is in .gitignore)
+git add -f apps/web-arcade/public/games/<slug>/
+
+# Or add exception to .gitignore
+echo '!apps/web-arcade/public/games/<slug>/' >> .gitignore
+git add apps/web-arcade/public/games/<slug>/
+```

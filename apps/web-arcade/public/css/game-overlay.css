@@ -154,35 +154,30 @@
 }
 
 /* ============================================================
-   GAME VIEWPORT — placeholder for iframe/canvas
+   GAME VIEWPORT — hosts injected game content
    ============================================================ */
 .fn-game-overlay__viewport {
   width: 100%;
   height: 100%;
-  max-width: 1200px;
-  max-height: 800px;
-  background: #1e293b;
-  border-radius: var(--fn-radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: var(--fn-spacing-s);
-  margin: var(--fn-spacing-m);
+  background: #0a0a14;
+  position: relative;
+  overflow: hidden;
 }
 
-.fn-game-overlay__viewport-title {
-  font-family: var(--fn-font);
-  font-size: 24px;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: -0.3px;
+/* Game canvases should fill the viewport */
+.fn-game-overlay__viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.fn-game-overlay__viewport-sub {
-  font-family: var(--fn-font);
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.2);
+/* Game iframes should fill the viewport */
+.fn-game-overlay__viewport iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 /* ============================================================
@@ -195,11 +190,6 @@
 
   .fn-game-overlay__title {
     font-size: 13px;
-  }
-
-  .fn-game-overlay__viewport {
-    border-radius: 0;
-    margin: 0;
   }
 }
 

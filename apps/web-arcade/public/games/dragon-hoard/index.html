@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0613">
+  <title>Dragon's Hoard — Fuzzynuts Arcade</title>
+  <meta name="description" content="Collect treasure while dodging dragon fire! A fast-paced arcade game in the Fuzzynuts Arcade.">
+  <link rel="icon" href="../../logo_512.png" type="image/png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"></noscript>
+
+  <!-- Shared arcade shell -->
+  <link rel="stylesheet" href="../../css/design-tokens.css">
+  <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
+
+  <!-- Game CSS -->
+  <link rel="stylesheet" href="dragon-hoard.css">
+</head>
+<body>
+  <!-- Nav injected by arcade-shell.js -->
+
+  <!-- Game container -->
+  <div id="game-container">
+    <!-- Start screen -->
+    <div id="start-screen">
+      <div class="start-icon">🐉</div>
+      <h1>Dragon's Hoard</h1>
+      <p>Collect treasure while dodging dragon fire!<br>Use arrow keys or WASD to move. Tap to move on mobile.</p>
+      <button id="start-btn">Start Game</button>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" style="display: none;">
+      <div id="score-display">Score: <span id="score-value">0</span></div>
+      <div id="combo-display">Combo: <span id="combo-value">x1</span></div>
+      <div id="lives-display">Lives: <span id="lives-value">3</span></div>
+    </div>
+
+    <!-- Game canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Game over screen -->
+    <div id="game-over" style="display: none;">
+      <h2>🐉 Dragon Wins!</h2>
+      <p>Final Score: <span id="final-score">0</span></p>
+      <p class="best-score">Best: <span id="best-score">0</span></p>
+      <button id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Shared arcade shell -->
+  <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
+  <script>
+    ArcadeShell.init({
+      slug: 'dragon-hoard',
+      title: "Dragon's Hoard",
+      icon: '🐉',
+      accentColor: '#f97316',
+      hideNavOnPlay: true,
+      showLoader: false,
+    });
+  </script>
+
+  <!-- Score bridge -->
+  <script src="../fuzzy-score.js"></script>
+
+  <!-- Game engine -->
+  <script src="dragon-hoard.js"></script>
+
+  <!-- Service worker -->
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+      });
+    }
+  </script>
+</body>
+</html>
