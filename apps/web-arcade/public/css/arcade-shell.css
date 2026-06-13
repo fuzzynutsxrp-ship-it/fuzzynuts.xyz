@@ -199,6 +199,38 @@ a { color: inherit; }
   color: #ffd280;
 }
 
+/* Fullscreen toggle */
+.arcade-nav__fullscreen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: var(--arcade-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.arcade-nav__fullscreen:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+}
+.arcade-nav__fullscreen svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+/* Default: show expand, hide compress */
+.arcade-nav__fs-compress { display: none; }
+.arcade-nav__fs-expand  { display: block; }
+/* When fullscreen active: show compress, hide expand */
+body.arcade-fullscreen .arcade-nav__fs-compress { display: block; }
+body.arcade-fullscreen .arcade-nav__fs-expand   { display: none; }
+
 /* Chat button — floating, always visible */
 .arcade-chat-float {
   position: fixed;
