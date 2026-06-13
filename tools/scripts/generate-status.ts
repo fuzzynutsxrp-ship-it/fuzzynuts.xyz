@@ -140,11 +140,20 @@ function main(): void {
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-    // Normalize the generatedAt timestamp line before comparing,
-    // since it changes every run and isn't a staleness signal.
-    const normalizeTs = (s: string) =>
-      s.replace(/_Generated \*\*[^*]+\*\* /, "_Generated **TIMESTAMP** ");
-    if (normalizeTs(cur) !== normalizeTs(out)) {
+    // Normalize dynamic metadata before comparing — timestamp, commit SHA,
+    // and the "Recent activity" section all change with every commit, so
+    // comparing them raw makes the check fail on any push.
+    const normalize = (s: string) =>
+      s
+        .replace(
+          /_Generated \*\*[^*]+\*\* from `[a-f0-9]+` on `[^`]+`\._/,
+          "_Generated **TIMESTAMP** from `SHA` on `BRANCH`._",
+        )
+        .replace(
+          /## Recent activity[\s\S]*$/,
+          "## Recent activity\n\n(dynamically generated — skipped in freshness check)\n",
+        );
+    if (normalize(cur) !== normalize(out)) {
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);
     }
