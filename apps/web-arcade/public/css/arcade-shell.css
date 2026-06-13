@@ -310,7 +310,7 @@ a { color: inherit; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   GAME CONTAINER — Push below nav
+   GAME CONTAINER — Push below nav + aspect-ratio locking
    ═══════════════════════════════════════════════════════════════ */
 /* Game container — Push below nav (standalone only) */
 .arcade-game {
@@ -320,6 +320,9 @@ a { color: inherit; }
   height: calc(100svh - var(--arcade-nav-height));
   height: calc(100dvh - var(--arcade-nav-height));
   overflow: hidden;
+  /* Container queries for responsive game content */
+  container-type: size;
+  container-name: game-viewport;
 }
 
 /* Full-bleed variant (nav auto-hides, game fills entire viewport) */
@@ -334,6 +337,47 @@ body.in-iframe .arcade-game {
   height: 100vh;
   height: 100svh;
   height: 100dvh;
+}
+
+/* ── Mobile: lock aspect ratio, prevent letterboxing ── */
+@media (max-width: 639px) {
+  .arcade-game {
+    /* On mobile in iframe, use aspect-ratio to prevent squishing */
+    aspect-ratio: 16 / 9;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* Game canvas should scale to fit without distortion */
+  .arcade-game canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+/* ── Container query: adapt game content to viewport size ── */
+@container game-viewport (max-width: 480px) {
+  /* Compact HUD for very small screens */
+  .arcade-game #hud {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+
+  /* Smaller overlays on tiny screens */
+  .arcade-game .overlay-content {
+    padding: 1rem;
+  }
+
+  .arcade-game .overlay-content h1,
+  .arcade-game .overlay-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .arcade-game .play-btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+  }
 }
 
 /* ── Overlay scroll fix (CRITICAL for mobile) ── */
