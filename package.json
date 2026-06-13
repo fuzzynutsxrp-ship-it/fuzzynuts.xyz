@@ -30,6 +30,7 @@
     "version": "changeset version && pnpm install --lockfile-only",
     "release": "turbo run build --filter=...[origin/main] && changeset publish",
     "preflight": "bash scripts/preflight.sh",
+    "new-game": "node tools/new-game.mjs",
     "status": "tsx tools/scripts/generate-status.ts",
     "status:check": "tsx tools/scripts/generate-status.ts --check",
     "clean": "turbo run clean && rm -rf node_modules .turbo",
