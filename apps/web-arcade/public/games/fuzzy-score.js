@@ -90,6 +90,11 @@ var FuzzyScoreSubmit = (function() {
     'dragon-hoard': 999999,
     'cosmic-blaster': 999999,
     'rsc': 99000000,
+    'snake': 50000,
+    'breakout': 100000,
+    'pong': 11,
+    'tetris': 999999,
+    'asteroids': 500000,
     // legacy aliases (DO NOT add to canonical list)
     'survivors': 5000000,
     'racer': 2000000,

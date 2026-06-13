@@ -29,6 +29,11 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   rsc: 99_000_000, // [MANUAL VERIFICATION REQUIRED] — RSC XP-based scoring, cap TBD
   "dragon-hoard": 999_999, // Endless collect-avoid game, cap for anti-cheat
   "cosmic-blaster": 999_999, // Endless space shooter, cap for anti-cheat
+  "snake": 50_000, // Classic snake with power-ups
+  "breakout": 100_000, // Brick breaker with power-ups
+  "pong": 11, // First to 11 wins
+  "tetris": 999_999, // Falling blocks puzzle
+  "asteroids": 500_000, // Ship vs asteroids
 };
 
 /** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */

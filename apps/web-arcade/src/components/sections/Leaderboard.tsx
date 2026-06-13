@@ -42,6 +42,11 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
   rsc: "green",
   "dragon-hoard": "orange",
   "cosmic-blaster": "cyan",
+  "snake": "green",
+  "breakout": "orange",
+  "pong": "cyan",
+  "tetris": "purple",
+  "asteroids": "red",
 };
 
 /** Map game IDs to emojis for the tab selector */
@@ -54,6 +59,11 @@ const GAME_EMOJIS: Record<string, string> = {
   rsc: "⚔️",
   "dragon-hoard": "🐉",
   "cosmic-blaster": "🚀",
+  "snake": "🐍",
+  "breakout": "🧱",
+  "pong": "🏓",
+  "tetris": "🟦",
+  "asteroids": "☄️",
 };
 
 /** Week options for the week selector dropdown */

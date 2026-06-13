@@ -37,6 +37,11 @@
     // New factory games (added by game factory pipeline)
     'dragon-hoard':      { engine: 'inline', path: '/games/dragon-hoard/' },
     'cosmic-blaster':    { engine: 'inline', path: '/games/cosmic-blaster/' },
+    'snake':            { engine: 'inline', path: '/games/snake/' },
+    'breakout':            { engine: 'inline', path: '/games/breakout/' },
+    'pong':            { engine: 'inline', path: '/games/pong/' },
+    'tetris':            { engine: 'inline', path: '/games/tetris/' },
+    'asteroids':            { engine: 'inline', path: '/games/asteroids/' },
   };
 
   // ─── Helpers ───────────────────────────────────────────────────

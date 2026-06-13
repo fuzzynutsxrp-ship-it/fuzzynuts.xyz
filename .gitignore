@@ -37,6 +37,11 @@ apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/nut-racer/
 !apps/web-arcade/public/games/fuzzynuts-world/
 !apps/web-arcade/public/games/top-secret/
+!apps/web-arcade/public/games/snake/
+!apps/web-arcade/public/games/breakout/
+!apps/web-arcade/public/games/pong/
+!apps/web-arcade/public/games/tetris/
+!apps/web-arcade/public/games/asteroids/
 !apps/web-arcade/public/games/fuzzy-score.js
 
 # ── Tauri ────────────────────────────────────────────────────
