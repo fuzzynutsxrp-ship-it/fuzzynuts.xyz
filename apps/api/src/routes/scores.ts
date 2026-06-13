@@ -263,6 +263,7 @@ export function buildScoresRouter(env: {
   MONGODB_URI: string;
   GAME_SESSION_SECRET: string;
   WALLET_JWT_SECRET: string;
+  REQUIRE_HMAC?: boolean;
 }): Router {
   const router = Router();
   let _db: Db | null = null;
@@ -331,7 +332,7 @@ export function buildScoresRouter(env: {
 
       // ── HMAC signature verification ──────────────────────
       // If X-Score-Hmac header is present, verify the HMAC.
-      // If missing, fall back to existing auth (backward compat during rollout).
+      // If missing: reject when REQUIRE_HMAC=true, log deprecation when false.
       const hmacSignature = req.headers["x-score-hmac"] as string | undefined;
       const hmacNonce = req.headers["x-score-nonce"] as string | undefined;
 
@@ -371,6 +372,21 @@ export function buildScoresRouter(env: {
             message: "Invalid HMAC signature",
           });
         }
+      } else {
+        // No HMAC header present
+        if (env.REQUIRE_HMAC) {
+          console.warn(
+            `[scores] ❌ HMAC required but missing for ${authUser.displayName} on ${game}`,
+          );
+          return res.status(401).json({
+            error: "E_HMAC_REQUIRED",
+            message: "HMAC signature required. Please update your client.",
+          });
+        }
+        // Backward compat: log deprecation warning
+        console.warn(
+          `[scores] ⚠️ DEPRECATED: Score submitted without HMAC by ${authUser.displayName} on ${game}. HMAC will be required in a future release.`,
+        );
       }
 
       // ── Validate score cap ───────────────────────────────

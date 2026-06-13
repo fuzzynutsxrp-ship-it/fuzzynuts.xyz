@@ -38,6 +38,7 @@ const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
 const ADMIN_WALLET_ADDRESS = optionalEnv("ADMIN_WALLET_ADDRESS");
 const DISCORD_WEBHOOK_URL = optionalEnv("DISCORD_WEBHOOK_URL");
+const REQUIRE_HMAC = process.env.REQUIRE_HMAC === "true"; // default: false
 
 const app = express();
 
@@ -115,6 +116,7 @@ async function bootstrap() {
         MONGODB_URI,
         GAME_SESSION_SECRET,
         WALLET_JWT_SECRET,
+        REQUIRE_HMAC,
       }));
     } catch (e) {
       console.error("[api] Failed to load scores router:", e);
