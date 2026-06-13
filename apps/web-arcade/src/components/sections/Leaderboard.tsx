@@ -48,6 +48,10 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
   "tetris": "purple",
   "asteroids": "red",
   "flappy": "gold",
+  "subway-runner": "cyan",
+  "jetpack": "orange",
+  "ski-free": "cyan",
+  "doodle-jump": "green",
 };
 
 /** Map game IDs to emojis for the tab selector */
@@ -66,6 +70,10 @@ const GAME_EMOJIS: Record<string, string> = {
   "tetris": "🟦",
   "asteroids": "☄️",
   "flappy": "🐦",
+  "subway-runner": "🚇",
+  "jetpack": "🚀",
+  "ski-free": "⛷️",
+  "doodle-jump": "🐸",
 };
 
 /** Week options for the week selector dropdown */
