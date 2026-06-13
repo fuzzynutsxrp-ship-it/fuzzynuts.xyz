@@ -8,29 +8,19 @@ const nextConfig: NextConfig = {
 
   /**
    * ═══════════════════════════════════════════════════════════════
-   *  REWRITES — Serve the static HTML arcade at the root route.
+   *  REWRITES — none.
    *
-   *  The Poki-parity arcade lives at public/index.html as a fully
-   *  self-contained static build (HTML + CSS + JS + images + data).
-   *  Next.js App Router's page.tsx would normally shadow this file,
-   *  so we rewrite `/` → `/index.html` to bypass the React shell.
+   *  The React App Router arcade (src/app/page.tsx) is now served at
+   *  the root route `/`. We previously rewrote `/` → `/index.html` to
+   *  serve a static placeholder page; that bypassed the React arcade
+   *  and only surfaced ~8 games, so it has been removed.
    *
-   *  The legacy React dashboard is preserved at /legacy/.
-   *  All other App Router routes (/leaderboard, /admin/*, etc.)
-   *  continue to work normally.
+   *  The old static page still exists at public/index.html for
+   *  reference but is no longer routed (slated for deletion).
    * ═══════════════════════════════════════════════════════════════
    */
   async rewrites() {
-    return [
-      {
-        source: "/",
-        destination: "/index.html",
-      },
-      {
-        source: "/index",
-        destination: "/index.html",
-      },
-    ];
+    return [];
   },
 
   /* ─────────────────────────────────────────────────────────────
