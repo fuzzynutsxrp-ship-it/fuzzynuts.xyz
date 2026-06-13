@@ -56,6 +56,12 @@ app.use(
   }),
 );
 
+// ── Cross-origin headers for game assets (WASM, WebGL, audio) ──
+// crossOriginResourcePolicy: cross-origin — allow iframe games to load assets
+app.use(
+  helmet.crossOriginResourcePolicy({ policy: "cross-origin" }),
+);
+
 // ── CORS — allow the frontend origin to call this API ──────────
 const ALLOWED_ORIGINS = [
   "https://fuzzynuts.xyz",
@@ -63,6 +69,8 @@ const ALLOWED_ORIGINS = [
   "https://game.fuzzynuts.xyz",
   "http://localhost:3000", // local dev
 ];
+
+// Standard CORS for API routes (JSON, credentialed)
 app.use(
   cors({
     origin(origin, cb) {
@@ -71,6 +79,23 @@ app.use(
       cb(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Range"],
+    exposedHeaders: ["Content-Length", "Content-Range", "X-Request-Id"],
+    maxAge: 86400, // cache preflight for 24h
+  }),
+);
+
+// ── CORS for game asset routes (images, WASM, WebGL binaries) ──
+// Wide-open origin for static game assets — these are public files
+// that games load from <script>, <img>, fetch(), WebAssembly.instantiate()
+app.use(
+  "/games",
+  cors({
+    origin: "*",
+    methods: ["GET", "HEAD", "OPTIONS"],
+    allowedHeaders: ["Range", "Content-Type"],
+    exposedHeaders: ["Content-Length", "Content-Range"],
   }),
 );
 
