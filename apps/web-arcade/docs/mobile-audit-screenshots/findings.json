@@ -1,0 +1,59 @@
+[
+  {
+    "slug": "homepage",
+    "device": "iPhone-12",
+    "issue": "Horizontal overflow detected (FALSE POSITIVE — tabs inside overflow-x:auto scroll container)",
+    "severity": "info",
+    "screenshot": "homepage-overflow-iPhone-12.png",
+    "revised": true,
+    "revised_reason": "Parent container has overflow-x:auto — this is correct scrollable tab behavior"
+  },
+  {
+    "slug": "mario",
+    "device": "iPhone-12",
+    "issue": "Horizontal overflow detected (FALSE POSITIVE — game uses CSS transform:scale for responsive layout)",
+    "severity": "info",
+    "screenshot": "mario-overflow-iPhone-12.png",
+    "revised": true,
+    "revised_reason": "Game uses transform: scale(min(100vw/1265, 100dvh/464)) — DOM rects don't match visual size"
+  },
+  {
+    "slug": "fuzzynuts-world",
+    "device": "iPhone-12",
+    "issue": "No game container (iframe/canvas) found on page — by design (MMORPG loads dynamically)",
+    "severity": "info"
+  },
+  {
+    "slug": "homepage",
+    "device": "Pixel-5",
+    "issue": "Horizontal overflow detected (FALSE POSITIVE — tabs inside overflow-x:auto scroll container)",
+    "severity": "info",
+    "screenshot": "homepage-overflow-Pixel-5.png",
+    "revised": true,
+    "revised_reason": "Parent container has overflow-x:auto — this is correct scrollable tab behavior"
+  },
+  {
+    "slug": "mario",
+    "device": "Pixel-5",
+    "issue": "Horizontal overflow detected (FALSE POSITIVE — game uses CSS transform:scale for responsive layout)",
+    "severity": "info",
+    "screenshot": "mario-overflow-Pixel-5.png",
+    "revised": true,
+    "revised_reason": "Game uses transform: scale(min(100vw/1265, 100dvh/464)) — DOM rects don't match visual size"
+  },
+  {
+    "slug": "fuzzynuts-world",
+    "device": "Pixel-5",
+    "issue": "No game container (iframe/canvas) found on page — by design (MMORPG loads dynamically)",
+    "severity": "info"
+  },
+  {
+    "slug": "rsc",
+    "device": "Pixel-5",
+    "issue": "Horizontal overflow detected (FALSE POSITIVE — particle in overflow:hidden fixed container)",
+    "severity": "info",
+    "screenshot": "rsc-overflow-Pixel-5.png",
+    "revised": true,
+    "revised_reason": "Particles are in position:fixed; inset:0; overflow:hidden container — visually clipped"
+  }
+]
