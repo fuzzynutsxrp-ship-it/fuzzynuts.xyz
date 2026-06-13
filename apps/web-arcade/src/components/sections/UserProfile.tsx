@@ -56,6 +56,7 @@ const GAME_EMOJIS: Record<string, string> = {
   "pong": "🏓",
   "tetris": "🟦",
   "asteroids": "☄️",
+  "flappy": "🐦",
 };
 
 /* ═══════════════════════════════════════════════════════════════

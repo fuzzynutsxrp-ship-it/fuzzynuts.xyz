@@ -95,6 +95,11 @@ var FuzzyScoreSubmit = (function() {
     'pong': 11,
     'tetris': 999999,
     'asteroids': 500000,
+    'doodle-jump': 500000,
+    'ski-free': 99999,
+    'jetpack': 100000,
+    'subway-runner': 50000,
+    'flappy': 999,
     // legacy aliases (DO NOT add to canonical list)
     'survivors': 5000000,
     'racer': 2000000,

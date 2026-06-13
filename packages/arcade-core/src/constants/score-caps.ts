@@ -34,6 +34,11 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   "pong": 11, // First to 11 wins
   "tetris": 999_999, // Falling blocks puzzle
   "asteroids": 500_000, // Ship vs asteroids
+  "flappy": 999,
+  "subway-runner": 50_000,
+  "jetpack": 100_000,
+  "ski-free": 99_999,
+  "doodle-jump": 500_000,
 };
 
 /** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */
