@@ -10,32 +10,38 @@ import {
   Radio,
   ChevronDown,
   Gamepad2,
+  Users,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
+import { truncateAddress, formatNumber } from "@/lib/utils";
 import { useWalletStore } from "@/store/wallet";
 import { useSession } from "next-auth/react";
 import {
   useLeaderboardSSE,
   getCurrentWeekKey,
-  getWeekKeyOffset,
   timeAgo,
 } from "@/features/arcade";
 import type { ScoreEntry } from "@/features/arcade";
-import { API_SCORES, MAX_ENTRIES } from "@/features/arcade/constants";
+import { API_SCORES } from "@/features/arcade/constants";
 import { toBackendSlug } from "@/features/arcade/slugAliases";
 import { MyRankWidget } from "@/components/ui/MyRankWidget";
+import { gameRegistry } from "@/lib/gameRegistry";
 
 /* ═══════════════════════════════════════════════════════════════
    Constants
    ═══════════════════════════════════════════════════════════════ */
 
+const LEADERBOARD_SIZE = 100;
+
+/** Build game filter list from gameRegistry — only games with leaderboards */
 const GAME_FILTERS = [
-  { id: "all", label: "All Games", emoji: "🎮" },
-  ...GAMES.map((g) => ({ id: g.id, label: g.title, emoji: g.image })),
+  { slug: "all", title: "All Games" },
+  ...gameRegistry
+    .getAll()
+    .filter((g) => g.status === "live" && g.leaderboardEnabled)
+    .map((g) => ({ slug: g.slug, title: g.title })),
 ];
 
 const TIMEFRAMES = [
@@ -43,22 +49,94 @@ const TIMEFRAMES = [
   { id: "alltime", label: "All Time" },
 ];
 
-const GAME_EMOJIS: Record<string, string> = Object.fromEntries(
-  GAMES.map((g) => [g.id, g.image]),
-);
+/* ═══════════════════════════════════════════════════════════════
+   Aggregated player row type
+   ═══════════════════════════════════════════════════════════════ */
+
+interface PlayerRow {
+  /** Best display name available */
+  displayName: string;
+  /** Wallet address (if XRPL) */
+  wallet?: string;
+  /** Google userId (if web2) */
+  userId?: string;
+  /** Sum of scores across games */
+  totalScore: number;
+  /** Count of distinct games played */
+  gamesPlayed: number;
+  /** Best rank across all game entries */
+  bestRank: number;
+  /** Most recent timestamp */
+  lastActive: number;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Aggregate raw score entries into player rows
+   ═══════════════════════════════════════════════════════════════ */
+
+function aggregateByPlayer(entries: ScoreEntry[]): PlayerRow[] {
+  const map = new Map<string, PlayerRow>();
+
+  for (const entry of entries) {
+    // Key by wallet (XRPL) or userId (Google) or name fallback
+    const key =
+      entry.wallet?.toLowerCase() ||
+      entry.userId ||
+      entry.displayName ||
+      entry.name ||
+      `anon-${Math.random()}`;
+
+    const existing = map.get(key);
+    if (existing) {
+      existing.totalScore += entry.score;
+      existing.gamesPlayed += 1;
+      if (entry.ts && entry.ts > existing.lastActive) {
+        existing.lastActive = entry.ts;
+      }
+      // Keep best display name
+      if (entry.displayName && !existing.displayName) {
+        existing.displayName = entry.displayName;
+      }
+    } else {
+      map.set(key, {
+        displayName:
+          entry.displayName ||
+          entry.name ||
+          (entry.wallet ? truncateAddress(entry.wallet) : "Anonymous"),
+        wallet: entry.wallet,
+        userId: entry.userId,
+        totalScore: entry.score,
+        gamesPlayed: 1,
+        bestRank: 0,
+        lastActive: entry.ts || 0,
+      });
+    }
+  }
+
+  // Sort by total score descending and assign ranks
+  const rows = Array.from(map.values())
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .slice(0, LEADERBOARD_SIZE);
+
+  rows.forEach((row, i) => {
+    row.bestRank = i + 1;
+  });
+
+  return rows;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    Podium Component — Top 3 players
    ═══════════════════════════════════════════════════════════════ */
 
 function Podium({
-  scores,
-  currentUserId,
+  rows,
+  currentUserKey,
 }: {
-  scores: ScoreEntry[];
-  currentUserId?: string | null;
+  rows: PlayerRow[];
+  currentUserKey?: string | null;
 }) {
-  const top3 = scores.slice(0, 3);
+  const top3 = rows.slice(0, 3);
   if (top3.length === 0) return null;
 
   const podiumConfig = [
@@ -66,10 +144,11 @@ function Podium({
       rank: 1,
       medal: "🥇",
       borderClass: "border-brand-gold/40",
-      shadowStyle: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.08)",
+      shadowStyle:
+        "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.08)",
       textClass: "text-brand-gold",
       label: "1st Place",
-      order: "order-2", // center on desktop
+      order: "order-2",
     },
     {
       rank: 2,
@@ -96,13 +175,10 @@ function Podium({
       {podiumConfig.map((cfg) => {
         const entry = top3[cfg.rank - 1];
         if (!entry) return <div key={cfg.rank} />;
-        const name =
-          entry.displayName ||
-          entry.name ||
-          (entry.wallet ? truncateAddress(entry.wallet) : "Anonymous");
         const isYou =
-          currentUserId &&
-          entry.wallet?.toLowerCase() === currentUserId.toLowerCase();
+          currentUserKey &&
+          (entry.wallet?.toLowerCase() === currentUserKey.toLowerCase() ||
+            entry.userId === currentUserKey);
 
         return (
           <div
@@ -111,19 +187,26 @@ function Podium({
             style={{ boxShadow: cfg.shadowStyle }}
           >
             <div className="text-3xl sm:text-4xl mb-2">{cfg.medal}</div>
-            <p className={`text-[10px] font-bold uppercase tracking-widest ${cfg.textClass} mb-1.5`}>
+            <p
+              className={`text-[10px] font-bold uppercase tracking-widest ${cfg.textClass} mb-1.5`}
+            >
               {cfg.label}
             </p>
             <p className="font-display text-sm sm:text-base font-bold text-cream truncate">
-              {name}
+              {entry.displayName}
               {isYou && (
                 <span className="ml-1 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1 py-0.5 rounded-full">
                   you
                 </span>
               )}
             </p>
-            <p className={`font-mono text-lg sm:text-xl font-black ${cfg.textClass} mt-1`}>
-              {formatNumber(entry.score)}
+            <p
+              className={`font-mono text-lg sm:text-xl font-black ${cfg.textClass} mt-1`}
+            >
+              {formatNumber(entry.totalScore)}
+            </p>
+            <p className="text-[10px] text-[var(--color-cream-dim)] mt-1">
+              {entry.gamesPlayed} game{entry.gamesPlayed !== 1 ? "s" : ""} played
             </p>
           </div>
         );
@@ -151,11 +234,9 @@ function RankBadge({ rank }: { rank: number }) {
    Provider Badge — [Google] or [XRPL]
    ═══════════════════════════════════════════════════════════════ */
 
-function ProviderBadge({ entry }: { entry: ScoreEntry }) {
-  // Heuristic: if entry has userId and it looks like a Google ID, show Google.
-  // If it has a wallet address (starts with r), show XRPL.
-  const hasUserId = !!entry.userId;
-  const hasWallet = !!entry.wallet && entry.wallet.startsWith("r");
+function ProviderBadge({ row }: { row: PlayerRow }) {
+  const hasUserId = !!row.userId;
+  const hasWallet = !!row.wallet && row.wallet.startsWith("r");
 
   if (hasUserId && !hasWallet) {
     return (
@@ -222,25 +303,24 @@ export function LeaderboardClient() {
       setAllLoading(true);
       setAllError(null);
       try {
+        const liveGames = gameRegistry
+          .getAll()
+          .filter((g) => g.status === "live" && g.leaderboardEnabled);
         const params = timeframe === "weekly" ? `&week=${weekKey}` : "";
-        const promises = GAMES.map(async (game) => {
-          const backendSlug = toBackendSlug(game.id);
-          const url = `${API_SCORES}?game=${backendSlug}&limit=${MAX_ENTRIES}${params}`;
+        const promises = liveGames.map(async (game) => {
+          const backendSlug = toBackendSlug(game.slug);
+          const url = `${API_SCORES}?game=${backendSlug}&limit=${LEADERBOARD_SIZE}${params}`;
           const res = await fetch(url);
           if (!res.ok) return [];
           const data = await res.json();
           const raw: ScoreEntry[] = Array.isArray(data)
             ? data
             : data.leaderboard || data.scores || data.data || [];
-          return raw.map((e) => ({ ...e, game: e.game || game.id }));
+          return raw.map((e) => ({ ...e, game: e.game || game.slug }));
         });
         const results = await Promise.all(promises);
         if (!cancelled) {
-          const merged = results
-            .flat()
-            .sort((a, b) => b.score - a.score)
-            .slice(0, MAX_ENTRIES);
-          setAllScores(merged);
+          setAllScores(results.flat());
         }
       } catch (err) {
         if (!cancelled) {
@@ -261,8 +341,8 @@ export function LeaderboardClient() {
     };
   }, [selectedGame, timeframe, weekKey]);
 
-  // Resolve which data to use
-  const scores =
+  // Resolve raw scores
+  const rawScores =
     selectedGame === "all" ? allScores : singleGameHook.scores;
   const loading =
     selectedGame === "all" ? allLoading : singleGameHook.loading;
@@ -275,21 +355,28 @@ export function LeaderboardClient() {
   const manualRefresh =
     selectedGame === "all" ? () => {} : singleGameHook.manualRefresh;
 
-  // ── Find current user's rank ──
-  const userRankIndex = walletAddress
-    ? scores.findIndex(
-        (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase(),
+  // ── Aggregate into player rows ──
+  const playerRows = useMemo(
+    () => aggregateByPlayer(rawScores),
+    [rawScores],
+  );
+
+  // ── Find current user ──
+  const currentUserKey = walletAddress || session?.user?.email || null;
+  const userRowIndex = currentUserKey
+    ? playerRows.findIndex(
+        (r) =>
+          r.wallet?.toLowerCase() === currentUserKey.toLowerCase() ||
+          r.userId === currentUserKey,
       )
     : -1;
-  const userRank = userRankIndex >= 0 ? userRankIndex + 1 : null;
-  const userEntry = userRank ? scores[userRankIndex] : null;
-
-  // Table rows (skip top 3 if podium is shown)
-  const tableScores = scores.slice(3);
+  const userRank = userRowIndex >= 0 ? userRowIndex + 1 : null;
 
   // Game title for empty state
   const selectedGameMeta =
-    selectedGame !== "all" ? GAMES.find((g) => g.id === selectedGame) : null;
+    selectedGame !== "all"
+      ? gameRegistry.getBySlug(selectedGame)
+      : null;
   const selectedGameLabel = selectedGameMeta?.title || "All Games";
 
   return (
@@ -321,11 +408,10 @@ export function LeaderboardClient() {
               <Trophy className="text-brand-gold" size={28} />
               Global Leaderboard
             </h1>
-            {timeframe === "weekly" && (
-              <p className="text-sm text-[var(--color-cream-dim)] mt-1">
-                Resets every Monday 00:00 UTC
-              </p>
-            )}
+            <p className="text-sm text-[var(--color-cream-dim)] mt-1">
+              Top {LEADERBOARD_SIZE} players
+              {timeframe === "weekly" && " · Resets every Monday 00:00 UTC"}
+            </p>
           </div>
 
           {/* ── My Rank Widget ── */}
@@ -337,16 +423,15 @@ export function LeaderboardClient() {
             <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-white/[0.03] border border-white/5 overflow-x-auto">
               {GAME_FILTERS.map((gf) => (
                 <button
-                  key={gf.id}
-                  onClick={() => setSelectedGame(gf.id)}
+                  key={gf.slug}
+                  onClick={() => setSelectedGame(gf.slug)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                    selectedGame === gf.id
+                    selectedGame === gf.slug
                       ? "bg-brand-gold/15 text-brand-gold border border-brand-gold/30"
                       : "text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 border border-transparent"
                   }`}
                 >
-                  <span>{gf.emoji}</span>
-                  <span>{gf.label}</span>
+                  <span>{gf.title}</span>
                 </button>
               ))}
             </div>
@@ -357,9 +442,8 @@ export function LeaderboardClient() {
                 onClick={() => setGameDropdownOpen(!gameDropdownOpen)}
                 className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/5 text-cream font-semibold text-sm"
               >
-                <span className="flex items-center gap-2">
-                  <span>{GAME_FILTERS.find((g) => g.id === selectedGame)?.emoji}</span>
-                  <span>{GAME_FILTERS.find((g) => g.id === selectedGame)?.label}</span>
+                <span>
+                  {GAME_FILTERS.find((g) => g.slug === selectedGame)?.title}
                 </span>
                 <ChevronDown
                   size={16}
@@ -372,23 +456,22 @@ export function LeaderboardClient() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden bg-[#0a0613] border border-white/10 shadow-2xl"
+                    className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden bg-[#0a0613] border border-white/10 shadow-2xl max-h-64 overflow-y-auto"
                   >
                     {GAME_FILTERS.map((gf) => (
                       <button
-                        key={gf.id}
+                        key={gf.slug}
                         onClick={() => {
-                          setSelectedGame(gf.id);
+                          setSelectedGame(gf.slug);
                           setGameDropdownOpen(false);
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
-                          selectedGame === gf.id
+                          selectedGame === gf.slug
                             ? "bg-brand-gold/10 text-brand-gold"
                             : "text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5"
                         }`}
                       >
-                        <span>{gf.emoji}</span>
-                        <span>{gf.label}</span>
+                        <span>{gf.title}</span>
                       </button>
                     ))}
                   </motion.div>
@@ -440,21 +523,23 @@ export function LeaderboardClient() {
           </div>
 
           {/* ── Podium (Top 3) ── */}
-          {!loading && scores.length > 0 && (
-            <Podium scores={scores} currentUserId={walletAddress} />
+          {!loading && playerRows.length > 0 && (
+            <Podium rows={playerRows} currentUserKey={currentUserKey} />
           )}
 
           {/* ── Leaderboard Table ── */}
           <div className="rounded-xl overflow-hidden border border-white/5 bg-[#0a0613]">
-            {/* Table Header */}
-            <div className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cream-dim)] border-b border-white/5 bg-white/[0.02]">
+            {/* Table Header — desktop */}
+            <div className="hidden sm:flex items-center gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cream-dim)] border-b border-white/5 bg-white/[0.02]">
               <span className="w-10 text-center">Rank</span>
               <span className="flex-1">Player</span>
-              {selectedGame === "all" && (
-                <span className="w-28 text-right hidden md:block">Game</span>
-              )}
-              <span className="w-24 text-right">Score</span>
-              <span className="w-20 text-right hidden sm:block">When</span>
+              <span className="w-28 text-right">Games Played</span>
+              <span className="w-28 text-right">Total Score</span>
+            </div>
+
+            {/* Mobile header */}
+            <div className="sm:hidden px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cream-dim)] border-b border-white/5 bg-white/[0.02]">
+              Top Players
             </div>
 
             {/* Loading skeleton */}
@@ -472,14 +557,15 @@ export function LeaderboardClient() {
                       <div className="w-8 h-8 rounded-full bg-white/5" />
                       <div className="w-24 h-4 rounded bg-white/5" />
                     </div>
-                    <div className="w-24 h-4 rounded bg-white/5" />
+                    <div className="w-24 h-4 rounded bg-white/5 hidden sm:block" />
+                    <div className="w-24 h-4 rounded bg-white/5 hidden sm:block" />
                   </div>
                 ))}
               </div>
             )}
 
             {/* Error state */}
-            {!loading && error && scores.length === 0 && (
+            {!loading && error && playerRows.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <WifiOff size={32} className="text-orange mb-4 opacity-60" />
                 <p className="font-display text-lg font-bold text-cream mb-2">
@@ -499,7 +585,7 @@ export function LeaderboardClient() {
             )}
 
             {/* Empty state */}
-            {!loading && !error && scores.length === 0 && (
+            {!loading && !error && playerRows.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
                 <Gamepad2
                   size={48}
@@ -524,79 +610,103 @@ export function LeaderboardClient() {
               </div>
             )}
 
-            {/* Score rows (starting from rank 4, since top 3 are in podium) */}
-            {!loading && tableScores.length > 0 && (
+            {/* Player rows — skip top 3 (podium) */}
+            {!loading && playerRows.length > 0 && (
               <div>
-                {tableScores.map((entry, index) => {
+                {playerRows.slice(3).map((row, index) => {
                   const rank = index + 4; // offset by 3 for podium
                   const isCurrentUser =
-                    walletAddress &&
-                    entry.wallet?.toLowerCase() ===
-                      walletAddress.toLowerCase();
-                  const displayName =
-                    entry.displayName ||
-                    entry.name ||
-                    (entry.wallet
-                      ? truncateAddress(entry.wallet)
-                      : "Anonymous");
-                  const gameMeta = GAMES.find(
-                    (g) => g.id === entry.game,
-                  );
+                    currentUserKey &&
+                    (row.wallet?.toLowerCase() ===
+                      currentUserKey.toLowerCase() ||
+                      row.userId === currentUserKey);
 
                   return (
                     <div
-                      key={`${entry.wallet || index}-${entry.score}-${entry.game}`}
-                      className={`flex items-center gap-3 px-4 py-3 border-b border-white/[0.03] last:border-0 transition-colors ${
+                      key={`${row.wallet || row.userId || index}`}
+                      className={`border-b border-white/[0.03] last:border-0 transition-colors ${
                         isCurrentUser
                           ? "bg-brand-gold/[0.06] border-l-2 border-l-brand-gold"
                           : "hover:bg-white/[0.02]"
                       }`}
                     >
-                      {/* Rank */}
-                      <div className="w-10 flex justify-center shrink-0">
-                        <RankBadge rank={rank} />
-                      </div>
+                      {/* Desktop row */}
+                      <div className="hidden sm:flex items-center gap-3 px-4 py-3">
+                        {/* Rank */}
+                        <div className="w-10 flex justify-center shrink-0">
+                          <RankBadge rank={rank} />
+                        </div>
 
-                      {/* Player */}
-                      <div className="flex-1 min-w-0 flex items-center">
-                        <span
-                          className={`text-sm font-medium truncate ${
-                            isCurrentUser
-                              ? "text-brand-gold font-bold"
-                              : "text-cream"
-                          }`}
-                        >
-                          {displayName}
-                        </span>
-                        <ProviderBadge entry={entry} />
-                        {isCurrentUser && (
-                          <span className="ml-1.5 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
-                            you
+                        {/* Player */}
+                        <div className="flex-1 min-w-0 flex items-center">
+                          <span
+                            className={`text-sm font-medium truncate ${
+                              isCurrentUser
+                                ? "text-brand-gold font-bold"
+                                : "text-cream"
+                            }`}
+                          >
+                            {row.displayName}
                           </span>
-                        )}
-                      </div>
+                          <ProviderBadge row={row} />
+                          {isCurrentUser && (
+                            <span className="ml-1.5 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
+                              you
+                            </span>
+                          )}
+                        </div>
 
-                      {/* Game column (All Games mode only) */}
-                      {selectedGame === "all" && (
-                        <div className="w-28 text-right shrink-0 hidden md:block">
-                          <span className="text-xs text-[var(--color-cream-dim)]">
-                            {gameMeta?.image} {gameMeta?.title || entry.game}
+                        {/* Games Played */}
+                        <div className="w-28 text-right shrink-0">
+                          <span className="font-mono text-sm tabular-nums text-[var(--color-cream-dim)]">
+                            {row.gamesPlayed}
                           </span>
                         </div>
-                      )}
 
-                      {/* Score */}
-                      <div className="w-24 text-right shrink-0">
-                        <span className="font-mono text-sm font-bold tabular-nums text-cream">
-                          {formatNumber(entry.score)}
-                        </span>
+                        {/* Total Score */}
+                        <div className="w-28 text-right shrink-0">
+                          <span className="font-mono text-sm font-bold tabular-nums text-cream">
+                            {formatNumber(row.totalScore)}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Time ago */}
-                      <div className="w-20 text-right shrink-0 hidden sm:block">
-                        <span className="text-[11px] font-mono text-[var(--color-cream-dim)] opacity-60">
-                          {entry.ts ? timeAgo(entry.ts) : "—"}
-                        </span>
+                      {/* Mobile card — stacked columns */}
+                      <div className="sm:hidden px-4 py-3 flex items-start gap-3">
+                        {/* Rank */}
+                        <div className="flex justify-center shrink-0 pt-0.5">
+                          <RankBadge rank={rank} />
+                        </div>
+
+                        {/* Player info + stats stacked */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`text-sm font-medium truncate ${
+                                isCurrentUser
+                                  ? "text-brand-gold font-bold"
+                                  : "text-cream"
+                              }`}
+                            >
+                              {row.displayName}
+                            </span>
+                            <ProviderBadge row={row} />
+                            {isCurrentUser && (
+                              <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1 py-0.5 rounded-full">
+                                you
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="text-[11px] text-[var(--color-cream-dim)]">
+                              <Users size={10} className="inline mr-0.5" />
+                              {row.gamesPlayed} game{row.gamesPlayed !== 1 ? "s" : ""}
+                            </span>
+                            <span className="font-mono text-xs font-bold tabular-nums text-cream">
+                              {formatNumber(row.totalScore)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
@@ -605,7 +715,7 @@ export function LeaderboardClient() {
             )}
 
             {/* Soft warning (partial error with cached data) */}
-            {error && scores.length > 0 && (
+            {error && playerRows.length > 0 && (
               <div className="px-4 py-2 bg-orange/5 border-t border-orange/20 text-xs text-orange flex items-center gap-2">
                 <WifiOff size={12} />
                 {error}
@@ -616,7 +726,7 @@ export function LeaderboardClient() {
           {/* Footer meta */}
           {lastFetched && (
             <p className="text-[11px] text-[var(--color-cream-dim)]/60 text-center mt-4 font-mono">
-              Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} ·{" "}
+              Updated {timeAgo(lastFetched)} · Top {LEADERBOARD_SIZE} ·{" "}
               {timeframe === "weekly"
                 ? "Resets Monday 00:00 UTC"
                 : "All Time"}
@@ -625,7 +735,7 @@ export function LeaderboardClient() {
 
           {/* ── Sticky User Rank Banner (if not in top 100) ── */}
           <AnimatePresence>
-            {walletAddress && userRank === null && !loading && scores.length > 0 && (
+            {currentUserKey && userRank === null && !loading && playerRows.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -634,7 +744,7 @@ export function LeaderboardClient() {
               >
                 <Trophy size={16} className="text-brand-gold" />
                 <span className="text-sm text-cream">
-                  Your rank is outside the top {MAX_ENTRIES}. Play to climb!
+                  Your rank is outside the top {LEADERBOARD_SIZE}. Play to climb!
                 </span>
                 <Link
                   href="/"
