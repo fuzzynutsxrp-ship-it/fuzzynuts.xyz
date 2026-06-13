@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Secret — Fuzzynuts Arcade</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FUZZYNUTS GAME STARTER TEMPLATE
+       
+       This is a ready-to-run HTML5 game skeleton that implements
+       the full Fuzzynuts postMessage contract out of the box.
+       
+       Replace the placeholder canvas logic with your actual game.
+       The scoring, muting, and communication bridge are pre-wired.
+       
+       Contracts implemented:
+         ✅ fuzzy-score.js bridge (score submission)
+         ✅ postMessage: gameReady (loading overlay dismissal)
+         ✅ postMessage: FUZZY_SCORE_SUBMITTED (score toast)
+         ✅ postMessage: setMute (audio control from parent)
+       ═══════════════════════════════════════════════════════════════ -->
+
+  <style>
+    /* ── Fuzzynuts Cyber-Nature Design Tokens ── */
+    :root {
+      --fn-brand-gold:    #FBBF24;
+      --fn-neon-green:    #10B981;
+      --fn-forest-dark:   #010508;
+      --fn-card-bg:       rgba(26, 26, 36, 0.85);
+      --fn-cream:         #f0ede6;
+      --fn-error:         #ef4444;
+      --fn-font-heading:  'Outfit', sans-serif;
+      --fn-font-body:     'Inter', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--fn-forest-dark);
+      color: var(--fn-cream);
+      font-family: var(--fn-font-body);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #game-canvas {
+      display: block;
+      background: #0a0a14;
+      image-rendering: pixelated;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* ── HUD Overlay ── */
+    #hud {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hud-item {
+      background: var(--fn-card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fn-brand-gold);
+      text-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+    }
+
+    /* ── Game Over Overlay ── */
+    #game-over {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(1, 5, 8, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    #game-over.visible { display: flex; }
+
+    #game-over h2 {
+      font-family: var(--fn-font-heading);
+      font-size: 32px;
+      color: var(--fn-brand-gold);
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
+
+    #game-over .final-score {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--fn-cream);
+    }
+
+    #game-over button {
+      margin-top: 12px;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      pointer-events: auto;
+    }
+
+    #btn-retry {
+      background: var(--fn-brand-gold);
+      color: var(--fn-forest-dark);
+    }
+    #btn-retry:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    }
+
+    /* ── Reduced Motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HUD: score + timer -->
+  <div id="hud">
+    <div class="hud-item">🌰 Score: <span id="hud-score">0</span></div>
+    <div class="hud-item">⏱ <span id="hud-time">0:00</span></div>
+  </div>
+
+  <!-- Game Canvas -->
+  <canvas id="game-canvas" width="960" height="540"></canvas>
+
+  <!-- Game Over Overlay -->
+  <div id="game-over">
+    <h2>🐿️ Game Over!</h2>
+    <div class="final-score" id="final-score">0</div>
+    <button id="btn-retry">Play Again 🌰</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCORE BRIDGE — Include BEFORE your game logic.
+       This provides FuzzyScoreSubmit(slug, score, duration).
+       Path assumes game is in public/games/<slug>/ directory.
+       ═══════════════════════════════════════════════════════════ -->
+  <script src="../fuzzy-score.js"></script>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════════
+       GAME ENGINE SKELETON
+       
+       Replace this section with your actual game logic.
+       The integration hooks are clearly marked with 🔌 icons.
+       ═══════════════════════════════════════════════════════════ */
+
+    (function() {
+      'use strict';
+
+      // ──────────────────────────────────────────────────
+      // 🔌 CONFIGURATION — Set these for YOUR game
+      // ──────────────────────────────────────────────────
+
+      /**
+       * GAME_SLUG must match:
+       *   1. The folder name in public/games/<slug>/
+       *   2. The key in GAME_REGISTRY (page.tsx)
+       *   3. The entry in SCORE_CAPS (fuzzy-score.js)
+       *   4. The key in GAMES array (utils.ts)
+       */
+      var GAME_SLUG = 'top-secret';  // ← CHANGE THIS
+      var GAME_TITLE = 'Top Secret';  // ← CHANGE THIS
+
+      // ──────────────────────────────────────────────────
+      // State
+      // ──────────────────────────────────────────────────
+
+      var canvas = document.getElementById('game-canvas');
+      var ctx = canvas.getContext('2d');
+      var score = 0;
+      var startTime = Date.now();
+      var isRunning = false;
+      var isMuted = false;
+      var animFrameId = null;
+
+      // ──────────────────────────────────────────────────
+      // 🔌 POSTMESSAGE CONTRACT: setMute listener
+      // GameWrapper sends this when user clicks mute button
+      // ──────────────────────────────────────────────────
+
+      window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'setMute') {
+          isMuted = event.data.muted;
+          console.log('[' + GAME_TITLE + '] Mute:', isMuted);
+          // TODO: Mute/unmute your audio system here
+          // e.g., audioContext.suspend() / audioContext.resume()
+        }
+      });
+
+      // ──────────────────────────────────────────────────
+      // HUD Updates
+      // ──────────────────────────────────────────────────
+
+      function updateHUD() {
+        document.getElementById('hud-score').textContent = score;
+        var elapsed = Math.floor((Date.now() - startTime) / 1000);
+        var mins = Math.floor(elapsed / 60);
+        var secs = elapsed % 60;
+        document.getElementById('hud-time').textContent =
+          mins + ':' + String(secs).padStart(2, '0');
+      }
+
+      // ──────────────────────────────────────────────────
+      // Game Loop (PLACEHOLDER — Replace with your game!)
+      // ──────────────────────────────────────────────────
+
+      function gameLoop() {
+        if (!isRunning) return;
+
+        // Clear canvas
+        ctx.fillStyle = '#0a0a14';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // ── PLACEHOLDER: Draw a demo message ──
+        ctx.fillStyle = '#FBBF24';
+        ctx.font = '24px Outfit, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🐿️ Replace this with your game!', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.fillStyle = '#f0ede6';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillText('Click anywhere to add +100 points', canvas.width / 2, canvas.height / 2 + 20);
+        ctx.fillText('Press ESC or wait 60s for Game Over', canvas.width / 2, canvas.height / 2 + 50);
+
+        // ── PLACEHOLDER: Auto-increment score for demo ──
+        score += 1;
+
+        // ── PLACEHOLDER: Auto game-over after 60s ──
+        var elapsed = (Date.now() - startTime) / 1000;
+        if (elapsed >= 60) {
+          gameOver();
+          return;
+        }
+
+        updateHUD();
+        animFrameId = requestAnimationFrame(gameLoop);
+      }
+
+      // ── PLACEHOLDER: Click handler for demo ──
+      canvas.addEventListener('click', function() {
+        if (isRunning) {
+          score += 100;
+          updateHUD();
+        }
+      });
+
+      // ESC key → game over
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isRunning) {
+          gameOver();
+        }
+      });
+
+      // ──────────────────────────────────────────────────
+      // 🔌 GAME OVER: Submit score via fuzzy-score.js
+      // This is the critical integration point.
+      // ──────────────────────────────────────────────────
+
+      function gameOver() {
+        isRunning = false;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+
+        var durationSeconds = Math.floor((Date.now() - startTime) / 1000);
+
+        // Show game over overlay
+        document.getElementById('final-score').textContent = score.toLocaleString();
+        document.getElementById('game-over').classList.add('visible');
+
+        // 🔌 SUBMIT SCORE — This is the key integration!
+        // FuzzyScoreSubmit handles:
+        //   1. Client-side validation (cap check, duration check)
+        //   2. localStorage persistence (instant)
+        //   3. Backend API POST (async, fire-and-forget)
+        //   4. postMessage → parent GameWrapper (toast notification)
+        var result = FuzzyScoreSubmit(GAME_SLUG, score, durationSeconds);
+        console.log('[' + GAME_TITLE + '] Score submitted:', result);
+
+        // 🔌 ACHIEVEMENT: Unlock "Desert Explorer" on first play
+        try {
+          if (!localStorage.getItem('fuzzy_achievement_desert_explorer')) {
+            localStorage.setItem('fuzzy_achievement_desert_explorer', 'true');
+            console.log('[' + GAME_TITLE + '] 🏜️ Achievement unlocked: Desert Explorer');
+            window.parent.postMessage({
+              type: 'FUZZY_ACHIEVEMENT_UNLOCKED',
+              achievement: 'desert-explorer'
+            }, '*');
+          }
+        } catch(e) {}
+      }
+
+      // ──────────────────────────────────────────────────
+      // Retry
+      // ──────────────────────────────────────────────────
+
+      document.getElementById('btn-retry').addEventListener('click', function() {
+        document.getElementById('game-over').classList.remove('visible');
+        startGame();
+      });
+
+      // ──────────────────────────────────────────────────
+      // 🔌 START GAME + gameReady signal
+      // ──────────────────────────────────────────────────
+
+      function startGame() {
+        score = 0;
+        startTime = Date.now();
+        isRunning = true;
+        updateHUD();
+        gameLoop();
+      }
+
+      // ──────────────────────────────────────────────────
+      // 🔌 INITIALIZATION — Signal parent when ready
+      // This dismisses the LoadingOverlay in GameWrapper.
+      // Must be called AFTER all assets are loaded.
+      // ──────────────────────────────────────────────────
+
+      function init() {
+        // Resize canvas to fill viewport
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+          if (!document.fullscreenElement) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+          }
+        });
+
+        // Start the game
+        startGame();
+
+        // 🔌 SIGNAL PARENT: "I'm ready, dismiss the loading overlay"
+        try {
+          window.parent.postMessage({ type: 'gameReady' }, '*');
+          console.log('[' + GAME_TITLE + '] Sent gameReady to parent');
+        } catch(e) {}
+      }
+
+      // Boot
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

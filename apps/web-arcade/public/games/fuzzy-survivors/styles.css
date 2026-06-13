@@ -1,0 +1,1289 @@
+/* Survivor — open-source roguelite styles */
+:root {
+    --bg: #0a0613;
+    --card: rgba(10, 6, 19, 0.95);
+    --accent: #d4a843;
+    --accent-strong: #b8922f;
+    /* iter-10 a11y: --primary darkened from #3388ff (3.43:1 vs white) to
+       #1d6fe0 (~4.66:1) so primary buttons clear the WCAG AA 4.5:1 bar
+       at the existing 15px weight 600 on white text. */
+    --primary: #ff2e88;
+    --primary-strong: #ff5fa8;
+    --danger: #ff3355;
+    --muted: rgba(245, 240, 230, 0.45);
+    --text: #e8ebf3;
+    --border: rgba(255, 46, 136, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    /* Use small-viewport / dynamic-viewport units with a vh fallback so iOS
+       Safari doesn't overflow behind the address bar. */
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+    background: radial-gradient(ellipse at top, #1a0d2e 0%, #0a0613 70%);
+    color: var(--text);
+    font-family:
+        "Outfit",
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        'Microsoft YaHei',
+        sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none; /* disable browser pinch/zoom inside the game */
+    overscroll-behavior: none; /* no pull-to-refresh on mobile */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameContainer {
+    position: relative;
+    box-shadow: 0 0 60px rgba(255, 46, 136, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    /* Scale to fill the viewport while preserving the game's 3:2 aspect ratio.
+       Without explicit width/height, the flex parent (body) sized this to the
+       canvas's intrinsic 1200×800, leaving the iframe mostly black. */
+    width: min(100vw, calc(100dvh * 1.5));
+    height: min(100dvh, calc(100vw / 1.5));
+    max-width: 100vw;
+    max-height: 100vh;
+    max-height: 100svh;
+    max-height: 100dvh;
+}
+
+/* ═══ MOBILE: fullscreen game container ═══
+   On touch devices, pin the game container to the viewport edges using
+   position:fixed. This is the standard pattern for fullscreen mobile web
+   games — it bypasses body flex, padding, and overflow entirely. The canvas
+   inside already has width:100%; height:100% so it fills whatever size
+   the container is. */
+@media (hover: none) and (pointer: coarse) {
+    #gameContainer {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%);
+        max-width: 100vw;
+        max-height: 100vh;
+        max-height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+        z-index: 1;
+    }
+}
+
+/*
+ * Accessibility: a visually-hidden element that still exposes text to
+ * assistive tech. Paired with aria-live="polite" to announce game events.
+ */
+.sr-only {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Visible focus ring for keyboard users. Pointer users keep a clean look. */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.upgrade-option:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(255, 210, 77, 0.25);
+}
+
+canvas {
+    display: block;
+    border: 1px solid rgba(255, 46, 136, 0.15);
+    background: #0d0a16;
+    width: 100%;
+    height: 100%;
+    image-rendering: crisp-edges;
+}
+/* Remove canvas border on mobile — it creates a visible "frame" */
+@media (hover: none) and (pointer: coarse) {
+    canvas {
+        border: none;
+    }
+}
+
+#ui {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.hud {
+    position: absolute;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 14px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    line-height: 1.6;
+}
+
+.hud-sub {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+#topLeft {
+    top: 10px;
+    left: 10px;
+}
+#topRight {
+    top: 10px;
+    right: 10px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+#bottomLeft {
+    bottom: 10px;
+    left: 10px;
+}
+
+.bar-label {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.hp-bar,
+.exp-bar {
+    width: 220px;
+    height: 12px;
+    background: rgba(20, 22, 36, 0.9);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff3355, #ff6a7a);
+    transition: width 0.2s;
+}
+.exp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d4a843, #ffd280);
+    transition: width 0.2s;
+}
+
+.chip-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.weapon-icons {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    max-width: 260px;
+    justify-content: flex-end;
+    /* iter-10: float HUD chips above the gameplay so the player avatar can
+       never tuck under them when the camera stops at the arena edge. The
+       semi-transparent backdrop on `.chip` keeps things legible without
+       hiding the world behind it. */
+    z-index: 5;
+    pointer-events: none;
+}
+.weapon-icons .chip {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+.chip {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    background: rgba(0, 0, 0, 0.72);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+.chip.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(255, 210, 77, 0.35);
+}
+.chip.maxed {
+    border-color: #00d9a0;
+    box-shadow: 0 0 10px rgba(0, 217, 160, 0.4);
+}
+.chip.evolved {
+    border-color: #ff66aa;
+    box-shadow: 0 0 12px rgba(255, 102, 170, 0.55);
+}
+.chip-lvl {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: var(--accent);
+    color: #111;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 6px;
+}
+
+.icon-btn {
+    pointer-events: auto;
+    background: rgba(10, 12, 22, 0.85);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.icon-btn:hover {
+    background: rgba(255, 46, 136, 0.1);
+}
+
+/* Overlays ------------------------------------------------------------- */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 6, 19, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    pointer-events: auto;
+    z-index: 10;
+    padding-top: 20px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* Override body touch-action:none so overlays can scroll */
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+/* In iframe mode (GameModal), no nav bar */
+body.in-iframe .overlay {
+    padding-top: 12px;
+}
+
+.overlay-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    text-align: center;
+    min-width: 360px;
+    max-width: 92vw;
+    max-height: calc(92vh - 44px);
+    max-height: calc(92dvh - 44px);
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* On phones, reduce min-width so cards don't overflow */
+@media (max-width: 420px) {
+    .overlay-card {
+        min-width: unset;
+        width: 94vw;
+        max-height: calc(90vh - 44px);
+        max-height: calc(90dvh - 44px);
+        padding: 18px 14px;
+        border-radius: 10px;
+    }
+}
+
+.overlay-card h1 {
+    color: var(--primary-strong);
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 20px rgba(255, 46, 136, 0.5);
+}
+.overlay-card h2 {
+    color: var(--accent);
+    margin-bottom: 18px;
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+.overlay-card .subtitle {
+    color: var(--muted);
+    margin-bottom: 22px;
+}
+
+.instructions {
+    text-align: left;
+    margin: 18px 0;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.btn-row.vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.btn {
+    border: 0;
+    padding: 12px 26px;
+    font-size: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition:
+        transform 0.15s ease,
+        background 0.2s;
+    color: #fff;
+}
+@media (hover: hover) {
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+}
+.btn.primary {
+    background: var(--primary);
+}
+.btn.primary:hover {
+    background: var(--primary-strong);
+}
+.btn.ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.btn.ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.btn.danger {
+    background: var(--danger);
+}
+
+/* Level-up ----------------------------------------------------------- */
+.overlay-card.levelup {
+    min-width: 440px;
+}
+@media (max-width: 480px) {
+    .overlay-card.levelup {
+        min-width: unset;
+        width: 94vw;
+    }
+}
+.upgrade-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    outline: none;
+}
+.upgrade-option:hover,
+.upgrade-option:focus {
+    background: rgba(255, 210, 77, 0.12);
+    border-color: var(--accent);
+    transform: translateX(2px);
+}
+.upgrade-option .name {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 16px;
+}
+.upgrade-option .desc {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+.upgrade-option.maxed {
+    opacity: 0.55;
+    cursor: default;
+    border-style: dashed;
+}
+.upgrade-option.maxed:hover,
+.upgrade-option.maxed:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border);
+    transform: none;
+}
+.upgrade-option.maxed .name::after {
+    content: '';
+}
+
+/* Achievements gallery ---------------------------------------------- */
+.achievements-card {
+    min-width: 540px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+}
+.achievements-card .ach-count {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+    margin-left: 8px;
+}
+.ach-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 14px 0 18px;
+}
+.ach-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+    transition: transform 0.15s;
+}
+.ach-card.earned {
+    border-color: var(--accent);
+    background: rgba(255, 210, 77, 0.07);
+}
+.ach-card.locked {
+    opacity: 0.55;
+    filter: grayscale(0.6);
+}
+.ach-card-icon {
+    font-size: 28px;
+    line-height: 1;
+}
+.ach-card-name {
+    margin-top: 6px;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+}
+.ach-card.locked .ach-card-name {
+    color: var(--muted);
+}
+.ach-card-desc {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+/* Game over ---------------------------------------------------------- */
+.overlay-card.gameover {
+    border-color: var(--danger);
+}
+.overlay-card.gameover h1 {
+    color: var(--danger);
+    text-shadow: 0 0 20px rgba(255, 51, 85, 0.5);
+}
+.stats {
+    margin: 18px 0;
+    font-size: 16px;
+    line-height: 2;
+}
+
+/* Settings ----------------------------------------------------------- */
+.settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 28px;
+    min-width: 360px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+}
+.settings-card h2 {
+    color: var(--accent);
+    margin-bottom: 16px;
+}
+.settings-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px dashed var(--border);
+    font-size: 14px;
+}
+.settings-row:first-of-type {
+    border-top: 0;
+}
+.settings-row input[type='range'] {
+    width: 100%;
+}
+.settings-row output {
+    color: var(--muted);
+    font-size: 12px;
+    min-width: 36px;
+    text-align: right;
+}
+.settings-row select {
+    background: rgba(10, 6, 19, 0.9);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+.settings-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+/* Boss banner -------------------------------------------------------- */
+.boss-banner {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    color: var(--danger);
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-shadow: 0 0 30px rgba(255, 50, 80, 0.7);
+    opacity: 0;
+    transition:
+        opacity 0.4s,
+        transform 0.4s;
+    pointer-events: none;
+}
+.boss-banner.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Virtual joystick (touch only) -------------------------------------- */
+/* iter-14: edge-button size is now driven by --touch-button-size, set on
+   <html> by storage.js settings.touchButtonScale (0.8 / 1.0 / 1.2). The
+   joystick base + knob and the special-skill button all scale together so
+   thumb reach stays consistent. */
+:root {
+    --touch-button-size: 140px;
+    --touch-knob-size: 58px;
+    --touch-special-size: 96px;
+}
+.joystick {
+    position: absolute;
+    bottom: 80px;
+    left: 30px;
+    width: var(--touch-button-size);
+    height: var(--touch-button-size);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    display: none;
+    pointer-events: auto;
+    touch-action: none;
+}
+.joystick-knob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--touch-knob-size);
+    height: var(--touch-knob-size);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    transform: translate(-50%, -50%);
+}
+
+/* Special-skill button — mirrors the joystick on the bottom-right. */
+.special-skill-btn {
+    position: absolute;
+    bottom: 100px;
+    right: 30px;
+    width: var(--touch-special-size);
+    height: var(--touch-special-size);
+    border-radius: 50%;
+    background: rgba(120, 80, 200, 0.25);
+    color: #fff;
+    border: 2px solid rgba(180, 140, 255, 0.55);
+    font-size: 36px;
+    line-height: 1;
+    display: none;
+    pointer-events: auto;
+    touch-action: none;
+    cursor: pointer;
+}
+.special-skill-btn:active {
+    background: rgba(160, 110, 240, 0.4);
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .joystick,
+    .special-skill-btn {
+        display: block;
+    }
+    /* Ensure controls stay above the gesture bar on modern phones */
+    .joystick {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        left: calc(30px + env(safe-area-inset-left, 0px));
+    }
+    .special-skill-btn {
+        bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+        right: calc(30px + env(safe-area-inset-right, 0px));
+    }
+}
+
+/* iter-14: PWA install prompt slot. */
+.pwa-install-prompt {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 9999;
+    font-size: 14px;
+}
+
+/* Accessibility ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .upgrade-option,
+    .boss-banner,
+    .ach-toast,
+    .hp-fill,
+    .exp-fill {
+        transition: none !important;
+        animation: none !important;
+    }
+    .btn:hover {
+        transform: none;
+    }
+    .upgrade-option:hover,
+    .upgrade-option:focus {
+        transform: none;
+    }
+}
+
+/*
+ * High-contrast mode. We opt into this both via the user's OS preference
+ * (prefers-contrast: more) and the forced-colors mode that Windows uses.
+ * Colours are widened, outlines thicken, and low-opacity surfaces are
+ * replaced with solid fills so text stays legible.
+ */
+@media (prefers-contrast: more) {
+    :root {
+        --accent: #ffd966;
+        --primary: #ff6faa;
+        --danger: #ff6699;
+        --muted: #c8cbd8;
+        --border: rgba(255, 111, 170, 0.5);
+    }
+    .overlay {
+        background: rgba(0, 0, 0, 0.9);
+    }
+    .overlay-card,
+    .settings-card {
+        border-width: 2px;
+    }
+    .chip {
+        border-width: 3px;
+    }
+    .btn {
+        outline: 1px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+@media (forced-colors: active) {
+    .btn,
+    .icon-btn,
+    .upgrade-option {
+        border: 1px solid ButtonBorder;
+        forced-color-adjust: none;
+    }
+    :focus-visible {
+        outline: 3px solid Highlight;
+    }
+}
+
+/* Achievement toasts ------------------------------------------------- */
+.ach-toast-host {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 20;
+    width: min(380px, 92vw);
+}
+.ach-toast {
+    background: rgba(10, 6, 19, 0.95);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--text);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+}
+.ach-toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.ach-toast .ach-icon {
+    font-size: 22px;
+    width: 34px;
+    text-align: center;
+}
+.ach-toast .ach-title {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    text-transform: uppercase;
+}
+.ach-toast .ach-name {
+    font-weight: 700;
+    font-size: 14px;
+}
+.ach-toast .ach-desc {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* High score list --------------------------------------------------- */
+.hs-details {
+    text-align: left;
+    margin: 12px 0 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+.hs-details > summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    padding: 6px 0;
+}
+.hs-list {
+    margin-top: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+}
+.hs-head,
+.hs-row {
+    display: grid;
+    grid-template-columns: 24px 1fr 1fr 1fr 1.4fr;
+    padding: 6px 10px;
+    gap: 6px;
+}
+.hs-head {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.hs-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+.hs-empty {
+    color: var(--muted);
+    padding: 10px;
+    font-style: italic;
+}
+
+/* Speedrun splits + leaderboard wide view ---------------------------- */
+.splits {
+    margin: 6px 0 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 12px;
+}
+.splits-head {
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.split-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 10px;
+}
+.hs-head.wide,
+.hs-row.wide {
+    grid-template-columns: 24px 70px 60px 60px 1.4fr 100px 50px;
+}
+.hs-list.scroll {
+    max-height: 260px;
+    overflow-y: auto;
+}
+.leaderboard-card {
+    max-width: 720px;
+    width: 90vw;
+}
+.lb-section {
+    margin-top: 10px;
+}
+.lb-section h3 {
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.lb-json {
+    width: 100%;
+    margin-top: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: #ddd;
+    border-radius: 6px;
+    resize: vertical;
+}
+.no-hit {
+    color: #66ddaa;
+    font-weight: 700;
+}
+
+/* Evolve badge on level-up option ----------------------------------- */
+.upgrade-option .evolve-tag {
+    color: #ff88bb;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Colorblind / high-contrast mode ----------------------------------- */
+body.cb-mode {
+    --accent: #ffd966;
+    --primary: #ff6faa;
+    --danger: #ff77aa;
+}
+body.cb-mode .chip {
+    border-width: 3px;
+}
+body.cb-mode .hp-fill {
+    background: #ff77aa;
+}
+body.cb-mode .exp-fill {
+    background: #ffd966;
+}
+
+/* Phones ------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .overlay-card,
+    .overlay-card.levelup,
+    .settings-card {
+        min-width: 260px;
+        padding: 14px 16px;
+    }
+    .hud {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+    .hp-bar,
+    .exp-bar {
+        width: 140px;
+        height: 14px;
+    }
+    .chip {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+    .overlay-card h1 {
+        font-size: 24px;
+        margin-bottom: 2px;
+        letter-spacing: 1px;
+    }
+    .overlay-card h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    .overlay-card .subtitle {
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+    .boss-banner {
+        font-size: 28px;
+    }
+    /* Compact buttons for mobile — still 44px min tap target */
+    .btn {
+        padding: 10px 18px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    .btn-row {
+        gap: 6px;
+    }
+    /* Start screen: compact the many buttons */
+    .instructions {
+        font-size: 11px;
+        padding: 8px 10px;
+        margin: 10px 0;
+        line-height: 1.6;
+    }
+    /* Hide keyboard hotkey hints on mobile — irrelevant */
+    .hotkey-hint {
+        display: none;
+    }
+    /* Reduce upgrade option padding for more screen real estate */
+    .upgrade-option {
+        padding: 12px 14px;
+    }
+    .upgrade-option .name {
+        font-size: 15px;
+    }
+}
+
+/* Very small phones (iPhone SE, etc) -------------------------------- */
+@media (max-width: 380px) {
+    .overlay-card {
+        padding: 14px 10px;
+    }
+    .overlay-card h1 {
+        font-size: 22px;
+    }
+    .hud {
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+    .hp-bar,
+    .exp-bar {
+        width: 110px;
+    }
+    .btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    .chip {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+}
+
+/* iter-12: stage picker + daily share ------------------------------- */
+.stage-picker-card {
+    max-width: 720px;
+}
+.stage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+.stage-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--fg, #eee);
+    text-align: left;
+    cursor: pointer;
+    transition:
+        border-color 0.15s,
+        transform 0.1s;
+}
+.stage-card:hover,
+.stage-card:focus-visible {
+    border-color: var(--accent, #ffcc66);
+    transform: translateY(-1px);
+}
+.stage-card.active {
+    border-color: var(--accent, #ffcc66);
+    background: rgba(255, 204, 102, 0.08);
+}
+.stage-icon {
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.stage-name {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.stage-desc {
+    font-size: 13px;
+    opacity: 0.78;
+}
+.daily-share-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin: 10px 0 4px;
+}
+.share-preview {
+    background: rgba(0, 0, 0, 0.35);
+    color: #ddd;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+/* iter-13: stage chip on main menu Stage button --------------------- */
+.stage-chip {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255, 204, 102, 0.12);
+    border: 1px solid rgba(255, 204, 102, 0.4);
+    border-radius: 999px;
+    color: var(--accent, #ffcc66);
+    vertical-align: middle;
+}
+
+.hotkey-hint {
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted, #aaa);
+    text-align: center;
+}
+.hotkey-hint kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin: 0 2px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px;
+}
+
+/* iter-13: daily streak overlay ------------------------------------- */
+.streak-card {
+    max-width: 560px;
+}
+.streak-stats {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+.streak-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 110px;
+}
+.streak-pill span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+.streak-pill strong {
+    font-size: 22px;
+    color: var(--accent, #ffcc66);
+}
+.streak-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    margin-bottom: 6px;
+}
+.streak-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.streak-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.45);
+}
+.streak-cell.played {
+    background: rgba(85, 160, 255, 0.18);
+    border-color: rgba(85, 160, 255, 0.4);
+    color: #cfe5ff;
+}
+.streak-cell.won {
+    background: rgba(85, 220, 130, 0.22);
+    border-color: rgba(85, 220, 130, 0.5);
+    color: #d0ffd9;
+}
+.streak-cell.missed {
+    /* default; kept explicit so the contract is obvious in tests */
+}
+
+/* iter-13: help (keyboard shortcuts) overlay ------------------------ */
+.help-card {
+    max-width: 460px;
+}
+.help-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+    text-align: left;
+}
+.help-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.help-row kbd {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 12px;
+}
+
+/* iter-13: how-to-play overlay -------------------------------------- */
+.howto-card {
+    max-width: 520px;
+}
+.howto-list {
+    text-align: left;
+    margin: 12px 0 18px;
+    padding-left: 22px;
+    line-height: 1.7;
+    font-size: 14px;
+}
+.howto-list li + li {
+    margin-top: 6px;
+}
+
+/* iter-15: tutorial offer + tutorial banner + replay menu --------------- */
+.tutorial-offer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 6, 19, 0.78);
+    backdrop-filter: blur(2px);
+    z-index: 60;
+}
+.tutorial-offer-card {
+    background: rgba(10, 6, 19, 0.95);
+    border: 1px solid rgba(255, 46, 136, 0.2);
+    border-radius: 14px;
+    padding: 22px 26px;
+    text-align: center;
+    max-width: 380px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+.tutorial-banner {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 6, 19, 0.95);
+    border: 1px solid rgba(212, 168, 67, 0.3);
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: min(560px, 90vw);
+    z-index: 50;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.tutorial-banner strong {
+    display: block;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+.tutorial-banner .tutorial-body {
+    display: block;
+}
+.tutorial-banner .tutorial-skip-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    opacity: 0.7;
+}
+.replay-card {
+    max-width: 480px;
+}
+.replay-summary {
+    text-align: left;
+    margin: 12px 0 18px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.7;
+}

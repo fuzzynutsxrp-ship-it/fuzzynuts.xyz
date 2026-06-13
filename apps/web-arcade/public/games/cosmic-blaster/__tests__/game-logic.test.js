@@ -121,7 +121,7 @@ describe('cross-file invariant', () => {
   it('MAX_SCORE === SCORE_CAPS["cosmic-blaster"] from arcade-core', () => {
     // Read the canonical score-caps source
     const capsPath = join(
-      __dirname, '..', '..', '..', '..', '..', '..', '..',
+      __dirname, '..', '..', '..', '..', '..', '..',
       'packages', 'arcade-core', 'src', 'constants', 'score-caps.ts'
     );
     let capsSrc;
@@ -143,7 +143,7 @@ describe('cross-file invariant', () => {
 
   it('MAX_SCORE matches fuzzy-score.js SCORE_CAPS["cosmic-blaster"]', () => {
     const fuzzyPath = join(
-      __dirname, '..', '..', '..', 'fuzzy-score.js'
+      __dirname, '..', '..', 'fuzzy-score.js'
     );
     let fuzzySrc;
     try {
