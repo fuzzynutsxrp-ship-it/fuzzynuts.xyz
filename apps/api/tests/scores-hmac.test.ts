@@ -309,55 +309,78 @@ describe("HMAC verification on score submissions", () => {
   });
 });
 
-describe("REQUIRE_HMAC env var behavior", () => {
-  it("REQUIRE_HMAC=true rejects score without HMAC header", async () => {
-    // Import the router builder to test REQUIRE_HMAC behavior
+describe("REQUIRE_HMAC env var behavior (HTTP integration)", () => {
+  async function makeApp(requireHmac?: boolean) {
+    const express = await import("express");
     const { buildScoresRouter } = await import("../src/routes/scores");
-    
-    // Build router with REQUIRE_HMAC=true
+    const app = express.default();
+    app.use(express.json());
     const router = buildScoresRouter({
       MONGODB_URI: "mongodb://test",
       GAME_SESSION_SECRET: TEST_SECRET,
       WALLET_JWT_SECRET: "test-wallet-secret",
-      REQUIRE_HMAC: true,
+      ...(requireHmac !== undefined ? { REQUIRE_HMAC: requireHmac } : {}),
     });
+    app.use("/", router);
+    return app;
+  }
 
-    // The router should be created (not throw)
-    expect(router).toBeDefined();
-    
-    // Note: Full integration test would require spinning up Express.
-    // The logic is verified by checking the code path exists.
-    // The actual rejection is tested via the error code E_HMAC_REQUIRED.
+  it("REQUIRE_HMAC=true + no HMAC header → 401 E_HMAC_REQUIRED", async () => {
+    const supertest = await import("supertest");
+    const app = await makeApp(true);
+
+    const res = await supertest.default(app)
+      .post("/")
+      .send({ game: "snake", score: 100 })
+      .expect(401);
+
+    expect(res.body.error).toBe("E_HMAC_REQUIRED");
   });
 
-  it("REQUIRE_HMAC=false (default) allows score without HMAC header", async () => {
-    const { buildScoresRouter } = await import("../src/routes/scores");
-    
-    // Build router without REQUIRE_HMAC (defaults to false)
-    const router = buildScoresRouter({
-      MONGODB_URI: "mongodb://test",
-      GAME_SESSION_SECRET: TEST_SECRET,
-      WALLET_JWT_SECRET: "test-wallet-secret",
-    });
+  it("REQUIRE_HMAC=false + no HMAC header → 200 success + deprecation warning", async () => {
+    const supertest = await import("supertest");
+    const app = await makeApp(false);
 
-    // Router should be created
-    expect(router).toBeDefined();
-    
-    // Missing HMAC with REQUIRE_HMAC=false should allow submission
-    // and log a deprecation warning (tested via console.warn mock in integration).
+    // Spy on console.warn to capture deprecation warning
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const res = await supertest.default(app)
+      .post("/")
+      .send({ game: "snake", score: 100 })
+      .expect(200);
+
+    expect(res.body.ok).toBe(true);
+    expect(res.body.score).toBe(100);
+
+    // Verify deprecation warning was logged
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("DEPRECATED"),
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("without HMAC"),
+    );
+
+    warnSpy.mockRestore();
   });
 
-  it("REQUIRE_HMAC is optional and defaults to false", async () => {
-    const { buildScoresRouter } = await import("../src/routes/scores");
-    
-    // Build router without REQUIRE_HMAC
-    const router = buildScoresRouter({
-      MONGODB_URI: "mongodb://test",
-      GAME_SESSION_SECRET: TEST_SECRET,
-      WALLET_JWT_SECRET: "test-wallet-secret",
-    });
+  it("REQUIRE_HMAC undefined (default) + no HMAC header → 200 success", async () => {
+    const supertest = await import("supertest");
+    const app = await makeApp(); // no REQUIRE_HMAC arg → undefined → defaults to false
 
-    // Should not throw — REQUIRE_HMAC is optional
-    expect(router).toBeDefined();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const res = await supertest.default(app)
+      .post("/")
+      .send({ game: "snake", score: 100 })
+      .expect(200);
+
+    expect(res.body.ok).toBe(true);
+
+    // Should still log deprecation (default = allow but warn)
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("DEPRECATED"),
+    );
+
+    warnSpy.mockRestore();
   });
 });
