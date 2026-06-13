@@ -192,6 +192,9 @@ importers:
       framer-motion:
         specifier: ^12.38.0
         version: 12.40.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      jdenticon:
+        specifier: ^3.3.0
+        version: 3.3.0
       lucide-react:
         specifier: ^1.14.0
         version: 1.17.0(react@19.1.0)
@@ -2525,6 +2528,9 @@ packages:
   caniuse-lite@1.0.30001793:
     resolution: {integrity: sha512-iwSsYWaCOoh26cV8NwNRViHlrfUvYsHDfRVcbtmw0Kg6PJIZZXwMkj1442FYLBGkeUf1juAsU3DTfxW579mrPA==}
 
+  canvas-renderer@2.2.1:
+    resolution: {integrity: sha512-RrBgVL5qCEDIXpJ6NrzyRNoTnXxYarqm/cS/W6ERhUJts5UQtt/XPEosGN3rqUkZ4fjBArlnCbsISJ+KCFnIAg==}
+
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
     engines: {node: '>=18'}
@@ -3597,6 +3603,11 @@ packages:
     resolution: {integrity: sha512-KLViCmWx94zOvpLwSlsx6yOCeMhZYaxrJV87Po5k/FoZzcPSahvK5qJ7fYhS61sZi5ikmh2S3Hz55A2l3U69ng==}
     peerDependencies:
       react: ^19.0.0
+
+  jdenticon@3.3.0:
+    resolution: {integrity: sha512-DhuBRNRIybGPeAjMjdHbkIfiwZCCmf8ggu7C49jhp6aJ7DYsZfudnvnTY5/1vgUhrGA7JaDAx1WevnpjCPvaGg==}
+    engines: {node: '>=6.4.0'}
+    hasBin: true
 
   jiti@1.21.7:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
@@ -8680,6 +8691,10 @@ snapshots:
 
   caniuse-lite@1.0.30001793: {}
 
+  canvas-renderer@2.2.1:
+    dependencies:
+      '@types/node': 20.19.41
+
   chai@5.3.3:
     dependencies:
       assertion-error: 2.0.1
@@ -9956,6 +9971,10 @@ snapshots:
       react: 19.1.0
     transitivePeerDependencies:
       - '@types/react'
+
+  jdenticon@3.3.0:
+    dependencies:
+      canvas-renderer: 2.2.1
 
   jiti@1.21.7: {}
 
