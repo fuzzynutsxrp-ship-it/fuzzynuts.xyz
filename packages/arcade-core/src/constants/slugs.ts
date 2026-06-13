@@ -34,7 +34,12 @@ export type GameSlug =
   | "memory"
   | "minesweeper"
   | "sudoku"
-  | "wordle";
+  | "wordle"
+  | "tank-battle"
+  | "helicopter"
+  | "fruit-ninja"
+  | "tower-defense"
+  | "space-invaders";
 
 /** Every canonical slug, in display order. */
 export const GAME_SLUGS: readonly GameSlug[] = [
@@ -61,6 +66,11 @@ export const GAME_SLUGS: readonly GameSlug[] = [
   "minesweeper",
   "sudoku",
   "wordle",
+  "tank-battle",
+  "helicopter",
+  "fruit-ninja",
+  "tower-defense",
+  "space-invaders",
 ] as const;
 
 /**
@@ -101,6 +111,11 @@ export const ID_TO_SLUG: Record<string, GameSlug> = {
   "minesweeper": "minesweeper",
   "sudoku": "sudoku",
   "wordle": "wordle",
+  "tank-battle": "tank-battle",
+  "helicopter": "helicopter",
+  "fruit-ninja": "fruit-ninja",
+  "tower-defense": "tower-defense",
+  "space-invaders": "space-invaders",
 };
 
 /** Reverse: canonical slug → legacy id used by GAMES[] in the web-arcade UI. */
@@ -128,6 +143,11 @@ export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
   "minesweeper": "minesweeper",
   "sudoku": "sudoku",
   "wordle": "wordle",
+  "tank-battle": "tank-battle",
+  "helicopter": "helicopter",
+  "fruit-ninja": "fruit-ninja",
+  "tower-defense": "tower-defense",
+  "space-invaders": "space-invaders",
 };
 
 /**

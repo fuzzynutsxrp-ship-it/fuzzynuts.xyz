@@ -281,6 +281,11 @@ export const GAMES = [
     color: "#10b981",
     tags: ["Puzzle", "Words", "Daily"],
   },
+  { id: "tank-battle", title: "Tank Battle", type: "Action", description: "Top-down tank combat — destroy enemy waves!", icon: "/icons/icon-world-pop.webp", image: "🪖", color: "#22c55e", tags: ["Action", "Shooter", "Top-down"] },
+  { id: "helicopter", title: "Helicopter", type: "Action", description: "Fly through the cave — don't crash!", icon: "/icons/icon-world-pop.webp", image: "🚁", color: "#f97316", tags: ["Action", "Endless", "Side-scroll"] },
+  { id: "fruit-ninja", title: "Fruit Ninja", type: "Action", description: "Slice fruit, dodge bombs, combo for bonus!", icon: "/icons/icon-world-pop.webp", image: "🍉", color: "#ef4444", tags: ["Action", "Slicing", "Casual"] },
+  { id: "tower-defense", title: "Tower Defense", type: "Strategy", description: "Place towers, upgrade defenses, survive!", icon: "/icons/icon-world-pop.webp", image: "🏰", color: "#7c3aed", tags: ["Strategy", "Tower Defense", "Waves"] },
+  { id: "space-invaders", title: "Space Invaders", type: "Classic", description: "Classic alien shooter — defend Earth!", icon: "/icons/icon-world-pop.webp", image: "👾", color: "#06b6d4", tags: ["Classic", "Shooter", "Aliens"] },
 ];
 
 export const HOW_TO_STEPS = [
