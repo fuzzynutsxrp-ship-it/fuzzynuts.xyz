@@ -13,3 +13,6 @@ New ADRs use the next available 4-digit number and follow [`template.md`](./temp
 - [0005 — Capacitor over Expo for mobile](./0005-capacitor-over-expo.md)
 - [0006 — XRPL RegularKey + SignerList on distributor](./0006-xrpl-regularkey-multisig-distributor.md)
 - [0007 — Content-hashed games-build pipeline](./0007-content-hashed-games-build.md)
+- [0008 — Rewards route for payout processing](./0008-rewards-route.md)
+- [0009 — Multisig payout implementation in xrpl-token-utils](./0009-multisig-payout-implementation.md)
+- [0010 — Persistent challenge store (replace in-memory Map)](./0010-persistent-challenge-store.md)
