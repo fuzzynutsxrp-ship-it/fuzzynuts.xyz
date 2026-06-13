@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Search, User, LogIn, LogOut, Trophy } from "lucide-react";
+import { Search, User, LogIn, LogOut, Trophy, Gift } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useWalletStore } from "@/store/wallet";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -154,7 +154,8 @@ export default function Home() {
                   {isConnected && address && (
                     <div className="fnx-dd-meta"><small>Wallet</small><div>{truncateAddress(address)}</div></div>
                   )}
-                  <Link href="/profile" onClick={() => setDropdownOpen(false)}><User size={15} /> Profile</Link>
+                  <Link href="/profile" onClick={() => setDropdownOpen(false)}><User size={15} /> Profile &amp; stats</Link>
+                  <Link href="/prizes" onClick={() => setDropdownOpen(false)}><Gift size={15} /> Rewards / Referrals</Link>
                   <Link href="/leaderboard" onClick={() => setDropdownOpen(false)}><Trophy size={15} /> Leaderboard</Link>
                   <div className="fnx-dd-sep" />
                   <button
