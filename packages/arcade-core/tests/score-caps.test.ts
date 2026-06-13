@@ -27,7 +27,8 @@ describe("SCORE_CAPS — single source of truth", () => {
 
   it("no cap is set absurdly high (sanity ceiling)", () => {
     for (const slug of GAME_SLUGS) {
-      expect(SCORE_CAPS[slug]).toBeLessThanOrEqual(10_000_000);
+      // 100M — rsc (MMORPG XP scoring) legitimately needs 99M cap
+      expect(SCORE_CAPS[slug]).toBeLessThanOrEqual(100_000_000);
     }
   });
 });
