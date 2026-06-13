@@ -51,6 +51,8 @@ export { usePayoutEligibility } from "./hooks/usePayoutEligibility";
 export { useSyncLocalScores } from "./hooks/useSyncLocalScores";
 export { useWeeklyCountdown } from "./hooks/useWeeklyCountdown";
 export type { CountdownState } from "./hooks/useWeeklyCountdown";
+export { useMyRank } from "./hooks/useMyRank";
+export type { MyRankData } from "./hooks/useMyRank";
 
 // ── Components ──
 export { LeaderboardSkeleton } from "./components/LeaderboardSkeleton";

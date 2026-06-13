@@ -27,6 +27,7 @@ import type { GameMetadata } from "@/lib/gameRegistry";
 import { useChatSocket } from "@/components/chat/useChatSocket";
 import { trackGameStart, trackScoreSubmitted, trackDiscordClick } from "@/lib/analytics";
 import { useWalletStore } from "@/store/wallet";
+import { GameErrorBoundary } from "@/components/GameErrorBoundary";
 
 /* ═══════════════════════════════════════════════════════════════
    GameModal — CrazyGames-style lightbox for instant game play
@@ -290,6 +291,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   const defaultSandbox =
     "allow-scripts allow-same-origin allow-popups allow-forms";
 
+  // Build allow policy — add cross-origin-isolated for games that need SharedArrayBuffer
+  const allowPolicy = useMemo(() => {
+    const base = "autoplay; fullscreen; gamepad";
+    return game?.crossOriginIsolated ? `${base}; cross-origin-isolated` : base;
+  }, [game?.crossOriginIsolated]);
+
   return createPortal(
     <dialog
       ref={dialogRef}
@@ -393,7 +400,9 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
       {/* ── Body: viewport + sidebar ── */}
       <div className="game-modal__body">
-        {/* Game viewport */}
+        {/* Game viewport — wrapped in ErrorBoundary so a single game crash
+            never kills the entire Next.js app */}
+        <GameErrorBoundary onRetry={handleRetry}>
         <div
           ref={containerRef}
           className="game-modal__viewport"
@@ -401,6 +410,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             touchAction: "none",
             userSelect: "none",
             WebkitUserSelect: "none",
+            position: "relative",
           }}
         >
           {/* Loading state */}
@@ -452,12 +462,13 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             title={`Play ${game.title}`}
             sandbox={game.sandbox || defaultSandbox}
             loading="eager"
-            allow="autoplay; fullscreen; gamepad"
+            allow={allowPolicy}
             onLoad={handleIframeLoad}
             className="game-modal__iframe"
             aria-label={`${game.title} game window`}
           />
         </div>
+        </GameErrorBoundary>
 
         {/* ── Play Next sidebar (CrazyGames pattern) ── */}
         <aside className="game-modal__sidebar" aria-label="More games">

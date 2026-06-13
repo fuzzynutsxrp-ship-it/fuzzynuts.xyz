@@ -32,6 +32,33 @@ const nextConfig: NextConfig = {
      ───────────────────────────────────────────────────────────── */
   async headers() {
     return [
+      /* ── Minigolf: Cross-Origin Isolation for SharedArrayBuffer / WASM ──
+         The minigolf game uses WebAssembly threads which require
+         SharedArrayBuffer. Browsers gate SAB behind cross-origin
+         isolation: the page must serve COOP + COEP headers.
+
+         We scope these narrowly to /games/minigolf/* so other routes
+         (and third-party embeds) are unaffected.
+
+         COEP: credentialless is more permissive than require-corp — it
+         allows cross-origin subresources (Google Fonts, CDN assets)
+         without requiring them to send CORP/CORS headers, as long as
+         no credentials are attached. Same-origin resources are
+         unaffected.
+         ───────────────────────────────────────────────────────────── */
+      {
+        source: "/games/minigolf/:path*",
+        headers: [
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+          {
+            key: "Cross-Origin-Embedder-Policy",
+            value: "credentialless",
+          },
+        ],
+      },
       {
         source: "/videos/:path*.mp4",
         headers: [

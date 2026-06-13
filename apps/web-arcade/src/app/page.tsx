@@ -8,14 +8,19 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
+import { GameModalSkeleton } from "@/components/game/GameModalSkeleton";
 
 const Footer = dynamic(() =>
   import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
 );
 
 type Game = (typeof GAMES)[number];
+
+const GameModal = dynamic(() =>
+  import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
+  { loading: () => <GameModalSkeleton />, ssr: false },
+);
 
 const CATEGORIES = [
   { key: "all", label: "All Games", grad: "linear-gradient(135deg,#6366f1,#4f46e5)" },

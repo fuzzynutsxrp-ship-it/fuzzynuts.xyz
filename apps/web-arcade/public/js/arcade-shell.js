@@ -69,7 +69,7 @@
     navEl.id = 'arcadeNav';
     navEl.innerHTML =
       '<div class="arcade-nav__left">' +
-        '<a class="arcade-nav__back" href="' + BASE + 'arcade/" title="Back to Arcade">' +
+        '<a class="arcade-nav__back" href="/" title="Back to Arcade">' +
           '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>' +
           'Arcade' +
         '</a>' +
@@ -77,11 +77,74 @@
         '<span class="arcade-nav__title">' + escHtml(config.icon + ' ' + config.title) + '</span>' +
       '</div>' +
       '<div class="arcade-nav__right">' +
+        '<button class="arcade-nav__fullscreen" id="arcadeFullscreenBtn" title="Fullscreen (F)" aria-label="Toggle fullscreen">' +
+          '<svg class="arcade-nav__fs-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>' +
+          '<svg class="arcade-nav__fs-compress" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>' +
+        '</button>' +
         '<a class="arcade-nav__link" href="' + BASE + '">fuzzynuts.xyz</a>' +
-        '<a class="arcade-nav__brand" href="' + BASE + 'arcade/" title="Fuzzynuts Arcade">🕹️ ARCADE</a>' +
+        '<a class="arcade-nav__brand" href="/" title="Fuzzynuts Arcade">🕹️ ARCADE</a>' +
       '</div>';
 
     document.body.insertBefore(navEl, document.body.firstChild);
+
+    // Wire up fullscreen toggle
+    setupFullscreen();
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // FULLSCREEN — targets game canvas/container, not whole page
+  // ═══════════════════════════════════════════════════════════
+
+  function setupFullscreen() {
+    var fsBtn = document.getElementById('arcadeFullscreenBtn');
+    if (!fsBtn) return;
+
+    // Find the game element to fullscreen (canvas, #game-container, or body)
+    function getGameElement() {
+      return document.getElementById('game-container')
+        || document.getElementById('game-canvas')
+        || document.querySelector('canvas')
+        || document.getElementById('gameContainer')
+        || document.body;
+    }
+
+    function updateFsState() {
+      var isFs = !!document.fullscreenElement;
+      document.body.classList.toggle('arcade-fullscreen', isFs);
+      if (fsBtn) {
+        fsBtn.setAttribute('aria-label', isFs ? 'Exit fullscreen' : 'Toggle fullscreen');
+        fsBtn.title = isFs ? 'Exit Fullscreen (F)' : 'Fullscreen (F)';
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
+        console.warn('[ArcadeShell] Fullscreen API not supported');
+        return;
+      }
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        var el = getGameElement();
+        var req = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (req) req.call(el);
+      }
+    }
+
+    fsBtn.addEventListener('click', toggleFullscreen);
+
+    document.addEventListener('fullscreenchange', updateFsState);
+    document.addEventListener('webkitfullscreenchange', updateFsState);
+
+    // Keyboard shortcut: F key (when not typing in an input)
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'f' || e.key === 'F') {
+        var tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    });
   }
 
   function setupNavAutoHide() {
