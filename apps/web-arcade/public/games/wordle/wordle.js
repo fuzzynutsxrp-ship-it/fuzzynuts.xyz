@@ -213,6 +213,12 @@
     'ZXCVBNM'
   ];
 
+  // ─── START SCREEN ───────────────────────────────────────────────────
+  function showStartScreen() {
+    const overlay = document.getElementById('start-screen');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
   // ─── INITIALIZATION ─────────────────────────────────────────────────
   function init() {
     canvas = document.getElementById('game-canvas');
