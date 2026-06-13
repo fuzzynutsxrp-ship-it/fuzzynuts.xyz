@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fuzzynuts.xyz";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.fuzzynuts.xyz";
 
 /**
  * Search-engine indexing switch. Defaults to OFF (noindex) so the site stays
