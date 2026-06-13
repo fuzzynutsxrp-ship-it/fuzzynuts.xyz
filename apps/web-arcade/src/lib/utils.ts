@@ -109,6 +109,17 @@ export const GAMES = [
     color: "#22c55e",
     tags: ["MMORPG", "Classic", "PvP"],
   },
+  {
+    id: "dragon-hoard",
+    title: "Dragon's Hoard",
+    type: "Arcade",
+    description:
+      "Collect treasure while dodging dragon fire! Fast-paced arcade action with combo scoring and increasing difficulty.",
+    icon: "/icons/icon-world-pop.webp",
+    image: "🐉",
+    color: "#f97316",
+    tags: ["Arcade", "Collect", "Endless"],
+  },
 ];
 
 export const HOW_TO_STEPS = [

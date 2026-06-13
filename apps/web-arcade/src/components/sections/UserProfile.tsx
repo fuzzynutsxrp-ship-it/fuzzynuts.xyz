@@ -49,6 +49,7 @@ const GAME_EMOJIS: Record<string, string> = {
   minigolf: "⛳",
   racer: "🏎️",
   rsc: "⚔️",
+  "dragon-hoard": "🐉",
 };
 
 /* ═══════════════════════════════════════════════════════════════

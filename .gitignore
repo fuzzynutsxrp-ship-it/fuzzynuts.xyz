@@ -29,6 +29,7 @@ coverage/
 apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/.gitkeep
 !apps/web-arcade/public/games/rsc/
+!apps/web-arcade/public/games/dragon-hoard/
 
 # ── Tauri ────────────────────────────────────────────────────
 apps/desktop-tauri/src-tauri/target/
