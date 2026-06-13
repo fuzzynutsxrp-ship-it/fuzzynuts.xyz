@@ -42,6 +42,11 @@ apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/pong/
 !apps/web-arcade/public/games/tetris/
 !apps/web-arcade/public/games/asteroids/
+!apps/web-arcade/public/games/doodle-jump/
+!apps/web-arcade/public/games/ski-free/
+!apps/web-arcade/public/games/jetpack/
+!apps/web-arcade/public/games/subway-runner/
+!apps/web-arcade/public/games/flappy/
 !apps/web-arcade/public/games/fuzzy-score.js
 
 # ── Tauri ────────────────────────────────────────────────────

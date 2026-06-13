@@ -47,6 +47,7 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
   "pong": "cyan",
   "tetris": "purple",
   "asteroids": "red",
+  "flappy": "gold",
 };
 
 /** Map game IDs to emojis for the tab selector */
@@ -64,6 +65,7 @@ const GAME_EMOJIS: Record<string, string> = {
   "pong": "🏓",
   "tetris": "🟦",
   "asteroids": "☄️",
+  "flappy": "🐦",
 };
 
 /** Week options for the week selector dropdown */
