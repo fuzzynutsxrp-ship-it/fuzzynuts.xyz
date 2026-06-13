@@ -47,7 +47,7 @@ function freshState(){
     score: 0,                // distance + tricks
     trickPts: 0,
     distance: 0,
-    best: +(localStorage.getItem('surf-up_best')||0),
+    best: (() => { try { return +(localStorage.getItem('surf-up_best')||0); } catch(e) { return 0; } })(),
 
     /* player */
     px: 0, py: 0,            // screen position (set each frame)
@@ -134,7 +134,7 @@ function gameOver(){
   const finalScore = Math.floor(state.score);
   if (finalScore > state.best){
     state.best = finalScore;
-    localStorage.setItem('surf-up_best', String(finalScore));
+    try { localStorage.setItem('surf-up_best', String(finalScore)); } catch (e) { /* Safari private */ }
   }
   window.__gameScore = finalScore;
   updateHUD();
