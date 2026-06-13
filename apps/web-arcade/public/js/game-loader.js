@@ -161,6 +161,13 @@
         const bodyContent = doc.body.innerHTML;
         viewport.innerHTML = bodyContent;
 
+        // Strip inline event handlers to prevent XSS
+        viewport.querySelectorAll('*').forEach(el => {
+          for (const attr of Array.from(el.attributes)) {
+            if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
+          }
+        });
+
         // Fix relative paths in viewport content
         viewport.querySelectorAll('img[src]').forEach(img => {
           const src = img.getAttribute('src');
@@ -220,6 +227,11 @@
 
         // Set up close cleanup
         teardownFns.push(() => {
+          // Dispatch game-cleanup for games with event-based cleanup
+          try { window.dispatchEvent(new Event('game-cleanup')); } catch(e) {}
+          // Call engine destroy functions
+          try { if (window.__bombermanEngine?.destroy) window.__bombermanEngine.destroy(); } catch(e) {}
+          try { if (window.__towerStackDestroy) window.__towerStackDestroy(); } catch(e) {}
           // Remove injected scripts
           document.querySelectorAll('[data-game-script]').forEach(el => el.remove());
           // Remove injected styles
@@ -279,7 +291,7 @@
           hideNav: true,
           slug: slug,
           origin: window.location.origin,
-        }, '*');
+        }, window.location.origin);
       } catch(e) {}
     };
 
@@ -311,7 +323,7 @@
         // Forward to parent if we're in an iframe ourselves
         try {
           if (window.parent !== window) {
-            window.parent.postMessage(event.data, '*');
+            window.parent.postMessage(event.data, window.location.origin);
           }
         } catch(e) {}
       }

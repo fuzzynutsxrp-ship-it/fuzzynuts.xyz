@@ -697,6 +697,8 @@
   };
 
   // ── Initialization ─────────────────────────────────────────────────────────
+  function _onResize() { resize(); if (!gameRunning) drawStartScreen(); }
+
   function init() {
     canvas = document.getElementById('game-canvas');
     if (!canvas) {
@@ -709,7 +711,7 @@
 
     bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
     resize();
-    window.addEventListener('resize', () => { resize(); if (!gameRunning) drawStartScreen(); });
+    window.addEventListener('resize', _onResize);
     document.addEventListener('keydown', onKeyDown);
     canvas.addEventListener('touchstart', onTouchStart, { passive: true });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -759,7 +761,7 @@
     document.removeEventListener('keydown', onKeyDown);
     document.removeEventListener('keydown', onRestartKey);
     document.removeEventListener('keydown', waitStartRef);
-    window.removeEventListener('resize', resize);
+    window.removeEventListener('resize', _onResize);
     if (canvas) {
       canvas.removeEventListener('touchstart', onTouchStart);
       canvas.removeEventListener('touchmove', onTouchMove);
