@@ -376,6 +376,9 @@
     if (gameOverEl) gameOverEl.classList.remove('hidden');
 
     drawGameOverScreen();
+
+    // Notify listeners (replaces monkey-patching)
+    window.dispatchEvent(new Event('bomberman-game-over'));
   }
 
   // ── Player movement ────────────────────────────────────────────────────────
@@ -466,8 +469,6 @@
 
     // Power-ups
     for (const p of powerups) {
-      const x = p.col * tileW + tileW * 0.2;
-      const y = p.row * tileH + tileH * 0.2;
       const s = tileW * 0.6;
       ctx.fillStyle = POWERUP_COLORS[p.type] || '#fff';
       ctx.beginPath();
@@ -686,15 +687,13 @@
     canvas.removeEventListener('touchstart', onRestartTouch);
   }
 
-  // Wrap gameOver to hook restart
-  const _gameOver = gameOver;
-  gameOver = function() {
-    _gameOver();
+  // Hook restart on game-over via event (replaces monkey-patching)
+  window.addEventListener('bomberman-game-over', function _onGameOver() {
     setTimeout(() => {
       document.addEventListener('keydown', onRestartKey);
       canvas.addEventListener('touchstart', onRestartTouch, { passive: true });
     }, 300);
-  };
+  });
 
   // ── Initialization ─────────────────────────────────────────────────────────
   function _onResize() { resize(); if (!gameRunning) drawStartScreen(); }

@@ -316,6 +316,8 @@
   function setupScoreBridge(slug) {
     function onMessage(event) {
       if (!event.data || typeof event.data !== 'object') return;
+      // Validate origin to prevent cross-site score injection
+      if (event.origin !== window.location.origin) return;
 
       // Listen for score submissions from the game
       if (event.data.type === 'FUZZY_SCORE_SUBMITTED') {
