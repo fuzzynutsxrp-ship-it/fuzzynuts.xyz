@@ -39,7 +39,12 @@ export type GameSlug =
   | "helicopter"
   | "fruit-ninja"
   | "tower-defense"
-  | "space-invaders";
+  | "space-invaders"
+  | "boxing"
+  | "bowling"
+  | "archery"
+  | "surf-up"
+  | "rally";
 
 /** Every canonical slug, in display order. */
 export const GAME_SLUGS: readonly GameSlug[] = [
@@ -71,6 +76,11 @@ export const GAME_SLUGS: readonly GameSlug[] = [
   "fruit-ninja",
   "tower-defense",
   "space-invaders",
+  "boxing",
+  "bowling",
+  "archery",
+  "surf-up",
+  "rally",
 ] as const;
 
 /**
@@ -116,6 +126,11 @@ export const ID_TO_SLUG: Record<string, GameSlug> = {
   "fruit-ninja": "fruit-ninja",
   "tower-defense": "tower-defense",
   "space-invaders": "space-invaders",
+  "boxing": "boxing",
+  "bowling": "bowling",
+  "archery": "archery",
+  "surf-up": "surf-up",
+  "rally": "rally",
 };
 
 /** Reverse: canonical slug → legacy id used by GAMES[] in the web-arcade UI. */
@@ -148,6 +163,11 @@ export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
   "fruit-ninja": "fruit-ninja",
   "tower-defense": "tower-defense",
   "space-invaders": "space-invaders",
+  "boxing": "boxing",
+  "bowling": "bowling",
+  "archery": "archery",
+  "surf-up": "surf-up",
+  "rally": "rally",
 };
 
 /**

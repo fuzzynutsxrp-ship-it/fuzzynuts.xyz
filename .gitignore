@@ -45,6 +45,11 @@ apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/doodle-jump/
 !apps/web-arcade/public/games/wordle/
 !apps/web-arcade/public/games/space-invaders/
+!apps/web-arcade/public/games/rally/
+!apps/web-arcade/public/games/surf-up/
+!apps/web-arcade/public/games/archery/
+!apps/web-arcade/public/games/bowling/
+!apps/web-arcade/public/games/boxing/
 !apps/web-arcade/public/games/tower-defense/
 !apps/web-arcade/public/games/fruit-ninja/
 !apps/web-arcade/public/games/helicopter/
