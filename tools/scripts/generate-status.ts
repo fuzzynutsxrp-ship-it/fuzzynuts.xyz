@@ -62,6 +62,18 @@ function sh(cmd: string, fallback = ""): string {
   }
 }
 
+function fmtPrettier(md: string): string {
+  try {
+    return execSync("npx prettier --parser markdown", {
+      cwd: ROOT,
+      input: md,
+      stdio: ["pipe", "pipe", "ignore"],
+    }).toString();
+  } catch {
+    return md;
+  }
+}
+
 function loadState(): State {
   if (!existsSync(STATE_FILE)) {
     throw new Error(`Missing ${STATE_FILE}`);
@@ -85,7 +97,7 @@ function rootVersion(): string {
 
 function recentCommits(n = 10): string {
   const SEP = "\x1F"; // ASCII unit separator — safe from shell interpretation
-  const formatStr = `%h${SEP}%s${SEP}%an${SEP}%ar`;
+  const formatStr = `%h${SEP}%s${SEP}%an${SEP}%ai`;
   const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}'`);
   if (!raw) return "";
   const lines = raw.split("\n").filter(Boolean);
@@ -117,6 +129,9 @@ function main(): void {
     out = fill(out, `manual.${k}`, MANUAL_ICON[v] ?? v);
   }
   out = fill(out, "recentCommits", recentCommits());
+
+  // Always format with prettier so both status:check and format:check agree
+  out = fmtPrettier(out);
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
