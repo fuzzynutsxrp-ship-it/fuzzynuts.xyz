@@ -2,6 +2,23 @@
 
 Source directory for all FuzzyNuts arcade games. Each game is a self-contained folder with HTML, JS, CSS, and assets.
 
+## Quick start (automated)
+
+Use the scaffolder instead of doing the steps below by hand — it creates the
+folder from `template/` and registers the game across the whole chain for you:
+
+```bash
+pnpm new-game --slug space-race --title "Space Race" --genre Racing \
+  --color "#22d3ee" --score-cap 99999 --description "Dodge and dash."
+```
+
+It edits `slugs.ts`, `score-caps.ts`, `gameRegistry.ts`, and `lib/utils.ts`,
+copies the game into `apps/web-arcade/public/games/`, and is idempotent (safe to
+re-run). Because it touches the money-adjacent `arcade-core` constants, finish
+with `pnpm changeset` and add an ADR per `HERMES.md` §1.3 before merging.
+
+The manual steps below remain accurate as a reference / fallback.
+
 ## Structure
 
 ```
