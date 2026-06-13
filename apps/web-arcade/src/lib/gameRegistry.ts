@@ -60,7 +60,7 @@ export const GAME_LIST: GameMetadata[] = [
     color: "#ef4444",
     description:
       "Classic side-scrolling action with all 32 original levels, a random map generator, and full level editor. Run, jump, and stomp your way to glory.",
-    scoreCap: 99_999,
+    scoreCap: 9_999_990,
     minPlayTime: 15,
     controls: ["Arrow keys / WASD to move", "Shift or Ctrl to sprint", "P to pause"],
     iconPath: "/icons/icon-super-pop.webp",
@@ -85,7 +85,7 @@ export const GAME_LIST: GameMetadata[] = [
     color: "#a855f7",
     description:
       "Survive endless waves of forest creatures with auto-attack combat. Upgrade your weapons, collect power-ups, and see how long you last.",
-    scoreCap: 999_999,
+    scoreCap: 5_000_000,
     minPlayTime: 15,
     controls: ["WASD or Arrow keys to move", "Auto-attack (no click needed)", "1-4 to select upgrades"],
     iconPath: "/icons/icon-survivors-pop.webp",
@@ -110,7 +110,7 @@ export const GAME_LIST: GameMetadata[] = [
     color: "#22d3ee",
     description:
       "3D mini-golf with physics-based putting. Navigate tricky courses, nail trick shots, and aim for the elusive hole-in-one on every green.",
-    scoreCap: 10_500,
+    scoreCap: 100_000,
     minPlayTime: 15,
     controls: ["Mouse click + drag to aim", "Release to putt", "Scroll to zoom"],
     iconPath: "/icons/icon-putt-pop.webp",
@@ -135,7 +135,7 @@ export const GAME_LIST: GameMetadata[] = [
     color: "#f97316",
     description:
       "High-speed racing through forest tracks. Collect acorns for boost, dodge obstacles, and race to the finish line in record time!",
-    scoreCap: 99_999,
+    scoreCap: 2_000_000,
     minPlayTime: 15,
     controls: ["Arrow keys to steer", "Space to boost", "R to restart"],
     iconPath: "/icons/icon-racer-pop.webp",
