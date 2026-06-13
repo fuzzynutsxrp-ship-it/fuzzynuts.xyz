@@ -38,7 +38,7 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
     [walletAddress, session?.user?.id],
   );
 
-  const { rank, totalScore, gamesPlayed, nextRankScore, loading, error, refetch } =
+  const { rank, totalScore, gamesPlayed, nextRankScore, prevRankScore, loading, error, refetch } =
     useMyRank(userId);
 
   const handleRefresh = useCallback(() => {
@@ -47,17 +47,24 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
 
   // ── Progress bar math ──
   const progressPercent = useMemo(() => {
-    if (!rank || rank <= 1 || !nextRankScore || totalScore <= 0) return 100;
-    // Find the score range between current rank and next rank
-    const prevRankScore = nextRankScore;
-    // Estimate the score at user's position
-    if (totalScore >= prevRankScore) return 100;
-    // Show progress as percentage toward next rank's score
-    const range = prevRankScore - totalScore;
-    if (range <= 0) return 100;
-    // Show how close we are (inverse: closer = higher %)
-    return Math.max(0, Math.min(95, ((prevRankScore - range) / prevRankScore) * 100));
-  }, [rank, totalScore, nextRankScore]);
+    // Rank 1: no bar needed (trophy emoji shown instead)
+    if (!rank || rank <= 1) return 0;
+    // No scores yet: 0%
+    if (totalScore <= 0) return 0;
+    // If we've already passed the next rank score
+    if (nextRankScore && totalScore >= nextRankScore) return 100;
+    // Calculate progress within the gap between prev rank and next rank
+    if (prevRankScore !== null && nextRankScore !== null) {
+      const range = nextRankScore - prevRankScore;
+      if (range <= 0) return 100;
+      return Math.max(0, Math.min(99, ((totalScore - prevRankScore) / range) * 100));
+    }
+    // Fallback: progress toward next rank from 0
+    if (nextRankScore) {
+      return Math.max(0, Math.min(99, (totalScore / nextRankScore) * 100));
+    }
+    return 0;
+  }, [rank, totalScore, nextRankScore, prevRankScore]);
 
   const scoreToNextRank = useMemo(() => {
     if (!nextRankScore || totalScore >= nextRankScore) return null;
@@ -316,19 +323,17 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
           </div>
         </div>
 
-        {/* Progress to next rank */}
-        {rank !== null && (
+        {/* Progress to next rank — hidden for rank 1 */}
+        {rank !== null && rank > 1 && (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-[var(--color-cream-dim)] font-medium">
-                {rank === 1 ? "You're #1!" : "Progress to next rank"}
+                Progress to next rank
               </span>
               <span className="font-mono text-neon-green/80">
                 {scoreToNextRank
                   ? `+${formatNumber(scoreToNextRank)} pts`
-                  : rank === 1
-                    ? "🏆"
-                    : "—"}
+                  : "—"}
               </span>
             </div>
             <div
@@ -351,6 +356,13 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
                 }}
               />
             </div>
+          </div>
+        )}
+        {/* Rank 1 trophy message */}
+        {rank === 1 && (
+          <div className="flex items-center justify-center gap-2 text-[11px] pt-1">
+            <span className="text-[var(--color-cream-dim)] font-medium">{"You're #1!"}</span>
+            <span>🏆</span>
           </div>
         )}
       </div>

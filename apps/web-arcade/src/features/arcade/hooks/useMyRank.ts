@@ -25,6 +25,7 @@ export interface MyRankData {
   totalScore: number;
   gamesPlayed: number;
   nextRankScore: number | null;
+  prevRankScore: number | null;
   loading: boolean;
   error: string | null;
   refetch: () => void;
@@ -42,6 +43,7 @@ export function useMyRank(userId: string | null): MyRankData {
   const [totalScore, setTotalScore] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [nextRankScore, setNextRankScore] = useState<number | null>(null);
+  const [prevRankScore, setPrevRankScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,8 +108,13 @@ export function useMyRank(userId: string | null): MyRankData {
       // 5. Score needed for next rank
       const nextScore =
         rankIndex > 0 ? allScores[rankIndex - 1].score : null;
+      // 6. Score of player directly behind (previous rank)
+      const prevScore =
+        rankIndex >= 0 && rankIndex < allScores.length - 1
+          ? allScores[rankIndex + 1].score
+          : null;
 
-      // 6. Personal stats from user's own scores
+      // 7. Personal stats from user's own scores
       const uniqueGames = new Set(
         (userScores as ScoreEntry[]).map((s) => s.game),
       );
@@ -125,12 +132,14 @@ export function useMyRank(userId: string | null): MyRankData {
       setTotalScore(userTotal);
       setGamesPlayed(uniqueGames.size);
       setNextRankScore(nextScore);
+      setPrevRankScore(prevScore);
       setLoading(false);
     } catch (err) {
       setRank(null);
       setTotalScore(0);
       setGamesPlayed(0);
       setNextRankScore(null);
+      setPrevRankScore(null);
       setLoading(false);
       setError(
         err instanceof Error ? err.message : "Failed to load rank data",
@@ -148,6 +157,7 @@ export function useMyRank(userId: string | null): MyRankData {
     totalScore,
     gamesPlayed,
     nextRankScore,
+    prevRankScore,
     loading,
     error,
     refetch: fetchRank,
