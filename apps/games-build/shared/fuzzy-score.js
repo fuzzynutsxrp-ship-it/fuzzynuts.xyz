@@ -63,14 +63,55 @@ var FuzzyScoreSubmit = (function () {
   // slugs (e.g. 'fuzzy-survivors', 'nut-racer') are translated to these
   // by src/features/arcade/slugAliases.ts at the React boundary, but
   // games call FuzzyScoreSubmit() directly with the backend slug.
+  /* ─────────────────────────────────────────────────────────────
+     SCORE_CAPS — kept in sync with packages/arcade-core/src/constants/score-caps.ts
+     38 canonical games + legacy aliases for backwards compat.
+     ───────────────────────────────────────────────────────────── */
   var SCORE_CAPS = {
-    mario: 99999,
-    survivors: 999999,
-    minigolf: 10500,
-    "fuzzynuts-world": 9999999,
-    racer: 99999,
+    'mario': 9999990,
+    'fuzzy-survivors': 5000000,
+    'minigolf': 100000,
+    'nut-racer': 2000000,
+    'fuzzynuts-world': 10000000,
+    'rsc': 99000000,
+    'dragon-hoard': 999999,
+    'cosmic-blaster': 999999,
+    'snake': 50000,
+    'breakout': 100000,
+    'pong': 11,
+    'tetris': 999999,
+    'asteroids': 500000,
+    'flappy': 999,
+    'subway-runner': 50000,
+    'jetpack': 100000,
+    'ski-free': 99999,
+    'doodle-jump': 500000,
+    '2048': 999999,
+    'memory': 10000,
+    'minesweeper': 99999,
+    'sudoku': 99999,
+    'wordle': 1000,
+    'tank-battle': 500000,
+    'helicopter': 99999,
+    'fruit-ninja': 999999,
+    'tower-defense': 999999,
+    'space-invaders': 99999,
+    'boxing': 99999,
+    'bowling': 300,
+    'archery': 99999,
+    'surf-up': 99999,
+    'rally': 99999,
+    'maze-escape': 99999,
+    'frogger': 99999,
+    'bomberman': 99999,
+    'capture-flag': 99999,
+    'tower-stack': 99999,
+    // legacy aliases (DO NOT add to canonical list)
+    'survivors': 5000000,
+    'racer': 2000000,
+    'nutracer': 2000000
   };
-  var MIN_DURATION = 15; // seconds
+  var MIN_DURATION = 5; // seconds — aligns with MIN_PLAY_DURATION_SECONDS in arcade-core
 
   function getCurrentWeekKey() {
     var now = new Date();
