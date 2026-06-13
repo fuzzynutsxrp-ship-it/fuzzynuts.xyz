@@ -1,8 +1,8 @@
 # 0008 — Implement Rewards Route for Payout Processing
 
-- **Status**: proposed
+- **Status**: accepted
 - **Date**: 2026-06-12
-- **Deciders**: @fuzzynutsxrp-ship-it
+- **Deciders**: @fuzzynutsxrp-ship-it, @Shafster
 
 ## Context
 

@@ -1,8 +1,8 @@
 # 0009 — Multisig Payout Implementation in xrpl-token-utils
 
-- **Status**: proposed
+- **Status**: accepted
 - **Date**: 2026-06-12
-- **Deciders**: @fuzzynutsxrp-ship-it
+- **Deciders**: @fuzzynutsxrp-ship-it, @Shafster
 
 ## Context
 

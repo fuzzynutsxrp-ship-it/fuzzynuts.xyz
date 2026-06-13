@@ -1,8 +1,8 @@
 # 0010 — Persistent Challenge Store (Replace In-Memory Map)
 
-- **Status**: proposed
+- **Status**: accepted
 - **Date**: 2026-06-12
-- **Deciders**: @fuzzynutsxrp-ship-it
+- **Deciders**: @fuzzynutsxrp-ship-it, @Shafster
 
 ## Context
 
