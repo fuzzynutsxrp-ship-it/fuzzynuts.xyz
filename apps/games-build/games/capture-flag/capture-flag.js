@@ -24,7 +24,8 @@
   let startTime = 0;
   let gameTime = 0;
   let p1Captures = 0, p2Captures = 0;
-  let bestScore = parseInt(localStorage.getItem('capture-flag_best') || '0', 10);
+  let bestScore;
+  try { bestScore = parseInt(localStorage.getItem('capture-flag_best') || '0', 10); } catch (e) { bestScore = 0; }
   let animFrame;
   let lastPowerupSpawn = 0;
 
@@ -51,7 +52,6 @@
     }
     ctx = canvas.getContext('2d');
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
   }
 
   function resizeCanvas() {
@@ -324,7 +324,7 @@
     window.__gameScore = finalScore;
     if (finalScore > bestScore) {
       bestScore = finalScore;
-      localStorage.setItem('capture-flag_best', bestScore.toString());
+      try { localStorage.setItem('capture-flag_best', bestScore.toString()); } catch (e) { /* Safari private */ }
     }
     gameState = 'gameover';
     if (typeof FuzzyScoreSubmit === 'function') {
@@ -549,6 +549,12 @@
 
   // ── Game Loop ──
   let lastTime = 0;
+  let _listeners = [];
+
+  function addListener(target, event, handler, opts) {
+    target.addEventListener(event, handler, opts);
+    _listeners.push({ target, event, handler, opts });
+  }
 
   function loop(ts) {
     const dt = Math.min((ts - lastTime) / 1000, 0.05);
@@ -567,7 +573,7 @@
 
   // ── Input ──
   function setupInput() {
-    window.addEventListener('keydown', function (e) {
+    addListener(window, 'keydown', function (e) {
       keys[e.key] = true;
       if (gameState === 'start' && (e.key === ' ')) {
         e.preventDefault();
@@ -575,22 +581,28 @@
       } else if (gameState === 'gameover' && e.key === ' ') {
         e.preventDefault();
         startGame();
+      } else if (gameState === 'playing') {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+          e.preventDefault();
+        }
       }
     });
-    window.addEventListener('keyup', function (e) {
+    addListener(window, 'keyup', function (e) {
       keys[e.key] = false;
     });
 
     // Touch controls
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-    canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+    addListener(canvas, 'touchstart', handleTouchStart, { passive: false });
+    addListener(canvas, 'touchmove', handleTouchMove, { passive: false });
+    addListener(canvas, 'touchend', handleTouchEnd, { passive: false });
+    addListener(canvas, 'touchcancel', handleTouchEnd, { passive: false });
 
     // Click for start/restart
-    canvas.addEventListener('click', function () {
+    addListener(canvas, 'click', function () {
       if (gameState === 'start' || gameState === 'gameover') startGame();
     });
+
+    addListener(window, 'resize', resizeCanvas);
   }
 
   function getTouchPos(touch) {
@@ -657,10 +669,20 @@
   }
 
   function handleTouchEnd(e) {
+    e.preventDefault();
     for (const touch of e.changedTouches) {
       if (touch.identifier === p1Touch.id) { p1Touch.active = false; p1Touch.dx = 0; p1Touch.dy = 0; }
       if (touch.identifier === p2Touch.id) { p2Touch.active = false; p2Touch.dx = 0; p2Touch.dy = 0; }
     }
+  }
+
+  // ── Destroy (SPA cleanup) ──
+  function destroy() {
+    cancelAnimationFrame(animFrame);
+    for (const l of _listeners) {
+      l.target.removeEventListener(l.event, l.handler, l.opts);
+    }
+    _listeners = [];
   }
 
   // ── Init ──
@@ -672,6 +694,8 @@
     lastTime = performance.now();
     animFrame = requestAnimationFrame(loop);
   }
+
+  window.__gameDestroy = destroy;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

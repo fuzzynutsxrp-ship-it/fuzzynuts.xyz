@@ -21,7 +21,7 @@
   let canvas, ctx, w, h;
   let maze, cols, rows, cellSize;
   let player, exitCell, gems;
-  let score = 0, level = 0, totalDuration = 0;
+  let score = 0, level = 0, levelsCompleted = 0, totalDuration = 0;
   let timeLeft, timerInterval;
   let fogOfWar = true;
   let explored; // Set of "r,c"
@@ -31,6 +31,14 @@
   let playerTrail = [];
   let cellVisited;
   let levelStartTime;
+
+  // ── localStorage safe accessor (Safari private browsing) ──
+  function safeGetLocal(key) {
+    try { return localStorage.getItem(key) || '0'; } catch (e) { return '0'; }
+  }
+  function safeSetLocal(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) { /* ignore */ }
+  }
 
   // ── Maze generation (recursive backtracker / growing tree) ──
   function generateMaze(c, r) {
@@ -106,7 +114,7 @@
     }
     ctx = canvas.getContext('2d');
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    addListener(window, 'resize', resizeCanvas);
   }
 
   function resizeCanvas() {
@@ -348,6 +356,7 @@
   function startGame() {
     score = 0;
     level = 0;
+    levelsCompleted = 0;
     totalDuration = 0;
     initLevel();
     gameState = 'playing';
@@ -412,6 +421,7 @@
     gameState = 'levelComplete';
     clearInterval(timerInterval);
 
+    levelsCompleted = level + 1;
     level++;
     if (level >= LEVEL_SIZES.length) {
       // All levels done
@@ -433,8 +443,8 @@
 
     // Save best score
     const bestKey = 'maze-escape_best';
-    const prev = parseInt(localStorage.getItem(bestKey)) || 0;
-    if (score > prev) localStorage.setItem(bestKey, score);
+    const prev = parseInt(safeGetLocal(bestKey)) || 0;
+    if (score > prev) safeSetLocal(bestKey, score);
 
     window.__gameScore = score;
     if (typeof FuzzyScoreSubmit === 'function') {
@@ -447,7 +457,7 @@
 
   // ── Input ──
   function setupInput() {
-    document.addEventListener('keydown', (e) => {
+    addListener(document, 'keydown', (e) => {
       if (gameState === 'start') { startGame(); return; }
       if (gameState === 'gameover') {
         if (e.key === 'Enter' || e.key === ' ') { startGame(); }
@@ -464,14 +474,14 @@
 
     // Touch swipe
     let touchStart = null;
-    canvas.addEventListener('touchstart', (e) => {
+    addListener(canvas, 'touchstart', (e) => {
       if (gameState === 'start') { startGame(); return; }
       if (gameState === 'gameover') { startGame(); return; }
       const t = e.touches[0];
       touchStart = { x: t.clientX, y: t.clientY };
     }, { passive: true });
 
-    canvas.addEventListener('touchend', (e) => {
+    addListener(canvas, 'touchend', (e) => {
       if (!touchStart || gameState !== 'playing') return;
       const t = e.changedTouches[0];
       const dx = t.clientX - touchStart.x;
@@ -488,18 +498,35 @@
   }
 
   // ── Game loop ──
+  let _listeners = [];
+
+  function addListener(target, event, handler, opts) {
+    target.addEventListener(event, handler, opts);
+    _listeners.push({ target, event, handler, opts });
+  }
+
   function loop() {
     animFrame = requestAnimationFrame(loop);
     if (gameState === 'playing') {
       draw();
     } else if (gameState === 'start') {
-      drawOverlay('MAZE ESCAPE', 'Find the exit!', ['Arrow keys or swipe to move', 'Collect gems for bonus points', 'Press any key to start', '', `Best: ${localStorage.getItem('maze-escape_best') || 0}`]);
+      drawOverlay('MAZE ESCAPE', 'Find the exit!', ['Arrow keys or swipe to move', 'Collect gems for bonus points', 'Press any key to start', '', `Best: ${safeGetLocal('maze-escape_best')}`]);
     } else if (gameState === 'levelComplete') {
       drawOverlay('LEVEL COMPLETE!', `Score: ${score}`, ['Generating next maze...']);
     } else if (gameState === 'gameover') {
       const won = level >= LEVEL_SIZES.length;
-      drawOverlay(won ? 'YOU WIN!' : 'GAME OVER', `Final Score: ${score}`, [`Levels completed: ${level}`, 'Press Enter to play again']);
+      drawOverlay(won ? 'YOU WIN!' : 'GAME OVER', `Final Score: ${score}`, [`Levels completed: ${levelsCompleted}`, 'Press Enter to play again']);
     }
+  }
+
+  // ── Destroy (SPA cleanup) ──
+  function destroy() {
+    cancelAnimationFrame(animFrame);
+    clearInterval(timerInterval);
+    for (const l of _listeners) {
+      l.target.removeEventListener(l.event, l.handler, l.opts);
+    }
+    _listeners = [];
   }
 
   // ── Init ──
@@ -509,6 +536,8 @@
     gameState = 'start';
     loop();
   }
+
+  window.__gameDestroy = destroy;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

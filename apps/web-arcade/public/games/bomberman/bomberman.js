@@ -350,8 +350,9 @@
     animFrame = null;
 
     // Best score
-    const prev = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
-    if (score > prev) localStorage.setItem('bomberman_best', score.toString());
+    let prev;
+    try { prev = parseInt(localStorage.getItem('bomberman_best') || '0', 10); } catch (e) { prev = 0; }
+    if (score > prev) { try { localStorage.setItem('bomberman_best', score.toString()); } catch (e) { /* Safari private */ } }
     bestScore = Math.max(score, prev);
 
     const duration = Math.floor((Date.now() - startTime) / 1000);
@@ -547,7 +548,8 @@
     ctx.fillText('Space / Tap to place bomb', canvas.width / 2, canvas.height * 0.58);
     ctx.fillText('Destroy all enemies to advance!', canvas.width / 2, canvas.height * 0.66);
 
-    const bs = localStorage.getItem('bomberman_best') || '0';
+    let bs;
+    try { bs = localStorage.getItem('bomberman_best') || '0'; } catch (e) { bs = '0'; }
     ctx.fillStyle = '#888';
     ctx.font = Math.floor(tileH * 0.4) + 'px monospace';
     ctx.fillText('Best: ' + bs, canvas.width / 2, canvas.height * 0.78);
@@ -573,10 +575,11 @@
     ctx.fillText('Score: ' + score, canvas.width / 2, canvas.height * 0.5);
     ctx.fillText('Level: ' + level, canvas.width / 2, canvas.height * 0.58);
 
-    const bs = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+    let bs2;
+    try { bs2 = parseInt(localStorage.getItem('bomberman_best') || '0', 10); } catch (e) { bs2 = 0; }
     ctx.fillStyle = '#888';
     ctx.font = Math.floor(tileH * 0.4) + 'px monospace';
-    ctx.fillText('Best: ' + bs, canvas.width / 2, canvas.height * 0.68);
+    ctx.fillText('Best: ' + bs2, canvas.width / 2, canvas.height * 0.68);
 
     ctx.fillStyle = PLAYER_COLOR;
     ctx.font = Math.floor(tileH * 0.5) + 'px monospace';
@@ -636,7 +639,7 @@
     gameRunning = true;
     gamePaused = false;
     startTime = Date.now();
-    bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+    try { bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10); } catch (e) { bestScore = 0; }
     initLevel();
     lastTime = performance.now();
     animFrame = requestAnimationFrame(gameLoop);
@@ -676,7 +679,7 @@
     }
     ctx = canvas.getContext('2d');
 
-    bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+    try { bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10); } catch (e) { bestScore = 0; }
     resize();
     window.addEventListener('resize', () => { resize(); if (!gameRunning) drawStartScreen(); });
     document.addEventListener('keydown', onKeyDown);

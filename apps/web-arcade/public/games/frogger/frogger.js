@@ -144,8 +144,9 @@
     gameActive = false;
     cancelAnimationFrame(animFrame);
 
-    const best = parseInt(localStorage.getItem('frogger_best') || '0', 10);
-    if (score > best) localStorage.setItem('frogger_best', score);
+    let best;
+    try { best = parseInt(localStorage.getItem('frogger_best') || '0', 10); } catch (e) { best = 0; }
+    if (score > best) { try { localStorage.setItem('frogger_best', score); } catch (e) { /* Safari private */ } }
 
     if (typeof FuzzyScoreSubmit === 'function') {
       try { FuzzyScoreSubmit('frogger', score, gameDuration); } catch (e) { /* */ }
