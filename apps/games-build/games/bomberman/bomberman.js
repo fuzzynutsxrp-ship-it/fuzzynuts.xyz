@@ -35,6 +35,7 @@
   let shieldTimer = 0;
   let touchStart = null;
   let touchMoved = false;
+  let waitStartRef = null;  // stored for destroy() cleanup
 
   // ── Grid helpers ───────────────────────────────────────────────────────────
   function isFixedWall(c, r) {
@@ -202,7 +203,7 @@
       }
     }
 
-    // Remove bomb
+    // Remove bomb (use findIndex to avoid stale reference after chaining)
     const idx = bombs.indexOf(bomb);
     if (idx !== -1) bombs.splice(idx, 1);
     player.activeBombs = Math.max(0, player.activeBombs - 1);
@@ -362,6 +363,18 @@
     }
 
     updateHUD();
+
+    // Show game-over overlay
+    const finalScoreEl = document.getElementById('final-score');
+    if (finalScoreEl) finalScoreEl.textContent = score;
+    const newBestEl = document.getElementById('new-best');
+    if (newBestEl) {
+      if (score > prev) newBestEl.classList.remove('hidden');
+      else newBestEl.classList.add('hidden');
+    }
+    const gameOverEl = document.getElementById('game-over');
+    if (gameOverEl) gameOverEl.classList.remove('hidden');
+
     drawGameOverScreen();
   }
 
@@ -593,12 +606,21 @@
       player.x += (player.col - player.x) * Math.min(1, dt * player.speed * 3);
       player.y += (player.row - player.y) * Math.min(1, dt * player.speed * 3);
 
-      // Update bombs
-      for (let i = bombs.length - 1; i >= 0; i--) {
-        bombs[i].timer -= dt;
-        if (bombs[i].timer <= 0) {
-          explodeBomb(bombs[i]);
+      // Update bombs — use while-loop so chain reactions (timer set to 0)
+      // explode in the same frame instead of surviving 1 extra tick
+      let bombExploded = true;
+      while (bombExploded) {
+        bombExploded = false;
+        for (let i = bombs.length - 1; i >= 0; i--) {
+          if (bombs[i].timer <= 0) {
+            explodeBomb(bombs[i]);
+            bombExploded = true;
+          }
         }
+      }
+      // Tick remaining bomb timers
+      for (const b of bombs) {
+        b.timer -= dt;
       }
 
       // Update explosions
@@ -626,6 +648,12 @@
 
   // ── Start / Restart ────────────────────────────────────────────────────────
   function startGame() {
+    // Cancel any existing game loop to prevent duplicate stacking (H4/H5)
+    if (animFrame) {
+      cancelAnimationFrame(animFrame);
+      animFrame = null;
+    }
+
     score = 0;
     lives = 3;
     level = 1;
@@ -633,6 +661,13 @@
     gamePaused = false;
     startTime = Date.now();
     bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+
+    // Hide start screen and game-over overlays
+    const startScreen = document.getElementById('start-screen');
+    if (startScreen) startScreen.classList.add('hidden');
+    const gameOverEl = document.getElementById('game-over');
+    if (gameOverEl) gameOverEl.classList.add('hidden');
+
     initLevel();
     lastTime = performance.now();
     animFrame = requestAnimationFrame(gameLoop);
@@ -683,26 +718,58 @@
     // Start screen wait
     drawStartScreen();
 
-    function waitStart(e) {
+    waitStartRef = function waitStart(e) {
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         document.removeEventListener('keydown', waitStart);
         startGame();
       }
-    }
-    document.addEventListener('keydown', waitStart);
+    };
+    document.addEventListener('keydown', waitStartRef);
     canvas.addEventListener('touchstart', function ts(e) {
       canvas.removeEventListener('touchstart', ts);
       startGame();
     }, { once: true });
+
+    // Wire start button click (C3 fix)
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) startBtn.addEventListener('click', startGame);
+
+    // Wire restart button click
+    const restartBtn = document.getElementById('restart-btn');
+    if (restartBtn) restartBtn.addEventListener('click', startGame);
 
     // Expose for external control
     window.__bombermanEngine = {
       start: startGame,
       pause: () => { gamePaused = true; },
       resume: () => { gamePaused = false; },
-      isRunning: () => gameRunning
+      isRunning: () => gameRunning,
+      destroy: destroy
     };
+  }
+
+  // ── Cleanup (H5) ─────────────────────────────────────────────────────────
+  function destroy() {
+    if (animFrame) {
+      cancelAnimationFrame(animFrame);
+      animFrame = null;
+    }
+    gameRunning = false;
+    document.removeEventListener('keydown', onKeyDown);
+    document.removeEventListener('keydown', onRestartKey);
+    document.removeEventListener('keydown', waitStartRef);
+    window.removeEventListener('resize', resize);
+    if (canvas) {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchstart', onRestartTouch);
+    }
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) startBtn.removeEventListener('click', startGame);
+    const restartBtn = document.getElementById('restart-btn');
+    if (restartBtn) restartBtn.removeEventListener('click', startGame);
   }
 
   // ── Boot ───────────────────────────────────────────────────────────────────

@@ -5,10 +5,11 @@
   const GOLD = '#fbbf24';
   const PERFECT_THRESHOLD = 5;
   const MIN_BLOCK_WIDTH = 10;
-  const BASE_SPEED = 2;
+  const BASE_SPEED = 120; // pixels per second (was 2 per frame at 60fps)
   const BLOCK_HEIGHT = 30;
   const BASE_BLOCK_WIDTH = 200;
   const PARTICLE_COUNT = 20;
+  const TARGET_DT = 16.667; // 60fps reference frame time
 
   let canvas, ctx;
   let state = 'start'; // start | playing | over
@@ -25,6 +26,16 @@
   let particles = [];
   let bounceStack = []; // per-block bounce offset
   let animFrame = null;
+  let lastTime = 0;
+
+  // Stored references for cleanup
+  let _onKeydown = null;
+  let _onClick = null;
+  let _onTouchstart = null;
+  let _onGameStart = null;
+  let _onGameRestart = null;
+  let _onCleanup = null;
+  let _onResize = null;
 
   function getColor(layer) {
     const hue = (layer * 25 + 200) % 360;
@@ -46,7 +57,8 @@
     }
     ctx = canvas.getContext('2d');
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    _onResize = resizeCanvas;
+    window.addEventListener('resize', _onResize);
   }
 
   function resizeCanvas() {
@@ -77,6 +89,7 @@
     bounceStack = [];
     startTime = Date.now();
     direction = 1;
+    lastTime = performance.now();
 
     // Base block
     const baseX = (canvas.width - BASE_BLOCK_WIDTH) / 2;
@@ -86,6 +99,12 @@
 
     currentBlock = spawnBlock(baseY - BLOCK_HEIGHT, BASE_BLOCK_WIDTH);
     updateHUD();
+
+    // Start the game loop if not running
+    if (!animFrame) {
+      lastTime = performance.now();
+      animFrame = requestAnimationFrame(gameLoop);
+    }
   }
 
   function updateHUD() {
@@ -99,8 +118,8 @@
       particles.push({
         x: x + Math.random() * w,
         y: y,
-        vx: (Math.random() - 0.5) * 8,
-        vy: -Math.random() * 6 - 2,
+        vx: (Math.random() - 0.5) * 480, // pixels/sec (was 8 per frame)
+        vy: -Math.random() * 360 - 120,   // pixels/sec
         life: 1,
         color: color,
         size: Math.random() * 4 + 2
@@ -154,7 +173,7 @@
     }
 
     // Next block
-    speed = BASE_SPEED + stack.length * 0.3;
+    speed = BASE_SPEED + stack.length * 1.8; // scaled for per-second units
     currentBlock = spawnBlock(newY - BLOCK_HEIGHT, placedWidth);
   }
 
@@ -170,25 +189,31 @@
     }
     // Dispatch event for arcade integration
     window.dispatchEvent(new CustomEvent('game-over', { detail: { score: score, game: 'tower-stack' } }));
+
+    // H4: Stop the animation loop on game over
+    if (animFrame) {
+      cancelAnimationFrame(animFrame);
+      animFrame = null;
+    }
   }
 
   function updateParticles(dt) {
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.2;
-      p.life -= 0.02;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 720 * dt; // gravity scaled per-second (was 0.2 per frame)
+      p.life -= 1.2 * dt; // decay per-second (was 0.02 per frame)
       if (p.life <= 0) particles.splice(i, 1);
     }
   }
 
-  function update() {
+  function update(dt) {
     if (state !== 'playing') return;
 
-    // Move current block
+    // Move current block (frame-rate independent)
     if (currentBlock && currentBlock.moving) {
-      currentBlock.x += speed * direction;
+      currentBlock.x += speed * direction * dt;
       if (currentBlock.x + currentBlock.width > canvas.width) {
         direction = -1;
       } else if (currentBlock.x < 0) {
@@ -196,16 +221,17 @@
       }
     }
 
-    // Camera lerp
-    cameraY += (targetCameraY - cameraY) * 0.08;
+    // Camera lerp (frame-rate independent: exponential decay)
+    const lerpFactor = 1 - Math.pow(1 - 0.08, dt * 60);
+    cameraY += (targetCameraY - cameraY) * lerpFactor;
 
-    // Bounce decay
+    // Bounce decay (frame-rate independent)
     for (let i = 0; i < bounceStack.length; i++) {
-      if (bounceStack[i] > 0) bounceStack[i] *= 0.75;
+      if (bounceStack[i] > 0) bounceStack[i] *= Math.pow(0.75, dt * 60);
       if (bounceStack[i] < 0.5) bounceStack[i] = 0;
     }
 
-    updateParticles(1);
+    updateParticles(dt);
   }
 
   function drawBlock(b, layer, bounce) {
@@ -352,8 +378,12 @@
     }
   }
 
-  function gameLoop() {
-    update();
+  function gameLoop(now) {
+    // C1: Compute delta time, clamped to avoid spiral of death
+    const dt = Math.min((now - lastTime) / TARGET_DT, 3);
+    lastTime = now;
+
+    update(dt);
     draw();
     animFrame = requestAnimationFrame(gameLoop);
   }
@@ -368,47 +398,67 @@
     }
   }
 
+  // H5: destroy() to remove all event listeners
+  function destroy() {
+    if (animFrame) {
+      cancelAnimationFrame(animFrame);
+      animFrame = null;
+    }
+    if (_onKeydown) window.removeEventListener('keydown', _onKeydown);
+    if (_onClick) canvas.removeEventListener('click', _onClick);
+    if (_onTouchstart) canvas.removeEventListener('touchstart', _onTouchstart);
+    if (_onGameStart) window.removeEventListener('game-start', _onGameStart);
+    if (_onGameRestart) window.removeEventListener('game-restart', _onGameRestart);
+    if (_onResize) window.removeEventListener('resize', _onResize);
+    if (_onCleanup) window.removeEventListener('game-cleanup', _onCleanup);
+    _onKeydown = _onClick = _onTouchstart = _onGameStart = _onGameRestart = _onResize = _onCleanup = null;
+  }
+
   function init() {
     initCanvas();
 
     // Keyboard
-    window.addEventListener('keydown', function(e) {
+    _onKeydown = function(e) {
       if (e.code === 'Space' || e.key === ' ') {
         e.preventDefault();
         handleInput();
       }
-    });
+    };
+    window.addEventListener('keydown', _onKeydown);
 
     // Mouse
-    canvas.addEventListener('click', function(e) {
+    _onClick = function(e) {
       e.preventDefault();
       handleInput();
-    });
+    };
+    canvas.addEventListener('click', _onClick);
 
     // Touch
-    canvas.addEventListener('touchstart', function(e) {
+    _onTouchstart = function(e) {
       e.preventDefault();
       handleInput();
-    }, { passive: false });
+    };
+    canvas.addEventListener('touchstart', _onTouchstart, { passive: false });
 
     // Listen for external start
-    window.addEventListener('game-start', function() {
-      startGame();
-    });
+    _onGameStart = function() { startGame(); };
+    window.addEventListener('game-start', _onGameStart);
 
     // Listen for external restart
-    window.addEventListener('game-restart', function() {
-      startGame();
-    });
+    _onGameRestart = function() { startGame(); };
+    window.addEventListener('game-restart', _onGameRestart);
 
-    gameLoop();
+    // H4/H5: Cleanup handler calls destroy()
+    _onCleanup = function() { destroy(); };
+    window.addEventListener('game-cleanup', _onCleanup);
+
+    // Draw initial start screen (no loop until game starts)
+    lastTime = performance.now();
+    draw();
   }
 
-  // Cleanup
-  window.addEventListener('game-cleanup', function() {
-    if (animFrame) cancelAnimationFrame(animFrame);
-    window.removeEventListener('resize', resizeCanvas);
-  });
+  // Expose destroy for external callers
+  window.__towerStackDestroy = destroy;
 
   // Boot
   if (document.readyState === 'loading') {
