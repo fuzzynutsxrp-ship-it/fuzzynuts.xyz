@@ -2,26 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
-  images: {
-    unoptimized: true,
-  },
-
-  /**
-   * ═══════════════════════════════════════════════════════════════
-   *  REWRITES — none.
-   *
-   *  The React App Router arcade (src/app/page.tsx) is now served at
-   *  the root route `/`. We previously rewrote `/` → `/index.html` to
-   *  serve a static placeholder page; that bypassed the React arcade
-   *  and only surfaced ~8 games, so it has been removed.
-   *
-   *  The old static page still exists at public/index.html for
-   *  reference but is no longer routed (slated for deletion).
-   * ═══════════════════════════════════════════════════════════════
-   */
-  async rewrites() {
-    return [];
-  },
 
   /* ─────────────────────────────────────────────────────────────
      headers() — long-cache video + fallback image used by the

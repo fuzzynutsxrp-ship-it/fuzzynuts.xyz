@@ -107,7 +107,7 @@ export const GAMES = [
     icon: "/icons/icon-world-pop.webp",
     image: "⚔️",
     color: "#22c55e",
-    tags: ["MMORPG", "Classic", "PvP"],
+    tags: ["MMORPG", "Classic", "PvP", "Multiplayer"],
   },
   {
     id: "dragon-hoard",

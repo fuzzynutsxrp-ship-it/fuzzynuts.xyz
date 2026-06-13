@@ -21,7 +21,7 @@ import Link from "next/link";
 interface TopNavProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onMenuToggle: () => void;
+  onMenuToggle?: () => void;
 }
 
 export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProps) {
@@ -59,6 +59,7 @@ export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProp
       >
         <div className="flex items-center h-12 md:h-14 px-2 md:px-3">
           {/* Hamburger — mobile only, outside the tile group */}
+          {onMenuToggle && (
           <button
             onClick={onMenuToggle}
             className="md:hidden p-2 mr-1 min-h-[40px] min-w-[40px] flex items-center justify-center text-[var(--color-cream-dim)] hover:text-brand-gold cursor-pointer rounded-lg hover:bg-white/5 transition-colors shrink-0"
@@ -66,6 +67,7 @@ export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProp
           >
             <Menu size={20} />
           </button>
+          )}
 
           {/* Tile group — logo + search + user, all flush */}
           <div className="flex items-center">

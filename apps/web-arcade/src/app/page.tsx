@@ -9,8 +9,11 @@ import { TopNav } from "@/components/layout/TopNav";
 import { CategoryTabs } from "@/components/game/CategoryTabs";
 import { PokiGameCard } from "@/components/game/PokiGameCard";
 import { ComingSoonCard } from "@/components/game/ComingSoonCard";
-import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
+
+const GameModal = dynamic(() =>
+  import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
+);
 
 const Footer = dynamic(() =>
   import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
@@ -45,7 +48,7 @@ function matchesCategory(game: (typeof GAMES)[number], category: string): boolea
   const tags = (game.tags ?? []).map((t) => t.toLowerCase());
   const hay = [type, ...tags];
   switch (category) {
-    case "multiplayer": return hay.some((h) => h.includes("multiplayer")) || game.id === "fuzzynuts-world" || game.id === "rsc";
+    case "multiplayer": return hay.some((h) => h.includes("multiplayer"));
     case "arcade": return hay.some((h) => h.includes("arcade") || h.includes("action"));
     case "racing": return hay.some((h) => h.includes("racing") || h.includes("runner"));
     case "chill": return hay.some((h) => h.includes("casual") || h.includes("puzzle") || h.includes("physics"));
@@ -59,6 +62,11 @@ function matchesCategory(game: (typeof GAMES)[number], category: string): boolea
 function gamesByIds(ids: string[]) {
   return ids.map((id) => GAMES.find((g) => g.id === id)).filter(Boolean) as typeof GAMES;
 }
+
+/* Pre-computed curated rows — static IDs + static GAMES = no need to recompute per render */
+const TRENDING_GAMES = gamesByIds(TRENDING_IDS);
+const NEW_GAMES = gamesByIds(NEW_IDS);
+const TOP_RATED_GAMES = gamesByIds(TOP_RATED_IDS);
 
 /* ═══════════════════════════════════════════════════════════════
    Section row component — horizontal scroll on mobile, grid on desktop
@@ -108,7 +116,6 @@ function GameRow({
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [, setMenuOpen] = useState(false);
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
 
   const isFiltering = activeCategory !== "all" || searchQuery.trim().length > 0;
@@ -127,16 +134,15 @@ export default function Home() {
     return games;
   }, [activeCategory, searchQuery]);
 
-  const trending = gamesByIds(TRENDING_IDS);
-  const justAdded = gamesByIds(NEW_IDS);
-  const topRated = gamesByIds(TOP_RATED_IDS);
+  const trending = TRENDING_GAMES;
+  const justAdded = NEW_GAMES;
+  const topRated = TOP_RATED_GAMES;
 
   return (
     <div className="min-h-screen bg-[#0a0613] flex flex-col">
       <TopNav
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onMenuToggle={() => setMenuOpen((o) => !o)}
       />
 
       <CategoryTabs
