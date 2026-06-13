@@ -285,6 +285,13 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     [onGameSwitch]
   );
 
+  // Build allow policy — add cross-origin-isolated for games that need SharedArrayBuffer.
+  // MUST run before any early return so hooks are called in the same order every render.
+  const allowPolicy = useMemo(() => {
+    const base = "autoplay; fullscreen; gamepad";
+    return game?.crossOriginIsolated ? `${base}; cross-origin-isolated` : base;
+  }, [game?.crossOriginIsolated]);
+
   // Don't render anything if no game
   if (!game) return null;
 
@@ -456,7 +463,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             title={`Play ${game.title}`}
             sandbox={game.sandbox || defaultSandbox}
             loading="eager"
-            allow="autoplay; fullscreen; gamepad"
+            allow={allowPolicy}
             onLoad={handleIframeLoad}
             className="game-modal__iframe"
             aria-label={`${game.title} game window`}

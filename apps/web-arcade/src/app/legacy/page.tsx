@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { TopNav } from "@/components/layout/TopNav";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { CategoryTabs } from "@/components/game/CategoryTabs";
 import { PokiGameCard } from "@/components/game/PokiGameCard";
 import { ComingSoonCard } from "@/components/game/ComingSoonCard";
@@ -140,7 +140,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#0a0613] flex flex-col">
       {/* Compact Top Bar */}
-      <TopNav
+      <SiteHeader
+        variant="dark"
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onMenuToggle={() => setMenuOpen((o) => !o)}

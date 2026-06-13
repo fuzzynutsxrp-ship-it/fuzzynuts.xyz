@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useWalletStore } from "@/store/wallet";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { ClaimRewards } from "@/components/sections/ClaimRewards";
+import { MyRankWidget } from "@/components/ui/MyRankWidget";
 
 /* ═══════════════════════════════════════════════════════════════
    Types
@@ -449,6 +450,15 @@ export function UserProfile() {
           transition={{ delay: 0.05 }}
         >
           <ClaimRewards />
+        </motion.div>
+
+        {/* ═══ MY RANK WIDGET ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.07 }}
+        >
+          <MyRankWidget />
         </motion.div>
 
         {/* ═══ STATS SUMMARY ═══ */}
