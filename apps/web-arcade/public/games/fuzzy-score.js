@@ -88,6 +88,7 @@ var FuzzyScoreSubmit = (function() {
     'nut-racer': 2000000,
     'fuzzynuts-world': 10000000,
     'dragon-hoard': 999999,
+    'cosmic-blaster': 999999,
     'rsc': 99000000,
     // legacy aliases (DO NOT add to canonical list)
     'survivors': 5000000,

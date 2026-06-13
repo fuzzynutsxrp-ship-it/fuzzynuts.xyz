@@ -41,6 +41,7 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
   racer: "orange",
   rsc: "green",
   "dragon-hoard": "orange",
+  "cosmic-blaster": "cyan",
 };
 
 /** Map game IDs to emojis for the tab selector */
@@ -52,6 +53,7 @@ const GAME_EMOJIS: Record<string, string> = {
   racer: "🏎️",
   rsc: "⚔️",
   "dragon-hoard": "🐉",
+  "cosmic-blaster": "🚀",
 };
 
 /** Week options for the week selector dropdown */
