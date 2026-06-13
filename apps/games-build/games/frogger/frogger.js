@@ -114,6 +114,7 @@
   }
 
   function showStartScreen() {
+    cancelAnimationFrame(animFrame);
     drawBG();
     ctx.fillStyle = FROG_COLOR;
     ctx.font = 'bold 36px monospace';
@@ -178,9 +179,11 @@
 
   function handleKey(e) {
     if (!gameActive) return;
-    e.preventDefault();
     const map = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
-    if (map[e.key]) moveFrog(map[e.key][0], map[e.key][1]);
+    if (map[e.key]) {
+      e.preventDefault();
+      moveFrog(map[e.key][0], map[e.key][1]);
+    }
   }
 
   let touchStart = null;
@@ -223,7 +226,7 @@
     }
 
     updateLanes(dt);
-    updateFrogPosition();
+    updateFrogPosition(dt);
     checkCollisions();
     checkGoal();
 
@@ -266,7 +269,7 @@
     });
   }
 
-  function updateFrogPosition() {
+  function updateFrogPosition(dt) {
     if (frog.row >= 2 && frog.row <= 6) {
       const lane = lanes.find(l => l.row === frog.row);
       if (!lane) return;
@@ -290,7 +293,7 @@
         }
       }
       if (frog.riding) {
-        frog.col += frog.riding.speed * GRID * (1 / 60) / GRID;
+        frog.col += frog.riding.speed * dt;
       }
     }
   }
@@ -504,6 +507,17 @@
     ctx.quadraticCurveTo(x, y, x + r, y);
     ctx.closePath();
   }
+
+  function destroy() {
+    cancelAnimationFrame(animFrame);
+    document.removeEventListener('keydown', handleKey);
+    canvas.removeEventListener('touchstart', onTouchStart);
+    canvas.removeEventListener('touchend', onTouchEnd);
+    window.removeEventListener('resize', resize);
+    gameActive = false;
+  }
+
+  window.__froggerDestroy = destroy;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
