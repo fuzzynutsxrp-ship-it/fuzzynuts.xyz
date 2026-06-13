@@ -6,25 +6,40 @@
   <meta name="description" content="FuzzyNuts — Free online games. Play racing, roguelikes, tycoons, puzzles and more. No downloads, no sign-ups.">
   <title>FuzzyNuts — Free Online Games</title>
 
-  <!-- Google Fonts — Nunito -->
+  <!-- Google Fonts — Nunito (defered via media swap) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-  <!-- Stylesheets -->
+  <!-- Critical CSS (render-blocking) -->
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/nav-bar.css">
   <link rel="stylesheet" href="css/hero.css">
-  <link rel="stylesheet" href="css/carousel.css">
   <link rel="stylesheet" href="css/game-card.css">
-  <link rel="stylesheet" href="css/sidebar.css">
-  <link rel="stylesheet" href="css/top-list.css">
-  <link rel="stylesheet" href="css/categories.css">
-  <link rel="stylesheet" href="css/game-grid.css">
-  <link rel="stylesheet" href="css/seo.css">
-  <link rel="stylesheet" href="css/footer.css">
-  <link rel="stylesheet" href="css/cookie.css">
-  <link rel="stylesheet" href="css/game-overlay.css">
+
+  <!-- Non-critical CSS (deferred) -->
+  <link rel="stylesheet" href="css/featured-carousel.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/carousel.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/sidebar.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/top-list.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/categories.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/game-grid.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/seo.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/footer.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/cookie.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/game-overlay.css" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="css/featured-carousel.css">
+    <link rel="stylesheet" href="css/carousel.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/top-list.css">
+    <link rel="stylesheet" href="css/categories.css">
+    <link rel="stylesheet" href="css/game-grid.css">
+    <link rel="stylesheet" href="css/seo.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/cookie.css">
+    <link rel="stylesheet" href="css/game-overlay.css">
+  </noscript>
 </head>
 <body>
 
@@ -142,27 +157,117 @@
 
   <main class="fn-dashboard">
 
-<!-- ============================== Hero Spotlight ============================== -->
-<section class="fn-hero-banner" aria-label="Featured game">
+<!-- ============================== Featured Game Carousel ============================== -->
+<section class="fn-featured-carousel" aria-label="Featured games" aria-roledescription="carousel">
+  <div class="fn-featured-carousel__track" aria-live="off">
 
-  <!-- Left: Text content -->
-  <div class="fn-hero-banner__content">
-    <span class="fn-hero-banner__badge">
-      🔥 Featured
-    </span>
-    <h1 class="fn-hero-banner__title">RuneScape Classic</h1>
-    <p class="fn-hero-banner__subtitle">The original 2001 MMORPG — now playable in your browser. Explore, quest, skill, and PK. No downloads needed.</p>
-    <a href="/games/rsc/" class="fn-hero-banner__cta">
-      Play Now
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
+    <!-- Slide 1: Fuzzynuts World -->
+    <div class="fn-featured-carousel__slide is-active" role="group" aria-roledescription="slide" aria-label="1 of 5">
+      <div class="fn-featured-carousel__content">
+        <span class="fn-featured-carousel__badge">🔥 Featured</span>
+        <h2 class="fn-featured-carousel__title">Fuzzynuts World</h2>
+        <p class="fn-featured-carousel__subtitle">Explore a massive open world, complete quests, craft items, and compete with players worldwide. The flagship Fuzzynuts MMORPG experience.</p>
+        <a href="/games/fuzzynuts-world/" class="fn-featured-carousel__cta">
+          Play Now
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+      </div>
+      <div class="fn-featured-carousel__visual">
+        <picture><source srcset="/images/games/fuzzynuts-world.webp" type="image/webp"><img src="/images/games/fuzzynuts-world.png" alt="Fuzzynuts World — open world MMORPG" class="fn-featured-carousel__img" loading="eager" width="640" height="360"></picture>
+      </div>
+    </div>
+
+    <!-- Slide 2: RuneScape Classic -->
+    <div class="fn-featured-carousel__slide" role="group" aria-roledescription="slide" aria-label="2 of 5">
+      <div class="fn-featured-carousel__content">
+        <span class="fn-featured-carousel__badge">⚔️ Classic</span>
+        <h2 class="fn-featured-carousel__title">RuneScape Classic</h2>
+        <p class="fn-featured-carousel__subtitle">The original 2001 MMORPG — now playable in your browser. Explore, quest, skill, and PK. No downloads needed.</p>
+        <a href="/games/rsc/" class="fn-featured-carousel__cta">
+          Play Now
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+      </div>
+      <div class="fn-featured-carousel__visual">
+        <picture><source srcset="/images/games/rsc.webp" type="image/webp"><img src="/images/games/rsc.png" alt="RuneScape Classic — browser MMORPG" class="fn-featured-carousel__img" loading="lazy" width="640" height="360"></picture>
+      </div>
+    </div>
+
+    <!-- Slide 3: Super Fuzzynuts -->
+    <div class="fn-featured-carousel__slide" role="group" aria-roledescription="slide" aria-label="3 of 5">
+      <div class="fn-featured-carousel__content">
+        <span class="fn-featured-carousel__badge">🍄 Platformer</span>
+        <h2 class="fn-featured-carousel__title">Super Fuzzynuts</h2>
+        <p class="fn-featured-carousel__subtitle">Classic side-scrolling action with all 32 original levels, random map generator, and level editor. Jump, stomp, collect nuts!</p>
+        <a href="/games/mario/" class="fn-featured-carousel__cta">
+          Play Now
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+      </div>
+      <div class="fn-featured-carousel__visual">
+        <picture><source srcset="/images/games/mario.webp" type="image/webp"><img src="/images/games/mario.png" alt="Super Fuzzynuts — platformer" class="fn-featured-carousel__img" loading="lazy" width="640" height="360"></picture>
+      </div>
+    </div>
+
+    <!-- Slide 4: Cosmic Blaster -->
+    <div class="fn-featured-carousel__slide" role="group" aria-roledescription="slide" aria-label="4 of 5">
+      <div class="fn-featured-carousel__content">
+        <span class="fn-featured-carousel__badge">🚀 Shooter</span>
+        <h2 class="fn-featured-carousel__title">Cosmic Blaster</h2>
+        <p class="fn-featured-carousel__subtitle">Blast through asteroids and enemy ships in this fast-paced space shooter! Dodge, shoot, and survive as long as you can.</p>
+        <a href="/games/cosmic-blaster/" class="fn-featured-carousel__cta">
+          Play Now
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+      </div>
+      <div class="fn-featured-carousel__visual">
+        <picture><source srcset="/images/games/cosmic-blaster.webp" type="image/webp"><img src="/images/games/cosmic-blaster.png" alt="Cosmic Blaster — space shooter" class="fn-featured-carousel__img" loading="lazy" width="640" height="360"></picture>
+      </div>
+    </div>
+
+    <!-- Slide 5: Fuzzy Survivors -->
+    <div class="fn-featured-carousel__slide" role="group" aria-roledescription="slide" aria-label="5 of 5">
+      <div class="fn-featured-carousel__content">
+        <span class="fn-featured-carousel__badge">⚔️ Survival</span>
+        <h2 class="fn-featured-carousel__title">Fuzzy Survivors</h2>
+        <p class="fn-featured-carousel__subtitle">Survive endless waves of enemies with auto-attack combat. Upgrade weapons, unlock abilities, and see how long you last.</p>
+        <a href="/games/fuzzy-survivors/" class="fn-featured-carousel__cta">
+          Play Now
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+      </div>
+      <div class="fn-featured-carousel__visual">
+        <picture><source srcset="/images/games/survivors.webp" type="image/webp"><img src="/images/games/survivors.png" alt="Fuzzy Survivors — horde survival" class="fn-featured-carousel__img" loading="lazy" width="640" height="360"></picture>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Right: Visual placeholder -->
-  <div class="fn-hero-banner__visual">
-    <span class="fn-hero-banner__emoji" role="img" aria-label="Swords">⚔️🏰</span>
+  <!-- Navigation arrows -->
+  <button class="fn-featured-carousel__arrow fn-featured-carousel__arrow--prev" aria-label="Previous featured game" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+  </button>
+  <button class="fn-featured-carousel__arrow fn-featured-carousel__arrow--next" aria-label="Next featured game" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+  </button>
+
+  <!-- Dot indicators -->
+  <div class="fn-featured-carousel__dots" role="tablist" aria-label="Featured game slides">
+    <button class="fn-featured-carousel__dot is-active" role="tab" aria-selected="true" aria-label="Go to slide 1: Fuzzynuts World" type="button"></button>
+    <button class="fn-featured-carousel__dot" role="tab" aria-selected="false" aria-label="Go to slide 2: RuneScape Classic" type="button"></button>
+    <button class="fn-featured-carousel__dot" role="tab" aria-selected="false" aria-label="Go to slide 3: Super Fuzzynuts" type="button"></button>
+    <button class="fn-featured-carousel__dot" role="tab" aria-selected="false" aria-label="Go to slide 4: Cosmic Blaster" type="button"></button>
+    <button class="fn-featured-carousel__dot" role="tab" aria-selected="false" aria-label="Go to slide 5: Fuzzy Survivors" type="button"></button>
   </div>
 
+  <!-- Progress bar -->
+  <div class="fn-featured-carousel__progress" aria-hidden="true"></div>
+
+  <!-- Play/pause toggle -->
+  <button class="fn-featured-carousel__pause" aria-label="Pause auto-rotation" type="button">
+    <svg class="fn-featured-carousel__pause-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+    <svg class="fn-featured-carousel__play-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M8 5v14l11-7z" /></svg>
+  </button>
 </section>
 
 <!-- ============================== Category Grid ============================== -->
@@ -240,56 +345,56 @@
 
           <a href="/games/rsc/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--1">
-              <img src="/images/games/rsc.png" alt="RuneScape Classic" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/rsc.webp" type="image/webp"><img src="/images/games/rsc.png" alt="RuneScape Classic" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">MMORPG</span>
             </div>
             <div class="fn-game-card__title">RuneScape Classic</div>
           </a>
           <a href="/games/cosmic-blaster/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--5">
-              <img src="/images/games/cosmic-blaster.png" alt="Cosmic Blaster" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/cosmic-blaster.webp" type="image/webp"><img src="/images/games/cosmic-blaster.png" alt="Cosmic Blaster" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">PLAY</span>
             </div>
             <div class="fn-game-card__title">Cosmic Blaster</div>
           </a>
           <a href="/games/dragon-hoard/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--4">
-              <img src="/images/games/dragon-hoard.png" alt="Dragon's Hoard" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/dragon-hoard.webp" type="image/webp"><img src="/images/games/dragon-hoard.png" alt="Dragon's Hoard" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">PLAY</span>
             </div>
             <div class="fn-game-card__title">Dragon's Hoard</div>
           </a>
           <a href="/games/mario/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--1">
-              <img src="/images/games/mario.png" alt="Super Mario" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/mario.webp" type="image/webp"><img src="/images/games/mario.png" alt="Super Mario" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">PLAY</span>
             </div>
             <div class="fn-game-card__title">Super Mario</div>
           </a>
           <a href="/games/fuzzy-survivors/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--2">
-              <img src="/images/games/survivors.png" alt="Fuzzy Survivors" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/survivors.webp" type="image/webp"><img src="/images/games/survivors.png" alt="Fuzzy Survivors" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">PLAY</span>
             </div>
             <div class="fn-game-card__title">Fuzzy Survivors</div>
           </a>
           <a href="/games/nut-racer/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--3">
-              <img src="/images/games/racer.png" alt="Nut Racer" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/racer.webp" type="image/webp"><img src="/images/games/racer.png" alt="Nut Racer" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">PLAY</span>
             </div>
             <div class="fn-game-card__title">Nut Racer</div>
           </a>
           <a href="/games/minigolf/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--6">
-              <img src="/images/games/minigolf.png" alt="Minigolf" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/minigolf.webp" type="image/webp"><img src="/images/games/minigolf.png" alt="Minigolf" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--hot">PLAY</span>
             </div>
             <div class="fn-game-card__title">Minigolf</div>
           </a>
           <a href="/games/fuzzynuts-world/" class="fn-game-card" role="listitem">
             <div class="fn-game-card__thumb fn-game-card__thumb--4">
-              <img src="/images/games/fuzzynuts-world.png" alt="FuzzyNuts World" class="fn-game-card__img" loading="lazy">
+              <picture><source srcset="/images/games/fuzzynuts-world.webp" type="image/webp"><img src="/images/games/fuzzynuts-world.png" alt="FuzzyNuts World" class="fn-game-card__img" loading="lazy" width="320" height="180"></picture>
               <span class="fn-game-card__badge fn-game-card__badge--new">MMO</span>
             </div>
             <div class="fn-game-card__title">FuzzyNuts World</div>
@@ -612,6 +717,217 @@
   })();
   </script>
 
+  <!-- Featured Game Carousel Logic -->
+  <script>
+  (() => {
+    'use strict';
+
+    const carousel = document.querySelector('.fn-featured-carousel');
+    if (!carousel) return;
+
+    const slides = carousel.querySelectorAll('.fn-featured-carousel__slide');
+    const dots = carousel.querySelectorAll('.fn-featured-carousel__dot');
+    const btnPrev = carousel.querySelector('.fn-featured-carousel__arrow--prev');
+    const btnNext = carousel.querySelector('.fn-featured-carousel__arrow--next');
+    const progressBar = carousel.querySelector('.fn-featured-carousel__progress');
+    const pauseBtn = carousel.querySelector('.fn-featured-carousel__pause');
+    const pauseIcon = carousel.querySelector('.fn-featured-carousel__pause-icon');
+    const playIcon = carousel.querySelector('.fn-featured-carousel__play-icon');
+
+    const INTERVAL = 5000; // 5 seconds per slide
+    let currentIndex = 0;
+    let isPlaying = true;
+    let timerId = null;
+    let progressStart = 0;
+    let progressRaf = null;
+
+    // Check reduced-motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function goToSlide(index) {
+      // Wrap around
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+
+      // Update slides
+      slides[currentIndex].classList.remove('is-active');
+      slides[currentIndex].setAttribute('aria-hidden', 'true');
+      slides[index].classList.add('is-active');
+      slides[index].removeAttribute('aria-hidden');
+
+      // Update dots
+      dots[currentIndex].classList.remove('is-active');
+      dots[currentIndex].setAttribute('aria-selected', 'false');
+      dots[index].classList.add('is-active');
+      dots[index].setAttribute('aria-selected', 'true');
+
+      currentIndex = index;
+
+      // Update live region for screen readers
+      const track = carousel.querySelector('.fn-featured-carousel__track');
+      if (track) track.setAttribute('aria-live', 'polite');
+      setTimeout(() => {
+        if (track) track.setAttribute('aria-live', 'off');
+      }, 1000);
+    }
+
+    function nextSlide() {
+      goToSlide(currentIndex + 1);
+    }
+
+    function prevSlide() {
+      goToSlide(currentIndex - 1);
+    }
+
+    // Progress bar animation
+    function startProgress() {
+      if (!progressBar || prefersReducedMotion) return;
+      progressStart = performance.now();
+      progressBar.style.transition = 'none';
+      progressBar.style.width = '0%';
+      requestAnimationFrame(() => {
+        progressBar.style.transition = 'width ' + INTERVAL + 'ms linear';
+        progressBar.style.width = '100%';
+      });
+    }
+
+    function stopProgress() {
+      if (!progressBar) return;
+      progressBar.style.transition = 'none';
+      progressBar.style.width = '0%';
+    }
+
+    // Auto-rotation
+    function startAutoPlay() {
+      if (prefersReducedMotion) return;
+      stopAutoPlay();
+      isPlaying = true;
+      pauseIcon.style.display = '';
+      playIcon.style.display = 'none';
+      pauseBtn.setAttribute('aria-label', 'Pause auto-rotation');
+      startProgress();
+      timerId = setInterval(() => {
+        nextSlide();
+        startProgress();
+      }, INTERVAL);
+    }
+
+    function stopAutoPlay() {
+      isPlaying = false;
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      stopProgress();
+      pauseIcon.style.display = 'none';
+      playIcon.style.display = '';
+      pauseBtn.setAttribute('aria-label', 'Resume auto-rotation');
+    }
+
+    // Event: prev/next arrows
+    btnPrev.addEventListener('click', () => {
+      prevSlide();
+      if (isPlaying) { stopAutoPlay(); startAutoPlay(); }
+    });
+
+    btnNext.addEventListener('click', () => {
+      nextSlide();
+      if (isPlaying) { stopAutoPlay(); startAutoPlay(); }
+    });
+
+    // Event: dot clicks
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        goToSlide(i);
+        if (isPlaying) { stopAutoPlay(); startAutoPlay(); }
+      });
+    });
+
+    // Event: pause/play toggle
+    pauseBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        stopAutoPlay();
+      } else {
+        startAutoPlay();
+      }
+    });
+
+    // Pause on hover
+    carousel.addEventListener('mouseenter', () => {
+      if (isPlaying) stopAutoPlay();
+    });
+
+    carousel.addEventListener('mouseleave', () => {
+      if (!isPlaying && timerId === null) startAutoPlay();
+    });
+
+    // Pause on focus (for keyboard users)
+    carousel.addEventListener('focusin', () => {
+      if (isPlaying) stopAutoPlay();
+    });
+
+    carousel.addEventListener('focusout', (e) => {
+      // Only resume if focus left the carousel entirely
+      if (!carousel.contains(e.relatedTarget)) {
+        if (!isPlaying && timerId === null) startAutoPlay();
+      }
+    });
+
+    // Keyboard navigation
+    carousel.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+        if (isPlaying) { stopAutoPlay(); startAutoPlay(); }
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextSlide();
+        if (isPlaying) { stopAutoPlay(); startAutoPlay(); }
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        if (isPlaying) stopAutoPlay(); else startAutoPlay();
+      }
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
+    carousel.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping = false;
+    }, { passive: true });
+
+    carousel.addEventListener('touchmove', (e) => {
+      if (!isSwiping) {
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        if (dx > 10 && dx > dy) isSwiping = true;
+      }
+    }, { passive: true });
+
+    carousel.addEventListener('touchend', (e) => {
+      if (!isSwiping) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) {
+        if (dx > 0) prevSlide(); else nextSlide();
+        if (isPlaying) { stopAutoPlay(); startAutoPlay(); }
+      }
+    }, { passive: true });
+
+    // Initialize: hide non-active slides from AT
+    slides.forEach((slide, i) => {
+      if (i !== currentIndex) slide.setAttribute('aria-hidden', 'true');
+    });
+
+    // Start auto-play (unless reduced motion)
+    if (!prefersReducedMotion) {
+      startAutoPlay();
+    }
+  })();
+  </script>
 
   <!-- Mobile Nav Logic -->
   <script>
@@ -721,23 +1037,38 @@
       'Play with Friends':  { indices: range(30, 15, 38), badge: null },
     };
 
-    function buildCard(game, badge) {
+    function buildCard(game, badge, colorIndex) {
       const a = document.createElement('a');
       const slug = game.slug || game.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       a.href = '/games/' + slug + '/';
       a.className = 'fn-game-card';
       a.setAttribute('role', 'listitem');
 
-      const badgeHTML = badge
-        ? '<span class="fn-game-card__badge ' + badge.cls + '">' + badge.text + '</span>'
-        : '';
+      const colorNum = (colorIndex % 6) + 1;
+      const thumbDiv = document.createElement('div');
+      thumbDiv.className = 'fn-game-card__thumb fn-game-card__thumb--' + colorNum;
 
-      a.innerHTML =
-        '<div class="fn-game-card__thumb">' +
-          badgeHTML +
-          '<img src="' + game.thumbnail + '" alt="' + game.title + '" class="fn-game-card__img" width="320" height="180" loading="lazy">' +
-        '</div>' +
-        '<div class="fn-game-card__title">' + game.title + '</div>';
+      if (badge) {
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'fn-game-card__badge ' + badge.cls;
+        badgeSpan.textContent = badge.text;
+        thumbDiv.appendChild(badgeSpan);
+      }
+
+      const img = document.createElement('img');
+      img.src = game.thumbnail;
+      img.alt = game.title;
+      img.className = 'fn-game-card__img';
+      img.loading = 'lazy';
+      thumbDiv.appendChild(img);
+
+      a.appendChild(thumbDiv);
+
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'fn-game-card__title';
+      titleDiv.textContent = game.title;
+      a.appendChild(titleDiv);
+
       return a;
     }
 
@@ -760,7 +1091,7 @@
           config.indices.forEach((i, pos) => {
             if (!games[i]) return;
             const badge = (config.badge && pos === config.badge.index) ? config.badge : null;
-            track.appendChild(buildCard(games[i], badge));
+            track.appendChild(buildCard(games[i], badge, pos));
           });
         });
       } catch (e) {
