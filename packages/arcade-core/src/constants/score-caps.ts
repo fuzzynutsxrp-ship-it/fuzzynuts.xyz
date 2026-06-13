@@ -28,6 +28,7 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   "fuzzynuts-world": 10_000_000,
   rsc: 99_000_000, // [MANUAL VERIFICATION REQUIRED] — RSC XP-based scoring, cap TBD
   "dragon-hoard": 999_999, // Endless collect-avoid game, cap for anti-cheat
+  "cosmic-blaster": 999_999, // Endless space shooter, cap for anti-cheat
 };
 
 /** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */

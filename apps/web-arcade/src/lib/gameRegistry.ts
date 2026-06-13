@@ -229,6 +229,31 @@ export const GAME_LIST: GameMetadata[] = [
     ],
     touchHint: "Tap and drag to move your thief",
   },
+  {
+    slug: "cosmic-blaster",
+    title: "Cosmic Blaster",
+    genre: "Arcade",
+    color: "#06b6d4",
+    description:
+      "Blast through asteroids and enemy ships in this fast-paced space shooter! Dodge, shoot, and survive as long as you can.",
+    scoreCap: 999_999,
+    minPlayTime: 15,
+    controls: ["Arrow keys / WASD to move", "Space to shoot", "Touch to move and auto-fire"],
+    iconPath: "/icons/icon-world-pop.webp",
+    iframePath: "/games/cosmic-blaster/",
+    sandbox: DEFAULT_SANDBOX,
+    leaderboardEnabled: true,
+    achievementsEnabled: false,
+    status: "live",
+    scoreType: "high-score",
+    loadingTips: [
+      "Dodge asteroids and enemy ships",
+      "Collect power-ups for triple-shot and extra lives",
+      "Survive waves of increasing difficulty",
+      "Chain kills for bonus points!",
+    ],
+    touchHint: "Tap and drag to move — ship auto-fires while touching",
+  },
 ];
 
 /* ── Registry API ── */

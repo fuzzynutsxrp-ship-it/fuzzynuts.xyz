@@ -18,7 +18,8 @@ export type GameSlug =
   | "nut-racer"
   | "fuzzynuts-world"
   | "rsc"
-  | "dragon-hoard";
+  | "dragon-hoard"
+  | "cosmic-blaster";
 
 /** Every canonical slug, in display order. */
 export const GAME_SLUGS: readonly GameSlug[] = [
@@ -29,6 +30,7 @@ export const GAME_SLUGS: readonly GameSlug[] = [
   "fuzzynuts-world",
   "rsc",
   "dragon-hoard",
+  "cosmic-blaster",
 ] as const;
 
 /**
@@ -64,6 +66,7 @@ export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
   "fuzzynuts-world": "fuzzynuts-world",
   rsc: "rsc",
   "dragon-hoard": "dragon-hoard",
+  "cosmic-blaster": "cosmic-blaster",
 };
 
 /**

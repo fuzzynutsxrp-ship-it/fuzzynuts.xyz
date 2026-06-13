@@ -50,6 +50,7 @@ const GAME_EMOJIS: Record<string, string> = {
   racer: "🏎️",
   rsc: "⚔️",
   "dragon-hoard": "🐉",
+  "cosmic-blaster": "🚀",
 };
 
 /* ═══════════════════════════════════════════════════════════════

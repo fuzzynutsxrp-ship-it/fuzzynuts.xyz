@@ -36,6 +36,7 @@
     'rsc':               { engine: 'iframe', url: 'https://game.fuzzynuts.xyz' },
     // New factory games (added by game factory pipeline)
     'dragon-hoard':      { engine: 'inline', path: '/games/dragon-hoard/' },
+    'cosmic-blaster':    { engine: 'inline', path: '/games/cosmic-blaster/' },
   };
 
   // ─── Helpers ───────────────────────────────────────────────────

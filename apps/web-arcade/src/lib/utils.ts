@@ -120,6 +120,17 @@ export const GAMES = [
     color: "#f97316",
     tags: ["Arcade", "Collect", "Endless"],
   },
+  {
+    id: "cosmic-blaster",
+    title: "Cosmic Blaster",
+    type: "Arcade",
+    description:
+      "Blast through asteroids and enemy ships in this fast-paced space shooter!",
+    icon: "/icons/icon-world-pop.webp",
+    image: "🚀",
+    color: "#06b6d4",
+    tags: ["Arcade", "Shooter", "Endless"],
+  },
 ];
 
 export const HOW_TO_STEPS = [
