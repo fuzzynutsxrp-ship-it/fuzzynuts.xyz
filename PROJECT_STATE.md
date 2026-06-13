@@ -1,3 +1,7 @@
+> ⚠️ **DEPRECATED (2026-06-13).** This file is **historical context only** and is
+> no longer maintained. The current source of truth is **[`docs/STATE.md`](docs/STATE.md)**.
+> This file stops at the RSC logout/chat work and predates the 38-game arcade rebuild.
+
 # FuzzyNuts Project State
 Last updated: 2026-06-04
 Current focus: Logout detection + redirect fully working (v13b on VPS, parent page deployed)
