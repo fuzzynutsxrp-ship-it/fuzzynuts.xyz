@@ -51,6 +51,11 @@ const GAME_EMOJIS: Record<string, string> = {
   rsc: "⚔️",
   "dragon-hoard": "🐉",
   "cosmic-blaster": "🚀",
+  "snake": "🐍",
+  "breakout": "🧱",
+  "pong": "🏓",
+  "tetris": "🟦",
+  "asteroids": "☄️",
 };
 
 /* ═══════════════════════════════════════════════════════════════

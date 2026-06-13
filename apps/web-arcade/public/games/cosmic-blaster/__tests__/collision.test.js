@@ -163,12 +163,18 @@ describe('rectRect', () => {
     expect(rectRect(0, 0, 10, 10, 0, 20, 10, 10)).toBe(false);
   });
 
-  it('zero-size rectangle → false', () => {
-    // A zero-size rect can't overlap anything (0 < x2+w2 but 0+0 > x2 is 0 > 0 = false)
-    expect(rectRect(50, 50, 0, 0, 0, 0, 100, 100)).toBe(false);
+  it('zero-size rect inside another rect → true (point is inside)', () => {
+    // A zero-size rect at (50,50) is a point inside (0,0,100,100)
+    // 50 < 100 && 50 > 0 && 50 < 100 && 50 > 0 → all true
+    expect(rectRect(50, 50, 0, 0, 0, 0, 100, 100)).toBe(true);
+  });
+
+  it('zero-size rect outside another rect → false', () => {
+    expect(rectRect(200, 200, 0, 0, 0, 0, 100, 100)).toBe(false);
   });
 
   it('both zero-size at same point → false', () => {
+    // Two zero-size rects at same point: 0 < 0 is false
     expect(rectRect(0, 0, 0, 0, 0, 0, 0, 0)).toBe(false);
   });
 });

@@ -19,7 +19,12 @@ export type GameSlug =
   | "fuzzynuts-world"
   | "rsc"
   | "dragon-hoard"
-  | "cosmic-blaster";
+  | "cosmic-blaster"
+  | "snake"
+  | "breakout"
+  | "pong"
+  | "tetris"
+  | "asteroids";
 
 /** Every canonical slug, in display order. */
 export const GAME_SLUGS: readonly GameSlug[] = [
@@ -31,6 +36,11 @@ export const GAME_SLUGS: readonly GameSlug[] = [
   "rsc",
   "dragon-hoard",
   "cosmic-blaster",
+  "snake",
+  "breakout",
+  "pong",
+  "tetris",
+  "asteroids",
 ] as const;
 
 /**
@@ -55,6 +65,11 @@ export const ID_TO_SLUG: Record<string, GameSlug> = {
   nutracer: "nut-racer", // the bug spelling — accept it as input, normalize to canonical
   rsc: "rsc",
   "dragon-hoard": "dragon-hoard",
+  "snake": "snake",
+  "breakout": "breakout",
+  "pong": "pong",
+  "tetris": "tetris",
+  "asteroids": "asteroids",
 };
 
 /** Reverse: canonical slug → legacy id used by GAMES[] in the web-arcade UI. */
@@ -67,6 +82,11 @@ export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
   rsc: "rsc",
   "dragon-hoard": "dragon-hoard",
   "cosmic-blaster": "cosmic-blaster",
+  "snake": "snake",
+  "breakout": "breakout",
+  "pong": "pong",
+  "tetris": "tetris",
+  "asteroids": "asteroids",
 };
 
 /**

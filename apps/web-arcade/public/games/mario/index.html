@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Super Fuzzynuts — The Nuttiest Platformer on XRPL</title>
+    <meta name="keywords" content="fuzzynuts, super fuzzynuts, platformer, mario, html5, xrpl, arcade, crypto, game, nut" />
+    <meta name="description" content="Play Super Fuzzynuts — a full 32-level platformer with random maps, mods, and a level editor. Part of the Fuzzynuts Arcade on XRPL." />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Super Fuzzynuts — The Nuttiest Platformer" />
+    <meta property="og:description" content="32 levels of classic platforming action. Mods, editor, random maps — all in your browser." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fuzzynuts.xyz/games/mario/" />
+
+    <!-- Font: non-blocking -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Shared arcade shell -->
+    <link rel="stylesheet" href="../../css/design-tokens.css">
+    <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
+    <link href="index.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="Theme/Mario.gif">
+
+    <style>
+        /* Game-specific overrides */
+        body { font-family: 'Press Start 2P', 'Courier New', monospace; }
+        #controls { border-bottom: 1px solid #1a1208; }
+
+        /* ═══ MOBILE RESPONSIVE — scale canvas to fit viewport ═══ */
+        @media (max-width: 1300px) {
+            body { overflow: hidden !important; }
+            section#game {
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                min-height: 0;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            section#game .EightBitter {
+                transform-origin: center center;
+                /* Scale down to fit: 375/1265 ≈ 0.296 for iPhone, scales up on larger screens */
+                transform: scale(min(calc(100vw / 1265), calc(100dvh / 464)));
+                margin: 0;
+            }
+            #controls {
+                display: none; /* Hide desktop controls panel on mobile */
+            }
+        }
+    </style>
+
+    <!-- Preload the heavy bundle so download starts ASAP -->
+    <link rel="preload" href="FullScreenMario.bundle.js" as="script">
+</head>
+
+<body>
+    <!-- Nav injected by arcade-shell.js -->
+
+    <section id="game">
+        <!-- FSM.UserWrapper will fill out this section... -->
+    </section>
+
+    <section id="controls">
+        <!-- FSM.UserWrapper will fill out this section... -->
+    </section>
+
+    <!-- Clean up stale FSM score data from localStorage -->
+    <script type="text/javascript">
+    (function() {
+        var keys = ['score', 'coins', 'lives', 'world', 'time', 'traveled', 'power'];
+        for (var i = 0; i < keys.length; i++) {
+            localStorage.removeItem('FullScreenMario' + keys[i]);
+        }
+    })();
+    </script>
+
+    <!-- Shared arcade shell -->
+    <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
+    <script>
+    ArcadeShell.init({
+      slug: 'mario',
+      title: 'Super Fuzzynuts',
+      icon: '🍄',
+      accentColor: '#ef4444',
+      hideNavOnPlay: true,
+    });
+    </script>
+
+    <!-- All game engine scripts concatenated into one file -->
+    <script src="FullScreenMario.bundle.js" type="text/javascript"></script>
+
+    <!-- Force-enable touch controls for mobile playability -->
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+        // TouchPasser is created during UserWrapper init, which happens
+        // after the bundle loads. We poll until it's ready, then enable.
+        var attempts = 0;
+        var touchCheck = setInterval(function() {
+            attempts++;
+            // Check both FSM.TouchPasser and the settings-based fallback
+            if (typeof FSM !== 'undefined' && FSM && FSM.TouchPasser) {
+                clearInterval(touchCheck);
+                FSM.TouchPasser.enabled = true;
+                FSM.TouchPasser.enable();
+                FSM.TouchPasser.addControls();
+                console.log('[Fuzzynuts] Touch controls enabled via TouchPasser');
+            } else if (attempts > 50) {
+                clearInterval(touchCheck);
+                console.warn('[Fuzzynuts] TouchPasser not found after 10s');
+            }
+        }, 200);
+    })();
+    </script>
+
+    <!--
+      MONKEY-PATCHES for Fuzzynuts Arcade:
+      1. gameStart: Force score/coins reset on Game Over restart
+      2. setMap: If lives <= 0 (dying), redirect to full gameStart
+         instead of allowing map-hop exploit during death animation
+    -->
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+        var patchCheck = setInterval(function() {
+            if (typeof FullScreenMario !== 'undefined' &&
+                FullScreenMario.FullScreenMario &&
+                FullScreenMario.FullScreenMario.prototype) {
+
+                var proto = FullScreenMario.FullScreenMario.prototype;
+
+                // --- Patch 1: gameStart resets score/coins ---
+                var originalGameStart = proto.gameStart;
+                proto.gameStart = function() {
+                    var FSM = proto.ensureCorrectCaller(this);
+                    if (FSM.ItemsHolder) {
+                        FSM.ItemsHolder.setItem("score", 0);
+                        FSM.ItemsHolder.setItem("coins", 0);
+                    }
+                    return originalGameStart.call(this);
+                };
+
+                // --- Patch 2: setMap guards against negative-lives exploit ---
+                var originalSetMap = proto.setMap;
+                proto.setMap = function(name, location) {
+                    var FSM = proto.ensureCorrectCaller(this);
+                    if (FSM.ItemsHolder && FSM.ItemsHolder.getItem("lives") <= 0) {
+                        if (FSM.TimeHandler) {
+                            FSM.TimeHandler.cancelAllEvents();
+                        }
+                        FSM.ItemsHolder.setItem("score", 0);
+                        FSM.ItemsHolder.setItem("coins", 0);
+                        FSM.ItemsHolder.setItem("lives",
+                            FSM.settings.statistics.values.lives.valueDefault);
+                        return originalSetMap.call(this, name, location);
+                    }
+                    return originalSetMap.call(this, name, location);
+                };
+
+                clearInterval(patchCheck);
+                console.log('[Fuzzynuts] Patched gameStart + setMap');
+            }
+        }, 100);
+        setTimeout(function() { clearInterval(patchCheck); }, 30000);
+    })();
+    </script>
+
+    <!-- Fuzzynuts Arcade Score Submitter -->
+    <script src="../fuzzy-score.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+
+        // Score getter: reads from FSM engine
+        function getMarioScore() {
+            try {
+                if (typeof FSM !== 'undefined' && FSM && FSM.ItemsHolder) {
+                    return FSM.ItemsHolder.getItem("score") || 0;
+                }
+            } catch(e) {}
+            return 0;
+        }
+
+        // Wait for game engine, then hook up auto-save + hide loader
+        var readyCheck = setInterval(function() {
+            if (typeof FSM !== 'undefined' && FSM && FSM.ItemsHolder) {
+                clearInterval(readyCheck);
+                // Hide the arcade shell loader
+                ArcadeShell.hideLoader();
+                // Hook up auto-save (submits on tab blur + page exit)
+                ArcadeShell.autoSave(getMarioScore);
+
+    // Register service worker for offline caching
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+        });
+    }
+                // Periodic save every 15s
+                setInterval(function() {
+                    ArcadeShell.submit(getMarioScore());
+                }, 15000);
+                // Reset score tracking on game restart detection
+                var lastCheck = 0;
+                setInterval(function() {
+                    var score = getMarioScore();
+                    if (score === 0 && lastCheck > 0) {
+                        ArcadeShell.resetScore();
+                    }
+                    lastCheck = score;
+                }, 2000);
+            }
+        }, 500);
+        // Failsafe
+        setTimeout(function() {
+            clearInterval(readyCheck);
+            ArcadeShell.showLoader('⚠️ Load timeout — try reloading');
+        }, 30000);
+    })();
+    </script>
+</body>
+</html>

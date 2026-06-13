@@ -389,6 +389,9 @@
     var hasMapping = false;
     var mappingChecked = false;
     var gameSessionToken = null;
+    var gameSessionTokenTime = 0;
+    var gameSessionTokenPromise = null;
+    var TOKEN_TTL_MS = 4 * 60 * 1000; // 4 minutes (backend expiry is 5 min)
 
     /* ── Check if wallet has a username mapping ── */
     function checkMapping() {
@@ -463,11 +466,21 @@
     }
 
     /* ── Fetch game session token (cookie-authenticated) ── */
-    function fetchGameSessionToken() {
-      if (!walletAddress) return Promise.resolve(null);
-      if (gameSessionToken) return Promise.resolve(gameSessionToken);
+    async function fetchGameSessionToken() {
+      if (!walletAddress) return null;
 
-      return fetch('https://fuzzynutsxyz-production.up.railway.app/api/game-session', {
+      // Return cached token if still valid (TTL check)
+      if (gameSessionToken && (Date.now() - gameSessionTokenTime < TOKEN_TTL_MS)) {
+        return gameSessionToken;
+      }
+
+      // Return in-flight promise if one exists (race condition fix)
+      if (gameSessionTokenPromise) return gameSessionTokenPromise;
+
+      // Clear stale token
+      gameSessionToken = null;
+
+      gameSessionTokenPromise = fetch('https://fuzzynutsxyz-production.up.railway.app/api/game-session', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -479,14 +492,22 @@
         .then(function(data) {
           if (data && data.token) {
             gameSessionToken = data.token;
+            gameSessionTokenTime = Date.now();
             return data.token;
           }
           return null;
         })
         .catch(function(err) {
           console.warn('[rsc] Game session token fetch failed:', err.message);
+          statusEl.textContent = 'Auth failed — try reconnecting your wallet';
+          statusEl.className = 'rsc-status';
           return null;
+        })
+        .finally(function() {
+          gameSessionTokenPromise = null;
         });
+
+      return gameSessionTokenPromise;
     }
 
     /* ── Hide the loading overlay ── */
