@@ -47,7 +47,9 @@ app.use(
     directives: {
       frameAncestors: [
         "'self'",
+        "https://fuzzynuts.xyz",
         "https://www.fuzzynuts.xyz",
+        "https://game.fuzzynuts.xyz",
         "http://localhost:3000",
       ],
     },
