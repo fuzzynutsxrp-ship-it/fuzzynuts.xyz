@@ -15,6 +15,7 @@
 
 import { Router } from "express";
 import { z } from "zod";
+import { jwtVerify } from "jose";
 import { mintNonce, signPayload } from "@fuzzynuts/shared-anticheat";
 import { formatGameChallenge, verifyMessageSignature } from "@fuzzynuts/xrpl-token-utils/verify";
 
@@ -31,6 +32,7 @@ const GameSessionBody = z.object({
 
 export function buildGameSessionRouter(env: {
   GAME_SESSION_SECRET: string;
+  WALLET_JWT_SECRET: string;
   OPENRSC_GAME_ENDPOINT?: string;
   GAME_SERVER_READY?: string;
   // Reuse the challenge store from auth.ts (injected)
@@ -40,6 +42,67 @@ export function buildGameSessionRouter(env: {
   const gameEndpoint = env.OPENRSC_GAME_ENDPOINT ?? "fuzzynuts.xyz:43594";
   const serverReady = env.GAME_SERVER_READY === "true";
 
+  /**
+   * Mint and return a game session token for the given wallet address.
+   * Shared by both the challenge-verify path and the cookie-auth path.
+   */
+  async function mintGameSessionToken(walletAddress: string) {
+    const now = Date.now();
+    const expiresAt = now + GAME_SESSION_TTL_MS;
+    const sessionNonce = mintNonce();
+
+    const payload = JSON.stringify({
+      walletAddress,
+      gameServerEndpoint: gameEndpoint,
+      expiresAt,
+      nonce: sessionNonce,
+      gameSlug: "rsc",
+    });
+
+    const signature = await signPayload(payload, env.GAME_SESSION_SECRET);
+
+    return {
+      token: {
+        walletAddress,
+        gameServerEndpoint: gameEndpoint,
+        expiresAt,
+        nonce: sessionNonce,
+        gameSlug: "rsc",
+        signature,
+      },
+    };
+  }
+
+  /**
+   * Extract wallet address from the HttpOnly JWT cookie.
+   * Returns null if cookie is missing or invalid.
+   */
+  async function getWalletFromCookie(req: any): Promise<string | null> {
+    const cookies = req.headers.cookie;
+    if (!cookies) return null;
+
+    const match = cookies.match(/fuzzy_wallet_session=([^;]+)/);
+    if (!match) return null;
+
+    try {
+      const { payload } = await jwtVerify(
+        match[1],
+        new TextEncoder().encode(env.WALLET_JWT_SECRET),
+        { issuer: "fuzzynuts.xyz" },
+      );
+      if (typeof payload.address === "string" && XRPL_ADDR.test(payload.address)) {
+        return payload.address;
+      }
+    } catch {
+      // Invalid or expired JWT — fall through
+    }
+    return null;
+  }
+
+  // ── POST / — mint a game session token ────────────────────────
+  // Two auth paths:
+  //   Path A (cookie):  Valid fuzzy_wallet_session JWT cookie → mint token directly
+  //   Path B (challenge): { challengeId, signature, publicKey } → verify XRPL sig → mint token
   router.post("/", async (req, res) => {
     // ── Env-driven toggle: block until game VPS is live ───────
     if (!serverReady) {
@@ -51,6 +114,19 @@ export function buildGameSessionRouter(env: {
     }
     // ── end toggle ────────────────────────────────────────────
 
+    // ── Path A: Cookie-authenticated (Xaman wallet-login JWT) ──
+    const cookieWallet = await getWalletFromCookie(req);
+    if (cookieWallet) {
+      try {
+        const result = await mintGameSessionToken(cookieWallet);
+        return res.json(result);
+      } catch (err) {
+        console.error("[game-session] Token mint failed (cookie path):", err);
+        return res.status(500).json({ error: "E_INTERNAL" });
+      }
+    }
+
+    // ── Path B: Challenge-verified (XRPL signature) ───────────
     const parsed = GameSessionBody.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: "E_SCHEMA" });
 
@@ -71,9 +147,6 @@ export function buildGameSessionRouter(env: {
     }
 
     // 2. Verify XRPL signature
-    //    The challenge string was issued by /api/auth/challenge and stored
-    //    in the challenge store. The wallet signed this exact string.
-    //    We verify it matches the wallet's public key.
     const result = verifyMessageSignature({
       message: challengeRecord.challenge,
       signature,
@@ -88,30 +161,13 @@ export function buildGameSessionRouter(env: {
     env.challengeStore.delete(challengeId);
 
     // 4. Mint the game session token
-    const now = Date.now();
-    const expiresAt = now + GAME_SESSION_TTL_MS;
-    const sessionNonce = mintNonce();
-
-    const payload = JSON.stringify({
-      walletAddress,
-      gameServerEndpoint: gameEndpoint,
-      expiresAt,
-      nonce: sessionNonce,
-      gameSlug: "rsc",
-    });
-
-    const signature_ = await signPayload(payload, env.GAME_SESSION_SECRET);
-
-    return res.json({
-      token: {
-        walletAddress,
-        gameServerEndpoint: gameEndpoint,
-        expiresAt,
-        nonce: sessionNonce,
-        gameSlug: "rsc",
-        signature: signature_,
-      },
-    });
+    try {
+      const tokenResult = await mintGameSessionToken(walletAddress);
+      return res.json(tokenResult);
+    } catch (err) {
+      console.error("[game-session] Token mint failed (challenge path):", err);
+      return res.status(500).json({ error: "E_INTERNAL" });
+    }
   });
 
   return router;

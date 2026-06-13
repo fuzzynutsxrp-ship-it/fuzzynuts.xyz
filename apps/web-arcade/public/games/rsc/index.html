@@ -388,6 +388,7 @@
     var walletAddress = getWalletAddress();
     var hasMapping = false;
     var mappingChecked = false;
+    var gameSessionToken = null;
 
     /* ── Check if wallet has a username mapping ── */
     function checkMapping() {
@@ -461,6 +462,33 @@
         });
     }
 
+    /* ── Fetch game session token (cookie-authenticated) ── */
+    function fetchGameSessionToken() {
+      if (!walletAddress) return Promise.resolve(null);
+      if (gameSessionToken) return Promise.resolve(gameSessionToken);
+
+      return fetch('https://fuzzynutsxyz-production.up.railway.app/api/game-session', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then(function(res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function(data) {
+          if (data && data.token) {
+            gameSessionToken = data.token;
+            return data.token;
+          }
+          return null;
+        })
+        .catch(function(err) {
+          console.warn('[rsc] Game session token fetch failed:', err.message);
+          return null;
+        });
+    }
+
     /* ── Hide the loading overlay ── */
     var overlayDismissed = false;
     function dismissOverlay() {
@@ -520,27 +548,35 @@
     /* ── Launch the game in the iframe ── */
     function launchGame() {
       landing.classList.add('hidden');
-      var walletAddress = getWalletAddress();
-      var url = buildClientUrl(walletAddress);
-      iframe.src = url;
-      gameWrap.classList.add('visible');
+      var walletAddr = getWalletAddress();
 
-      // Show overlay — iframe will postMessage when login completes
-      overlayDismissed = false;
-      loadingOverlay.classList.remove('hidden', 'fade-out');
-      loadingText.textContent = 'Connecting to game server...';
-      loadingText.className = 'rsc-loading-text';
-
-      // Timeout fallback: dismiss after 25 seconds
-      setTimeout(function() {
-        if (!overlayDismissed) {
-          loadingText.textContent = 'Login taking longer than expected...';
-          loadingText.className = 'rsc-loading-text error';
+      // Fetch game session token, then launch iframe
+      fetchGameSessionToken().then(function(token) {
+        var url = buildClientUrl(walletAddr);
+        if (token) {
+          // Pass token to iframe via URL hash param
+          url += '&gameSession=' + encodeURIComponent(JSON.stringify(token));
         }
-      }, 25000);
-      setTimeout(function() {
-        dismissOverlay();
-      }, 30000);
+        iframe.src = url;
+        gameWrap.classList.add('visible');
+
+        // Show overlay — iframe will postMessage when login completes
+        overlayDismissed = false;
+        loadingOverlay.classList.remove('hidden', 'fade-out');
+        loadingText.textContent = 'Connecting to game server...';
+        loadingText.className = 'rsc-loading-text';
+
+        // Timeout fallback: dismiss after 25 seconds
+        setTimeout(function() {
+          if (!overlayDismissed) {
+            loadingText.textContent = 'Login taking longer than expected...';
+            loadingText.className = 'rsc-loading-text error';
+          }
+        }, 25000);
+        setTimeout(function() {
+          dismissOverlay();
+        }, 30000);
+      });
     }
 
     /* ── Play button handler ── */

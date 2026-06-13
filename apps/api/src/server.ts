@@ -145,6 +145,7 @@ async function bootstrap() {
       "/api/game-session",
       buildGameSessionRouter({
         GAME_SESSION_SECRET,
+        WALLET_JWT_SECRET,
         OPENRSC_GAME_ENDPOINT: process.env.OPENRSC_GAME_ENDPOINT,
         GAME_SERVER_READY: process.env.GAME_SERVER_READY,
         challengeStore,
