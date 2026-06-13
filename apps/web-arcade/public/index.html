@@ -708,7 +708,7 @@
   <!-- Game Data Loader -->
   <script>
   (() => {
-    // Build index arrays (15 games each, wrapping around 40-item manifest)
+    // Build index arrays (15 games each, wrapping around 38-item manifest)
     function range(start, count, max) {
       const out = [];
       for (let i = 0; i < count; i++) out.push((start + i) % max);
@@ -727,18 +727,50 @@
       a.href = '/games/' + slug + '/';
       a.className = 'fn-game-card';
       a.setAttribute('role', 'listitem');
+      a.dataset.slug = slug;
 
-      const badgeHTML = badge
-        ? '<span class="fn-game-card__badge ' + badge.cls + '">' + badge.text + '</span>'
-        : '';
+      // Thumbnail wrapper with gradient class
+      const thumbDiv = document.createElement('div');
+      const gradientIndex = (Math.abs(hashCode(slug)) % 6) + 1;
+      thumbDiv.className = 'fn-game-card__thumb fn-game-card__thumb--' + gradientIndex;
 
-      a.innerHTML =
-        '<div class="fn-game-card__thumb">' +
-          badgeHTML +
-          '<img src="' + game.thumbnail + '" alt="' + game.title + '" class="fn-game-card__img" width="320" height="180" loading="lazy">' +
-        '</div>' +
-        '<div class="fn-game-card__title">' + game.title + '</div>';
+      // Badge (if any)
+      if (badge) {
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'fn-game-card__badge ' + badge.cls;
+        badgeSpan.textContent = badge.text;
+        thumbDiv.appendChild(badgeSpan);
+      }
+
+      // Image
+      const img = document.createElement('img');
+      img.src = game.thumbnail;
+      img.alt = game.title;
+      img.className = 'fn-game-card__img';
+      img.width = 320;
+      img.height = 180;
+      img.loading = 'lazy';
+      thumbDiv.appendChild(img);
+
+      a.appendChild(thumbDiv);
+
+      // Title
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'fn-game-card__title';
+      titleDiv.textContent = game.title;
+      a.appendChild(titleDiv);
+
       return a;
+    }
+
+    /** Simple string hash for consistent gradient assignment */
+    function hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash;
     }
 
     async function load() {

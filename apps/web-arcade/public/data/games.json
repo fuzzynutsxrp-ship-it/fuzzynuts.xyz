@@ -1,242 +1,230 @@
 [
   {
-    "id": 340,
-    "title": "Game Of Thrones Winter Is Coming",
-    "thumbnail": "/images/thumbnails/game-340.jpg",
-    "category": "Strategy"
+    "slug": "mario",
+    "title": "Super Fuzzynuts",
+    "thumbnail": "/images/games/mario.png",
+    "category": "Platformer"
   },
   {
-    "id": 347,
-    "title": "Elvenar",
-    "thumbnail": "/images/thumbnails/game-347.jpg",
-    "category": "Strategy"
+    "slug": "fuzzy-survivors",
+    "title": "Fuzzy Survivors",
+    "thumbnail": "/images/games/survivors.png",
+    "category": "Horde Survival"
   },
   {
-    "id": 620,
-    "title": "Hero Wars: Dominion Era",
-    "thumbnail": "/images/thumbnails/game-620.jpg",
+    "slug": "minigolf",
+    "title": "Fuzzy Putt",
+    "thumbnail": "/images/games/minigolf.png",
+    "category": "Mini Golf"
+  },
+  {
+    "slug": "nut-racer",
+    "title": "Nut Racer",
+    "thumbnail": "/images/games/racer.png",
+    "category": "Racing"
+  },
+  {
+    "slug": "fuzzynuts-world",
+    "title": "Fuzzynuts World",
+    "thumbnail": "/images/games/fuzzynuts-world.png",
     "category": "MMORPG"
   },
   {
-    "id": 645,
-    "title": "Crystal Saga Nova",
-    "thumbnail": "/images/thumbnails/game-645.jpg",
+    "slug": "rsc",
+    "title": "RuneScape Classic",
+    "thumbnail": "/images/games/rsc.png",
     "category": "MMORPG"
   },
   {
-    "id": 458,
-    "title": "League of Angels - Heaven's Fury",
-    "thumbnail": "/images/thumbnails/game-458.jpg",
-    "category": "MMORPG"
+    "slug": "dragon-hoard",
+    "title": "Dragon's Hoard",
+    "thumbnail": "/images/games/dragon-hoard.png",
+    "category": "Arcade"
   },
   {
-    "id": 345,
-    "title": "Forge of Empires",
-    "thumbnail": "/images/thumbnails/game-345.jpg",
-    "category": "Strategy"
+    "slug": "cosmic-blaster",
+    "title": "Cosmic Blaster",
+    "thumbnail": "/images/games/cosmic-blaster.png",
+    "category": "Arcade"
   },
   {
-    "id": 350,
-    "title": "Goodgame Empire",
-    "thumbnail": "/images/thumbnails/game-350.jpg",
-    "category": "Strategy"
+    "slug": "snake",
+    "title": "Snake",
+    "thumbnail": "/images/games/snake.png",
+    "category": "Classic Arcade"
   },
   {
-    "id": 433,
-    "title": "RuneScape",
-    "thumbnail": "/images/thumbnails/game-433.jpg",
-    "category": "MMORPG"
+    "slug": "breakout",
+    "title": "Breakout",
+    "thumbnail": "/images/games/breakout.png",
+    "category": "Classic Arcade"
   },
   {
-    "id": 573,
-    "title": "Titan Revenge",
-    "thumbnail": "/images/thumbnails/game-573.jpg",
-    "category": "MMORPG"
+    "slug": "pong",
+    "title": "Pong",
+    "thumbnail": "/images/games/pong.png",
+    "category": "Classic Arcade"
   },
   {
-    "id": 559,
-    "title": "Tales Of Yore",
-    "thumbnail": "/images/thumbnails/game-559.jpg",
-    "category": "MMORPG"
+    "slug": "tetris",
+    "title": "Tetris",
+    "thumbnail": "/images/games/tetris.png",
+    "category": "Classic Arcade"
   },
   {
-    "id": 522,
-    "title": "Flyff Universe",
-    "thumbnail": "/images/thumbnails/game-522.jpg",
-    "category": "MMORPG"
+    "slug": "asteroids",
+    "title": "Asteroids",
+    "thumbnail": "/images/games/asteroids.png",
+    "category": "Classic Arcade"
   },
   {
-    "id": 532,
-    "title": "World of Runes",
-    "thumbnail": "/images/thumbnails/game-532.jpg",
-    "category": "MMORPG"
+    "slug": "flappy",
+    "title": "Flappy Nut",
+    "thumbnail": "/images/games/flappy.png",
+    "category": "Endless Runner"
   },
   {
-    "id": 471,
-    "title": "Armor Valor",
-    "thumbnail": "/images/thumbnails/game-471.jpg",
-    "category": "Strategy"
+    "slug": "subway-runner",
+    "title": "Subway Runner",
+    "thumbnail": "/images/games/subway-runner.png",
+    "category": "Endless Runner"
   },
   {
-    "id": 463,
-    "title": "Survivor Legacy",
-    "thumbnail": "/images/thumbnails/game-463.jpg",
-    "category": "Strategy"
+    "slug": "jetpack",
+    "title": "Jetpack Joyride",
+    "thumbnail": "/images/games/jetpack.png",
+    "category": "Endless Runner"
   },
   {
-    "id": 535,
-    "title": "Mirage Online Classic",
-    "thumbnail": "/images/thumbnails/game-535.jpg",
-    "category": "MMORPG"
+    "slug": "ski-free",
+    "title": "Ski Free",
+    "thumbnail": "/images/games/ski-free.png",
+    "category": "Endless Runner"
   },
   {
-    "id": 443,
-    "title": "Ultimate Pirates",
-    "thumbnail": "/images/thumbnails/game-443.jpg",
-    "category": "Strategy"
+    "slug": "doodle-jump",
+    "title": "Doodle Jump",
+    "thumbnail": "/images/games/doodle-jump.png",
+    "category": "Endless Runner"
   },
   {
-    "id": 440,
-    "title": "Vampire Empire",
-    "thumbnail": "/images/thumbnails/game-440.jpg",
-    "category": "Strategy"
+    "slug": "2048",
+    "title": "2048",
+    "thumbnail": "/images/games/2048.png",
+    "category": "Puzzle"
   },
   {
-    "id": 468,
-    "title": "Firestone Idle RPG",
-    "thumbnail": "/images/thumbnails/game-468.jpg",
-    "category": "Strategy"
+    "slug": "memory",
+    "title": "Memory Match",
+    "thumbnail": "/images/games/memory.png",
+    "category": "Puzzle"
   },
   {
-    "id": 455,
-    "title": "Eternal Fury",
-    "thumbnail": "/images/thumbnails/game-455.jpg",
-    "category": "MMORPG"
+    "slug": "minesweeper",
+    "title": "Minesweeper",
+    "thumbnail": "/images/games/minesweeper.png",
+    "category": "Puzzle"
   },
   {
-    "id": 353,
-    "title": "Stein.world",
-    "thumbnail": "/images/thumbnails/game-353.jpg",
-    "category": "MMORPG"
+    "slug": "sudoku",
+    "title": "Sudoku",
+    "thumbnail": "/images/games/sudoku.png",
+    "category": "Puzzle"
   },
   {
-    "id": 457,
-    "title": "The Third Age",
-    "thumbnail": "/images/thumbnails/game-457.jpg",
-    "category": "Strategy"
+    "slug": "wordle",
+    "title": "Wordle",
+    "thumbnail": "/images/games/wordle.png",
+    "category": "Puzzle"
   },
   {
-    "id": 341,
-    "title": "League of Angels 3",
-    "thumbnail": "/images/thumbnails/game-341.jpg",
-    "category": "MMORPG"
+    "slug": "tank-battle",
+    "title": "Tank Battle",
+    "thumbnail": "/images/games/tank-battle.png",
+    "category": "Action"
   },
   {
-    "id": 460,
-    "title": "Empire: World War 3",
-    "thumbnail": "/images/thumbnails/game-460.jpg",
-    "category": "Strategy"
+    "slug": "helicopter",
+    "title": "Helicopter",
+    "thumbnail": "/images/games/helicopter.png",
+    "category": "Action"
   },
   {
-    "id": 543,
-    "title": "Battle Arena Heroes Adventure",
-    "thumbnail": "/images/thumbnails/game-543.jpg",
-    "category": "Strategy"
+    "slug": "fruit-ninja",
+    "title": "Fruit Ninja",
+    "thumbnail": "/images/games/fruit-ninja.png",
+    "category": "Action"
   },
   {
-    "id": 354,
-    "title": "Gods Origin Online",
-    "thumbnail": "/images/thumbnails/game-354.jpg",
-    "category": "MMORPG"
+    "slug": "tower-defense",
+    "title": "Tower Defense",
+    "thumbnail": "/images/games/tower-defense.png",
+    "category": "Action"
   },
   {
-    "id": 355,
-    "title": "Chronicles of Eidola",
-    "thumbnail": "/images/thumbnails/game-355.jpg",
-    "category": "MMORPG"
+    "slug": "space-invaders",
+    "title": "Space Invaders",
+    "thumbnail": "/images/games/space-invaders.png",
+    "category": "Action"
   },
   {
-    "id": 421,
-    "title": "Therian Saga",
-    "thumbnail": "/images/thumbnails/game-421.jpg",
-    "category": "MMORPG"
+    "slug": "boxing",
+    "title": "Boxing",
+    "thumbnail": "/images/games/boxing.png",
+    "category": "Sports"
   },
   {
-    "id": 343,
-    "title": "Dragon Awaken",
-    "thumbnail": "/images/thumbnails/game-343.jpg",
-    "category": "MMORPG"
+    "slug": "bowling",
+    "title": "Bowling",
+    "thumbnail": "/images/games/bowling.png",
+    "category": "Sports"
   },
   {
-    "id": 344,
-    "title": "Omega Zodiac",
-    "thumbnail": "/images/thumbnails/game-344.jpg",
-    "category": "MMORPG"
+    "slug": "archery",
+    "title": "Archery",
+    "thumbnail": "/images/games/archery.png",
+    "category": "Sports"
   },
   {
-    "id": 365,
-    "title": "Naruto Online",
-    "thumbnail": "/images/thumbnails/game-365.jpg",
-    "category": "MMORPG"
+    "slug": "surf-up",
+    "title": "Surf Up",
+    "thumbnail": "/images/games/surf-up.png",
+    "category": "Sports"
   },
   {
-    "id": 118,
-    "title": "Starbreak",
-    "thumbnail": "/images/thumbnails/game-118.jpg",
-    "category": "MMORPG"
+    "slug": "rally",
+    "title": "Rally",
+    "thumbnail": "/images/games/rally.png",
+    "category": "Racing"
   },
   {
-    "id": 370,
-    "title": "Dragon Blood",
-    "thumbnail": "/images/thumbnails/game-370.jpg",
-    "category": "MMORPG"
+    "slug": "maze-escape",
+    "title": "Maze Escape",
+    "thumbnail": "/images/games/maze-escape.png",
+    "category": "Puzzle"
   },
   {
-    "id": 371,
-    "title": "League of Angels 2",
-    "thumbnail": "/images/thumbnails/game-371.jpg",
-    "category": "MMORPG"
+    "slug": "frogger",
+    "title": "Frogger",
+    "thumbnail": "/images/games/frogger.png",
+    "category": "Classic"
   },
   {
-    "id": 374,
-    "title": "Clash of Avatars",
-    "thumbnail": "/images/thumbnails/game-374.jpg",
-    "category": "MMORPG"
+    "slug": "bomberman",
+    "title": "Bomberman",
+    "thumbnail": "/images/games/bomberman.png",
+    "category": "Action"
   },
   {
-    "id": 346,
-    "title": "One Piece Online 2",
-    "thumbnail": "/images/thumbnails/game-346.jpg",
-    "category": "MMORPG"
+    "slug": "capture-flag",
+    "title": "Capture the Flag",
+    "thumbnail": "/images/games/capture-flag.png",
+    "category": "Multiplayer"
   },
   {
-    "id": 383,
-    "title": "Legends of Honor",
-    "thumbnail": "/images/thumbnails/game-383.jpg",
-    "category": "Strategy"
-  },
-  {
-    "id": 384,
-    "title": "Felspire",
-    "thumbnail": "/images/thumbnails/game-384.jpg",
-    "category": "MMORPG"
-  },
-  {
-    "id": 386,
-    "title": "Aberoth",
-    "thumbnail": "/images/thumbnails/game-386.jpg",
-    "category": " MMORPG"
-  },
-  {
-    "id": 163,
-    "title": "Card Hunter",
-    "thumbnail": "/images/thumbnails/game-163.jpg",
-    "category": "Card Game"
-  },
-  {
-    "id": 388,
-    "title": "Lord’s Road",
-    "thumbnail": "/images/thumbnails/game-388.jpg",
-    "category": "MMORPG"
+    "slug": "tower-stack",
+    "title": "Tower Stack",
+    "thumbnail": "/images/games/tower-stack.png",
+    "category": "Arcade"
   }
 ]
