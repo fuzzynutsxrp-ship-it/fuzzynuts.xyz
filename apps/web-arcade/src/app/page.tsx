@@ -1,14 +1,13 @@
-// FuzzyNuts Arcade — React homepage (served at /).
-// Single source of games: GAMES (in sync with lib/gameRegistry, 38 games).
-// Every card opens the shared GameModal shell, so all games look uniform.
+// FuzzyNuts Arcade — homepage.
+// Light, Poki-style design driven by all 38 real games from GAMES, opening each
+// in the shared GameModal. Header is the shared SiteHeader (light variant) — the
+// same component used across the site, so nav/login/search stay consistent.
+// Body styles are embedded + scoped under `.fnx`.
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { TopNav } from "@/components/layout/TopNav";
-import { CategoryTabs } from "@/components/game/CategoryTabs";
-import { PokiGameCard } from "@/components/game/PokiGameCard";
-import { ComingSoonCard } from "@/components/game/ComingSoonCard";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { GAMES } from "@/lib/utils";
 import { GameModalSkeleton } from "@/components/game/GameModalSkeleton";
 
@@ -16,211 +15,189 @@ const Footer = dynamic(() =>
   import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
 );
 
+type Game = (typeof GAMES)[number];
+
 const GameModal = dynamic(() =>
   import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
   { loading: () => <GameModalSkeleton />, ssr: false },
 );
 
-/* ═══════════════════════════════════════════════════════════════
-   Curated sections — manually ordered for visual impact.
-   These pick specific game IDs to feature at the top; the full
-   catalog renders below in the "All Games" grid.
-   ═══════════════════════════════════════════════════════════════ */
-
-const TRENDING_IDS = ["fuzzynuts-world", "mario", "survivors"];
-const NEW_IDS = ["minigolf", "racer", "rsc"];
-const TOP_RATED_IDS = ["mario", "fuzzynuts-world", "minigolf", "rsc", "survivors", "racer"];
-
-const COMING_SOON = [
-  { title: "Fuzzy Kart", genre: "Racing" },
-  { title: "Nut Royale", genre: "Battle Royale" },
-  { title: "Squirrel Tycoon", genre: "Sim / Tycoon" },
-  { title: "Dungeon Nuts", genre: "Roguelike" },
-  { title: "Fuzzy Chess", genre: "Board Game" },
-  { title: "Acorn Builder", genre: "Puzzle" },
+const CATEGORIES = [
+  { key: "all", label: "All Games", grad: "linear-gradient(135deg,#6366f1,#4f46e5)" },
+  { key: "action", label: "Action", grad: "linear-gradient(135deg,#f59e0b,#d97706)" },
+  { key: "arcade", label: "Arcade", grad: "linear-gradient(135deg,#8b5cf6,#7c3aed)" },
+  { key: "puzzle", label: "Puzzle", grad: "linear-gradient(135deg,#a855f7,#7c3aed)" },
+  { key: "racing", label: "Racing", grad: "linear-gradient(135deg,#3b82f6,#1d4ed8)" },
+  { key: "sports", label: "Sports", grad: "linear-gradient(135deg,#f97316,#ea580c)" },
+  { key: "multiplayer", label: "Multiplayer", grad: "linear-gradient(135deg,#10b981,#059669)" },
+  { key: "classic", label: "Classic", grad: "linear-gradient(135deg,#06b6d4,#0891b2)" },
 ];
 
-/* ═══════════════════════════════════════════════════════════════
-   Category → Game matching (for tab filtering)
-   ═══════════════════════════════════════════════════════════════ */
+const FEATURED_ID = "rsc";
+const POPULAR_IDS = ["rsc", "cosmic-blaster", "dragon-hoard", "mario", "survivors", "racer", "minigolf", "fuzzynuts-world"];
 
-function matchesCategory(game: (typeof GAMES)[number], category: string): boolean {
-  if (category === "all") return true;
-  const type = game.type.toLowerCase();
-  const tags = (game.tags ?? []).map((t) => t.toLowerCase());
-  const hay = [type, ...tags];
-  switch (category) {
-    case "multiplayer": return hay.some((h) => h.includes("multiplayer")) || game.id === "fuzzynuts-world" || game.id === "rsc";
-    case "arcade": return hay.some((h) => h.includes("arcade") || h.includes("action"));
-    case "racing": return hay.some((h) => h.includes("racing") || h.includes("runner"));
-    case "chill": return hay.some((h) => h.includes("casual") || h.includes("puzzle") || h.includes("physics"));
-    case "classic": return hay.some((h) => h.includes("classic"));
-    case "sports": return hay.some((h) => h.includes("sports"));
-    case "puzzle": return hay.some((h) => h.includes("puzzle"));
-    default: return hay.some((h) => h.includes(category));
-  }
+function matchesCat(g: Game, cat: string): boolean {
+  if (cat === "all") return true;
+  const hay = [g.type, ...(g.tags ?? [])].join(" ").toLowerCase();
+  if (cat === "action") return /action|shoot|combat|fight/.test(hay);
+  if (cat === "arcade") return /arcade/.test(hay);
+  if (cat === "puzzle") return /puzzle|physics|casual/.test(hay);
+  if (cat === "racing") return /racing|runner|speed/.test(hay);
+  if (cat === "sports") return /sports/.test(hay);
+  if (cat === "multiplayer") return /multiplayer|mmo|2 player|local/.test(hay);
+  if (cat === "classic") return /classic/.test(hay);
+  return false;
 }
 
-function gamesByIds(ids: string[]) {
-  return ids.map((id) => GAMES.find((g) => g.id === id)).filter(Boolean) as typeof GAMES;
+function gamesByIds(ids: string[]): Game[] {
+  return ids.map((id) => GAMES.find((g) => g.id === id)).filter(Boolean) as Game[];
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Section row component — horizontal scroll on mobile, grid on desktop
-   ═══════════════════════════════════════════════════════════════ */
-
-function GameRow({
-  title,
-  emoji,
-  games,
-  onPlay,
-  priorityStart = false,
-  tileSize = "small",
-}: {
-  title: string;
-  emoji: string;
-  games: typeof GAMES;
-  onPlay: (id: string) => void;
-  priorityStart?: boolean;
-  tileSize?: "large" | "small";
-}) {
+function Card({ game, onPlay, i }: { game: Game; onPlay: (id: string) => void; i: number }) {
   return (
-    <section className="mb-8">
-      <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream mb-3 flex items-center gap-2">
-        <span>{emoji}</span> {title}
-      </h2>
-      <div className="game-grid-mosaic flex overflow-x-auto scrollbar-none pb-2 md:grid md:overflow-visible md:pb-0"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {games.map((game, i) => (
-          <div key={game.id} className={`shrink-0 w-[44vw] sm:w-[30vw] md:w-auto tile-${tileSize}`}>
-            <PokiGameCard
-              game={game}
-              onPlay={onPlay}
-              priority={priorityStart && i < 3}
-            />
-          </div>
-        ))}
-      </div>
-    </section>
+    <button className="fn-game-card" onClick={() => onPlay(game.id)} aria-label={`Play ${game.title}`}>
+      <span className={`fn-game-card__thumb fn-game-card__thumb--${(i % 6) + 1}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/images/games/${game.id}.png`}
+          alt={game.title}
+          className="fn-game-card__img"
+          loading="lazy"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
+        />
+        <span className="fn-game-card__badge">{game.type}</span>
+      </span>
+      <span className="fn-game-card__title">{game.title}</span>
+    </button>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Main page
-   ═══════════════════════════════════════════════════════════════ */
-
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [, setMenuOpen] = useState(false);
+  const [activeCat, setActiveCat] = useState("all");
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const isFiltering = activeCategory !== "all" || searchQuery.trim().length > 0;
-
-  const filteredGames = useMemo(() => {
-    let games = GAMES.filter((g) => matchesCategory(g, activeCategory));
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      games = games.filter(
-        (g) =>
-          g.title.toLowerCase().includes(q) ||
-          g.type.toLowerCase().includes(q) ||
-          g.tags?.some((t) => t.toLowerCase().includes(q)),
-      );
-    }
-    return games;
-  }, [activeCategory, searchQuery]);
-
-  const trending = gamesByIds(TRENDING_IDS);
-  const justAdded = gamesByIds(NEW_IDS);
-  const topRated = gamesByIds(TOP_RATED_IDS);
+  const featured = GAMES.find((g) => g.id === FEATURED_ID) ?? GAMES[0];
+  const popular = gamesByIds(POPULAR_IDS);
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return GAMES.filter((g) => matchesCat(g, activeCat)).filter(
+      (g) => !q || g.title.toLowerCase().includes(q) || g.type.toLowerCase().includes(q) || (g.tags ?? []).some((t) => t.toLowerCase().includes(q)),
+    );
+  }, [activeCat, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#0a0613] flex flex-col">
-      <TopNav
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onMenuToggle={() => setMenuOpen((o) => !o)}
-      />
+    <div className="fnx">
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <CategoryTabs
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-      />
+      <SiteHeader variant="light" searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      <main className="flex-1 px-3 md:px-5 py-4 pb-32">
-        {isFiltering ? (
-          filteredGames.length > 0 ? (
-            <section>
-              <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream mb-3">
-                {searchQuery.trim()
-                  ? `Results for "${searchQuery}"`
-                  : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Games`}
-              </h2>
-              <div className="game-grid-fluid">
-                {filteredGames.map((game, i) => (
-                  <PokiGameCard key={game.id} game={game} onPlay={setActiveGameId} priority={i < 6} />
-                ))}
-              </div>
-            </section>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-4xl mb-3">🔍</p>
-              <p className="text-[var(--color-cream-dim)] text-sm">No games found.</p>
+      <main className="fn-dashboard">
+        {/* Hero */}
+        <section className="fn-hero-banner" aria-label="Featured game">
+          <div className="fn-hero-banner__content">
+            <span className="fn-hero-banner__badge">🔥 Featured</span>
+            <h1 className="fn-hero-banner__title">{featured.title}</h1>
+            <p className="fn-hero-banner__subtitle">{featured.description}</p>
+            <button className="fn-hero-banner__cta" onClick={() => setActiveGameId(featured.id)}>
+              Play Now
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+            </button>
+          </div>
+          <div className="fn-hero-banner__visual" style={{ backgroundImage: `url(/images/games/${featured.id}.png)` }} />
+        </section>
+
+        {/* Category browse */}
+        <section className="fn-categories" aria-label="Browse by category">
+          <h2 className="fn-categories__heading">Browse by category</h2>
+          <div className="fn-categories__grid">
+            {CATEGORIES.map((c) => (
               <button
-                onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
-                className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
+                key={c.key}
+                className={`fn-cat-tile${activeCat === c.key ? " is-active" : ""}`}
+                onClick={() => { setActiveCat(c.key); document.getElementById("all-games")?.scrollIntoView({ behavior: "smooth" }); }}
               >
-                Show all games
+                <span className="fn-cat-tile__icon" style={{ background: c.grad }} aria-hidden="true">🎮</span>
+                <span className="fn-cat-tile__label">{c.label}</span>
               </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Popular row */}
+        <section className="fn-carousel-section" aria-label="Popular">
+          <h2 className="fn-carousel-section__heading">🕹️ Popular this week</h2>
+          <div className="fn-carousel__track">
+            {popular.map((g, i) => <Card key={g.id} game={g} onPlay={setActiveGameId} i={i} />)}
+          </div>
+        </section>
+
+        {/* All games grid */}
+        <section className="fn-carousel-section" id="all-games" aria-label="All games">
+          <h2 className="fn-carousel-section__heading">
+            {searchQuery.trim() ? `Results for "${searchQuery}"` : activeCat === "all" ? "All games" : CATEGORIES.find((c) => c.key === activeCat)?.label}
+            <span className="fnx-count">{filtered.length}</span>
+          </h2>
+          {filtered.length > 0 ? (
+            <div className="fn-grid">
+              {filtered.map((g, i) => <Card key={g.id} game={g} onPlay={setActiveGameId} i={i} />)}
             </div>
-          )
-        ) : (
-          <>
-            <GameRow title="Trending Now" emoji="🔥" games={trending} onPlay={setActiveGameId} priorityStart tileSize="large" />
-            <GameRow title="Just Added" emoji="🆕" games={justAdded} onPlay={setActiveGameId} tileSize="large" />
-            <GameRow title="Top Rated" emoji="🏆" games={topRated} onPlay={setActiveGameId} tileSize="small" />
+          ) : (
+            <p className="fnx-empty">No games found.</p>
+          )}
+        </section>
 
-            {/* All Games — the full catalog (every game in GAMES) */}
-            <section className="mb-8">
-              <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream mb-3 flex items-center gap-2">
-                <span>🎮</span> All Games
-                <span className="text-[var(--color-cream-dim)] text-sm font-normal">({GAMES.length})</span>
-              </h2>
-              <div className="game-grid-fluid">
-                {GAMES.map((game, i) => (
-                  <PokiGameCard key={game.id} game={game} onPlay={setActiveGameId} priority={i < 6} />
-                ))}
-              </div>
-            </section>
-
-            {/* Coming Soon — labelled teasers (no links, no 404s) */}
-            <section className="mb-8">
-              <h2 className="font-display text-[var(--fluid-h2)] font-black text-cream/60 mb-3 flex items-center gap-2">
-                <span>🔒</span> Coming Soon
-              </h2>
-              <div className="game-grid-mosaic">
-                {COMING_SOON.map((item) => (
-                  <div key={item.title} className="tile-small">
-                    <ComingSoonCard title={item.title} genre={item.genre} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
-
-        <div className="mt-12">
-          <Footer />
-        </div>
+        <Footer />
       </main>
 
-      <GameModal
-        gameId={activeGameId}
-        onClose={() => setActiveGameId(null)}
-        onGameSwitch={setActiveGameId}
-      />
+      <GameModal gameId={activeGameId} onClose={() => setActiveGameId(null)} onGameSwitch={setActiveGameId} />
     </div>
   );
 }
+
+const CSS = `
+.fnx {
+  --fn-bg:#f8fafc; --fn-surface:#fff; --fn-text:#0f172a; --fn-text-secondary:#64748b; --fn-border:#e2e8f0;
+  --fn-primary:#6366f1; --fn-primary-hover:#4f46e5;
+  --fn-shadow-close:0 1px 3px 0 rgba(15,23,42,.08),0 1px 2px -1px rgba(15,23,42,.08);
+  --fn-shadow-mid:0 4px 6px -1px rgba(15,23,42,.1),0 2px 4px -2px rgba(15,23,42,.1);
+  --fn-font:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--fn-bg); color:var(--fn-text); font-family:var(--fn-font); min-height:100vh; line-height:1.5;
+}
+.fnx *,.fnx *::before,.fnx *::after{box-sizing:border-box;}
+.fn-dashboard{max-width:1400px;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:40px;}
+.fn-hero-banner{display:grid;grid-template-columns:1fr 1fr;background:var(--fn-surface);border-radius:16px;box-shadow:var(--fn-shadow-close);overflow:hidden;min-height:300px;}
+.fn-hero-banner__content{display:flex;flex-direction:column;justify-content:center;gap:16px;padding:40px 32px;}
+.fn-hero-banner__badge{width:fit-content;padding:4px 12px;background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(236,72,153,.12));color:var(--fn-primary);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;border-radius:100px;}
+.fn-hero-banner__title{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;letter-spacing:-.5px;}
+.fn-hero-banner__subtitle{font-size:1rem;color:var(--fn-text-secondary);max-width:420px;}
+.fn-hero-banner__cta{display:inline-flex;align-items:center;gap:8px;width:fit-content;padding:12px 28px;background:var(--fn-primary);color:#fff;font-size:16px;font-weight:800;border:none;border-radius:100px;cursor:pointer;min-height:48px;transition:transform .15s,background .15s,box-shadow .15s;font-family:inherit;}
+.fn-hero-banner__cta:hover{background:var(--fn-primary-hover);transform:translateY(-2px);box-shadow:0 6px 16px rgba(99,102,241,.3);}
+.fn-hero-banner__cta svg{width:20px;height:20px;}
+.fn-hero-banner__visual{background-size:cover;background-position:center;min-height:240px;}
+.fn-categories{display:flex;flex-direction:column;gap:16px;}
+.fn-categories__heading,.fn-carousel-section__heading{font-size:24px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:10px;}
+.fnx-count{font-size:13px;font-weight:700;color:#fff;background:var(--fn-primary);border-radius:100px;padding:2px 10px;}
+.fn-categories__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.fn-cat-tile{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--fn-surface);border:2px solid transparent;border-radius:12px;box-shadow:var(--fn-shadow-close);cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;min-height:64px;font-family:inherit;}
+.fn-cat-tile:hover{transform:scale(1.04);box-shadow:var(--fn-shadow-mid);}
+.fn-cat-tile.is-active{border-color:var(--fn-primary);}
+.fn-cat-tile__icon{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.fn-cat-tile__label{font-size:15px;font-weight:800;color:var(--fn-text);}
+.fn-carousel-section{display:flex;flex-direction:column;gap:16px;}
+.fn-carousel__track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 12px;scrollbar-width:none;}
+.fn-carousel__track::-webkit-scrollbar{display:none;}
+.fn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;}
+.fn-game-card{flex:0 0 180px;width:180px;scroll-snap-align:start;display:flex;flex-direction:column;background:var(--fn-surface);border:none;padding:0;border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--fn-shadow-close);transition:box-shadow .18s,transform .18s;text-align:left;font-family:inherit;}
+.fn-grid .fn-game-card{flex:none;width:auto;}
+.fn-game-card:hover{box-shadow:var(--fn-shadow-mid);transform:translateY(-3px);}
+.fn-game-card__thumb{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.fn-game-card__img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s;}
+.fn-game-card:hover .fn-game-card__img{transform:scale(1.05);}
+.fn-game-card__thumb--1{background:linear-gradient(135deg,#6366f1,#4f46e5);} .fn-game-card__thumb--2{background:linear-gradient(135deg,#ec4899,#db2777);} .fn-game-card__thumb--3{background:linear-gradient(135deg,#14b8a6,#0d9488);} .fn-game-card__thumb--4{background:linear-gradient(135deg,#f59e0b,#d97706);} .fn-game-card__thumb--5{background:linear-gradient(135deg,#3b82f6,#1d4ed8);} .fn-game-card__thumb--6{background:linear-gradient(135deg,#8b5cf6,#7c3aed);}
+.fn-game-card__badge{position:absolute;top:8px;left:8px;z-index:2;font-size:11px;font-weight:800;color:#fff;background:rgba(15,23,42,.55);padding:3px 8px;border-radius:4px;letter-spacing:.2px;backdrop-filter:blur(4px);}
+.fn-game-card__title{font-size:14px;font-weight:800;color:var(--fn-text);padding:10px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fnx-empty{color:var(--fn-text-secondary);padding:24px 0;}
+@media (max-width:1024px){.fn-categories__grid{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:768px){.fn-hero-banner{grid-template-columns:1fr;}.fn-categories__grid{grid-template-columns:repeat(2,1fr);}}
+`;

@@ -10,13 +10,11 @@ const nextConfig: NextConfig = {
    * ═══════════════════════════════════════════════════════════════
    *  REWRITES — none.
    *
-   *  The React App Router arcade (src/app/page.tsx) is now served at
-   *  the root route `/`. We previously rewrote `/` → `/index.html` to
-   *  serve a static placeholder page; that bypassed the React arcade
-   *  and only surfaced ~8 games, so it has been removed.
-   *
-   *  The old static page still exists at public/index.html for
-   *  reference but is no longer routed (slated for deletion).
+   *  The React App Router arcade (src/app/page.tsx) is served at the
+   *  root route `/`. We previously rewrote `/` → `/index.html` to serve
+   *  a static placeholder page that only surfaced ~8 games; that page
+   *  (public/index.html) and its third-party games.json have since been
+   *  deleted. If you ever need them back, they're in git history.
    * ═══════════════════════════════════════════════════════════════
    */
   async rewrites() {
