@@ -58,7 +58,7 @@ Status legend: 🔴 open · 🟡 in progress · ✅ done · 🔒 needs ADR + COD
 
 | # | Blocker | Status | Notes |
 |---|---|---|---|
-| P0-1 | `games.json` still lists 40 third-party MMOs (Game of Thrones, Elvenar…) | 🔴 | Live homepage shows competitor games linking to 404s. Real games = the 38 dirs. |
+| ~~P0-1~~ | ~~`games.json` shows third-party MMOs on the live site~~ | ✅ N/A | **MISDIAGNOSED — verified 2026-06-13 against the live site.** The homepage renders the 38 real games from `apps/web-arcade/src/lib/gameRegistry.ts` and has **zero** third-party MMOs. The third-party `public/data/games.json` + `public/index.html` are dead legacy files Next.js never serves (`/index.html` returns the Next page, not the static file). Demoted to cleanup — see §3. |
 | P0-2 | `SCORE_CAPS` diverge across 3+ sources (10M ceiling vs 99M in `arcade-core` vs ~1B in `scores.ts`) | 🔴 🔒 | Touches `packages/arcade-core/src/constants/` → needs ADR. |
 | P0-3 | Server `VALID_GAMES` accepts only 6 slugs (`scores.ts`); a 2nd validator uses a different source | 🔴 🔒 | Unify on one source (SCORE_CAPS keys). |
 | P0-4 | Score submissions not HMAC-verified — leaderboard trivially spoofable | 🔴 🔒 | `shared-anticheat/hmac.ts` exists but isn't enforced in `scores.ts`. |
@@ -68,6 +68,8 @@ Status legend: 🔴 open · 🟡 in progress · ✅ done · 🔒 needs ADR + COD
 
 ## 3. Not launch-blocking (track, don't gate on)
 
+- P1: **Homepage "Coming Soon" placeholders.** The live homepage's "Popular this Week / New Releases / Play with Friends / All Games Coming Soon" sections list ~12 games that don't exist (Fuzzy Kart, Nut Royale, Squirrel Tycoon, Dungeon Nuts, Fuzzy Chess, Acorn Builder, Sky Nuts, Fuzzy Farm, …) linking to `/game/<slug>` (singular — note real games use `/games/<slug>/` plural). Decide before launch: keep as labelled teasers (and ensure the links don't 404) or remove. A launch site full of dead "SOON" links reads as unfinished.
+- P3: **Delete dead legacy artifacts** that caused the P0-1 misdiagnosis: `apps/web-arcade/public/index.html`, `apps/web-arcade/public/data/games.json`, and the 40 orphan `apps/web-arcade/public/images/thumbnails/game-*.jpg`. Nothing in the Next app references them.
 - P2: dedupe game source trees (`games-build/games` vs `web-arcade/public/games`).
 - P2: implement the games-build bundling pipeline (currently "deferred", serves raw static files).
 - P2: `arcade-core` test fails — a cap of 99,000,000 exceeds the 10,000,000 sanity ceiling (same root cause as P0-2).
