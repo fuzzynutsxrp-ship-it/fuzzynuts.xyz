@@ -1,0 +1,408 @@
+/* ============================================================
+   FEATURED GAME CAROUSEL — auto-rotating hero spotlight
+   Accessible, mobile-friendly, respects prefers-reduced-motion
+   ============================================================ */
+
+.fn-featured-carousel {
+  position: relative;
+  border-radius: var(--fn-radius-lg);
+  overflow: hidden;
+  min-height: 320px;
+  box-shadow: var(--fn-shadow-close);
+}
+
+/* --- Slides container --- */
+.fn-featured-carousel__track {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+}
+
+/* --- Individual slide --- */
+.fn-featured-carousel__slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--fn-spacing-l);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  pointer-events: none;
+}
+
+.fn-featured-carousel__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  position: relative;
+}
+
+/* --- Left: Text content --- */
+.fn-featured-carousel__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--fn-spacing-m);
+  padding: var(--fn-spacing-2xl) var(--fn-spacing-xl);
+  background: var(--fn-surface);
+  z-index: 1;
+}
+
+.fn-featured-carousel__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fn-spacing-2xs);
+  width: fit-content;
+  padding: var(--fn-spacing-2xs) var(--fn-spacing-s);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.12) 100%);
+  color: var(--fn-primary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-radius: var(--fn-radius-pill);
+}
+
+.fn-featured-carousel__title {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--fn-text);
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.fn-featured-carousel__subtitle {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--fn-text-secondary);
+  max-width: 420px;
+  margin: 0;
+}
+
+.fn-featured-carousel__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fn-spacing-xs);
+  width: fit-content;
+  padding: var(--fn-spacing-s) var(--fn-spacing-xl);
+  background: var(--fn-primary);
+  color: #ffffff;
+  font-family: var(--fn-font);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--fn-radius-pill);
+  cursor: pointer;
+  transition: background-color 0.15s ease,
+              transform 0.15s ease,
+              box-shadow 0.15s ease;
+  min-height: 48px;
+}
+
+.fn-featured-carousel__cta:hover {
+  background: var(--fn-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+}
+
+.fn-featured-carousel__cta:active {
+  transform: translateY(0);
+}
+
+.fn-featured-carousel__cta:focus-visible {
+  outline: 3px solid var(--fn-primary);
+  outline-offset: 2px;
+}
+
+.fn-featured-carousel__cta svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Right: Game image visual --- */
+.fn-featured-carousel__visual {
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+}
+
+.fn-featured-carousel__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gradient overlay on image for blending */
+.fn-featured-carousel__visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--fn-surface) 0%, transparent 30%);
+  pointer-events: none;
+}
+
+/* --- Navigation arrows --- */
+.fn-featured-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+  color: var(--fn-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, background-color 0.15s ease;
+  padding: 0;
+}
+
+.fn-featured-carousel__arrow svg {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.fn-featured-carousel__arrow:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
+
+.fn-featured-carousel__arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.fn-featured-carousel__arrow:focus-visible {
+  opacity: 1;
+  visibility: visible;
+  outline: 3px solid var(--fn-primary);
+  outline-offset: 2px;
+}
+
+.fn-featured-carousel__arrow--prev {
+  left: 12px;
+}
+
+.fn-featured-carousel__arrow--next {
+  right: 12px;
+}
+
+/* Show arrows on hover/focus within */
+.fn-featured-carousel:hover .fn-featured-carousel__arrow,
+.fn-featured-carousel:focus-within .fn-featured-carousel__arrow {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- Dot indicators --- */
+.fn-featured-carousel__dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.fn-featured-carousel__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.fn-featured-carousel__dot:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.15);
+}
+
+.fn-featured-carousel__dot.is-active {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: scale(1.15);
+}
+
+.fn-featured-carousel__dot:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* --- Progress bar (auto-rotation indicator) --- */
+.fn-featured-carousel__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 5;
+  transition: width linear;
+  width: 0;
+}
+
+/* --- Play/pause toggle --- */
+.fn-featured-carousel__pause {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.15s ease;
+  padding: 0;
+}
+
+.fn-featured-carousel__pause svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.fn-featured-carousel:hover .fn-featured-carousel__pause,
+.fn-featured-carousel:focus-within .fn-featured-carousel__pause {
+  opacity: 0.8;
+}
+
+.fn-featured-carousel__pause:hover {
+  opacity: 1 !important;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.fn-featured-carousel__pause:focus-visible {
+  opacity: 1 !important;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   MOBILE — stacked layout
+   ============================================================ */
+@media (max-width: 768px) {
+  .fn-featured-carousel {
+    min-height: auto;
+  }
+
+  .fn-featured-carousel__track {
+    min-height: auto;
+  }
+
+  .fn-featured-carousel__slide {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .fn-featured-carousel__slide.is-active {
+    min-height: auto;
+  }
+
+  .fn-featured-carousel__content {
+    padding: var(--fn-spacing-xl) var(--fn-spacing-m);
+    text-align: center;
+    align-items: center;
+  }
+
+  .fn-featured-carousel__subtitle {
+    max-width: none;
+  }
+
+  .fn-featured-carousel__visual {
+    min-height: 200px;
+    max-height: 240px;
+  }
+
+  .fn-featured-carousel__visual::after {
+    background: linear-gradient(0deg, var(--fn-surface) 0%, transparent 40%);
+  }
+
+  .fn-featured-carousel__arrow {
+    width: 36px;
+    height: 36px;
+    opacity: 0.7;
+    visibility: visible;
+  }
+
+  .fn-featured-carousel__arrow svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .fn-featured-carousel__arrow--prev {
+    left: 8px;
+  }
+
+  .fn-featured-carousel__arrow--next {
+    right: 8px;
+  }
+
+  .fn-featured-carousel__dots {
+    bottom: 12px;
+  }
+
+  .fn-featured-carousel__dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .fn-featured-carousel__pause {
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .fn-featured-carousel__title {
+    font-size: 1.5rem;
+  }
+
+  .fn-featured-carousel__cta {
+    font-size: 14px;
+    padding: var(--fn-spacing-xs) var(--fn-spacing-l);
+  }
+
+  .fn-featured-carousel__visual {
+    min-height: 160px;
+    max-height: 200px;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION — disable transitions and auto-rotate
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .fn-featured-carousel__slide {
+    transition: none;
+  }
+
+  .fn-featured-carousel__arrow,
+  .fn-featured-carousel__dot,
+  .fn-featured-carousel__pause {
+    transition: none;
+  }
+
+  .fn-featured-carousel__progress {
+    display: none;
+  }
+}
