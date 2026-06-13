@@ -66,7 +66,7 @@ export const GAMES = [
     tags: ["Platformer", "Classic", "32 Levels"],
   },
   {
-    id: "survivors",
+    id: "fuzzy-survivors",
     title: "Fuzzy Survivors",
     type: "Horde Survival",
     description:
@@ -88,7 +88,7 @@ export const GAMES = [
     tags: ["3D", "Physics", "Casual"],
   },
   {
-    id: "racer",
+    id: "nut-racer",
     title: "Nut Racer",
     type: "Racing",
     description:

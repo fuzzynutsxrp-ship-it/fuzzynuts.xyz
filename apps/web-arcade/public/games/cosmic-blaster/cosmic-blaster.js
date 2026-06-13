@@ -593,7 +593,7 @@
   function submitScore(s) {
     try {
       if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: 'game-score', slug: GAME_SLUG, score: s }, '*');
+        window.parent.postMessage({ type: 'game-score', slug: GAME_SLUG, score: s }, window.location.origin);
       }
     } catch {}
     try {

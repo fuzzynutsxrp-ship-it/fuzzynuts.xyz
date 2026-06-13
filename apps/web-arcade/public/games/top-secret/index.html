@@ -361,7 +361,7 @@
 
         // 🔌 SIGNAL PARENT: "I'm ready, dismiss the loading overlay"
         try {
-          window.parent.postMessage({ type: 'gameReady' }, '*');
+          window.parent.postMessage({ type: 'gameReady' }, window.location.origin);
           console.log('[' + GAME_TITLE + '] Sent gameReady to parent');
         } catch(e) {}
       }

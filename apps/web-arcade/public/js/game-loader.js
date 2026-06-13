@@ -288,7 +288,7 @@
         // Forward to parent if we're in an iframe ourselves
         try {
           if (window.parent !== window) {
-            window.parent.postMessage(event.data, '*');
+            window.parent.postMessage(event.data, window.location.origin);
           }
         } catch(e) {}
       }
