@@ -79,13 +79,20 @@
     walls.push({ x: W * 0.65, y: H * 0.85, w: 10, h: 50 });
 
     bushes = [
-      { x: W * 0.2, y: H * 0.3, w: 50, h: 50 },
-      { x: W * 0.75, y: H * 0.6, w: 50, h: 50 },
-      { x: W * 0.45, y: H * 0.15, w: 40, h: 40 },
-      { x: W * 0.5, y: H * 0.75, w: 40, h: 40 },
-      { x: W * 0.1, y: H * 0.6, w: 45, h: 45 },
-      { x: W * 0.85, y: H * 0.3, w: 45, h: 45 },
+      { x: W * 0.2, y: H * 0.3, w: 50, h: 50, dots: [] },
+      { x: W * 0.75, y: H * 0.6, w: 50, h: 50, dots: [] },
+      { x: W * 0.45, y: H * 0.15, w: 40, h: 40, dots: [] },
+      { x: W * 0.5, y: H * 0.75, w: 40, h: 40, dots: [] },
+      { x: W * 0.1, y: H * 0.6, w: 45, h: 45, dots: [] },
+      { x: W * 0.85, y: H * 0.3, w: 45, h: 45, dots: [] },
     ];
+    // Pre-generate bush dot positions
+    for (const b of bushes) {
+      b.dots = [];
+      for (let i = 0; i < 5; i++) {
+        b.dots.push({ dx: 5 + Math.random() * (b.w - 10), dy: 5 + Math.random() * (b.h - 10) });
+      }
+    }
 
     p1Base = { x: 30, y: H / 2 - BASE_H / 2, w: BASE_W, h: BASE_H };
     p2Base = { x: W - 30 - BASE_W, y: H / 2 - BASE_H / 2, w: BASE_W, h: BASE_H };
@@ -119,6 +126,7 @@
   }
 
   function startGame() {
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
     p1Captures = 0;
     p2Captures = 0;
     window.__gameScore = 0;
@@ -375,10 +383,8 @@
       ctx.globalAlpha = 1;
       // bush pattern
       ctx.fillStyle = '#2a5a2a';
-      for (let i = 0; i < 5; i++) {
-        const bx = b.x + 5 + Math.random() * (b.w - 10);
-        const by = b.y + 5 + Math.random() * (b.h - 10);
-        ctx.beginPath(); ctx.arc(bx, by, 3, 0, Math.PI * 2); ctx.fill();
+      for (const d of b.dots) {
+        ctx.beginPath(); ctx.arc(b.x + d.dx, b.y + d.dy, 3, 0, Math.PI * 2); ctx.fill();
       }
     }
 

@@ -499,6 +499,7 @@
     document.removeEventListener('keydown', _onKeyDown);
     canvas.removeEventListener('touchstart', _onTouchStart);
     canvas.removeEventListener('touchend', _onTouchEnd);
+    window.removeEventListener('resize', resizeCanvas);
   });
 
   // ── Game loop ──
