@@ -27,6 +27,7 @@ import type { GameMetadata } from "@/lib/gameRegistry";
 import { useChatSocket } from "@/components/chat/useChatSocket";
 import { trackGameStart, trackScoreSubmitted, trackDiscordClick } from "@/lib/analytics";
 import { useWalletStore } from "@/store/wallet";
+import { GameErrorBoundary } from "@/components/GameErrorBoundary";
 
 /* ═══════════════════════════════════════════════════════════════
    GameModal — CrazyGames-style lightbox for instant game play
@@ -393,7 +394,9 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
       {/* ── Body: viewport + sidebar ── */}
       <div className="game-modal__body">
-        {/* Game viewport */}
+        {/* Game viewport — wrapped in ErrorBoundary so a single game crash
+            never kills the entire Next.js app */}
+        <GameErrorBoundary onRetry={handleRetry}>
         <div
           ref={containerRef}
           className="game-modal__viewport"
@@ -401,6 +404,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             touchAction: "none",
             userSelect: "none",
             WebkitUserSelect: "none",
+            position: "relative",
           }}
         >
           {/* Loading state */}
@@ -458,6 +462,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             aria-label={`${game.title} game window`}
           />
         </div>
+        </GameErrorBoundary>
 
         {/* ── Play Next sidebar (CrazyGames pattern) ── */}
         <aside className="game-modal__sidebar" aria-label="More games">
