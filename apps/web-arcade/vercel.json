@@ -61,6 +61,14 @@
       "destination": "https://world.fuzzynuts.xyz/api/scores/stream"
     },
     {
+      "source": "/api/scores/:path*",
+      "destination": "https://world.fuzzynuts.xyz/api/scores/:path*"
+    },
+    {
+      "source": "/api/rewards/:path*",
+      "destination": "https://world.fuzzynuts.xyz/api/rewards/:path*"
+    },
+    {
       "source": "/api/rsc/:path*",
       "destination": "https://fuzzynutsxyz-production.up.railway.app/api/rsc/:path*"
     }
