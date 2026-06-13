@@ -6,6 +6,7 @@
 
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { GameModal } from "@/components/game/GameModal";
 import { GAMES } from "@/lib/utils";
 
@@ -77,13 +78,13 @@ export default function Home() {
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       <header className="fnx-header">
-        <a className="fnx-brand" href="/">🌰 FuzzyNuts</a>
+        <Link className="fnx-brand" href="/">🌰 FuzzyNuts</Link>
         <nav className="fnx-nav">
-          <a href="/">Home</a>
-          <a href="/leaderboard">Leaderboard</a>
-          <a href="/prizes">Prizes</a>
+          <Link href="/">Home</Link>
+          <Link href="/leaderboard">Leaderboard</Link>
+          <Link href="/prizes">Prizes</Link>
         </nav>
-        <a className="fnx-connect" href="/wallet">Connect Wallet</a>
+        <Link className="fnx-connect" href="/wallet">Connect Wallet</Link>
       </header>
 
       <main className="fn-dashboard">
