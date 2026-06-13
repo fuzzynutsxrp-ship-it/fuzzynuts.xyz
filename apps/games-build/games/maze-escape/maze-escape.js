@@ -446,46 +446,60 @@
   }
 
   // ── Input ──
+  let _touchSwipeStart = null;
+
+  function _onKeyDown(e) {
+    if (gameState === 'start') { startGame(); return; }
+    if (gameState === 'gameover') {
+      if (e.key === 'Enter' || e.key === ' ') { startGame(); }
+      return;
+    }
+    if (gameState !== 'playing') return;
+    switch (e.key) {
+      case 'ArrowUp': case 'w': case 'W': movePlayer(-1, 0); e.preventDefault(); break;
+      case 'ArrowDown': case 's': case 'S': movePlayer(1, 0); e.preventDefault(); break;
+      case 'ArrowLeft': case 'a': case 'A': movePlayer(0, -1); e.preventDefault(); break;
+      case 'ArrowRight': case 'd': case 'D': movePlayer(0, 1); e.preventDefault(); break;
+    }
+  }
+
+  function _onTouchStart(e) {
+    if (gameState === 'start') { startGame(); return; }
+    if (gameState === 'gameover') { startGame(); return; }
+    const t = e.touches[0];
+    _touchSwipeStart = { x: t.clientX, y: t.clientY };
+  }
+
+  function _onTouchEnd(e) {
+    if (!_touchSwipeStart || gameState !== 'playing') return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - _touchSwipeStart.x;
+    const dy = t.clientY - _touchSwipeStart.y;
+    const absDx = Math.abs(dx), absDy = Math.abs(dy);
+    if (Math.max(absDx, absDy) < 20) return;
+    if (absDx > absDy) {
+      movePlayer(0, dx > 0 ? 1 : -1);
+    } else {
+      movePlayer(dy > 0 ? 1 : -1, 0);
+    }
+    _touchSwipeStart = null;
+  }
+
   function setupInput() {
-    document.addEventListener('keydown', (e) => {
-      if (gameState === 'start') { startGame(); return; }
-      if (gameState === 'gameover') {
-        if (e.key === 'Enter' || e.key === ' ') { startGame(); }
-        return;
-      }
-      if (gameState !== 'playing') return;
-      switch (e.key) {
-        case 'ArrowUp': case 'w': case 'W': movePlayer(-1, 0); e.preventDefault(); break;
-        case 'ArrowDown': case 's': case 'S': movePlayer(1, 0); e.preventDefault(); break;
-        case 'ArrowLeft': case 'a': case 'A': movePlayer(0, -1); e.preventDefault(); break;
-        case 'ArrowRight': case 'd': case 'D': movePlayer(0, 1); e.preventDefault(); break;
-      }
-    });
+    document.addEventListener('keydown', _onKeyDown);
 
     // Touch swipe
-    let touchStart = null;
-    canvas.addEventListener('touchstart', (e) => {
-      if (gameState === 'start') { startGame(); return; }
-      if (gameState === 'gameover') { startGame(); return; }
-      const t = e.touches[0];
-      touchStart = { x: t.clientX, y: t.clientY };
-    }, { passive: true });
-
-    canvas.addEventListener('touchend', (e) => {
-      if (!touchStart || gameState !== 'playing') return;
-      const t = e.changedTouches[0];
-      const dx = t.clientX - touchStart.x;
-      const dy = t.clientY - touchStart.y;
-      const absDx = Math.abs(dx), absDy = Math.abs(dy);
-      if (Math.max(absDx, absDy) < 20) return;
-      if (absDx > absDy) {
-        movePlayer(0, dx > 0 ? 1 : -1);
-      } else {
-        movePlayer(dy > 0 ? 1 : -1, 0);
-      }
-      touchStart = null;
-    }, { passive: true });
+    canvas.addEventListener('touchstart', _onTouchStart, { passive: true });
+    canvas.addEventListener('touchend', _onTouchEnd, { passive: true });
   }
+
+  // Cleanup
+  window.addEventListener('game-cleanup', function () {
+    if (animFrame) cancelAnimationFrame(animFrame);
+    document.removeEventListener('keydown', _onKeyDown);
+    canvas.removeEventListener('touchstart', _onTouchStart);
+    canvas.removeEventListener('touchend', _onTouchEnd);
+  });
 
   // ── Game loop ──
   function loop() {

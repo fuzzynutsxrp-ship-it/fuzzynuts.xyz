@@ -33,7 +33,6 @@
   let lastTime = 0;
   let startTime = 0;
   let shieldTimer = 0;
-  let inputQueue = [];
   let touchStart = null;
   let touchMoved = false;
 
@@ -618,9 +617,6 @@
       checkExplosionHits();
       checkPowerups();
       checkLevelClear();
-
-      // Remove dead enemies
-      enemies = enemies.filter(e => e.alive);
     }
 
     draw();

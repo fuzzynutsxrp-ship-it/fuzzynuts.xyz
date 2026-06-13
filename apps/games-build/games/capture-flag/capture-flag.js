@@ -566,20 +566,24 @@
   }
 
   // ── Input ──
+  function _onKeyDown(e) {
+    keys[e.key] = true;
+    if (gameState === 'start' && (e.key === ' ')) {
+      e.preventDefault();
+      startGame();
+    } else if (gameState === 'gameover' && e.key === ' ') {
+      e.preventDefault();
+      startGame();
+    }
+  }
+  function _onKeyUp(e) { keys[e.key] = false; }
+  function _onClick() {
+    if (gameState === 'start' || gameState === 'gameover') startGame();
+  }
+
   function setupInput() {
-    window.addEventListener('keydown', function (e) {
-      keys[e.key] = true;
-      if (gameState === 'start' && (e.key === ' ')) {
-        e.preventDefault();
-        startGame();
-      } else if (gameState === 'gameover' && e.key === ' ') {
-        e.preventDefault();
-        startGame();
-      }
-    });
-    window.addEventListener('keyup', function (e) {
-      keys[e.key] = false;
-    });
+    window.addEventListener('keydown', _onKeyDown);
+    window.addEventListener('keyup', _onKeyUp);
 
     // Touch controls
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -588,10 +592,20 @@
     canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
     // Click for start/restart
-    canvas.addEventListener('click', function () {
-      if (gameState === 'start' || gameState === 'gameover') startGame();
-    });
+    canvas.addEventListener('click', _onClick);
   }
+
+  // Cleanup
+  window.addEventListener('game-cleanup', function () {
+    if (animFrame) cancelAnimationFrame(animFrame);
+    window.removeEventListener('keydown', _onKeyDown);
+    window.removeEventListener('keyup', _onKeyUp);
+    canvas.removeEventListener('touchstart', handleTouchStart);
+    canvas.removeEventListener('touchmove', handleTouchMove);
+    canvas.removeEventListener('touchend', handleTouchEnd);
+    canvas.removeEventListener('touchcancel', handleTouchEnd);
+    canvas.removeEventListener('click', _onClick);
+  });
 
   function getTouchPos(touch) {
     const rect = canvas.getBoundingClientRect();
