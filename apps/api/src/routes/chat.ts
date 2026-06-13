@@ -2,22 +2,28 @@
  * Community Chat — Socket.io backend
  *
  * Phase 1A: wallet-authenticated chat with Tier 1 moderation.
+ * Phase 1B: guest JWT identity (deviceId → random name/color).
  * Uses the same MongoDB cluster as the RSC wallet mappings.
  *
  * Exports:
  *   initChat(server, opts)    — attach Socket.io to the HTTP server
  *   chatHistoryRouter         — Express router for GET /api/chat/history
+ *   buildGuestJwtRouter()     — Express router for POST /api/auth/guest
  */
 
 import { Server as HttpServer } from "node:http";
 import { Router } from "express";
 import { Server } from "socket.io";
 import { MongoClient, type Db, type Collection } from "mongodb";
+import { SignJWT, jwtVerify } from "jose";
 
 // ── Types ──────────────────────────────────────────────────────
 interface ChatMessage {
-  walletAddress: string;
+  walletAddress?: string;
+  deviceId?: string;
   username: string;
+  displayName: string;
+  color: string;
   content: string;
   createdAt: Date;
   expiresAt: Date;
@@ -25,8 +31,87 @@ interface ChatMessage {
 
 interface OnlineUser {
   username: string;
-  walletAddress: string;
+  displayName: string;
+  color: string;
+  walletAddress?: string;
+  deviceId?: string;
   connectedAt: number;
+}
+
+// ── Guest identity helpers ─────────────────────────────────────
+const GUEST_COLORS = [
+  "#f472b6", // pink
+  "#a78bfa", // purple
+  "#60a5fa", // blue
+  "#34d399", // green
+  "#fbbf24", // amber
+  "#fb923c", // orange
+  "#f87171", // red
+  "#2dd4bf", // teal
+  "#818cf8", // indigo
+  "#e879f9", // fuchsia
+];
+
+function randomGuestName(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars
+  let suffix = "";
+  for (let i = 0; i < 4; i++) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `Guest-${suffix}`;
+}
+
+function pickColor(deviceId: string): string {
+  // Deterministic color from deviceId so the same guest always gets the same color
+  let hash = 0;
+  for (let i = 0; i < deviceId.length; i++) {
+    hash = (hash * 31 + deviceId.charCodeAt(i)) | 0;
+  }
+  return GUEST_COLORS[Math.abs(hash) % GUEST_COLORS.length];
+}
+
+/** Mint a guest JWT (HS256, 30-day expiry) */
+export async function mintGuestJwt(
+  deviceId: string,
+  secret: string,
+): Promise<string> {
+  const key = new TextEncoder().encode(secret);
+  return new SignJWT({ type: "guest", deviceId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setIssuer("fuzzynuts.xyz")
+    .setExpirationTime("30d")
+    .sign(key);
+}
+
+/** Verify a guest or wallet JWT and return identity fields */
+async function verifyChatJwt(
+  token: string,
+  secret: string,
+): Promise<
+  | { type: "guest"; deviceId: string }
+  | { type: "wallet"; address: string }
+  | null
+> {
+  try {
+    const key = new TextEncoder().encode(secret);
+    const { payload } = await jwtVerify(token, key, {
+      issuer: "fuzzynuts.xyz",
+    });
+    const type = payload.type as string;
+    if (type === "guest" && typeof payload.deviceId === "string") {
+      return { type: "guest", deviceId: payload.deviceId };
+    }
+    if (
+      type === "wallet" &&
+      typeof payload.address === "string"
+    ) {
+      return { type: "wallet", address: payload.address };
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 // ── Trust Score — Link Policy ─────────────────────────────────
@@ -101,20 +186,17 @@ const TRUSTED_DOMAINS: RegExp[] = [
   /game\.fuzzynuts\.xyz/i,
 ];
 
-// ── Rate Limiter (per wallet address, survives reconnect) ─────
-const rateLimits = new Map<string, number[]>();
+// ── Rate Limiter (per socket, 5 messages per second) ──────────
 const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 10_000;
+const RATE_LIMIT_WINDOW_MS = 1_000; // 1 second
 
-function checkRateLimit(walletAddress: string): boolean {
+function checkRateLimit(socketId: string, timestamps: number[]): boolean {
   const now = Date.now();
-  const timestamps = rateLimits.get(walletAddress) ?? [];
   const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
   if (recent.length >= RATE_LIMIT_MAX) {
     return false; // rate limited
   }
   recent.push(now);
-  rateLimits.set(walletAddress, recent);
   return true;
 }
 
@@ -396,37 +478,59 @@ export function initChat(
     }
   }
 
-  // ── Auth middleware — resolve wallet → username on connect ──
-  io.use(async (socket, next) => {
+  // ── Auth middleware — verify JWT (guest or wallet) on connect ──
+  io.use(async (socket: any, next: any) => {
     try {
-      const walletAddress = socket.handshake.auth.walletAddress as
-        | string
-        | undefined;
-      if (
-        !walletAddress ||
-        typeof walletAddress !== "string" ||
-        walletAddress.length < 25
-      ) {
-        return next(new Error("Wallet address required"));
+      const token = socket.handshake.auth.token as string | undefined;
+      if (!token || typeof token !== "string") {
+        return next(new Error("Authentication token required"));
       }
 
-      // Look up RSC username from the existing wallet_mappings collection
-      const db = await getDb(opts.MONGODB_URI);
-      const mappings = db.collection(opts.walletMappingsCollection);
-      const mapping = await mappings.findOne<{ username: string }>(
-        { walletAddress },
-        { projection: { username: 1 } },
-      );
+      let identity: { type: "guest"; deviceId: string } | { type: "wallet"; address: string } | null = null;
 
-      if (!mapping) {
-        return next(
-          new Error("No RSC account found. Claim a username first."),
+      // Backward compat: raw wallet address (starts with 'r')
+      if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(token)) {
+        identity = { type: "wallet", address: token };
+      } else {
+        // JWT token (guest or wallet)
+        identity = await verifyChatJwt(token, opts.WALLET_JWT_SECRET);
+      }
+
+      if (!identity) {
+        return next(new Error("Invalid or expired token"));
+      }
+
+      if (identity.type === "guest") {
+        // Guest: assign random name + deterministic color
+        socket.data.identityType = "guest";
+        socket.data.deviceId = identity.deviceId;
+        socket.data.username = randomGuestName();
+        socket.data.displayName = socket.data.username;
+        socket.data.color = pickColor(identity.deviceId);
+        socket.data.wallet = null;
+        next();
+      } else {
+        // Wallet: look up RSC username from wallet_mappings
+        const db = await getDb(opts.MONGODB_URI);
+        const mappings = db.collection(opts.walletMappingsCollection);
+        const mapping = await mappings.findOne<{ username: string }>(
+          { walletAddress: identity.address },
+          { projection: { username: 1 } },
         );
-      }
 
-      socket.data.username = mapping.username;
-      socket.data.wallet = walletAddress;
-      next();
+        if (!mapping) {
+          return next(
+            new Error("No RSC account found. Claim a username first."),
+          );
+        }
+
+        socket.data.identityType = "wallet";
+        socket.data.username = mapping.username;
+        socket.data.displayName = mapping.username;
+        socket.data.color = "#22d3ee"; // cyan for wallet users
+        socket.data.wallet = identity.address;
+        next();
+      }
     } catch (err) {
       console.error("[chat] Auth error:", err);
       next(new Error("Authentication failed"));
@@ -434,22 +538,34 @@ export function initChat(
   });
 
   // ── Connection handler ──────────────────────────────────────
-  io.on("connection", (socket) => {
+  io.on("connection", (socket: any) => {
     const username = socket.data.username as string;
-    const wallet = socket.data.wallet as string;
+    const displayName = socket.data.displayName as string;
+    const color = socket.data.color as string;
+    const wallet = socket.data.wallet as string | null;
+    const deviceId = socket.data.deviceId as string | undefined;
+    const identityType = socket.data.identityType as "guest" | "wallet";
 
-    console.log(`[chat] ${username} connected (${wallet.slice(0, 8)}...)`);
+    // Per-socket rate limit timestamps
+    const rateLimitTimestamps: number[] = [];
+
+    console.log(`[chat] ${displayName} connected (${identityType}${wallet ? ` ${wallet.slice(0, 8)}...` : deviceId ? ` ${deviceId.slice(0, 8)}...` : ""})`);
     onlineUsers.set(socket.id, {
       username,
-      walletAddress: wallet,
+      displayName,
+      color,
+      walletAddress: wallet ?? undefined,
+      deviceId,
       connectedAt: Date.now(),
     });
 
-    // Track socket ID for this wallet (multi-tab support)
-    if (!walletSockets.has(wallet)) {
-      walletSockets.set(wallet, new Set());
+    // Track socket ID for this wallet (multi-tab support, wallet users only)
+    if (wallet) {
+      if (!walletSockets.has(wallet)) {
+        walletSockets.set(wallet, new Set());
+      }
+      walletSockets.get(wallet)!.add(socket.id);
     }
-    walletSockets.get(wallet)!.add(socket.id);
 
     // Broadcast updated online list to everyone
     io.emit("users:online", Array.from(onlineUsers.values()));
@@ -476,6 +592,10 @@ export function initChat(
 
         // ── /report command — intercept before any other processing ──
         if (content.toLowerCase().startsWith("/report ")) {
+          if (!wallet) {
+            socket.emit("message:error", { error: "Guests cannot use /report" });
+            return;
+          }
           const targetUsername = content.slice(8).trim();
           if (!targetUsername) {
             socket.emit("message:error", {
@@ -488,6 +608,8 @@ export function initChat(
             socket.emit("message:report-ack", {
               id: `report-${Date.now()}`,
               username: "System",
+              displayName: "System",
+              color: "#ef4444",
               content: `Report filed against "${targetUsername}". Our moderators will review it.`,
               createdAt: new Date().toISOString(),
             });
@@ -498,7 +620,7 @@ export function initChat(
         }
 
         // ── Admin commands — /mute, /ban, /unmute, /unban, /clear ──
-        if (content.startsWith('/') && isAdmin(wallet)) {
+        if (content.startsWith('/') && wallet && isAdmin(wallet)) {
           const parts = content.trim().split(/\s+/);
           const cmd = (parts[0] ?? '').toLowerCase();
           const targetName = parts[1] || '';
@@ -597,58 +719,64 @@ export function initChat(
           return;
         }
 
-        // Ban check — banned users cannot send messages
-        if (await isBanned(wallet)) {
+        // Ban check — banned users cannot send messages (wallet users only)
+        if (wallet && await isBanned(wallet)) {
           socket.emit('message:error', { error: 'You are banned from chat' });
           return;
         }
 
-        // Mute check — shadow muted users' messages
-        if (await isMuted(wallet)) {
+        // Mute check — shadow muted users' messages (wallet users only)
+        if (wallet && await isMuted(wallet)) {
           socket.emit("message:muted", {
             id: `muted-${Date.now()}`,
             username,
+            displayName,
+            color,
             content,
             createdAt: new Date().toISOString(),
             muted: true,
           });
-          console.log(`[chat] Muted user ${username} attempted to send message`);
+          console.log(`[chat] Muted user ${displayName} attempted to send message`);
           return;
         }
 
-        // Rate limit check
-        if (!checkRateLimit(wallet)) {
+        // Rate limit check (per-socket, 5 msg/sec)
+        if (!checkRateLimit(socket.id, rateLimitTimestamps)) {
           socket.emit("message:error", {
-            error: "Slow down — max 5 messages per 10 seconds",
+            error: "Slow down — max 5 messages per second",
           });
           return;
         }
 
-        // Trust score — strip links for new accounts (< 24 hours)
+        // Trust score — strip links for new accounts (< 24 hours, wallet only)
         let finalContent = content;
         let linksStripped = false;
-        const hasLinks = URL_PATTERN.test(content);
-        URL_PATTERN.lastIndex = 0; // reset regex state after .test()
-        if (hasLinks) {
-          const accountAge = await getAccountAge(
-            opts.MONGODB_URI,
-            opts.walletMappingsCollection,
-            wallet,
-          );
-          if (accountAge < LINK_REMOVAL_AGE_MS) {
-            finalContent = stripLinks(content);
-            linksStripped = true;
-            socket.emit("message:link-stripped", {
-              id: `stripped-${Date.now()}`,
-              username,
-              content: finalContent,
-              originalContent: content,
-              createdAt: new Date().toISOString(),
-              linkStripped: true,
-            });
-            console.log(
-              `[chat] Stripped links from ${username} (account age: ${Math.round(accountAge / 60_000)}min)`,
+        if (wallet) {
+          const hasLinks = URL_PATTERN.test(content);
+          URL_PATTERN.lastIndex = 0; // reset regex state after .test()
+          if (hasLinks) {
+            const accountAge = await getAccountAge(
+              opts.MONGODB_URI,
+              opts.walletMappingsCollection,
+              wallet,
             );
+            if (accountAge < LINK_REMOVAL_AGE_MS) {
+              finalContent = stripLinks(content);
+              linksStripped = true;
+              socket.emit("message:link-stripped", {
+                id: `stripped-${Date.now()}`,
+                username,
+                displayName,
+                color,
+                content: finalContent,
+                originalContent: content,
+                createdAt: new Date().toISOString(),
+                linkStripped: true,
+              });
+              console.log(
+                `[chat] Stripped links from ${displayName} (account age: ${Math.round(accountAge / 60_000)}min)`,
+              );
+            }
           }
         }
 
@@ -659,12 +787,14 @@ export function initChat(
           socket.emit("message:shadowed", {
             id: `shadow-${Date.now()}`,
             username,
+            displayName,
+            color,
             content: finalContent,
             createdAt: new Date().toISOString(),
             shadowed: true,
           });
           console.log(
-            `[chat] Shadow-blocked ${username}: ${modResult.reason}`,
+            `[chat] Shadow-blocked ${displayName}: ${modResult.reason}`,
           );
           return;
         }
@@ -676,6 +806,8 @@ export function initChat(
             socket.emit("message:shadowed", {
               id: `ai-${Date.now()}`,
               username,
+              displayName,
+              color,
               content: finalContent,
               createdAt: new Date().toISOString(),
               shadowed: true,
@@ -683,7 +815,7 @@ export function initChat(
               aiCategories: aiResult.categories,
             });
             console.log(
-              `[chat] AI-flagged ${username}: ${aiResult.categories.join(", ")}`,
+              `[chat] AI-flagged ${displayName}: ${aiResult.categories.join(", ")}`,
             );
             return;
           }
@@ -693,8 +825,11 @@ export function initChat(
         const col = await getChatCollection(opts.MONGODB_URI);
         const now = new Date();
         const doc: ChatMessage = {
-          walletAddress: wallet,
+          walletAddress: wallet ?? undefined,
+          deviceId,
           username,
+          displayName,
+          color,
           content: finalContent,
           createdAt: now,
           expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days
@@ -705,24 +840,35 @@ export function initChat(
         const outgoing = {
           id: result.insertedId.toString(),
           username,
-          walletAddress: wallet,
+          displayName,
+          color,
+          walletAddress: wallet ?? undefined,
+          deviceId,
           content: finalContent,
           createdAt: now.toISOString(),
           ...(linksStripped && { linkStripped: true }),
         };
         io.emit("message:new", outgoing);
 
-        // Track last message for /report context
-        lastMessages.set(wallet, { username, content: finalContent, at: now });
+        // Track last message for /report context (wallet users only)
+        if (wallet) {
+          lastMessages.set(wallet, { username, content: finalContent, at: now });
+        }
       } catch (err) {
         console.error("[chat] Message error:", err);
         socket.emit("message:error", { error: "Failed to send message" });
       }
     });
 
-    // ── DM: Send private message ──────────────────────────────
+    // ── DM: Send private message (wallet users only) ──────────
     socket.on("dm:send", async (data: { toWallet?: unknown; content?: unknown }) => {
       try {
+        // DMs require wallet identity
+        if (!wallet) {
+          socket.emit("dm:error", { error: "Guests cannot send DMs" });
+          return;
+        }
+
         if (
           !data ||
           typeof data.toWallet !== "string" ||
@@ -747,9 +893,9 @@ export function initChat(
           return;
         }
 
-        // Rate limit (reuse existing limiter)
-        if (!checkRateLimit(wallet)) {
-          socket.emit("dm:error", { error: "Slow down — max 5 messages per 10 seconds" });
+        // Rate limit (per-socket, 5 msg/sec)
+        if (!checkRateLimit(socket.id, rateLimitTimestamps)) {
+          socket.emit("dm:error", { error: "Slow down — max 5 messages per second" });
           return;
         }
 
@@ -867,14 +1013,16 @@ export function initChat(
 
     // ── Disconnect ──────────────────────────────────────────
     socket.on("disconnect", () => {
-      console.log(`[chat] ${username} disconnected`);
+      console.log(`[chat] ${displayName} disconnected`);
       onlineUsers.delete(socket.id);
 
-      // Clean up walletSockets
-      const sockets = walletSockets.get(wallet);
-      if (sockets) {
-        sockets.delete(socket.id);
-        if (sockets.size === 0) walletSockets.delete(wallet);
+      // Clean up walletSockets (wallet users only)
+      if (wallet) {
+        const sockets = walletSockets.get(wallet);
+        if (sockets) {
+          sockets.delete(socket.id);
+          if (sockets.size === 0) walletSockets.delete(wallet);
+        }
       }
 
       io.emit("users:online", Array.from(onlineUsers.values()));
@@ -1071,6 +1219,28 @@ export function buildAdminChatRouter(
     } catch (err) {
       console.error("[chat:admin] Unmute error:", err);
       res.status(500).json({ error: "Failed to unmute user" });
+    }
+  });
+
+  return router;
+}
+
+// ── Express router: POST /api/auth/guest — mint a guest JWT ────
+export function buildGuestJwtRouter(WALLET_JWT_SECRET: string): Router {
+  const router = Router();
+
+  router.post("/", async (req, res) => {
+    try {
+      const { deviceId } = req.body;
+      if (!deviceId || typeof deviceId !== "string" || deviceId.length < 8 || deviceId.length > 128) {
+        return res.status(400).json({ error: "deviceId required (8-128 chars)" });
+      }
+
+      const token = await mintGuestJwt(deviceId, WALLET_JWT_SECRET);
+      return res.json({ token, type: "guest", deviceId });
+    } catch (err) {
+      console.error("[auth:guest] Error minting guest JWT:", err);
+      return res.status(500).json({ error: "Failed to mint guest token" });
     }
   });
 

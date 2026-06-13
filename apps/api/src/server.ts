@@ -232,8 +232,9 @@ async function bootstrap() {
   // Community Chat (Socket.io + history endpoint)
   if (MONGODB_URI && WALLET_JWT_SECRET) {
     try {
-      const { initChat, buildChatHistoryRouter } = await import("./routes/chat");
+      const { initChat, buildChatHistoryRouter, buildGuestJwtRouter } = await import("./routes/chat");
       app.use("/api/chat", buildChatHistoryRouter(MONGODB_URI));
+      app.use("/api/auth/guest", buildGuestJwtRouter(WALLET_JWT_SECRET));
 
       const httpServer = createServer(app);
       initChat(httpServer, {

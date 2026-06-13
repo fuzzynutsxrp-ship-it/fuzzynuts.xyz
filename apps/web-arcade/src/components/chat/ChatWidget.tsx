@@ -26,9 +26,24 @@ const CHAT_API =
   process.env.NEXT_PUBLIC_CHAT_API ||
   "https://fuzzynutsxyz-production.up.railway.app";
 
+const DEVICE_ID_KEY = "fuzzy_chat_device_id";
+
+/** Get or create a persistent deviceId for guest identity */
+function getDeviceId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem(DEVICE_ID_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(DEVICE_ID_KEY, id);
+  }
+  return id;
+}
+
 interface ChatMessage {
   id: string;
   username: string;
+  displayName: string;
+  color: string;
   content: string;
   createdAt: string;
   shadowed?: boolean;
@@ -37,6 +52,7 @@ interface ChatMessage {
   isSystem?: boolean;
   muted?: boolean;
   walletAddress?: string;
+  deviceId?: string;
 }
 
 interface DirectMessage {
@@ -53,7 +69,10 @@ interface DirectMessage {
 
 interface OnlineUser {
   username: string;
-  walletAddress: string;
+  displayName: string;
+  color: string;
+  walletAddress?: string;
+  deviceId?: string;
   connectedAt: number;
 }
 
@@ -126,7 +145,6 @@ export function ChatWidget() {
 
   // ── Socket connection (lifecycle: mount → unmount) ──────────
   useEffect(() => {
-    if (!isConnected || !address) return;
     if (socketRef.current?.connected) return;
 
     let cancelled = false;
@@ -155,9 +173,35 @@ export function ChatWidget() {
 
       if (cancelled) return;
 
+      // Get auth token — wallet or guest
+      let token: string | null = null;
+      if (isConnected && address) {
+        token = address; // Raw wallet address (backward compat)
+      } else {
+        // Guest mode: fetch guest JWT
+        try {
+          const deviceId = getDeviceId();
+          if (deviceId) {
+            const res = await fetch(`${CHAT_API}/api/auth/guest`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ deviceId }),
+            });
+            if (res.ok) {
+              const data = (await res.json()) as { token: string };
+              token = data.token;
+            }
+          }
+        } catch {
+          // Guest JWT fetch failed
+        }
+      }
+
+      if (cancelled || !token) return;
+
       // Connect socket
       const socket = io(CHAT_API, {
-        auth: { walletAddress: address },
+        auth: { token },
         withCredentials: true,
         transports: ["websocket", "polling"],
         reconnectionAttempts: 10,
@@ -346,11 +390,6 @@ export function ChatWidget() {
       return "";
     }
   };
-
-  // ── Not connected state ─────────────────────────────────────
-  if (!isConnected) {
-    return null;
-  }
 
   // ── Toggle button ───────────────────────────────────────────
   if (!open) {
@@ -582,20 +621,21 @@ export function ChatWidget() {
               <>
                 <div className="flex items-baseline gap-2">
                   <span
-                    className={`text-xs font-semibold ${
-                      msg.muted
-                        ? "text-[#FBBF24]"
+                    className="text-xs font-semibold"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: msg.muted
+                        ? "#FBBF24"
                         : msg.shadowed && msg.aiFlagged
-                          ? "text-[#e8943a]"
+                          ? "#e8943a"
                           : msg.shadowed
-                            ? "text-[#ef4444]"
+                            ? "#ef4444"
                             : msg.linkStripped
-                              ? "text-[#3B82F6]"
-                              : "text-[#7c3aed]"
-                    }`}
-                    style={{ fontFamily: "var(--font-display)" }}
+                              ? "#3B82F6"
+                              : msg.color || "#7c3aed",
+                    }}
                   >
-                    {msg.username}
+                    {msg.displayName || msg.username}
                   </span>
                   {/* DM button — only show for other users */}
                   {msg.walletAddress && msg.walletAddress !== address && (
