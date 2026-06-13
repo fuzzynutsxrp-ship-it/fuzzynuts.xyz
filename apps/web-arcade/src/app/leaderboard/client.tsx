@@ -27,6 +27,7 @@ import {
 import type { ScoreEntry } from "@/features/arcade";
 import { API_SCORES, MAX_ENTRIES } from "@/features/arcade/constants";
 import { toBackendSlug } from "@/features/arcade/slugAliases";
+import { MyRankWidget } from "@/components/ui/MyRankWidget";
 
 /* ═══════════════════════════════════════════════════════════════
    Constants
@@ -325,6 +326,9 @@ export function LeaderboardClient() {
               </p>
             )}
           </div>
+
+          {/* ── My Rank Widget ── */}
+          <MyRankWidget className="mb-6" />
 
           {/* ── Filters Bar ── */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
