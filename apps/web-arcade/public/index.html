@@ -716,14 +716,15 @@
     }
 
     const CAROUSEL_MAP = {
-      'Popular this Week': { indices: range(0, 15, 40), badge: { index: 0, text: '🔥 HOT', cls: 'fn-game-card__badge--hot' } },
-      'New Releases':      { indices: range(15, 15, 40), badge: { index: 0, text: '✨ NEW', cls: 'fn-game-card__badge--new' } },
-      'Play with Friends':  { indices: range(30, 15, 40), badge: null },
+      'Popular this Week': { indices: range(0, 15, 38), badge: { index: 0, text: '🔥 HOT', cls: 'fn-game-card__badge--hot' } },
+      'New Releases':      { indices: range(15, 15, 38), badge: { index: 0, text: '✨ NEW', cls: 'fn-game-card__badge--new' } },
+      'Play with Friends':  { indices: range(30, 15, 38), badge: null },
     };
 
     function buildCard(game, badge) {
       const a = document.createElement('a');
-      a.href = '/game/' + game.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const slug = game.slug || game.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      a.href = '/games/' + slug + '/';
       a.className = 'fn-game-card';
       a.setAttribute('role', 'listitem');
 
