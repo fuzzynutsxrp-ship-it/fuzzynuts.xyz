@@ -25,7 +25,6 @@ import { z } from "zod";
 /* ── Score Caps (must mirror client-side SCORE_CAPS) ── */
 
 const SCORE_CAPS: Record<string, number> = {
-  "top-secret": 1_000_000,
   "fuzzynuts-world": 10_000_000,
   mario: 9_999_990,
   survivors: 5_000_000,

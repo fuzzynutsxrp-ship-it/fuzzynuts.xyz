@@ -134,7 +134,6 @@ fuzzynuts-optimized/
 │   │   ├── fuzzy-survivors/        # Vampire Survivors clone (runtime only)
 │   │   ├── minigolf/               # Nut Golf WebAssembly (18M)
 │   │   ├── nut-racer/              # Pseudo-3D racer (288K)
-│   │   ├── top-secret/             # Placeholder stub for unannounced game
 │   │   └── fuzzy-score.js          # Score bridge (postMessage → API)
 │   ├── css/                        # Static CSS shared with game iframes
 │   │   ├── design-tokens.css       # CSS custom properties for games

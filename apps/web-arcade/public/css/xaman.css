@@ -1,0 +1,109 @@
+/* ============================================================
+   XAMAN QR MODAL — Wallet sign-in overlay
+   ============================================================
+   Z-index stack:
+     Game Overlay (200) < Xaman Modal (300) < Cookie (100) < Nav (50)
+   The modal MUST sit above the game theater so users can sign in
+   mid-session if their auth expires.
+   ============================================================ */
+
+.fn-xaman-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(10, 6, 19, 0.92);  /* degen-950 at 92% */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fn-xaman-fade-in 0.15s ease;
+}
+
+@keyframes fn-xaman-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.fn-xaman-modal {
+  background: #120a22;               /* degen-900 */
+  border: 1px solid #7c3aed;         /* violet primary */
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  color: #e2e8f0;
+  font-family: Inter, system-ui, sans-serif;
+  box-shadow:
+    0 0 0 1px rgba(124, 58, 237, 0.25),
+    0 0 40px rgba(124, 58, 237, 0.15);
+}
+
+.fn-xaman-modal h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #FBBF24;                    /* gold accent */
+}
+
+.fn-xaman-modal img {
+  width: 200px;
+  height: 200px;
+  border-radius: 0.5rem;
+  margin: 0 1rem;
+  background: #fff;
+  padding: 0.5rem;
+  border: 2px solid #7c3aed;         /* violet border on QR */
+}
+
+.fn-xaman-modal p {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.8rem;
+  color: #94a3b8;                    /* slate-400 */
+}
+
+.fn-xaman-deeplink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: #7c3aed;              /* violet primary */
+  color: #fff;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease;
+}
+
+.fn-xaman-deeplink:hover {
+  background: #6d28d9;              /* violet-700 */
+}
+
+.fn-xaman-cancel {
+  display: block;
+  margin-top: 0.75rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: Inter, system-ui, sans-serif;
+  transition: color 0.12s ease;
+}
+
+.fn-xaman-cancel:hover {
+  color: #e2e8f0;
+}
+
+.fn-xaman-status {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #10B981;                    /* emerald-500 */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fn-xaman-overlay {
+    animation: none;
+  }
+}

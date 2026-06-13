@@ -286,6 +286,16 @@ export const GAMES = [
   { id: "fruit-ninja", title: "Fruit Ninja", type: "Action", description: "Slice fruit, dodge bombs, combo for bonus!", icon: "/icons/icon-world-pop.webp", image: "🍉", color: "#ef4444", tags: ["Action", "Slicing", "Casual"] },
   { id: "tower-defense", title: "Tower Defense", type: "Strategy", description: "Place towers, upgrade defenses, survive!", icon: "/icons/icon-world-pop.webp", image: "🏰", color: "#7c3aed", tags: ["Strategy", "Tower Defense", "Waves"] },
   { id: "space-invaders", title: "Space Invaders", type: "Classic", description: "Classic alien shooter — defend Earth!", icon: "/icons/icon-world-pop.webp", image: "👾", color: "#06b6d4", tags: ["Classic", "Shooter", "Aliens"] },
+  { id: "boxing", title: "Boxing", type: "Sports", description: "Step into the ring — punch, dodge, knock out!", icon: "/icons/icon-world-pop.webp", image: "🥊", color: "#ef4444", tags: ["Sports", "Fighting", "1v1"] },
+  { id: "bowling", title: "Bowling", type: "Sports", description: "Roll strikes in 10-pin bowling!", icon: "/icons/icon-world-pop.webp", image: "🎳", color: "#f97316", tags: ["Sports", "Casual", "Precision"] },
+  { id: "archery", title: "Archery", type: "Sports", description: "Hit the bullseye — aim and fire!", icon: "/icons/icon-world-pop.webp", image: "🏹", color: "#10b981", tags: ["Sports", "Precision", "Aiming"] },
+  { id: "surf-up", title: "Surf Up", type: "Sports", description: "Ride the waves and pull off tricks!", icon: "/icons/icon-world-pop.webp", image: "🏄", color: "#06b6d4", tags: ["Sports", "Balance", "Waves"] },
+  { id: "rally", title: "Rally", type: "Racing", description: "Top-down rally racing — drift to win!", icon: "/icons/icon-world-pop.webp", image: "🏎️", color: "#fbbf24", tags: ["Racing", "Top-down", "Drifting"] },
+  { id: "maze-escape", title: "Maze Escape", type: "Puzzle", description: "Navigate procedural mazes — find the exit!", icon: "/icons/icon-world-pop.webp", image: "🏰", color: "#a855f7", tags: ["Puzzle", "Maze", "Procedural"] },
+  { id: "frogger", title: "Frogger", type: "Classic", description: "Cross the road and river — don't get squished!", icon: "/icons/icon-world-pop.webp", image: "🐸", color: "#10b981", tags: ["Classic", "Arcade", "Crossing"] },
+  { id: "bomberman", title: "Bomberman", type: "Action", description: "Place bombs, break walls, defeat enemies!", icon: "/icons/icon-world-pop.webp", image: "💣", color: "#f97316", tags: ["Action", "Strategy", "Bombs"] },
+  { id: "capture-flag", title: "Capture the Flag", type: "Multiplayer", description: "2-player local capture the flag — split screen!", icon: "/icons/icon-world-pop.webp", image: "🚩", color: "#ef4444", tags: ["Multiplayer", "Local", "Strategy"] },
+  { id: "tower-stack", title: "Tower Stack", type: "Arcade", description: "Stack blocks precisely — how high can you go?", icon: "/icons/icon-world-pop.webp", image: "🏗️", color: "#fbbf24", tags: ["Arcade", "Precision", "Endless"] },
 ];
 
 export const HOW_TO_STEPS = [

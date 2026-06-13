@@ -28,7 +28,6 @@ export const ScoreSubmissionSchema = z.object({
     "fuzzy-survivors",
     "minigolf",
     "nut-racer",
-    "top-secret",
     "fuzzynuts-world",
   ]),
   score: z.number().int().positive(),
@@ -45,7 +44,6 @@ export type ScoreSubmission = z.infer<typeof ScoreSubmissionSchema>;
 // ── Game-specific score caps (server-side authority) ──────────
 
 export const SCORE_CAPS: Record<string, number> = {
-  "top-secret": 1_000_000,
   "fuzzynuts-world": 10_000_000,
   mario: 9_999_990,
   "fuzzy-survivors": 5_000_000,

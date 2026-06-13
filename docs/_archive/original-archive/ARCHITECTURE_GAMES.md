@@ -41,7 +41,6 @@ FuzzyNuts Optimized/
 │       │   ├── fuzzy-survivors/
 │       │   ├── minigolf/
 │       │   ├── nut-racer/
-│       │   ├── top-secret/
 │       │   └── fuzzynuts-world/
 │       └── icons/
 │           └── icon-{slug}-pop.webp      ← Game icons
@@ -53,7 +52,6 @@ FuzzyNuts Optimized/
     ├── fuzzy-survivors/                  ← Fuzzy Survivors source
     ├── minigolf/                         ← Fuzzy Putt source
     ├── nut-racer/                        ← Nut Racer source
-    ├── top-secret/                       ← Top Secret source
     ├── fuzzynuts-world/                  ← Kaetram reference
     ├── templates/                        ← New game boilerplate
     └── scripts/                          ← Build/deploy automation
@@ -131,7 +129,6 @@ All game metadata is centralized in `src/lib/gameRegistry.ts`:
 | 2 | `fuzzy-survivors` | Fuzzy Survivors | Horde Survival | 999,999 | High score | Live |
 | 3 | `minigolf` | Fuzzy Putt | Mini Golf | 10,500 | High score | Live |
 | 4 | `nut-racer` | Nut Racer | Racing | 99,999 | High score | Live |
-| 5 | `top-secret` | Top Secret | ??? Classified | 999,999 | High score | Live |
 | 6 | `fuzzynuts-world` | Fuzzynuts World | MMORPG | 10,000,000 | Cumulative | Live |
 
 ---

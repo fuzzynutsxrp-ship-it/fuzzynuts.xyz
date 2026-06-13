@@ -1,0 +1,29 @@
+[
+  {
+    "id": "slither-io",
+    "title": "Slither.io",
+    "slug": "slither-io",
+    "thumbnail": "/images/thumbnails/game-slither.jpg",
+    "category": "Arcade",
+    "engine": "iframe",
+    "url": "https://slither.io"
+  },
+  {
+    "id": "kaetram",
+    "title": "Kaetram",
+    "slug": "kaetram",
+    "thumbnail": "/images/thumbnails/game-kaetram.jpg",
+    "category": "MMORPG",
+    "engine": "iframe",
+    "url": "https://world.fuzzynuts.xyz"
+  },
+  {
+    "id": "open-rsc",
+    "title": "Open RSC",
+    "slug": "open-rsc",
+    "thumbnail": "/images/thumbnails/game-rsc.jpg",
+    "category": "MMORPG",
+    "engine": "teavm",
+    "url": "https://game.fuzzynuts.xyz"
+  }
+]

@@ -592,16 +592,11 @@
 
   function submitScore(s) {
     try {
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: 'game-score', slug: GAME_SLUG, score: s }, '*');
-      }
+      if (typeof ArcadeShell !== 'undefined') ArcadeShell.submit(s);
     } catch {}
     try {
-      if (typeof window.submitFuzzyScore === 'function') {
-        window.submitFuzzyScore(GAME_SLUG, s);
-      }
+      if (typeof FuzzyScoreSubmit === 'function') FuzzyScoreSubmit(s);
     } catch {}
-    window.dispatchEvent(new CustomEvent('game-score', { detail: { slug: GAME_SLUG, score: s } }));
   }
 
   function getScore() { return score || 0; }

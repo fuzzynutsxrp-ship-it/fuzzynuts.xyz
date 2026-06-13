@@ -64,7 +64,6 @@ var FuzzyScoreSubmit = (function () {
   // by src/features/arcade/slugAliases.ts at the React boundary, but
   // games call FuzzyScoreSubmit() directly with the backend slug.
   var SCORE_CAPS = {
-    "top-secret": 999999,
     mario: 99999,
     survivors: 999999,
     minigolf: 10500,
@@ -225,7 +224,7 @@ var FuzzyScoreSubmit = (function () {
 
   /**
    * Submit a score from a game page.
-   * @param {string} game      - Backend game slug ('mario', 'survivors', 'minigolf', 'racer', 'top-secret', 'fuzzynuts-world')
+   * @param {string} game      - Backend game slug ('mario', 'survivors', 'minigolf', 'racer', 'fuzzynuts-world')
    * @param {number} score     - The player's score
    * @param {number} duration  - Seconds played (for anti-cheat)
    * @returns {{ success: boolean, reason?: string }}
