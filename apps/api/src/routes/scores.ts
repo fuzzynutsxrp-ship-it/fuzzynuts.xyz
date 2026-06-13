@@ -21,6 +21,8 @@ import { jwtVerify } from "jose";
 import { type Db, MongoClient } from "mongodb";
 import {
   verifySessionToken,
+  verifyPayload,
+  buildScoreMessage,
 } from "@fuzzynuts/shared-anticheat";
 import {
   upsertGoogleUser,
@@ -325,6 +327,50 @@ export function buildScoresRouter(env: {
           displayName: "Guest",
           provider: "google",
         };
+      }
+
+      // ── HMAC signature verification ──────────────────────
+      // If X-Score-Hmac header is present, verify the HMAC.
+      // If missing, fall back to existing auth (backward compat during rollout).
+      const hmacSignature = req.headers["x-score-hmac"] as string | undefined;
+      const hmacNonce = req.headers["x-score-nonce"] as string | undefined;
+
+      if (hmacSignature) {
+        if (!hmacNonce) {
+          return res.status(401).json({
+            error: "E_HMAC_NONCE_MISSING",
+            message: "X-Score-Nonce header required when X-Score-Hmac is present",
+          });
+        }
+
+        const expectedDuration = duration ?? 0;
+        const expectedWeekKey = weekKey ?? getCurrentWeekKey();
+        const walletAddress = authUser.wallet ?? "";
+
+        const message = buildScoreMessage({
+          game,
+          score,
+          duration: expectedDuration,
+          nonce: hmacNonce,
+          wallet: walletAddress,
+          weekKey: expectedWeekKey,
+        });
+
+        const isValid = await verifyPayload(
+          message,
+          hmacSignature,
+          env.GAME_SESSION_SECRET,
+        );
+
+        if (!isValid) {
+          console.warn(
+            `[scores] ❌ HMAC verification failed for ${authUser.displayName} on ${game}`,
+          );
+          return res.status(401).json({
+            error: "E_HMAC_INVALID",
+            message: "Invalid HMAC signature",
+          });
+        }
       }
 
       // ── Validate score cap ───────────────────────────────
