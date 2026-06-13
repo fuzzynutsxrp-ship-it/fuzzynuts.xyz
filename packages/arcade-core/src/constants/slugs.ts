@@ -29,7 +29,12 @@ export type GameSlug =
   | "subway-runner"
   | "jetpack"
   | "ski-free"
-  | "doodle-jump";
+  | "doodle-jump"
+  | "2048"
+  | "memory"
+  | "minesweeper"
+  | "sudoku"
+  | "wordle";
 
 /** Every canonical slug, in display order. */
 export const GAME_SLUGS: readonly GameSlug[] = [
@@ -51,6 +56,11 @@ export const GAME_SLUGS: readonly GameSlug[] = [
   "jetpack",
   "ski-free",
   "doodle-jump",
+  "2048",
+  "memory",
+  "minesweeper",
+  "sudoku",
+  "wordle",
 ] as const;
 
 /**
@@ -86,6 +96,11 @@ export const ID_TO_SLUG: Record<string, GameSlug> = {
   "jetpack": "jetpack",
   "ski-free": "ski-free",
   "doodle-jump": "doodle-jump",
+  "2048": "2048",
+  "memory": "memory",
+  "minesweeper": "minesweeper",
+  "sudoku": "sudoku",
+  "wordle": "wordle",
 };
 
 /** Reverse: canonical slug → legacy id used by GAMES[] in the web-arcade UI. */
@@ -108,6 +123,11 @@ export const SLUG_TO_LEGACY_ID: Record<GameSlug, string> = {
   "jetpack": "jetpack",
   "ski-free": "ski-free",
   "doodle-jump": "doodle-jump",
+  "2048": "2048",
+  "memory": "memory",
+  "minesweeper": "minesweeper",
+  "sudoku": "sudoku",
+  "wordle": "wordle",
 };
 
 /**

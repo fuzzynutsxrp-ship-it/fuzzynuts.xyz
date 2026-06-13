@@ -43,6 +43,11 @@ apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/tetris/
 !apps/web-arcade/public/games/asteroids/
 !apps/web-arcade/public/games/doodle-jump/
+!apps/web-arcade/public/games/wordle/
+!apps/web-arcade/public/games/sudoku/
+!apps/web-arcade/public/games/minesweeper/
+!apps/web-arcade/public/games/memory/
+!apps/web-arcade/public/games/2048/
 !apps/web-arcade/public/games/ski-free/
 !apps/web-arcade/public/games/jetpack/
 !apps/web-arcade/public/games/subway-runner/
