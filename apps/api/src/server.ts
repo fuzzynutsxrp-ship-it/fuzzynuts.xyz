@@ -142,7 +142,7 @@ async function bootstrap() {
   try {
     const { buildGameSessionRouter } = await import("./routes/game-session");
     app.use(
-      "/api/auth",
+      "/api/game-session",
       buildGameSessionRouter({
         GAME_SESSION_SECRET,
         OPENRSC_GAME_ENDPOINT: process.env.OPENRSC_GAME_ENDPOINT,

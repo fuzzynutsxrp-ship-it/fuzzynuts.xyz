@@ -1,5 +1,5 @@
 /**
- * POST /api/auth/game-session — mint a game session token
+ * POST /api/game-session — mint a game session token
  *
  * Gated by GAME_SERVER_READY env var:
  *   - unset/false → 503 "provisioning" (game VPS not yet live)
@@ -16,7 +16,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { mintNonce, signPayload } from "@fuzzynuts/shared-anticheat";
-import { formatGameChallenge } from "@fuzzynuts/xrpl-token-utils/verify";
+import { formatGameChallenge, verifyMessageSignature } from "@fuzzynuts/xrpl-token-utils/verify";
 
 const GAME_SESSION_TTL_MS = 5 * 60 * 1000; // 5 min
 const XRPL_ADDR = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -40,7 +40,7 @@ export function buildGameSessionRouter(env: {
   const gameEndpoint = env.OPENRSC_GAME_ENDPOINT ?? "fuzzynuts.xyz:43594";
   const serverReady = env.GAME_SERVER_READY === "true";
 
-  router.post("/game-session", async (req, res) => {
+  router.post("/", async (req, res) => {
     // ── Env-driven toggle: block until game VPS is live ───────
     if (!serverReady) {
       return res.status(503).json({
@@ -58,38 +58,31 @@ export function buildGameSessionRouter(env: {
       parsed.data;
 
     // 1. Validate the challenge exists and hasn't expired
-    //    Skip challenge verification when frontend sends placeholder values
-    //    (full challenge flow not yet wired up in frontend)
-    const isPlaceholder = challengeId === "placeholder";
-    if (!isPlaceholder) {
-      const challengeRecord = env.challengeStore.get(challengeId);
-      if (!challengeRecord) {
-        return res.status(404).json({ error: "E_CHALLENGE_NOT_FOUND" });
-      }
-      if (challengeRecord.exp < Date.now()) {
-        env.challengeStore.delete(challengeId);
-        return res.status(410).json({ error: "E_CHALLENGE_EXPIRED" });
-      }
-      if (challengeRecord.address !== walletAddress) {
-        return res.status(403).json({ error: "E_ADDRESS_MISMATCH" });
-      }
+    const challengeRecord = env.challengeStore.get(challengeId);
+    if (!challengeRecord) {
+      return res.status(404).json({ error: "E_CHALLENGE_NOT_FOUND" });
+    }
+    if (challengeRecord.exp < Date.now()) {
+      env.challengeStore.delete(challengeId);
+      return res.status(410).json({ error: "E_CHALLENGE_EXPIRED" });
+    }
+    if (challengeRecord.address !== walletAddress) {
+      return res.status(403).json({ error: "E_ADDRESS_MISMATCH" });
     }
 
     // 2. Verify XRPL signature
     //    The challenge string was issued by /api/auth/challenge and stored
     //    in the challenge store. The wallet signed this exact string.
     //    We verify it matches the wallet's public key.
-    //
-    //    import { verifyMessageSignature } from "@fuzzynuts/xrpl-token-utils/verify";
-    //    const result = verifyMessageSignature({
-    //      message: challengeRecord.challenge,
-    //      signature,
-    //      publicKey,
-    //      expectedAddress: walletAddress,
-    //    });
-    //    if (!result.valid || !result.addressMatch) {
-    //      return res.status(401).json({ error: "E_INVALID_SIGNATURE" });
-    //    }
+    const result = verifyMessageSignature({
+      message: challengeRecord.challenge,
+      signature,
+      publicKey,
+      expectedAddress: walletAddress,
+    });
+    if (!result.valid || !result.addressMatch) {
+      return res.status(401).json({ error: "E_INVALID_SIGNATURE" });
+    }
 
     // 3. Clean up the used challenge
     env.challengeStore.delete(challengeId);
