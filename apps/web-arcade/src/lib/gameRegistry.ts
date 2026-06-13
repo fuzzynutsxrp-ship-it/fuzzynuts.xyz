@@ -47,6 +47,8 @@ export interface GameMetadata {
   loadingTips: string[];
   /** Touch control hint for mobile devices (empty string for keyboard-only games) */
   touchHint: string;
+  /** Whether the game needs cross-origin isolation (SharedArrayBuffer / WASM threads) */
+  crossOriginIsolated?: boolean;
 }
 
 const DEFAULT_SANDBOX =
@@ -115,7 +117,8 @@ export const GAME_LIST: GameMetadata[] = [
     controls: ["Mouse click + drag to aim", "Release to putt", "Scroll to zoom"],
     iconPath: "/icons/icon-putt-pop.webp",
     iframePath: "/games/minigolf/",
-    sandbox: DEFAULT_SANDBOX,
+    sandbox: DEFAULT_SANDBOX + " allow-cross-origin-isolated",
+    crossOriginIsolated: true,
     leaderboardEnabled: true,
     achievementsEnabled: false,
     status: "live",

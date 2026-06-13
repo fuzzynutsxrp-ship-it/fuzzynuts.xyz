@@ -291,6 +291,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   const defaultSandbox =
     "allow-scripts allow-same-origin allow-popups allow-forms";
 
+  // Build allow policy — add cross-origin-isolated for games that need SharedArrayBuffer
+  const allowPolicy = useMemo(() => {
+    const base = "autoplay; fullscreen; gamepad";
+    return game?.crossOriginIsolated ? `${base}; cross-origin-isolated` : base;
+  }, [game?.crossOriginIsolated]);
+
   return createPortal(
     <dialog
       ref={dialogRef}
@@ -456,7 +462,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
             title={`Play ${game.title}`}
             sandbox={game.sandbox || defaultSandbox}
             loading="eager"
-            allow="autoplay; fullscreen; gamepad"
+            allow={allowPolicy}
             onLoad={handleIframeLoad}
             className="game-modal__iframe"
             aria-label={`${game.title} game window`}
