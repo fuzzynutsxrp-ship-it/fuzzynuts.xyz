@@ -47,7 +47,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Fuzzynuts — Play 6 Free Browser Games Instantly",
+    default: "Fuzzynuts — Play 38+ Free Online Games Instantly",
     template: "%s | FuzzyNuts",
   },
   description:
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: "Fuzzynuts",
-    title: "Fuzzynuts — Play 6 Free Browser Games Instantly",
+    title: "Fuzzynuts — Play 38+ Free Online Games Instantly",
     description:
       "Compete in weekly tournaments, climb the global leaderboard, and unlock achievements. No downloads required.",
     images: [
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
         url: "/images/og/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Fuzzynuts — Play 6 Free Browser Games Instantly",
+        alt: "Fuzzynuts — Play 38+ Free Online Games Instantly",
         type: "image/png",
       },
     ],
@@ -93,12 +93,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@fuzzynutsxrp",
     creator: "@fuzzynutsxrp",
-    title: "Fuzzynuts — Play 6 Free Browser Games Instantly",
+    title: "Fuzzynuts — Play 38+ Free Online Games Instantly",
     description:
       "🐿️ Compete in weekly tournaments, climb the leaderboard, and unlock achievements. No downloads needed!",
     images: {
       url: "/images/og/og-image.png",
-      alt: "Fuzzynuts — Play 6 Free Browser Games Instantly",
+      alt: "Fuzzynuts — Play 38+ Free Online Games Instantly",
     },
   },
   robots: ALLOW_INDEXING

@@ -9,9 +9,12 @@ export const metadata: Metadata = {
     title: "Global Leaderboard | Fuzzynuts",
     description:
       "Unified rankings for Google and XRPL players. Play free, climb the ranks.",
-    url: "https://fuzzynuts.xyz/leaderboard",
+    url: "https://www.fuzzynuts.xyz/leaderboard",
     siteName: "Fuzzynuts",
     type: "website",
+  },
+  alternates: {
+    canonical: "/leaderboard/",
   },
 };
 

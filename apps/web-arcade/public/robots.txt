@@ -1,11 +1,11 @@
-# Fuzzynuts — https://fuzzynuts.xyz
+# Fuzzynuts — https://www.fuzzynuts.xyz
 # Web2 gaming portal — clean sitemap, block crypto/internal routes
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://fuzzynuts.xyz/sitemap.xml
+Sitemap: https://www.fuzzynuts.xyz/sitemap.xml
 
 # Block internal/dev paths
 Disallow: /_next/
