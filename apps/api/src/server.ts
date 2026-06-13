@@ -75,15 +75,7 @@ app.use(
 app.use(express.json({ limit: "16kb" }));
 
 app.get("/healthz", (_req, res) => {
-  const envStatus = {
-    WALLET_JWT_SECRET: !!WALLET_JWT_SECRET,
-    GAME_SESSION_SECRET: !!GAME_SESSION_SECRET,
-    MONGODB_URI: !!MONGODB_URI,
-    RSC_PASSWORD_SECRET: !!RSC_PASSWORD_SECRET,
-    OPENAI_API_KEY: !!OPENAI_API_KEY,
-    ADMIN_WALLET_ADDRESS: !!ADMIN_WALLET_ADDRESS,
-  };
-  res.json({ ok: true, rsc: true, version: "2.1", env: envStatus });
+  res.json({ ok: true });
 });
 
 // ── Bootstrap routers — wrap each import in try/catch so a broken

@@ -124,7 +124,8 @@
     try {
       var fromUser = await xumm.user.account;
       var account = fromUser || (xumm.state && xumm.state.account);
-      if (typeof account === 'string' && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(account)) {
+      // Exactly 34 chars: r + 33 base58 chars (matches tightened server regex)
+      if (typeof account === 'string' && /^r[1-9A-HJ-NP-Za-km-z]{33}$/.test(account)) {
         return account;
       }
       return null;
@@ -275,12 +276,32 @@
         }
       });
 
-      // 2. Send the Xaman-authenticated address to our API
+      // 2. Get the OAuth token from the Xaman SDK
+      //    The SDK stores the token after successful authorize()
+      var oauthToken = null;
+      try {
+        // Xaman SDK exposes the token via .token after authorize
+        oauthToken = (xumm.token && typeof xumm.token === 'string')
+          ? xumm.token
+          : (xumm.state && xumm.state.token) || null;
+      } catch (e) {
+        console.warn('[auth] Could not read Xaman OAuth token:', e);
+      }
+
+      if (!oauthToken) {
+        throw new Error('Xaman OAuth token not available. Please try connecting again.');
+      }
+
+      // 3. Send both the address AND the OAuth token to our API
+      //    Server validates the token via Xaman userinfo endpoint
       var res = await fetch(API_BASE + '/api/auth/wallet-login', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: address }),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',  // CSRF protection
+        },
+        body: JSON.stringify({ address: address, token: oauthToken }),
       });
 
       if (res.ok) {

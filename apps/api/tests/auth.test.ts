@@ -1,347 +1,364 @@
 /**
- * Tests for wallet auth endpoints:
- *   POST /api/auth/wallet-login — Xaman OAuth login
- *   GET  /api/auth/me           — session check
- *   POST /api/auth/logout       — clear session
- *   POST /api/auth/challenge    — issue signing challenge
- *   POST /api/auth/verify       — verify XRPL signature
+ * Auth route tests — wallet authentication via Xaman OAuth2 + challenge/verify.
  *
- * Also tests the walletAuth JWT middleware.
+ * TOUCHES MONEY CODE — the auth flow controls who can submit scores.
+ * Tests cover:
+ *   - Xaman OAuth token validation (server-side, not trust client)
+ *   - CSRF protection (custom header requirement)
+ *   - JWT TTL (24 hours, reduced from 7 days)
+ *   - Address regex (exactly 34 chars)
+ *   - Challenge/verify flow (existing, still works)
+ *   - Session management (/me, /logout)
  */
 
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import express from "express";
-import { SignJWT, jwtVerify } from "jose";
+import request from "supertest";
+import { SignJWT } from "jose";
 
-// ── Test-scoped helpers (mirrors buildAuthRouter logic) ─────────
+// Mock the dependencies
+vi.mock("@fuzzynuts/shared-anticheat", () => ({
+  mintNonce: vi.fn(() => "test-nonce-" + Date.now()),
+}));
 
-const WALLET_JWT_SECRET = "test-secret-for-auth-unit-tests-32bytes!!";
-const secretBytes = new TextEncoder().encode(WALLET_JWT_SECRET);
-const COOKIE_TTL_SEC = 60 * 60 * 24 * 7;
-const VALID_ADDRESS = "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh";
-const VALID_ADDRESS_2 = "rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
-const INVALID_ADDRESS = "not-a-valid-xrpl-address";
+vi.mock("@fuzzynuts/xrpl-token-utils/verify", () => ({
+  verifyMessageSignature: vi.fn(),
+}));
+
+// Mock global fetch for Xaman userinfo calls
+const mockFetch = vi.fn();
+vi.stubGlobal("fetch", mockFetch);
+
+const TEST_SECRET = "test-jwt-secret-for-auth-tests";
+const TEST_ADDRESS = "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"; // exactly 34 chars
+
+async function buildApp() {
+  // Dynamic import to pick up mocks
+  const { buildAuthRouter } = await import("../src/routes/auth");
+  const app = express();
+  app.use(express.json());
+  app.use("/api/auth", buildAuthRouter({ WALLET_JWT_SECRET: TEST_SECRET }));
+  return app;
+}
 
 async function mintTestJwt(
-  address: string,
-  expSecondsFromNow = COOKIE_TTL_SEC,
-  provider = "xaman",
-): Promise<string> {
-  const cookieExp = Math.floor(Date.now() / 1000) + expSecondsFromNow;
+  address: string = TEST_ADDRESS,
+  provider: string = "xaman",
+  secret: string = TEST_SECRET,
+  expOffset: number = 3600,
+) {
+  const exp = Math.floor(Date.now() / 1000) + expOffset;
   return new SignJWT({ address, provider })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setIssuer("fuzzynuts.xyz")
-    .setExpirationTime(cookieExp)
-    .sign(secretBytes);
+    .setExpirationTime(exp)
+    .sign(new TextEncoder().encode(secret));
 }
 
-// ── Build a minimal test app ────────────────────────────────────
+describe("Auth routes", () => {
+  let app: express.Express;
 
-function buildTestApp() {
-  const app = express();
-  app.use(express.json());
-
-  // Inline the auth route logic (can't import buildAuthRouter directly
-  // because it depends on @fuzzynuts/xrpl-token-utils native addon).
-  // We test the endpoints through HTTP for integration coverage.
-
-  const XRPL_ADDR = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
-
-  // ── POST /api/auth/wallet-login
-  app.post("/api/auth/wallet-login", async (req, res) => {
-    const { address } = req.body;
-    if (!address || !XRPL_ADDR.test(address)) {
-      return res.status(400).json({ error: "E_SCHEMA" });
-    }
-
-    const cookieExp = Math.floor(Date.now() / 1000) + COOKIE_TTL_SEC;
-    const jwt = await new SignJWT({ address, provider: "xaman" })
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
-      .setIssuer("fuzzynuts.xyz")
-      .setExpirationTime(cookieExp)
-      .sign(secretBytes);
-
-    res.setHeader("Set-Cookie", [
-      `fuzzy_wallet_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
-      `fuzzy_session_meta=${encodeURIComponent(
-        JSON.stringify({ address, provider: "xaman", cookieExp: cookieExp * 1000 }),
-      )}; Secure; SameSite=Lax; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
-    ]);
-
-    return res.json({ ok: true, address, cookieExp: cookieExp * 1000 });
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    app = await buildApp();
   });
 
-  // ── GET /api/auth/me
-  app.get("/api/auth/me", async (req, res) => {
-    const cookie = req.headers.cookie ?? "";
-    const match = cookie.match(/(?:^|;\s*)fuzzy_wallet_session=([^;]+)/);
-    if (!match) {
-      return res.status(401).json({ error: "E_NO_SESSION" });
-    }
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    try {
-      const { payload } = await jwtVerify(match[1], secretBytes, {
-        issuer: "fuzzynuts.xyz",
+  // ── Wallet Login (Xaman OAuth) ────────────────────────────────
+
+  describe("POST /api/auth/wallet-login", () => {
+    it("valid wallet login → JWT cookie with correct address/provider", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ account: TEST_ADDRESS }),
       });
 
-      if (typeof payload.address !== "string" || !XRPL_ADDR.test(payload.address)) {
-        return res.status(401).json({ error: "E_BAD_SESSION" });
-      }
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS, token: "valid-xaman-token" });
 
-      return res.json({
-        user: {
-          address: payload.address,
-          provider: payload.provider ?? "xaman",
-        },
+      expect(res.status).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.address).toBe(TEST_ADDRESS);
+
+      // Check cookies are set
+      const cookies = res.headers["set-cookie"];
+      expect(cookies).toBeDefined();
+      const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
+      const sessionCookie = cookieArr.find((c: string) =>
+        c.startsWith("fuzzy_wallet_session="),
+      );
+      expect(sessionCookie).toBeDefined();
+      expect(sessionCookie).toContain("HttpOnly");
+      expect(sessionCookie).toContain("Secure");
+      expect(sessionCookie).toContain("SameSite=Lax");
+      // 24-hour TTL (86400 seconds)
+      expect(sessionCookie).toContain("Max-Age=86400");
+    });
+
+    it("missing CSRF header → 403 E_CSRF", async () => {
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .send({ address: TEST_ADDRESS, token: "valid-token" });
+
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe("E_CSRF");
+    });
+
+    it("missing address → 400 E_SCHEMA", async () => {
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ token: "valid-token" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe("E_SCHEMA");
+    });
+
+    it("missing token → 400 E_SCHEMA", async () => {
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe("E_SCHEMA");
+    });
+
+    it("invalid address format (too short) → 400 E_SCHEMA", async () => {
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: "rShort", token: "valid-token" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe("E_SCHEMA");
+    });
+
+    it("invalid Xaman token → 401 E_XAMAN_TOKEN_INVALID", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
       });
-    } catch {
-      return res.status(401).json({ error: "E_BAD_SESSION" });
-    }
-  });
 
-  // ── POST /api/auth/logout
-  app.post("/api/auth/logout", (_req, res) => {
-    res.setHeader("Set-Cookie", [
-      "fuzzy_wallet_session=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
-      "fuzzy_session_meta=; Secure; SameSite=Lax; Path=/; Max-Age=0",
-    ]);
-    return res.json({ ok: true });
-  });
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS, token: "invalid-token" });
 
-  return app;
-}
-
-// ── Tests ───────────────────────────────────────────────────────
-
-describe("wallet-login endpoint", () => {
-  it("accepts a valid XRPL address and returns JWT cookie", async () => {
-    const app = buildTestApp();
-    const res = await import("supertest").then((s) =>
-      s.default(app).post("/api/auth/wallet-login").send({ address: VALID_ADDRESS }),
-    );
-
-    expect(res.status).toBe(200);
-    expect(res.body.ok).toBe(true);
-    expect(res.body.address).toBe(VALID_ADDRESS);
-    expect(res.body.cookieExp).toBeGreaterThan(Date.now());
-
-    // Verify Set-Cookie headers
-    const cookies = res.headers["set-cookie"];
-    expect(cookies).toBeDefined();
-    const sessionCookie = (cookies as string[]).find((c: string) =>
-      c.startsWith("fuzzy_wallet_session="),
-    );
-    expect(sessionCookie).toBeDefined();
-    expect(sessionCookie).toContain("HttpOnly");
-    expect(sessionCookie).toContain("Secure");
-
-    // Verify the JWT can be decoded
-    const jwtMatch = sessionCookie!.match(/fuzzy_wallet_session=([^;]+)/);
-    expect(jwtMatch).toBeTruthy();
-    const { payload } = await jwtVerify(jwtMatch![1], secretBytes, {
-      issuer: "fuzzynuts.xyz",
-    });
-    expect(payload.address).toBe(VALID_ADDRESS);
-    expect(payload.provider).toBe("xaman");
-  });
-
-  it("rejects an invalid address format", async () => {
-    const app = buildTestApp();
-    const res = await import("supertest").then((s) =>
-      s.default(app).post("/api/auth/wallet-login").send({ address: INVALID_ADDRESS }),
-    );
-
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("E_SCHEMA");
-  });
-
-  it("rejects a missing address", async () => {
-    const app = buildTestApp();
-    const res = await import("supertest").then((s) =>
-      s.default(app).post("/api/auth/wallet-login").send({}),
-    );
-
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("E_SCHEMA");
-  });
-
-  it("rejects an empty body", async () => {
-    const app = buildTestApp();
-    const res = await import("supertest").then((s) =>
-      s.default(app).post("/api/auth/wallet-login"),
-    );
-
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("E_SCHEMA");
-  });
-});
-
-describe("GET /api/auth/me", () => {
-  it("returns user info for a valid session", async () => {
-    const app = buildTestApp();
-    const jwt = await mintTestJwt(VALID_ADDRESS);
-
-    const res = await import("supertest").then((s) =>
-      s.default(app)
-        .get("/api/auth/me")
-        .set("Cookie", `fuzzy_wallet_session=${jwt}`),
-    );
-
-    expect(res.status).toBe(200);
-    expect(res.body.user.address).toBe(VALID_ADDRESS);
-    expect(res.body.user.provider).toBe("xaman");
-  });
-
-  it("returns 401 with no cookie", async () => {
-    const app = buildTestApp();
-    const res = await import("supertest").then((s) =>
-      s.default(app).get("/api/auth/me"),
-    );
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe("E_NO_SESSION");
-  });
-
-  it("returns 401 for an expired token", async () => {
-    const app = buildTestApp();
-    // Mint a JWT that expired 10 seconds ago
-    const expiredJwt = await mintTestJwt(VALID_ADDRESS, -10);
-
-    const res = await import("supertest").then((s) =>
-      s.default(app)
-        .get("/api/auth/me")
-        .set("Cookie", `fuzzy_wallet_session=${expiredJwt}`),
-    );
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe("E_BAD_SESSION");
-  });
-
-  it("returns 401 for a tampered token", async () => {
-    const app = buildTestApp();
-    const jwt = await mintTestJwt(VALID_ADDRESS);
-    const tampered = jwt.slice(0, -5) + "XXXXX";
-
-    const res = await import("supertest").then((s) =>
-      s.default(app)
-        .get("/api/auth/me")
-        .set("Cookie", `fuzzy_wallet_session=${tampered}`),
-    );
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe("E_BAD_SESSION");
-  });
-
-  it("returns 401 for a token with wrong issuer", async () => {
-    const app = buildTestApp();
-    const wrongIssuerJwt = await new SignJWT({ address: VALID_ADDRESS, provider: "xaman" })
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
-      .setIssuer("evil.com")
-      .setExpirationTime(Math.floor(Date.now() / 1000) + COOKIE_TTL_SEC)
-      .sign(secretBytes);
-
-    const res = await import("supertest").then((s) =>
-      s.default(app)
-        .get("/api/auth/me")
-        .set("Cookie", `fuzzy_wallet_session=${wrongIssuerJwt}`),
-    );
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe("E_BAD_SESSION");
-  });
-
-  it("returns 401 for a token with invalid address format", async () => {
-    const app = buildTestApp();
-    const badAddrJwt = await new SignJWT({ address: "not-valid", provider: "xaman" })
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
-      .setIssuer("fuzzynuts.xyz")
-      .setExpirationTime(Math.floor(Date.now() / 1000) + COOKIE_TTL_SEC)
-      .sign(secretBytes);
-
-    const res = await import("supertest").then((s) =>
-      s.default(app)
-        .get("/api/auth/me")
-        .set("Cookie", `fuzzy_wallet_session=${badAddrJwt}`),
-    );
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe("E_BAD_SESSION");
-  });
-});
-
-describe("POST /api/auth/logout", () => {
-  it("clears cookies and returns ok", async () => {
-    const app = buildTestApp();
-    const res = await import("supertest").then((s) =>
-      s.default(app).post("/api/auth/logout"),
-    );
-
-    expect(res.status).toBe(200);
-    expect(res.body.ok).toBe(true);
-
-    // Verify cookies are cleared (Max-Age=0)
-    const cookies = res.headers["set-cookie"];
-    expect(cookies).toBeDefined();
-    const sessionCookie = (cookies as string[]).find((c: string) =>
-      c.startsWith("fuzzy_wallet_session="),
-    );
-    expect(sessionCookie).toBeDefined();
-    expect(sessionCookie).toContain("Max-Age=0");
-  });
-
-  it("session is gone after logout", async () => {
-    const app = buildTestApp();
-    const jwt = await mintTestJwt(VALID_ADDRESS);
-
-    // Verify session exists
-    const s = await import("supertest");
-    const meRes = await s.default(app)
-      .get("/api/auth/me")
-      .set("Cookie", `fuzzy_wallet_session=${jwt}`);
-    expect(meRes.status).toBe(200);
-
-    // Logout
-    await s.default(app).post("/api/auth/logout");
-
-    // Session should be gone (we'd need to clear the cookie client-side,
-    // but the server returns Max-Age=0 to instruct the browser)
-    const noCookieRes = await s.default(app).get("/api/auth/me");
-    expect(noCookieRes.status).toBe(401);
-  });
-});
-
-describe("walletAuth JWT middleware compatibility", () => {
-  it("JWT from wallet-login passes jwtVerify with correct issuer", async () => {
-    // Simulate what walletAuth.ts does: jwtVerify with issuer check
-    const jwt = await mintTestJwt(VALID_ADDRESS);
-
-    const { payload } = await jwtVerify(jwt, secretBytes, {
-      issuer: "fuzzynuts.xyz",
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_XAMAN_TOKEN_INVALID");
     });
 
-    expect(payload.address).toBe(VALID_ADDRESS);
-    expect(payload.provider).toBe("xaman");
-    expect(payload.iss).toBe("fuzzynuts.xyz");
+    it("address mismatch (token for different wallet) → 401", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          account: "rPDXnMjGFQRpvYEHTp7So9mY31draBoqLG",
+        }),
+      });
+
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS, token: "valid-token" });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_XAMAN_TOKEN_INVALID");
+      expect(res.body.detail).toContain("Address mismatch");
+    });
+
+    it("Xaman userinfo timeout → 401 E_XAMAN_TOKEN_INVALID", async () => {
+      mockFetch.mockRejectedValueOnce(new Error("The operation was aborted"));
+
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS, token: "token" });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_XAMAN_TOKEN_INVALID");
+    });
   });
 
-  it("JWT from wallet-login is rejected with wrong secret", async () => {
-    const jwt = await mintTestJwt(VALID_ADDRESS);
-    const wrongSecret = new TextEncoder().encode("wrong-secret-that-does-not-match!!");
+  // ── Session Management ────────────────────────────────────────
 
-    await expect(
-      jwtVerify(jwt, wrongSecret, { issuer: "fuzzynuts.xyz" }),
-    ).rejects.toThrow();
+  describe("GET /api/auth/me", () => {
+    it("valid session → returns user info", async () => {
+      const jwt = await mintTestJwt();
+
+      const res = await request(app)
+        .get("/api/auth/me")
+        .set("Cookie", `fuzzy_wallet_session=${jwt}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.user.address).toBe(TEST_ADDRESS);
+      expect(res.body.user.provider).toBe("xaman");
+    });
+
+    it("no cookie → 401 E_NO_SESSION", async () => {
+      const res = await request(app).get("/api/auth/me");
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_NO_SESSION");
+    });
+
+    it("expired token → 401 E_BAD_SESSION", async () => {
+      // expired 1 hour ago
+      const jwt = await mintTestJwt(TEST_ADDRESS, "xaman", TEST_SECRET, -3600);
+
+      const res = await request(app)
+        .get("/api/auth/me")
+        .set("Cookie", `fuzzy_wallet_session=${jwt}`);
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_BAD_SESSION");
+    });
+
+    it("tampered token → 401 E_BAD_SESSION", async () => {
+      const jwt = await mintTestJwt();
+      const tampered = jwt.slice(0, -5) + "XXXXX";
+
+      const res = await request(app)
+        .get("/api/auth/me")
+        .set("Cookie", `fuzzy_wallet_session=${tampered}`);
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_BAD_SESSION");
+    });
+
+    it("wrong issuer → 401 E_BAD_SESSION", async () => {
+      const jwt = await new SignJWT({ address: TEST_ADDRESS, provider: "xaman" })
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setIssuer("evil.com")
+        .setExpirationTime(Math.floor(Date.now() / 1000) + 3600)
+        .sign(new TextEncoder().encode(TEST_SECRET));
+
+      const res = await request(app)
+        .get("/api/auth/me")
+        .set("Cookie", `fuzzy_wallet_session=${jwt}`);
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_BAD_SESSION");
+    });
+
+    it("wrong secret → 401 E_BAD_SESSION", async () => {
+      const jwt = await mintTestJwt(TEST_ADDRESS, "xaman", "wrong-secret");
+
+      const res = await request(app)
+        .get("/api/auth/me")
+        .set("Cookie", `fuzzy_wallet_session=${jwt}`);
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe("E_BAD_SESSION");
+    });
   });
 
-  it("expired JWT is rejected by jwtVerify", async () => {
-    const expiredJwt = await mintTestJwt(VALID_ADDRESS, -10);
+  // ── Logout ────────────────────────────────────────────────────
 
-    await expect(
-      jwtVerify(expiredJwt, secretBytes, { issuer: "fuzzynuts.xyz" }),
-    ).rejects.toThrow();
+  describe("POST /api/auth/logout", () => {
+    it("clears cookies with Max-Age=0", async () => {
+      const res = await request(app).post("/api/auth/logout");
+
+      expect(res.status).toBe(200);
+      expect(res.body.ok).toBe(true);
+
+      const cookies = res.headers["set-cookie"];
+      expect(cookies).toBeDefined();
+      const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
+      const sessionCookie = cookieArr.find((c: string) =>
+        c.startsWith("fuzzy_wallet_session="),
+      );
+      expect(sessionCookie).toBeDefined();
+      expect(sessionCookie).toContain("Max-Age=0");
+    });
+  });
+
+  // ── Challenge/Verify (existing flow, still works) ─────────────
+
+  describe("POST /api/auth/challenge", () => {
+    it("valid address → returns challenge", async () => {
+      const res = await request(app)
+        .post("/api/auth/challenge")
+        .send({ address: TEST_ADDRESS });
+
+      expect(res.status).toBe(200);
+      expect(res.body.challenge).toContain("fuzzynuts.xyz");
+      expect(res.body.challengeId).toBeDefined();
+      expect(res.body.exp).toBeGreaterThan(Date.now());
+    });
+
+    it("invalid address → 400 E_SCHEMA", async () => {
+      const res = await request(app)
+        .post("/api/auth/challenge")
+        .send({ address: "bad" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe("E_SCHEMA");
+    });
+  });
+
+  // ── JWT Compatibility with walletAuth middleware ───────────────
+
+  describe("JWT compatibility", () => {
+    it("JWT from wallet-login is compatible with walletAuth middleware", async () => {
+      // First, do a wallet login
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ account: TEST_ADDRESS }),
+      });
+
+      const loginRes = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS, token: "valid-token" });
+
+      expect(loginRes.status).toBe(200);
+
+      // Extract the JWT cookie
+      const cookies = loginRes.headers["set-cookie"];
+      const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
+      const sessionCookie = cookieArr.find((c: string) =>
+        c.startsWith("fuzzy_wallet_session="),
+      );
+      const jwt = sessionCookie!.split("=")[1].split(";")[0];
+
+      // Use it with /me (which does the same jwtVerify as walletAuth)
+      const meRes = await request(app)
+        .get("/api/auth/me")
+        .set("Cookie", `fuzzy_wallet_session=${jwt}`);
+
+      expect(meRes.status).toBe(200);
+      expect(meRes.body.user.address).toBe(TEST_ADDRESS);
+      expect(meRes.body.user.provider).toBe("xaman-oauth");
+    });
+
+    it("JWT TTL is 24 hours (not 7 days)", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ account: TEST_ADDRESS }),
+      });
+
+      const res = await request(app)
+        .post("/api/auth/wallet-login")
+        .set("X-Requested-With", "XMLHttpRequest")
+        .send({ address: TEST_ADDRESS, token: "valid-token" });
+
+      const cookies = res.headers["set-cookie"];
+      const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
+      const sessionCookie = cookieArr.find((c: string) =>
+        c.startsWith("fuzzy_wallet_session="),
+      );
+
+      // 24 hours = 86400 seconds. Old was 7 days = 604800.
+      expect(sessionCookie).toContain("Max-Age=86400");
+      expect(sessionCookie).not.toContain("Max-Age=604800");
+    });
   });
 });

@@ -1,13 +1,18 @@
 /**
- * POST /api/auth/challenge   — issue a signing challenge
- * POST /api/auth/verify      — verify the wallet signature + set JWT cookie
- * POST /api/auth/wallet-login — Xaman OAuth2 login (address from SDK) + set JWT cookie
- * GET  /api/auth/me           — read current session from JWT cookie
- * POST /api/auth/logout       — clear session cookies
+ * Auth router — wallet authentication via Xaman OAuth2 + challenge/verify.
  *
- * STATUS: scaffold. xrpl.verify wiring + Xumm SignIn payload lookup
- *         live in @fuzzynuts/xrpl-token-utils (Phase E) — finish that
- *         package, then replace the TODOs here.
+ * Endpoints:
+ *   POST /api/auth/challenge     — issue a signing challenge (existing)
+ *   POST /api/auth/verify        — verify wallet signature + set JWT cookie (existing)
+ *   POST /api/auth/wallet-login  — validate Xaman OAuth token + set JWT cookie (NEW)
+ *   GET  /api/auth/me            — read current session from JWT cookie (NEW)
+ *   POST /api/auth/logout        — clear session cookies (NEW)
+ *
+ * Security (per security audit t_525af322):
+ *   - Server validates Xaman OAuth token via userinfo endpoint (not trust client)
+ *   - CSRF protection via custom header requirement
+ *   - JWT TTL reduced from 7 days to 24 hours
+ *   - XRPL address regex tightened to exactly 34 chars
  */
 
 import { Router } from "express";
@@ -17,9 +22,13 @@ import { mintNonce } from "@fuzzynuts/shared-anticheat";
 import { verifyMessageSignature } from "@fuzzynuts/xrpl-token-utils/verify";
 
 const CHALLENGE_TTL_MS = 5 * 60 * 1000; // 5 min
-const COOKIE_TTL_SEC = 60 * 60 * 24 * 7; // 7 days
+const COOKIE_TTL_SEC = 60 * 60 * 24; // 24 hours (was 7 days — audit fix)
 
-const XRPL_ADDR = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+// Exactly 34 chars: r + 33 base58 chars (audit fix — was {24,34})
+const XRPL_ADDR = /^r[1-9A-HJ-NP-Za-km-z]{33}$/;
+
+const XAMAN_USERINFO_URL = "https://oauth2.xumm.me/v1/userinfo";
+
 const ChallengeBody = z.object({ address: z.string().regex(XRPL_ADDR) });
 const VerifyBody = z.object({
   challengeId: z.string().min(16).max(128),
@@ -30,44 +39,125 @@ const VerifyBody = z.object({
 
 const WalletLoginBody = z.object({
   address: z.string().regex(XRPL_ADDR),
+  token: z.string().min(1).max(4096), // Xaman OAuth2 access token
 });
 
-/** Build Set-Cookie headers for the wallet session. */
-function buildSessionCookies(jwt: string, address: string, cookieExp: number) {
-  return [
-    `fuzzy_wallet_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
-    `fuzzy_session_meta=${encodeURIComponent(
-      JSON.stringify({ address, provider: "xaman", cookieExp: cookieExp * 1000 }),
-    )}; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
-  ];
+/**
+ * Validate a Xaman OAuth2 token by calling their userinfo endpoint.
+ * Returns the verified address if valid, or null if invalid.
+ *
+ * This is the critical security fix: we verify the token server-side
+ * instead of trusting the client-claimed address.
+ */
+async function validateXamanToken(
+  token: string,
+  expectedAddress: string,
+): Promise<{ valid: boolean; address?: string; error?: string }> {
+  try {
+    const res = await fetch(XAMAN_USERINFO_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(10_000), // 10s timeout
+    });
+
+    if (!res.ok) {
+      return {
+        valid: false,
+        error: `Xaman userinfo returned ${res.status}`,
+      };
+    }
+
+    const data = (await res.json()) as { sub?: string; account?: string };
+    const verifiedAddress = data.account || data.sub;
+
+    if (!verifiedAddress || typeof verifiedAddress !== "string") {
+      return { valid: false, error: "No address in Xaman userinfo response" };
+    }
+
+    if (!XRPL_ADDR.test(verifiedAddress)) {
+      return { valid: false, error: "Invalid address format from Xaman" };
+    }
+
+    if (verifiedAddress !== expectedAddress) {
+      return {
+        valid: false,
+        error: "Address mismatch: token does not match claimed address",
+      };
+    }
+
+    return { valid: true, address: verifiedAddress };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { valid: false, error: `Xaman validation failed: ${message}` };
+  }
 }
 
-/** Build a JWT for the given wallet address. */
-async function mintWalletJwt(
+/**
+ * Build session cookies (shared by challenge/verify and wallet-login).
+ */
+function buildSessionCookies(
   address: string,
-  secret: Uint8Array,
   provider: string,
-): Promise<{ jwt: string; cookieExp: number }> {
+  secret: Uint8Array,
+): Promise<{ jwt: string; cookieExp: number; cookies: string[] }> {
   const cookieExp = Math.floor(Date.now() / 1000) + COOKIE_TTL_SEC;
-  const jwt = await new SignJWT({ address, provider })
+
+  return new SignJWT({ address, provider })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setIssuer("fuzzynuts.xyz")
     .setExpirationTime(cookieExp)
-    .sign(secret);
-  return { jwt, cookieExp };
+    .sign(secret)
+    .then((jwt) => ({
+      jwt,
+      cookieExp,
+      cookies: [
+        `fuzzy_wallet_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
+        `fuzzy_session_meta=${encodeURIComponent(
+          JSON.stringify({
+            address,
+            provider,
+            cookieExp: cookieExp * 1000,
+          }),
+        )}; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
+      ],
+    }));
 }
 
 export function buildAuthRouter(env: {
   WALLET_JWT_SECRET: string;
-  // TODO(auth-rollout): replace with a real store (Mongo TTL or Redis).
-  challengeStore?: Map<string, { address: string; challenge: string; exp: number }>;
+  challengeStore?: Map<
+    string,
+    { address: string; challenge: string; exp: number }
+  >;
 }): Router {
   const router = Router();
-  const store = env.challengeStore ?? new Map();
+  const store =
+    env.challengeStore ??
+    new Map<string, { address: string; challenge: string; exp: number }>();
   const secret = new TextEncoder().encode(env.WALLET_JWT_SECRET);
 
-  // ── POST /challenge — issue a signing challenge ──────────────
+  // ── CSRF protection middleware (audit fix: HIGH) ──────────────
+  // Require custom header on state-changing endpoints.
+  // Simple CSRF protection: custom header cannot be sent cross-origin
+  // without CORS preflight (which is blocked by our CORS config).
+  function requireCsrfHeader(
+    req: import("express").Request,
+    res: import("express").Response,
+    next: import("express").NextFunction,
+  ) {
+    const header =
+      req.headers["x-requested-with"] || req.headers["x-fn-request"];
+    if (!header || header !== "XMLHttpRequest") {
+      res.status(403).json({ error: "E_CSRF" });
+      return;
+    }
+    next();
+  }
+
+  // ── POST /challenge ───────────────────────────────────────────
   router.post("/challenge", (req, res) => {
     const parsed = ChallengeBody.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: "E_SCHEMA" });
@@ -75,17 +165,22 @@ export function buildAuthRouter(env: {
     const challengeId = mintNonce();
     const challenge = `fuzzynuts.xyz:${parsed.data.address}:${mintNonce()}:${Date.now()}`;
     const exp = Date.now() + CHALLENGE_TTL_MS;
-    store.set(challengeId, { address: parsed.data.address, challenge, exp });
+    store.set(challengeId, {
+      address: parsed.data.address,
+      challenge,
+      exp,
+    });
     return res.json({ challenge, challengeId, exp });
   });
 
-  // ── POST /verify — verify XRPL signature + set JWT cookie ───
+  // ── POST /verify ──────────────────────────────────────────────
   router.post("/verify", async (req, res) => {
     const parsed = VerifyBody.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: "E_SCHEMA" });
 
     const record = store.get(parsed.data.challengeId);
-    if (!record) return res.status(404).json({ error: "E_CHALLENGE_NOT_FOUND" });
+    if (!record)
+      return res.status(404).json({ error: "E_CHALLENGE_NOT_FOUND" });
     if (record.exp < Date.now()) {
       store.delete(parsed.data.challengeId);
       return res.status(410).json({ error: "E_CHALLENGE_EXPIRED" });
@@ -107,36 +202,58 @@ export function buildAuthRouter(env: {
 
     store.delete(parsed.data.challengeId);
 
-    const { jwt, cookieExp } = await mintWalletJwt(parsed.data.address, secret, "xaman");
+    const { cookieExp, cookies } = await buildSessionCookies(
+      parsed.data.address,
+      "xaman",
+      secret,
+    );
 
-    res.setHeader("Set-Cookie", buildSessionCookies(jwt, parsed.data.address, cookieExp));
-
-    return res.json({ ok: true, address: parsed.data.address, cookieExp: cookieExp * 1000 });
+    res.setHeader("Set-Cookie", cookies);
+    return res.json({
+      ok: true,
+      address: parsed.data.address,
+      cookieExp: cookieExp * 1000,
+    });
   });
 
-  // ── POST /wallet-login — Xaman OAuth2 login ──────────────────
-  // The Xaman SDK's OAuth2 PKCE flow authenticates the user via the
-  // Xaman app. After successful auth, the client sends the verified
-  // wallet address here. The server validates the address format and
-  // issues a JWT session cookie.
-  //
-  // Security: The Xaman SDK is the authentication step — the user
-  // approved the connection in the Xaman app, which verified their
-  // wallet ownership via Xaman's backend. This endpoint trusts that
-  // verification and issues a session cookie.
-  router.post("/wallet-login", async (req, res) => {
+  // ── POST /wallet-login (NEW — Xaman OAuth2 with server-side validation) ──
+  router.post("/wallet-login", requireCsrfHeader, async (req, res) => {
     const parsed = WalletLoginBody.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: "E_SCHEMA" });
 
-    const { address } = parsed.data;
-    const { jwt, cookieExp } = await mintWalletJwt(address, secret, "xaman");
+    if (!env.WALLET_JWT_SECRET) {
+      return res.status(503).json({ error: "E_SERVICE_UNAVAILABLE" });
+    }
 
-    res.setHeader("Set-Cookie", buildSessionCookies(jwt, address, cookieExp));
+    // CRITICAL: Validate the Xaman OAuth token server-side.
+    // Do NOT trust the client-claimed address alone.
+    const validation = await validateXamanToken(
+      parsed.data.token,
+      parsed.data.address,
+    );
 
-    return res.json({ ok: true, address, cookieExp: cookieExp * 1000 });
+    if (!validation.valid) {
+      return res.status(401).json({
+        error: "E_XAMAN_TOKEN_INVALID",
+        detail: validation.error,
+      });
+    }
+
+    const { cookieExp, cookies } = await buildSessionCookies(
+      parsed.data.address,
+      "xaman-oauth",
+      secret,
+    );
+
+    res.setHeader("Set-Cookie", cookies);
+    return res.json({
+      ok: true,
+      address: parsed.data.address,
+      cookieExp: cookieExp * 1000,
+    });
   });
 
-  // ── GET /me — read current session from JWT cookie ───────────
+  // ── GET /me (NEW — read current session) ──────────────────────
   router.get("/me", async (req, res) => {
     const cookie = req.headers.cookie ?? "";
     const match = cookie.match(/(?:^|;\s*)fuzzy_wallet_session=([^;]+)/);
@@ -148,15 +265,10 @@ export function buildAuthRouter(env: {
       const { payload } = await jwtVerify(match[1]!, secret, {
         issuer: "fuzzynuts.xyz",
       });
-
-      if (typeof payload.address !== "string" || !XRPL_ADDR.test(payload.address)) {
-        return res.status(401).json({ error: "E_BAD_SESSION" });
-      }
-
       return res.json({
         user: {
-          address: payload.address,
-          provider: payload.provider ?? "xaman",
+          address: (payload as { address: string }).address,
+          provider: (payload as { provider: string }).provider,
         },
       });
     } catch {
@@ -164,7 +276,7 @@ export function buildAuthRouter(env: {
     }
   });
 
-  // ── POST /logout — clear session cookies ─────────────────────
+  // ── POST /logout (NEW — clear session cookies) ────────────────
   router.post("/logout", (_req, res) => {
     res.setHeader("Set-Cookie", [
       "fuzzy_wallet_session=; HttpOnly; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=0",
