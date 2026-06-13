@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0613">
+  <title>Tower Stack — Fuzzynuts Arcade</title>
+  <meta name="description" content="Stack blocks precisely! Align moving blocks to build the tallest tower possible.">
+  <link rel="icon" href="../../logo_512.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="../../css/design-tokens.css">
+  <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
+  <link rel="stylesheet" href="tower-stack.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="start-screen" class="overlay">
+      <div class="overlay-content">
+        <div class="game-icon">🏗️</div>
+        <h1>Tower Stack</h1>
+        <p class="subtitle">Stack blocks precisely! Align moving blocks to build the tallest tower possible.</p>
+        <button id="start-btn" class="play-btn">Start Game</button>
+        <div class="controls-info"><p>Space or click to drop block</p>
+          <p>Touch: tap to drop</p></div>
+        <p class="best-score">Best: <span id="best-score-start">0</span></p>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <div id="hud">
+      <span id="score-display">Score: 0</span>
+      <span id="lives-display"></span>
+      <span id="level-display"></span>
+    </div>
+    <div id="game-over" class="overlay hidden">
+      <div class="overlay-content">
+        <h2>Game Over</h2>
+        <p class="final-score">Score: <span id="final-score">0</span></p>
+        <p class="new-best hidden" id="new-best">🏆 New Best!</p>
+        <button id="restart-btn" class="play-btn">Play Again</button>
+      </div>
+    </div>
+  </div>
+  <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
+  <script>
+    ArcadeShell.init({ slug: 'tower-stack', title: 'Tower Stack', icon: '🏗️', accentColor: '#fbbf24', hideNavOnPlay: true, showLoader: false });
+  </script>
+  <script src="../fuzzy-score.js"></script>
+  <script src="tower-stack.js"></script>
+</body>
+</html>

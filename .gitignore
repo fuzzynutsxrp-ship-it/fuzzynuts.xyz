@@ -46,6 +46,11 @@ apps/web-arcade/public/games/*
 !apps/web-arcade/public/games/wordle/
 !apps/web-arcade/public/games/space-invaders/
 !apps/web-arcade/public/games/rally/
+!apps/web-arcade/public/games/tower-stack/
+!apps/web-arcade/public/games/capture-flag/
+!apps/web-arcade/public/games/bomberman/
+!apps/web-arcade/public/games/frogger/
+!apps/web-arcade/public/games/maze-escape/
 !apps/web-arcade/public/games/surf-up/
 !apps/web-arcade/public/games/archery/
 !apps/web-arcade/public/games/bowling/
