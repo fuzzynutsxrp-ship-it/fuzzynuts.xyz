@@ -44,6 +44,7 @@
   --color-glass-border-strong: rgba(255, 46, 136, 0.4);
   --color-glass-border-neon: rgba(16, 185, 129, 0.3);
   --color-glass-hover: #0d0818;
+  --color-inset-highlight: rgba(255, 255, 255, 0.03);
   /* DEGEN FINAL POLISH END */
   --font-display: "Outfit", sans-serif;
   --font-body: "Inter", sans-serif;

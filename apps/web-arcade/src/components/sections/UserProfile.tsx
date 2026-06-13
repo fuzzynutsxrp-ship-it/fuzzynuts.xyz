@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wallet,
@@ -370,11 +371,14 @@ export function UserProfile() {
                     className="w-20 h-20 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center shrink-0"
                     style={{ boxShadow: "0 0 24px rgba(251,191,36,0.2), 0 0 48px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
                   >
-                    <img
+                    <Image
                       src="/images/branding/logo.webp"
                       alt="Fuzzynuts"
-                      className="w-14 h-14 object-contain"
+                      width={56}
+                      height={56}
+                      className="object-contain"
                       draggable={false}
+                      priority
                     />
                   </div>
                   <div>
@@ -512,7 +516,7 @@ export function UserProfile() {
                 <div
                   key={gameId}
                   className="bg-degen-950 border-2 border-hot-pink/20 hover:border-gold/40 rounded-xl p-4 flex items-center gap-3 transition-all"
-                  style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+                  style={{ boxShadow: "inset 0 1px 0 var(--color-inset-highlight)" }}
                 >
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
@@ -640,7 +644,7 @@ export function UserProfile() {
           </h3>
           <div
             className="bg-degen-950 border-2 border-hot-pink/20 rounded-2xl overflow-hidden"
-            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
+            style={{ boxShadow: "inset 0 1px 0 var(--color-inset-highlight)" }}
           >
             {/* Loading */}
             {state.loading && <div className="p-4 sm:p-5"><SkeletonRows /></div>}
