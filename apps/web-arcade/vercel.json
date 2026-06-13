@@ -61,12 +61,24 @@
       "destination": "https://world.fuzzynuts.xyz/api/scores/stream"
     },
     {
+      "source": "/api/scores/stream/",
+      "destination": "https://world.fuzzynuts.xyz/api/scores/stream"
+    },
+    {
       "source": "/api/scores/:path*",
       "destination": "https://world.fuzzynuts.xyz/api/scores/:path*"
     },
     {
+      "source": "/api/scores/",
+      "destination": "https://world.fuzzynuts.xyz/api/scores"
+    },
+    {
       "source": "/api/rewards/:path*",
       "destination": "https://world.fuzzynuts.xyz/api/rewards/:path*"
+    },
+    {
+      "source": "/api/rewards/",
+      "destination": "https://world.fuzzynuts.xyz/api/rewards/tiers"
     },
     {
       "source": "/api/rsc/:path*",
