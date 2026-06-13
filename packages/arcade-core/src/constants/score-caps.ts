@@ -54,11 +54,11 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   "archery": 99_999,
   "surf-up": 99_999,
   "rally": 99_999,
-  "maze-escape": 99999,
-  "frogger": 99999,
-  "bomberman": 99999,
-  "capture-flag": 99999,
-  "tower-stack": 99999,
+  "maze-escape": 99_999,
+  "frogger": 99_999,
+  "bomberman": 99_999,
+  "capture-flag": 99_999,
+  "tower-stack": 99_999,
 };
 
 /** Type-safe cap lookup. Falls back to the most restrictive value if asked for an unknown slug. */

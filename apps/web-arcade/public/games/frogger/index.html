@@ -50,5 +50,12 @@
   </script>
   <script src="../fuzzy-score.js"></script>
   <script src="frogger.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+    });
+  }
+</script>
 </body>
 </html>
