@@ -12,11 +12,11 @@
 
 ## Repos & deploy targets
 
-| Piece | Repo | Branch → Deploy | Local path |
-|---|---|---|---|
-| **Frontend** (marketing + arcade UI) | `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz` | `main` → **Vercel** (auto) | `…/AI Tools/FuzzyNuts Optimized/fuzzynuts-optimized` |
-| **Backend** (Fuzzynuts World server, Kaetram fork; also serves `/api/scores` + `/api/rewards`) | `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world` (fork of `Kaetram/Kaetram-Open`, off `upstream/develop` @ base `4bdbd6d50` 2024-01-14, v0.5.5, ~45 ahead) | `develop` → **Railway** (auto) | `…/AI Tools/Fuzzynuts/kaetram` |
-| Backend reference mirror (READ-ONLY, stale, NOT deployed) | — | — | `…/AI Tools/FuzzyNuts Optimized/backend-reference` |
+| Piece                                                                                          | Repo                                                                                                                                                        | Branch → Deploy                | Local path                                           |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------- |
+| **Frontend** (marketing + arcade UI)                                                           | `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz`                                                                                                             | `main` → **Vercel** (auto)     | `…/AI Tools/FuzzyNuts Optimized/fuzzynuts-optimized` |
+| **Backend** (Fuzzynuts World server, Kaetram fork; also serves `/api/scores` + `/api/rewards`) | `github.com/fuzzynutsxrp-ship-it/fuzzynuts-world` (fork of `Kaetram/Kaetram-Open`, off `upstream/develop` @ base `4bdbd6d50` 2024-01-14, v0.5.5, ~45 ahead) | `develop` → **Railway** (auto) | `…/AI Tools/Fuzzynuts/kaetram`                       |
+| Backend reference mirror (READ-ONLY, stale, NOT deployed)                                      | —                                                                                                                                                           | —                              | `…/AI Tools/FuzzyNuts Optimized/backend-reference`   |
 
 - **API base:** `https://world.fuzzynuts.xyz` (hardcoded in the frontend).
 - Railway project: **brilliant-nurturing** (`production` env, US West) — service **efficient-tenderness** (`world.fuzzynuts.xyz`) + MongoDB service (`mongo:8.3.1`, proxy `tramway.proxy.rlwy.net`).
@@ -85,7 +85,7 @@
 ## Open decisions / launch checklist
 
 - [ ] Set `NEXT_PUBLIC_PROJECT_ID` in Vercel + redeploy, then test the Joey button.
-- **Prize values: stay on TEST amounts ($0.05/$0.03/$0.02). DO NOT set real values** — this is a live *test* wallet (owner's decision). Real values + `MAX_WEEKLY_NUT_EMISSION` sizing are a **launch-day-only** task; don't propose them before then. No need to test higher amounts: display, XRPL precision, and the claim path all work identically at small amounts (the cap-scale-down path is tested by lowering the cap, not raising prizes).
+- **Prize values: stay on TEST amounts ($0.05/$0.03/$0.02). DO NOT set real values** — this is a live _test_ wallet (owner's decision). Real values + `MAX_WEEKLY_NUT_EMISSION` sizing are a **launch-day-only** task; don't propose them before then. No need to test higher amounts: display, XRPL precision, and the claim path all work identically at small amounts (the cap-scale-down path is tested by lowering the cap, not raising prizes).
 - [ ] AMM pool: deepen or retire (currently thin & getting sniped).
 - [ ] Reconcile minigolf score cap (client/registry 10,500 vs server 100,000).
 - [x] Clean up: stale stash dropped + stray `create-nut-amm.cjs` removed (2026-05-27).

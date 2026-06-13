@@ -49,8 +49,11 @@ function getMsUntilReset(): number {
       now.getUTCFullYear(),
       now.getUTCMonth(),
       now.getUTCDate() + daysUntilMonday,
-      0, 0, 0, 0
-    )
+      0,
+      0,
+      0,
+      0,
+    ),
   );
   return Math.max(0, nextMonday.getTime() - now.getTime());
 }
@@ -63,19 +66,17 @@ function parseCountdown(ms: number): CountdownState {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  const display = days > 0
-    ? `${days}d ${hours}h ${minutes}m ${seconds}s`
-    : hours > 0
-    ? `${hours}h ${minutes}m ${seconds}s`
-    : minutes > 0
-    ? `${minutes}m ${seconds}s`
-    : `${seconds}s`;
+  const display =
+    days > 0
+      ? `${days}d ${hours}h ${minutes}m ${seconds}s`
+      : hours > 0
+        ? `${hours}h ${minutes}m ${seconds}s`
+        : minutes > 0
+          ? `${minutes}m ${seconds}s`
+          : `${seconds}s`;
 
-  const short = days > 0
-    ? `${days}d ${hours}h`
-    : hours > 0
-    ? `${hours}h ${minutes}m`
-    : `${minutes}m`;
+  const short =
+    days > 0 ? `${days}d ${hours}h` : hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 
   // Progress through the week (Monday 00:00 UTC → Monday 00:00 UTC)
   const elapsed = WEEK_MS - ms;
@@ -106,7 +107,7 @@ function parseCountdown(ms: number): CountdownState {
  */
 export function useWeeklyCountdown(): CountdownState {
   const [countdown, setCountdown] = useState<CountdownState>(() =>
-    parseCountdown(getMsUntilReset())
+    parseCountdown(getMsUntilReset()),
   );
 
   const tick = useCallback(() => {

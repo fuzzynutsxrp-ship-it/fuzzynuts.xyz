@@ -113,19 +113,14 @@ export function FloatingMascot() {
   if (dismissed) return null;
 
   /* ── Determine if mascot should be visible in DOM ── */
-  const isPresent =
-    phase === "entering" || phase === "visible" || phase === "exiting";
+  const isPresent = phase === "entering" || phase === "visible" || phase === "exiting";
 
   /* ── Reduced motion: show static image briefly, no animation ── */
   if (prefersReduced) {
     return (
       <AnimatePresence>
         {isPresent && (
-          <div
-            className="floating-mascot"
-            role="presentation"
-            aria-hidden="true"
-          >
+          <div className="floating-mascot" role="presentation" aria-hidden="true">
             <button
               onClick={handleDismiss}
               className="floating-mascot__close"
@@ -162,16 +157,11 @@ export function FloatingMascot() {
           role="presentation"
           aria-hidden="true"
           initial={{ y: "100%", opacity: 0 }}
-          animate={
-            phase === "exiting"
-              ? { y: "100%", opacity: 0 }
-              : { y: "0%", opacity: 1 }
-          }
+          animate={phase === "exiting" ? { y: "100%", opacity: 0 } : { y: "0%", opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
           transition={{
             y: {
-              duration:
-                phase === "exiting" ? SLIDE_DOWN_DURATION : SLIDE_UP_DURATION,
+              duration: phase === "exiting" ? SLIDE_DOWN_DURATION : SLIDE_UP_DURATION,
               ease:
                 phase === "exiting"
                   ? [0.4, 0, 1, 1] /* ease-in for exit */
@@ -248,9 +238,7 @@ export function FloatingMascot() {
                 : { scaleX: 1, opacity: 0.3 }
             }
             transition={
-              phase === "visible"
-                ? { duration: 3, repeat: Infinity, ease: "easeInOut" }
-                : {}
+              phase === "visible" ? { duration: 3, repeat: Infinity, ease: "easeInOut" } : {}
             }
           />
         </motion.div>

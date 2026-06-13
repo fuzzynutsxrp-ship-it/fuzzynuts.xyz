@@ -25,7 +25,9 @@ const BUY_URL = `https://xpmarket.com/dex/NUT-${ISSUER}/XRP`;
 
 function fmtPrice(p: number | null): string {
   if (p == null || !isFinite(p) || p <= 0) return "—";
-  return p < 0.01 ? `$${p.toPrecision(3)}` : `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  return p < 0.01
+    ? `$${p.toPrecision(3)}`
+    : `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 }
 
 export function PriceTicker() {
@@ -44,7 +46,9 @@ export function PriceTicker() {
       .catch(() => {
         /* leave null → renders "—"; Chart/Buy links still work */
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -59,12 +63,18 @@ export function PriceTicker() {
           no rounded-xl pill, no neon-ring soft inset). */}
       <div className="flex items-center gap-4 px-4 py-2 rounded-md bg-degen-950 border-2 border-hot-pink shadow-[0_0_20px_rgba(255,46,136,0.45)]">
         <div className="text-left">
-          <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Price</p>
-          <p className="font-mono font-bold text-sm text-[var(--color-gold)] tabular-nums">{fmtPrice(priceUsd)}</p>
+          <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">
+            Price
+          </p>
+          <p className="font-mono font-bold text-sm text-[var(--color-gold)] tabular-nums">
+            {fmtPrice(priceUsd)}
+          </p>
         </div>
         <div className="w-px h-7 bg-hot-pink/30" aria-hidden="true" />
         <div className="text-left">
-          <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">Market Cap</p>
+          <p className="text-[10px] uppercase tracking-wider text-[var(--color-cream-dim)]">
+            Market Cap
+          </p>
           <p className="font-mono font-bold text-sm text-[var(--color-acid)] tabular-nums">
             {mcap != null ? `$${formatNumber(mcap)}` : "—"}
           </p>

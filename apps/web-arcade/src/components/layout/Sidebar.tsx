@@ -3,17 +3,7 @@
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import {
-  Trophy,
-  Gift,
-  Gamepad2,
-  Flame,
-  Users,
-  Joystick,
-  Car,
-  Coffee,
-  X,
-} from "lucide-react";
+import { Trophy, Gift, Gamepad2, Flame, Users, Joystick, Car, Coffee, X } from "lucide-react";
 
 interface SidebarProps {
   open: boolean;
@@ -38,7 +28,13 @@ const CATEGORIES = [
   { label: "Chill", icon: Coffee, value: "chill" },
 ];
 
-export function Sidebar({ open, onClose, activeCategory, onCategoryChange, hideCategories }: SidebarProps) {
+export function Sidebar({
+  open,
+  onClose,
+  activeCategory,
+  onCategoryChange,
+  hideCategories,
+}: SidebarProps) {
   const pathname = usePathname();
 
   const isActiveHref = (href: string) => {

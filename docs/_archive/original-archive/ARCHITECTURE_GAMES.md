@@ -93,31 +93,31 @@ All 6 game pages share a unified component structure:
 
 ### Components
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| **GamePage** | `components/game/GamePage.tsx` | Orchestrator — manages state, keyboard shortcuts, layout |
-| **GameHeader** | `components/game/GameHeader.tsx` | Navigation, wallet, week selector, quick stats |
-| **GameSidebar** | `components/game/GameSidebar.tsx` | Live leaderboard, reward tracker, game info |
-| **ScoreSubmissionPanel** | `components/game/ScoreSubmissionPanel.tsx` | Score history, status badges, rank progress |
-| **LoadingOverlay** | `components/game/LoadingOverlay.tsx` | Animated loading screen while game initializes |
-| **ErrorBoundary** | `components/game/ErrorBoundary.tsx` | Crash recovery with retry button |
+| Component                | File                                       | Purpose                                                  |
+| ------------------------ | ------------------------------------------ | -------------------------------------------------------- |
+| **GamePage**             | `components/game/GamePage.tsx`             | Orchestrator — manages state, keyboard shortcuts, layout |
+| **GameHeader**           | `components/game/GameHeader.tsx`           | Navigation, wallet, week selector, quick stats           |
+| **GameSidebar**          | `components/game/GameSidebar.tsx`          | Live leaderboard, reward tracker, game info              |
+| **ScoreSubmissionPanel** | `components/game/ScoreSubmissionPanel.tsx` | Score history, status badges, rank progress              |
+| **LoadingOverlay**       | `components/game/LoadingOverlay.tsx`       | Animated loading screen while game initializes           |
+| **ErrorBoundary**        | `components/game/ErrorBoundary.tsx`        | Crash recovery with retry button                         |
 
 ### Responsive Breakpoints
 
-| Breakpoint | Layout |
-|-----------|--------|
-| **Mobile** (<768px) | Header condensed, sidebar = overlay drawer, panel simplified |
-| **Tablet** (768-1023px) | Sidebar = toggle drawer (button in corner) |
-| **Desktop** (≥1024px) | Full layout with fixed 280px sidebar |
+| Breakpoint              | Layout                                                       |
+| ----------------------- | ------------------------------------------------------------ |
+| **Mobile** (<768px)     | Header condensed, sidebar = overlay drawer, panel simplified |
+| **Tablet** (768-1023px) | Sidebar = toggle drawer (button in corner)                   |
+| **Desktop** (≥1024px)   | Full layout with fixed 280px sidebar                         |
 
 ### Keyboard Shortcuts
 
-| Key | Action |
-|-----|--------|
+| Key   | Action                   |
+| ----- | ------------------------ |
 | `ESC` | Back to arcade (/#games) |
-| `F1` | Toggle sidebar |
-| `F` | Toggle fullscreen |
-| `M` | Toggle mute |
+| `F1`  | Toggle sidebar           |
+| `F`   | Toggle fullscreen        |
+| `M`   | Toggle mute              |
 
 ---
 
@@ -125,14 +125,14 @@ All 6 game pages share a unified component structure:
 
 All game metadata is centralized in `src/lib/gameRegistry.ts`:
 
-| # | Slug | Title | Genre | Score Cap | Score Type | Status |
-|---|------|-------|-------|-----------|------------|--------|
-| 1 | `mario` | Super Fuzzynuts | Platformer | 99,999 | High score | Live |
-| 2 | `fuzzy-survivors` | Fuzzy Survivors | Horde Survival | 999,999 | High score | Live |
-| 3 | `minigolf` | Fuzzy Putt | Mini Golf | 10,500 | High score | Live |
-| 4 | `nut-racer` | Nut Racer | Racing | 99,999 | High score | Live |
-| 5 | `top-secret` | Top Secret | ??? Classified | 999,999 | High score | Live |
-| 6 | `fuzzynuts-world` | Fuzzynuts World | MMORPG | 10,000,000 | Cumulative | Live |
+| #   | Slug              | Title           | Genre          | Score Cap  | Score Type | Status |
+| --- | ----------------- | --------------- | -------------- | ---------- | ---------- | ------ |
+| 1   | `mario`           | Super Fuzzynuts | Platformer     | 99,999     | High score | Live   |
+| 2   | `fuzzy-survivors` | Fuzzy Survivors | Horde Survival | 999,999    | High score | Live   |
+| 3   | `minigolf`        | Fuzzy Putt      | Mini Golf      | 10,500     | High score | Live   |
+| 4   | `nut-racer`       | Nut Racer       | Racing         | 99,999     | High score | Live   |
+| 5   | `top-secret`      | Top Secret      | ??? Classified | 999,999    | High score | Live   |
+| 6   | `fuzzynuts-world` | Fuzzynuts World | MMORPG         | 10,000,000 | Cumulative | Live   |
 
 ---
 
@@ -148,6 +148,7 @@ FuzzyScoreSubmit("mario", score, durationSeconds);
 ```
 
 This triggers:
+
 1. **Client-side validation** — cap, duration, debounce
 2. **localStorage write** — instant, offline-first
 3. **POST to /api/scores** — async, fire-and-forget
@@ -205,6 +206,7 @@ cp -r templates/new-game {slug}/
 **Step 2: Add Score Bridge**
 
 In your game's HTML:
+
 ```html
 <script src="../shared/fuzzy-score.js"></script>
 ```
@@ -212,6 +214,7 @@ In your game's HTML:
 **Step 3: Integrate Score Submission**
 
 In your game's JavaScript:
+
 ```javascript
 // When the game ends:
 const result = FuzzyScoreSubmit("your-slug", playerScore, secondsPlayed);
@@ -245,6 +248,7 @@ if (result.success) {
 **Step 5: Register Score Cap on Server**
 
 In `packages/server/src/api/scores.ts`:
+
 ```typescript
 const SCORE_CAPS: Record<string, number> = {
   // ... existing games
@@ -253,6 +257,7 @@ const SCORE_CAPS: Record<string, number> = {
 ```
 
 In `shared/fuzzy-score.js`:
+
 ```javascript
 var SCORE_CAPS = {
   // ... existing games
@@ -287,6 +292,7 @@ Currently only **Fuzzynuts World** has achievements:
 - A background processor is needed to send XRPL payments (pending)
 
 Future: Individual game achievements can be added by:
+
 1. Setting `achievementsEnabled: true` in gameRegistry
 2. Implementing achievement logic in the game
 3. Posting achievement events via postMessage to the GameWrapper
@@ -295,11 +301,11 @@ Future: Individual game achievements can be added by:
 
 ## Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| Next.js | 15.5.18 | Framework |
-| React | 19.1.0 | UI library |
-| Tailwind CSS | 3.4.19 | Styling |
-| Framer Motion | 12.38.0 | Animations |
-| Lucide React | 1.14.0 | Icons |
-| Zustand | 5.0.13 | State management |
+| Package       | Version | Purpose          |
+| ------------- | ------- | ---------------- |
+| Next.js       | 15.5.18 | Framework        |
+| React         | 19.1.0  | UI library       |
+| Tailwind CSS  | 3.4.19  | Styling          |
+| Framer Motion | 12.38.0 | Animations       |
+| Lucide React  | 1.14.0  | Icons            |
+| Zustand       | 5.0.13  | State management |

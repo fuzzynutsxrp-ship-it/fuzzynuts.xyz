@@ -70,9 +70,7 @@ function LegendRow({
         <span className="font-display font-black text-xl text-[var(--color-gold)] tabular-nums">
           {item.percentage}%
         </span>
-        <span className="text-xs text-[var(--color-cream-dim)] tabular-nums">
-          {item.amount}
-        </span>
+        <span className="text-xs text-[var(--color-cream-dim)] tabular-nums">{item.amount}</span>
       </div>
     </motion.div>
   );
@@ -254,16 +252,25 @@ function LedgerEntry({
       <div className="ledger-entry__bar" style={{ background: accentColor }} />
       <div className="flex-1 min-w-0 py-4 sm:py-5 pr-4 sm:pr-5 pl-5 sm:pl-6">
         <div className="flex items-center gap-2 sm:gap-3 mb-2.5 flex-wrap">
-          <span className="font-mono text-[10px] tabular-nums opacity-40 select-none" style={{ color: accentColor }}>
+          <span
+            className="font-mono text-[10px] tabular-nums opacity-40 select-none"
+            style={{ color: accentColor }}
+          >
             {String(index).padStart(2, "0")}
           </span>
-          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+          <span
+            className="text-xs sm:text-sm font-bold uppercase tracking-wider"
+            style={{ color: accentColor }}
+          >
             {label}
           </span>
           {tag && (
             <span
               className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded"
-              style={{ color: accentColor, background: `color-mix(in srgb, ${accentColor} 10%, transparent)` }}
+              style={{
+                color: accentColor,
+                background: `color-mix(in srgb, ${accentColor} 10%, transparent)`,
+              }}
             >
               {tag}
             </span>
@@ -353,9 +360,8 @@ export function Trust() {
             Built to Last
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            Fair play, transparent systems, and a community-first approach.
-            Every score is verified, every leaderboard is public, and every
-            player competes on equal footing.
+            Fair play, transparent systems, and a community-first approach. Every score is verified,
+            every leaderboard is public, and every player competes on equal footing.
           </p>
           {/* DEGEN OVERHAUL END */}
         </motion.div>
@@ -477,7 +483,11 @@ export function Trust() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="flex items-start gap-3 p-4 rounded-xl"
-              style={{ background: "#0a0613", border: "1.5px solid rgba(255,46,136,0.15)", boxShadow: "0 0 10px rgba(255,46,136,0.06), inset 0 0 12px rgba(124,58,237,0.06)" }}
+              style={{
+                background: "#0a0613",
+                border: "1.5px solid rgba(255,46,136,0.15)",
+                boxShadow: "0 0 10px rgba(255,46,136,0.06), inset 0 0 12px rgba(124,58,237,0.06)",
+              }}
             >
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
@@ -489,9 +499,7 @@ export function Trust() {
                 <p className="font-display font-bold text-sm mb-1" style={{ color: chip.color }}>
                   {chip.title}
                 </p>
-                <p className="text-xs text-[var(--color-cream-dim)] leading-relaxed">
-                  {chip.desc}
-                </p>
+                <p className="text-xs text-[var(--color-cream-dim)] leading-relaxed">{chip.desc}</p>
               </div>
             </motion.div>
           ))}

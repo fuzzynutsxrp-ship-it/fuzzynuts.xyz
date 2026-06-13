@@ -46,12 +46,18 @@ function matchesCategory(game: (typeof GAMES)[number], category: string): boolea
   if (category === "all") return true;
   const id = game.id;
   switch (category) {
-    case "multiplayer": return id === "fuzzynuts-world" || id === "rsc";
-    case "arcade": return id === "mario" || id === "survivors";
-    case "racing": return id === "racer";
-    case "chill": return id === "minigolf";
-    case "classic": return id === "rsc" || id === "mario";
-    default: return false;
+    case "multiplayer":
+      return id === "fuzzynuts-world" || id === "rsc";
+    case "arcade":
+      return id === "mario" || id === "survivors";
+    case "racing":
+      return id === "racer";
+    case "chill":
+      return id === "minigolf";
+    case "classic":
+      return id === "rsc" || id === "mario";
+    default:
+      return false;
   }
 }
 
@@ -84,16 +90,13 @@ function GameRow({
         <span>{emoji}</span> {title}
       </h2>
       {/* Horizontal scroll on mobile, mosaic grid on desktop */}
-      <div className="game-grid-mosaic flex overflow-x-auto scrollbar-none pb-2 md:grid md:overflow-visible md:pb-0"
+      <div
+        className="game-grid-mosaic flex overflow-x-auto scrollbar-none pb-2 md:grid md:overflow-visible md:pb-0"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {games.map((game, i) => (
           <div key={game.id} className={`shrink-0 w-[44vw] sm:w-[30vw] md:w-auto tile-${tileSize}`}>
-            <PokiGameCard
-              game={game}
-              onPlay={onPlay}
-              priority={priorityStart && i < 3}
-            />
+            <PokiGameCard game={game} onPlay={onPlay} priority={priorityStart && i < 3} />
           </div>
         ))}
       </div>
@@ -142,10 +145,7 @@ export default function Home() {
       />
 
       {/* Category Tabs */}
-      <CategoryTabs
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-      />
+      <CategoryTabs activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
 
       {/* Main content */}
       <main className="flex-1 px-3 md:px-5 py-4 pb-32">
@@ -160,7 +160,12 @@ export default function Home() {
               </h2>
               <div className="game-grid-fluid">
                 {filteredGames.map((game, i) => (
-                  <PokiGameCard key={game.id} game={game} onPlay={setActiveGameId} priority={i < 6} />
+                  <PokiGameCard
+                    key={game.id}
+                    game={game}
+                    onPlay={setActiveGameId}
+                    priority={i < 6}
+                  />
                 ))}
               </div>
             </section>
@@ -169,7 +174,10 @@ export default function Home() {
               <p className="text-4xl mb-3">🔍</p>
               <p className="text-[var(--color-cream-dim)] text-sm">No games found.</p>
               <button
-                onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveCategory("all");
+                }}
                 className="mt-3 text-sm text-brand-gold hover:underline cursor-pointer"
               >
                 Show all games
@@ -179,9 +187,28 @@ export default function Home() {
         ) : (
           /* ── Default view: sectioned rows ── */
           <>
-            <GameRow title="Trending Now" emoji="🔥" games={trending} onPlay={setActiveGameId} priorityStart tileSize="large" />
-            <GameRow title="Just Added" emoji="🆕" games={justAdded} onPlay={setActiveGameId} tileSize="large" />
-            <GameRow title="Top Rated" emoji="🏆" games={topRated} onPlay={setActiveGameId} tileSize="small" />
+            <GameRow
+              title="Trending Now"
+              emoji="🔥"
+              games={trending}
+              onPlay={setActiveGameId}
+              priorityStart
+              tileSize="large"
+            />
+            <GameRow
+              title="Just Added"
+              emoji="🆕"
+              games={justAdded}
+              onPlay={setActiveGameId}
+              tileSize="large"
+            />
+            <GameRow
+              title="Top Rated"
+              emoji="🏆"
+              games={topRated}
+              onPlay={setActiveGameId}
+              tileSize="small"
+            />
 
             {/* Coming Soon — density filler */}
             <section className="mb-8">

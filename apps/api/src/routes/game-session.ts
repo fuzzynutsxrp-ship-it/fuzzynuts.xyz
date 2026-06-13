@@ -108,8 +108,7 @@ export function buildGameSessionRouter(env: {
     if (!serverReady) {
       return res.status(503).json({
         status: "provisioning",
-        message:
-          "Game server is being deployed. Check back shortly.",
+        message: "Game server is being deployed. Check back shortly.",
       });
     }
     // ── end toggle ────────────────────────────────────────────
@@ -130,8 +129,7 @@ export function buildGameSessionRouter(env: {
     const parsed = GameSessionBody.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: "E_SCHEMA" });
 
-    const { walletAddress, signature, publicKey, nonce, challengeId } =
-      parsed.data;
+    const { walletAddress, signature, publicKey, nonce, challengeId } = parsed.data;
 
     // 1. Validate the challenge exists and hasn't expired
     const challengeRecord = env.challengeStore.get(challengeId);

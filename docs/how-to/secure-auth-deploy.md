@@ -3,16 +3,19 @@
 ## Security Upgrade
 
 **Before (insecure):**
+
 ```
 Parent page → API (get credentials) → URL hash (password exposed) → iframe
 ```
 
 **After (secure):**
+
 ```
 Parent page → load iframe (clean URL) → iframe fetches API (credentials: include) → API reads HttpOnly cookie → returns credentials
 ```
 
 **Security properties:**
+
 - HttpOnly cookie = JS cannot read the token
 - SameSite=none + Secure = cross-subdomain works
 - Iframe fetches credentials directly = parent page NEVER sees password

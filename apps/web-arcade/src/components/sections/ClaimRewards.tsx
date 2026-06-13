@@ -19,11 +19,7 @@ import { formatNumber } from "@/lib/format";
 import { CyberCard } from "@/components/ui/CyberCard";
 // DEGEN OVERHAUL — shared degen confetti (was a local function below)
 import { ConfettiBurst } from "@/components/ui/ConfettiBurst";
-import {
-  usePayoutEligibility,
-  getCurrentWeekKey,
-  type ClaimStatus,
-} from "@/features/arcade";
+import { usePayoutEligibility, getCurrentWeekKey, type ClaimStatus } from "@/features/arcade";
 
 /* ═══════════════════════════════════════════════════════════════
    Prize Tier Config
@@ -82,7 +78,7 @@ function ClaimConfirmModal({
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
         className="relative w-full max-w-md rounded-2xl border-2 border-brand-gold/40
                    bg-degen-950 shadow-[0_0_30px_rgba(251,191,36,0.2)] overflow-hidden"
-          /* DEGEN FINAL POLISH END */
+        /* DEGEN FINAL POLISH END */
       >
         {/* Close button */}
         {!claiming && (
@@ -99,19 +95,21 @@ function ClaimConfirmModal({
 
         <div className="p-8 text-center">
           {/* Shield icon */}
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand-gold/10 border border-brand-gold/20
-                          flex items-center justify-center mb-5">
+          <div
+            className="w-16 h-16 mx-auto rounded-2xl bg-brand-gold/10 border border-brand-gold/20
+                          flex items-center justify-center mb-5"
+          >
             <ShieldCheck size={32} className="text-brand-gold" />
           </div>
 
-          <h3 className="font-display text-xl font-bold text-cream mb-2">
-            Confirm Prize Claim
-          </h3>
+          <h3 className="font-display text-xl font-bold text-cream mb-2">Confirm Prize Claim</h3>
 
           <div className="space-y-3 mb-6">
             <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-degen-900 border border-hot-pink/15 text-sm">
               <span className="text-cream-dim">Prize</span>
-              <span className="font-bold text-brand-gold">{tier.emoji} {tier.label} — {tier.amount}</span>
+              <span className="font-bold text-brand-gold">
+                {tier.emoji} {tier.label} — {tier.amount}
+              </span>
             </div>
             {game && (
               <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-degen-900 border border-hot-pink/15 text-sm">
@@ -200,8 +198,8 @@ export function ClaimRewards() {
     nutAmount != null
       ? `${formatNumber(nutAmount)} NUT @ ${fmtSnapshotPrice(snapPrice)} snapshot`
       : eligibility?.announced === false
-      ? "amount set at Monday snapshot"
-      : "—";
+        ? "amount set at Monday snapshot"
+        : "—";
 
   /** Status-to-string for claim button */
   const getButtonLabel = useCallback(
@@ -218,7 +216,7 @@ export function ClaimRewards() {
           return usdValue != null ? `Bag ${usdLabel} in $NUT 🥜` : "Bag the Bag";
       }
     },
-    [usdValue, usdLabel]
+    [usdValue, usdLabel],
   );
 
   /* ═══════════════════════════════════════════════════════
@@ -237,7 +235,8 @@ export function ClaimRewards() {
               The Weekly Nut Hoard 🥜
             </h3>
             <p className="text-sm text-cream-dim">
-              Connect your wallet and see if you bagged $NUT this week. Read-only — we can&apos;t touch your bag.
+              Connect your wallet and see if you bagged $NUT this week. Read-only — we can&apos;t
+              touch your bag.
             </p>
           </div>
           <motion.button
@@ -269,9 +268,7 @@ export function ClaimRewards() {
       <CyberCard accentColor="gold">
         <div className="p-8 flex flex-col items-center justify-center text-center">
           <Loader2 size={28} className="text-brand-gold animate-spin mb-3" />
-          <p className="text-sm text-cream-dim">
-            Checking prize eligibility for {weekKey}…
-          </p>
+          <p className="text-sm text-cream-dim">Checking prize eligibility for {weekKey}…</p>
         </div>
       </CyberCard>
     );
@@ -385,9 +382,7 @@ export function ClaimRewards() {
           </div>
           {/* DEGEN OVERHAUL START — bagless-for-now copy */}
           <div className="flex-1 text-center sm:text-left">
-            <h3 className="font-display text-lg font-bold text-cream mb-1">
-              Bagless… For Now 🥜
-            </h3>
+            <h3 className="font-display text-lg font-bold text-cream mb-1">Bagless… For Now 🥜</h3>
             <p className="text-sm text-cream-dim">
               No Top 3 finish for {weekKey} — it happens. Get back on the{" "}
               <a href="/leaderboard/" className="text-neon-green hover:underline font-semibold">
@@ -446,9 +441,7 @@ export function ClaimRewards() {
             <h3 className="font-display text-2xl sm:text-3xl font-bold gradient-text-gold mb-1">
               {tier?.label ?? "Prize"} — {eligibility?.game ?? "Arcade"}
             </h3>
-            <p className="text-cream-dim text-sm mb-1">
-              Week {weekKey}
-            </p>
+            <p className="text-cream-dim text-sm mb-1">Week {weekKey}</p>
             <motion.p
               initial={{ scale: 0.8 }}
               animate={{ scale: [0.8, 1.05, 1] }}

@@ -2,14 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 
-const CATEGORIES = [
-  "All",
-  "MMORPG",
-  "Platformer",
-  "Arcade",
-  "Racing",
-  "Classic",
-];
+const CATEGORIES = ["All", "MMORPG", "Platformer", "Arcade", "Racing", "Classic"];
 
 interface CategoryFiltersProps {
   active: string;

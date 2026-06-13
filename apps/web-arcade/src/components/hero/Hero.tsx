@@ -26,10 +26,7 @@ const FLOAT_ANIMATION = {
 
 export function Hero() {
   return (
-    <section
-      id="hero"
-      className="relative w-full overflow-hidden"
-    >
+    <section id="hero" className="relative w-full overflow-hidden">
       {/* Hero sizes to its content (no forced viewport height). A
           `min-h-[100svh]` here used to lock the section to one viewport
           tall; because viewport units scale with browser zoom, at low
@@ -58,7 +55,11 @@ export function Hero() {
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.94 }}
-            onClick={() => { document.getElementById("games")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+            onClick={() => {
+              document
+                .getElementById("games")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
             role="button"
             tabIndex={0}
             aria-label="Enter the FuzzyNuts arcade"
@@ -123,9 +124,8 @@ export function Hero() {
           transition={{ delay: 0.7 }}
           className="text-sm sm:text-base md:text-lg text-[var(--color-cream)] max-w-2xl mx-auto mb-8 leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]"
         >
-          Free arcade games, global leaderboards, and weekly competitions.
-          Sign in with Google, pick a game, and start climbing. No crypto
-          knowledge required — just pure gaming skill. 🐿️
+          Free arcade games, global leaderboards, and weekly competitions. Sign in with Google, pick
+          a game, and start climbing. No crypto knowledge required — just pure gaming skill. 🐿️
         </motion.p>
 
         {/* ── CTAs ── */}
@@ -139,7 +139,9 @@ export function Hero() {
             href="#games"
             onClick={(e) => {
               e.preventDefault();
-              document.getElementById("games")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              document
+                .getElementById("games")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             // DEGEN OVERHAUL START — gold→hot-pink CTA, pink hover bloom
             whileHover={{
@@ -219,8 +221,8 @@ export function Hero() {
         >
           <span className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
           <span className="text-[var(--color-cream)]">
-            <span className="font-bold text-[var(--color-gold)]">Weekly leaderboards</span>{" "}
-            — compete and climb the ranks
+            <span className="font-bold text-[var(--color-gold)]">Weekly leaderboards</span> —
+            compete and climb the ranks
           </span>
           <ArrowRight
             size={15}

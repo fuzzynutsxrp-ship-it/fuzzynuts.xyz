@@ -75,7 +75,9 @@ function fill(tmpl: string, key: string, value: string): string {
 
 function rootVersion(): string {
   try {
-    return (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version as string) ?? "0.0.0";
+    return (
+      (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version as string) ?? "0.0.0"
+    );
   } catch {
     return "0.0.0";
   }
@@ -87,10 +89,12 @@ function recentCommits(n = 10): string {
   const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}'`);
   if (!raw) return "";
   const lines = raw.split("\n").filter(Boolean);
-  return lines.map((l) => {
-    const [sha, subject, author, when] = l.split(SEP);
-    return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
-  }).join("\n");
+  return lines
+    .map((l) => {
+      const [sha, subject, author, when] = l.split(SEP);
+      return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
+    })
+    .join("\n");
 }
 
 function main(): void {
@@ -119,10 +123,7 @@ function main(): void {
     // Normalize the generatedAt timestamp line before comparing,
     // since it changes every run and isn't a staleness signal.
     const normalizeTs = (s: string) =>
-      s.replace(
-        /_Generated \*\*[^*]+\*\* /,
-        "_Generated **TIMESTAMP** ",
-      );
+      s.replace(/_Generated \*\*[^*]+\*\* /, "_Generated **TIMESTAMP** ");
     if (normalizeTs(cur) !== normalizeTs(out)) {
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);

@@ -33,6 +33,7 @@ fixes. All shipped to `main` → Vercel production (site is still behind the
 pre-launch password lockdown).
 
 ### Accessibility & performance
+
 - **Global reduced-motion**: added `providers/MotionProvider.tsx`
   (`<MotionConfig reducedMotion="user">`) at the root so every Framer Motion
   animation respects the OS "reduce motion" setting. A CSS `@media` query
@@ -42,6 +43,7 @@ pre-launch password lockdown).
   for reduced-motion users (a CSS media query can't stop a rAF loop).
 
 ### Front-page overhaul (skeptical-first-visitor restructure)
+
 - Merged `PrizeTiers` + `WalletCTA` → **`sections/Prizes.tsx`** (one prize
   promise + a single connect CTA; killed a back-to-back duplicate pitch and
   the old sci-fi maximalism).
@@ -59,6 +61,7 @@ pre-launch password lockdown).
 - Navbar: dropped the dead `#features` link, added `#prizes`.
 
 ### Trust section donut
+
 - Replaced three independent progress bars (the 2% slice read as a broken
   empty rail) with a **donut hero + clean legend** (dot · label · % · amount).
 - Recolored the 2% founder slice `#8B6914` → **`#a855f7`** (purple) for
@@ -68,6 +71,7 @@ pre-launch password lockdown).
   section so text reads over the bright forest backdrop.
 
 ### Game cards → full arcade cabinets (`GamesShowcase.tsx`)
+
 - Backlit **marquee** header (title + genre) on top, screen in a **bezel**
   with CRT glass (diagonal glare, edge vignette, scanlines ~0.2–0.3),
   **control deck** with two round buttons + a chunky domed PLAY button +
@@ -76,6 +80,7 @@ pre-launch password lockdown).
   gating preserved.
 
 ### Wallet & backend
+
 - **Joey/WalletConnect**: added `"joey"` to the `WalletProvider` union and
   `setConnectedFromAdapter` / `setDisconnectedFromAdapter` to the store; wired
   `connect()`/`disconnect()` through the Joey adapter. (Fixed the type errors
@@ -88,6 +93,7 @@ pre-launch password lockdown).
   `SITE_LOCKDOWN_PASSWORD`.
 
 ### Bug fixes
+
 - **Survivors/Racer leaderboards were silently empty.** The backend (via
   `fuzzy-score.js`) stores legacy slugs `survivors` / `racer`, but the frontend
   queried with canonical `fuzzy-survivors` / `nut-racer`. Wired
@@ -104,6 +110,7 @@ pre-launch password lockdown).
   the game's `index.html` was loading a 404'd script in production.
 
 ### Tooling
+
 - Installed **vitest** (pinned `^2` for Node 18/20 compatibility) + `test`
   scripts + `vitest.config.ts` scoped to `src/` (avoids the orphaned tests
   under `docs/archive/`). `npm test` → 19/19 pass.
@@ -123,7 +130,7 @@ The site currently runs **locked + noindexed**. To go live:
    (Production scope). Defaults to `noindex`.
 3. **Redeploy** and verify: a fresh private-window load shows the site (no 503,
    no password prompt) and the page source shows `<meta name="robots"
-   content="index, follow">`.
+content="index, follow">`.
 4. Confirm the OG image unfurls (Twitter/Discord) and run a Lighthouse mobile
    pass.
 

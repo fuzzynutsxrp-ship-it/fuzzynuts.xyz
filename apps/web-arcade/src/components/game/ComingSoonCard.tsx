@@ -13,10 +13,13 @@ export function ComingSoonCard({ title, genre }: ComingSoonCardProps) {
       {/* Thumbnail — flexes to fill remaining space above title bar */}
       <div className="relative flex-1 min-h-0 overflow-hidden bg-[#0a0613]">
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)",
-          backgroundSize: "16px 16px",
-        }} />
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)",
+            backgroundSize: "16px 16px",
+          }}
+        />
 
         {/* Lock icon center */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">

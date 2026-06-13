@@ -33,8 +33,7 @@ interface OnlineUser {
 const LINK_REMOVAL_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /** Matches http(s) URLs and bare domains like example.com/path */
-const URL_PATTERN =
-  /https?:\/\/[^\s]+|(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?/gi;
+const URL_PATTERN = /https?:\/\/[^\s]+|(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?/gi;
 
 /** Strip all URLs from a message, replacing with "[link removed]" */
 function stripLinks(content: string): string {
@@ -50,10 +49,7 @@ async function getAccountAge(
   try {
     const db = await getDb(uri);
     const mappings = db.collection<{ createdAt?: Date }>(collectionName);
-    const mapping = await mappings.findOne(
-      { walletAddress },
-      { projection: { createdAt: 1 } },
-    );
+    const mapping = await mappings.findOne({ walletAddress }, { projection: { createdAt: 1 } });
     if (!mapping?.createdAt) return Infinity; // no creation date = treat as old/trusted
     return Date.now() - new Date(mapping.createdAt).getTime();
   } catch {
@@ -190,9 +186,7 @@ async function moderateWithAI(
 
     const isFlagged = flagged.length > 0;
     if (isFlagged) {
-      console.log(
-        `[chat:ai] Flagged — categories: ${flagged.join(", ")}`,
-      );
+      console.log(`[chat:ai] Flagged — categories: ${flagged.join(", ")}`);
     } else {
       console.log("[chat:ai] Passed — no categories flagged");
     }
@@ -217,9 +211,7 @@ async function getDb(uri: string): Promise<Db> {
   return _db;
 }
 
-async function getChatCollection(
-  uri: string,
-): Promise<Collection<ChatMessage>> {
+async function getChatCollection(uri: string): Promise<Collection<ChatMessage>> {
   const db = await getDb(uri);
   return db.collection<ChatMessage>("chat_messages");
 }
@@ -227,47 +219,24 @@ async function getChatCollection(
 /** Create indexes once at startup (idempotent, no-ops if they exist). */
 async function ensureIndexes(uri: string): Promise<void> {
   const db = await getDb(uri);
-  await db.collection<ChatMessage>("chat_messages").createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0 },
-  );
-  await db.collection<ChatMessage>("chat_messages").createIndex(
-    { createdAt: -1 },
-  );
+  await db
+    .collection<ChatMessage>("chat_messages")
+    .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection<ChatMessage>("chat_messages").createIndex({ createdAt: -1 });
   // Reports collection — TTL index for auto-expiry
-  await db.collection("chat_reports").createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0 },
-  );
+  await db.collection("chat_reports").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   // Mutes collection — TTL index for auto-expiry
-  await db.collection("chat_mutes").createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0 },
-  );
-  await db.collection("chat_mutes").createIndex(
-    { walletAddress: 1 },
-    { unique: true },
-  );
+  await db.collection("chat_mutes").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection("chat_mutes").createIndex({ walletAddress: 1 }, { unique: true });
   // Bans collection — TTL index for auto-expiry (permanent bans have far future date)
-  await db.collection("chat_bans").createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0 },
-  );
-  await db.collection("chat_bans").createIndex(
-    { walletAddress: 1 },
-    { unique: true },
-  );
+  await db.collection("chat_bans").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection("chat_bans").createIndex({ walletAddress: 1 }, { unique: true });
   // Private messages — TTL index (90 days) + compound index for history queries
-  await db.collection("private_messages").createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0 },
-  );
-  await db.collection("private_messages").createIndex(
-    { fromWallet: 1, toWallet: 1, createdAt: -1 },
-  );
-  await db.collection("private_messages").createIndex(
-    { toWallet: 1, read: 1, createdAt: -1 },
-  );
+  await db.collection("private_messages").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db
+    .collection("private_messages")
+    .createIndex({ fromWallet: 1, toWallet: 1, createdAt: -1 });
+  await db.collection("private_messages").createIndex({ toWallet: 1, read: 1, createdAt: -1 });
 }
 
 // ── Init — attach Socket.io to the HTTP server ─────────────────
@@ -399,14 +368,8 @@ export function initChat(
   // ── Auth middleware — resolve wallet → username on connect ──
   io.use(async (socket, next) => {
     try {
-      const walletAddress = socket.handshake.auth.walletAddress as
-        | string
-        | undefined;
-      if (
-        !walletAddress ||
-        typeof walletAddress !== "string" ||
-        walletAddress.length < 25
-      ) {
+      const walletAddress = socket.handshake.auth.walletAddress as string | undefined;
+      if (!walletAddress || typeof walletAddress !== "string" || walletAddress.length < 25) {
         return next(new Error("Wallet address required"));
       }
 
@@ -419,9 +382,7 @@ export function initChat(
       );
 
       if (!mapping) {
-        return next(
-          new Error("No RSC account found. Claim a username first."),
-        );
+        return next(new Error("No RSC account found. Claim a username first."));
       }
 
       socket.data.username = mapping.username;
@@ -458,11 +419,7 @@ export function initChat(
     socket.on("message:send", async (data: { content?: unknown }) => {
       try {
         // Validate input
-        if (
-          !data ||
-          typeof data.content !== "string" ||
-          data.content.trim().length === 0
-        ) {
+        if (!data || typeof data.content !== "string" || data.content.trim().length === 0) {
           return;
         }
 
@@ -498,108 +455,134 @@ export function initChat(
         }
 
         // ── Admin commands — /mute, /ban, /unmute, /unban, /clear ──
-        if (content.startsWith('/') && isAdmin(wallet)) {
+        if (content.startsWith("/") && isAdmin(wallet)) {
           const parts = content.trim().split(/\s+/);
-          const cmd = (parts[0] ?? '').toLowerCase();
-          const targetName = parts[1] || '';
-          const param = parts[2] || '';
+          const cmd = (parts[0] ?? "").toLowerCase();
+          const targetName = parts[1] || "";
+          const param = parts[2] || "";
 
-          if (cmd === '/mute' && targetName) {
+          if (cmd === "/mute" && targetName) {
             const targetWallet = await findWalletByUsername(targetName);
             if (!targetWallet) {
-              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              socket.emit("message:error", { error: `User "${targetName}" not found` });
               return;
             }
             const minutes = parseInt(param, 10) || 60;
             const db = await getDb(opts.MONGODB_URI);
             const now = new Date();
-            await db.collection('chat_mutes').updateOne(
+            await db.collection("chat_mutes").updateOne(
               { walletAddress: targetWallet },
-              { $set: { walletAddress: targetWallet, username: targetName, mutedBy: username, createdAt: now, expiresAt: new Date(now.getTime() + minutes * 60 * 1000) } },
+              {
+                $set: {
+                  walletAddress: targetWallet,
+                  username: targetName,
+                  mutedBy: username,
+                  createdAt: now,
+                  expiresAt: new Date(now.getTime() + minutes * 60 * 1000),
+                },
+              },
               { upsert: true },
             );
-            io.emit('message:new', {
-              id: `sys-${Date.now()}`, username: 'System',
+            io.emit("message:new", {
+              id: `sys-${Date.now()}`,
+              username: "System",
               content: `${targetName} has been muted for ${minutes} minutes by ${username}`,
-              createdAt: now.toISOString(), isSystem: true,
+              createdAt: now.toISOString(),
+              isSystem: true,
             });
             console.log(`[chat:admin] ${username} muted ${targetName} for ${minutes}m`);
             return;
           }
 
-          if (cmd === '/unmute' && targetName) {
+          if (cmd === "/unmute" && targetName) {
             const targetWallet = await findWalletByUsername(targetName);
             if (!targetWallet) {
-              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              socket.emit("message:error", { error: `User "${targetName}" not found` });
               return;
             }
             const db = await getDb(opts.MONGODB_URI);
-            await db.collection('chat_mutes').deleteOne({ walletAddress: targetWallet });
-            io.emit('message:new', {
-              id: `sys-${Date.now()}`, username: 'System',
+            await db.collection("chat_mutes").deleteOne({ walletAddress: targetWallet });
+            io.emit("message:new", {
+              id: `sys-${Date.now()}`,
+              username: "System",
               content: `${targetName} has been unmuted by ${username}`,
-              createdAt: new Date().toISOString(), isSystem: true,
+              createdAt: new Date().toISOString(),
+              isSystem: true,
             });
             console.log(`[chat:admin] ${username} unmuted ${targetName}`);
             return;
           }
 
-          if (cmd === '/ban' && targetName) {
+          if (cmd === "/ban" && targetName) {
             const targetWallet = await findWalletByUsername(targetName);
             if (!targetWallet) {
-              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              socket.emit("message:error", { error: `User "${targetName}" not found` });
               return;
             }
             const db = await getDb(opts.MONGODB_URI);
             const now = new Date();
             // Ban for 10 years (effectively permanent)
-            await db.collection('chat_bans').updateOne(
+            await db.collection("chat_bans").updateOne(
               { walletAddress: targetWallet },
-              { $set: { walletAddress: targetWallet, username: targetName, bannedBy: username, createdAt: now, expiresAt: new Date(now.getTime() + 10 * 365 * 24 * 60 * 60 * 1000) } },
+              {
+                $set: {
+                  walletAddress: targetWallet,
+                  username: targetName,
+                  bannedBy: username,
+                  createdAt: now,
+                  expiresAt: new Date(now.getTime() + 10 * 365 * 24 * 60 * 60 * 1000),
+                },
+              },
               { upsert: true },
             );
-            io.emit('message:new', {
-              id: `sys-${Date.now()}`, username: 'System',
+            io.emit("message:new", {
+              id: `sys-${Date.now()}`,
+              username: "System",
               content: `${targetName} has been banned from chat by ${username}`,
-              createdAt: now.toISOString(), isSystem: true,
+              createdAt: now.toISOString(),
+              isSystem: true,
             });
             console.log(`[chat:admin] ${username} banned ${targetName}`);
             return;
           }
 
-          if (cmd === '/unban' && targetName) {
+          if (cmd === "/unban" && targetName) {
             const targetWallet = await findWalletByUsername(targetName);
             if (!targetWallet) {
-              socket.emit('message:error', { error: `User "${targetName}" not found` });
+              socket.emit("message:error", { error: `User "${targetName}" not found` });
               return;
             }
             const db = await getDb(opts.MONGODB_URI);
-            await db.collection('chat_bans').deleteOne({ walletAddress: targetWallet });
-            io.emit('message:new', {
-              id: `sys-${Date.now()}`, username: 'System',
+            await db.collection("chat_bans").deleteOne({ walletAddress: targetWallet });
+            io.emit("message:new", {
+              id: `sys-${Date.now()}`,
+              username: "System",
               content: `${targetName} has been unbanned by ${username}`,
-              createdAt: new Date().toISOString(), isSystem: true,
+              createdAt: new Date().toISOString(),
+              isSystem: true,
             });
             console.log(`[chat:admin] ${username} unbanned ${targetName}`);
             return;
           }
 
-          if (cmd === '/clear') {
+          if (cmd === "/clear") {
             const db = await getDb(opts.MONGODB_URI);
-            await db.collection('chat_messages').deleteMany({});
-            io.emit('chat:clear', { clearedBy: username, at: new Date().toISOString() });
+            await db.collection("chat_messages").deleteMany({});
+            io.emit("chat:clear", { clearedBy: username, at: new Date().toISOString() });
             console.log(`[chat:admin] ${username} cleared all messages`);
             return;
           }
 
           // Unknown admin command
-          socket.emit('message:error', { error: 'Unknown command. Use /mute, /unmute, /ban, /unban, /clear' });
+          socket.emit("message:error", {
+            error: "Unknown command. Use /mute, /unmute, /ban, /unban, /clear",
+          });
           return;
         }
 
         // Ban check — banned users cannot send messages
         if (await isBanned(wallet)) {
-          socket.emit('message:error', { error: 'You are banned from chat' });
+          socket.emit("message:error", { error: "You are banned from chat" });
           return;
         }
 
@@ -663,9 +646,7 @@ export function initChat(
             createdAt: new Date().toISOString(),
             shadowed: true,
           });
-          console.log(
-            `[chat] Shadow-blocked ${username}: ${modResult.reason}`,
-          );
+          console.log(`[chat] Shadow-blocked ${username}: ${modResult.reason}`);
           return;
         }
 
@@ -682,9 +663,7 @@ export function initChat(
               aiFlagged: true,
               aiCategories: aiResult.categories,
             });
-            console.log(
-              `[chat] AI-flagged ${username}: ${aiResult.categories.join(", ")}`,
-            );
+            console.log(`[chat] AI-flagged ${username}: ${aiResult.categories.join(", ")}`);
             return;
           }
         }
@@ -776,7 +755,9 @@ export function initChat(
             createdAt: new Date().toISOString(),
             reason: modResult.reason,
           });
-          console.log(`[chat:dm] Blocked DM from ${username} to ${recipient.username}: ${modResult.reason}`);
+          console.log(
+            `[chat:dm] Blocked DM from ${username} to ${recipient.username}: ${modResult.reason}`,
+          );
           return;
         }
 
@@ -842,10 +823,12 @@ export function initChat(
       try {
         if (typeof data?.fromWallet !== "string") return;
         const db = await getDb(opts.MONGODB_URI);
-        await db.collection("private_messages").updateMany(
-          { fromWallet: data.fromWallet, toWallet: wallet, read: false },
-          { $set: { read: true } },
-        );
+        await db
+          .collection("private_messages")
+          .updateMany(
+            { fromWallet: data.fromWallet, toWallet: wallet, read: false },
+            { $set: { read: true } },
+          );
       } catch (err) {
         console.error("[chat:dm:read] Error:", err);
       }
@@ -959,18 +942,14 @@ export function buildAdminChatRouter(
       const cookieHeader = req.headers.cookie;
       if (!cookieHeader) return res.status(401).json({ error: "No session" });
 
-      const match = cookieHeader.match(
-        new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`),
-      );
+      const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`));
       const token = match?.[1];
       if (!token) return res.status(401).json({ error: "No session" });
 
       const { jwtVerify } = await import("jose");
-      const { payload } = await jwtVerify(
-        token,
-        new TextEncoder().encode(WALLET_JWT_SECRET),
-        { issuer: "fuzzynuts.xyz" },
-      );
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(WALLET_JWT_SECRET), {
+        issuer: "fuzzynuts.xyz",
+      });
 
       const address = typeof payload.address === "string" ? payload.address : "";
       if (address !== ADMIN_WALLET_ADDRESS) {

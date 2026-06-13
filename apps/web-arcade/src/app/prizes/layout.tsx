@@ -7,17 +7,9 @@
 
 import { SubPageLayout } from "@/components/layout/SubPageLayout";
 
-export default function PrizesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PrizesLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SubPageLayout
-      showVideoBg={true}
-      showFallingNuts={true}
-      navbarTransparent={false}
-    >
+    <SubPageLayout showVideoBg={true} showFallingNuts={true} navbarTransparent={false}>
       {children}
     </SubPageLayout>
   );

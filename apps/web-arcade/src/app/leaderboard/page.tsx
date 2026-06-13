@@ -7,8 +7,7 @@ export const metadata: Metadata = {
     "See who tops the charts across all Fuzzynuts games. Unified rankings for Google and XRPL players. Play free, climb the ranks, win prizes.",
   openGraph: {
     title: "Global Leaderboard | Fuzzynuts",
-    description:
-      "Unified rankings for Google and XRPL players. Play free, climb the ranks.",
+    description: "Unified rankings for Google and XRPL players. Play free, climb the ranks.",
     url: "https://fuzzynuts.xyz/leaderboard",
     siteName: "Fuzzynuts",
     type: "website",

@@ -55,11 +55,7 @@ export function installArcadeShell(opts: ArcadeShellOptions = {}): void {
 }
 
 /** Notify the parent that the game just emitted a score event. */
-export function emitScoreEvent(payload: {
-  game: string;
-  score: number;
-  duration: number;
-}): void {
+export function emitScoreEvent(payload: { game: string; score: number; duration: number }): void {
   if (typeof window === "undefined" || window.parent === window) return;
   window.parent.postMessage({ type: "FUZZY_SCORE_SUBMITTED", ...payload }, "*");
 }

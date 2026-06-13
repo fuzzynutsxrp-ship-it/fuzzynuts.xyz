@@ -54,15 +54,15 @@ Each game uses the shared arcade shell:
 
 ```html
 <!-- Shared shell -->
-<link rel="stylesheet" href="../../css/design-tokens.css">
-<link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
+<link rel="stylesheet" href="../../css/design-tokens.css" />
+<link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix" />
 <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
 <script>
   ArcadeShell.init({
-    slug: 'my-game',
-    title: 'My Game',
-    icon: '🎮',
-    accentColor: '#ff2e88',
+    slug: "my-game",
+    title: "My Game",
+    icon: "🎮",
+    accentColor: "#ff2e88",
     hideNavOnPlay: true,
     showLoader: false,
   });
@@ -78,10 +78,11 @@ Games submit scores via `FuzzyScoreSubmit(slug, score, duration)`:
 
 ```javascript
 // On game over
-FuzzyScoreSubmit('my-game', finalScore, playDurationSeconds);
+FuzzyScoreSubmit("my-game", finalScore, playDurationSeconds);
 ```
 
 The score bridge:
+
 - Writes to localStorage (instant, works offline)
 - POSTs to backend API (async, fire-and-forget)
 - Validates against SCORE_CAPS anti-cheat ceiling
@@ -89,12 +90,12 @@ The score bridge:
 
 ## Engine Options
 
-| Engine | Use Case | Example |
-|--------|----------|---------|
-| Vanilla Canvas 2D | Simple arcade games | Dragon's Hoard |
-| Kaboom.js | Platformers, complex games | Super Fuzzynuts |
-| Three.js | 3D games | Fuzzy Putt |
-| Custom | Specialized engines | Nut Racer |
+| Engine            | Use Case                   | Example         |
+| ----------------- | -------------------------- | --------------- |
+| Vanilla Canvas 2D | Simple arcade games        | Dragon's Hoard  |
+| Kaboom.js         | Platformers, complex games | Super Fuzzynuts |
+| Three.js          | 3D games                   | Fuzzy Putt      |
+| Custom            | Specialized engines        | Nut Racer       |
 
 ## Mobile Requirements
 

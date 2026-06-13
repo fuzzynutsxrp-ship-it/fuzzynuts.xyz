@@ -224,11 +224,7 @@ export async function validateScoreSubmission(
   // ── 7. Optional: Verify wallet signature if provided ──
   if (data.signature) {
     const message = `${data.gameSlug}:${data.score}:${data.duration}:${data.nonce}:${data.timestamp}`;
-    const verified = await verifyEd25519Signature(
-      data.walletAddress,
-      message,
-      data.signature,
-    );
+    const verified = await verifyEd25519Signature(data.walletAddress, message, data.signature);
     if (!verified) {
       return {
         valid: false,
@@ -252,9 +248,7 @@ export function generateScoreChallenge(
   const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 24);
   const timestamp = Date.now();
   const challenge = `${gameSlug}:${walletAddress}:${nonce}:${timestamp}`;
-  const hash = createHmac("sha256", serverSecret)
-    .update(challenge)
-    .digest("hex");
+  const hash = createHmac("sha256", serverSecret).update(challenge).digest("hex");
 
   return {
     nonce,

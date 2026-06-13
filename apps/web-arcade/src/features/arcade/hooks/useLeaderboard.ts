@@ -26,10 +26,7 @@ import { toBackendSlug } from "../slugAliases";
  * @param week   - ISO week key (e.g., "2026-W20"), defaults to current week
  * @returns Object with scores array, loading/error states, and refetch functions
  */
-export function useLeaderboard(
-  game: string,
-  week?: string
-): LeaderboardReturn {
+export function useLeaderboard(game: string, week?: string): LeaderboardReturn {
   const resolvedWeek = week || getCurrentWeekKey();
 
   const [scores, setScores] = useState<ScoreEntry[]>([]);
@@ -86,9 +83,7 @@ export function useLeaderboard(
         const localScores = getLocalScores(backendGame, resolvedWeek);
         const merged = mergeScores(normalized, localScores);
 
-        const sorted = merged
-          .sort((a, b) => b.score - a.score)
-          .slice(0, MAX_ENTRIES);
+        const sorted = merged.sort((a, b) => b.score - a.score).slice(0, MAX_ENTRIES);
 
         setScores(sorted);
         setLoading(false);
@@ -117,11 +112,11 @@ export function useLeaderboard(
         setError(
           err instanceof Error && err.name === "TimeoutError"
             ? "Request timed out — please try again"
-            : "Unable to reach the leaderboard server"
+            : "Unable to reach the leaderboard server",
         );
       }
     },
-    [game, resolvedWeek]
+    [game, resolvedWeek],
   );
 
   /** Manual refresh with cooldown */

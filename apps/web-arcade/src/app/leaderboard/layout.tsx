@@ -3,10 +3,6 @@
  * TopNav + Sidebar are rendered inside the client component.
  */
 
-export default function LeaderboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function LeaderboardLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

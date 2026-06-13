@@ -19,10 +19,9 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Navbar } from "./Navbar";
 
-const Footer = dynamic(
-  () => import("./Footer").then((m) => ({ default: m.Footer })),
-  { ssr: false },
-);
+const Footer = dynamic(() => import("./Footer").then((m) => ({ default: m.Footer })), {
+  ssr: false,
+});
 
 const ClientFallingNuts = dynamic(
   () =>
@@ -59,7 +58,10 @@ export function SubPageLayout({
     // GamePage). When showVideoBg is true the fixed video layer above
     // covers it; when false (or while the video loads), the mesh shows
     // through so /leaderboard and /profile read as one degen surface.
-    <div className="relative min-h-screen bg-degen-mesh" data-navbar-transparent={navbarTransparent || undefined}>
+    <div
+      className="relative min-h-screen bg-degen-mesh"
+      data-navbar-transparent={navbarTransparent || undefined}
+    >
       {/* ── Background Layer ── */}
       {showVideoBg && (
         <div className="fixed inset-0 z-0">

@@ -11,17 +11,12 @@ import Link from "next/link";
  * via SubPageLayout — this component only renders content.
  */
 const PrizesPageContent = dynamic(
-  () =>
-    import("@/components/sections/PrizesPageContent").then(
-      (mod) => mod.PrizesPageContent,
-    ),
+  () => import("@/components/sections/PrizesPageContent").then((mod) => mod.PrizesPageContent),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-32">
-        <p className="text-neon-green animate-pulse font-display text-lg">
-          Loading prizes…
-        </p>
+        <p className="text-neon-green animate-pulse font-display text-lg">Loading prizes…</p>
       </div>
     ),
   },
@@ -45,10 +40,7 @@ export function PrizesClient() {
                        hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
                        active:scale-95 transition-all min-h-[44px]"
           >
-            <ArrowLeft
-              size={16}
-              className="transition-transform group-hover:-translate-x-1"
-            />
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             Back to Home
           </Link>
         </motion.div>

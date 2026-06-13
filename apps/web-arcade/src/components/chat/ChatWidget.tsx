@@ -3,15 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { io, type Socket } from "socket.io-client";
 import { useWalletStore } from "@/store/wallet";
-import {
-  MessageSquare,
-  X,
-  Send,
-  Users,
-  AlertTriangle,
-  Mail,
-  ArrowLeft,
-} from "lucide-react";
+import { MessageSquare, X, Send, Users, AlertTriangle, Mail, ArrowLeft } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
    ChatWidget — Community chat + DMs powered by Socket.io
@@ -23,8 +15,7 @@ import {
    ═══════════════════════════════════════════════════════════════ */
 
 const CHAT_API =
-  process.env.NEXT_PUBLIC_CHAT_API ||
-  "https://fuzzynutsxyz-production.up.railway.app";
+  process.env.NEXT_PUBLIC_CHAT_API || "https://fuzzynutsxyz-production.up.railway.app";
 
 interface ChatMessage {
   id: string;
@@ -80,7 +71,9 @@ export function ChatWidget() {
   const [dmInput, setDmInput] = useState("");
   const [dmLoading, setDmLoading] = useState(false);
   const [unreadDms, setUnreadDms] = useState(0);
-  const [lastDmSender, setLastDmSender] = useState<{ wallet: string; username: string } | null>(null);
+  const [lastDmSender, setLastDmSender] = useState<{ wallet: string; username: string } | null>(
+    null,
+  );
   const dmEndRef = useRef<HTMLDivElement>(null);
   const dmInputRef = useRef<HTMLInputElement>(null);
 
@@ -89,8 +82,12 @@ export function ChatWidget() {
   const dmTargetRef = useRef<string | null>(null);
 
   // Keep refs in sync with state
-  useEffect(() => { dmOpenRef.current = dmOpen; }, [dmOpen]);
-  useEffect(() => { dmTargetRef.current = dmTarget; }, [dmTarget]);
+  useEffect(() => {
+    dmOpenRef.current = dmOpen;
+  }, [dmOpen]);
+  useEffect(() => {
+    dmTargetRef.current = dmTarget;
+  }, [dmTarget]);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = useCallback(() => {
@@ -143,8 +140,7 @@ export function ChatWidget() {
             seenIdsRef.current.add(msg.id);
           }
           if (data.messages.length > 0) {
-            lastHistoryIdRef.current =
-              data.messages[data.messages.length - 1].id;
+            lastHistoryIdRef.current = data.messages[data.messages.length - 1].id;
           }
           setMessages(data.messages);
         }
@@ -253,10 +249,7 @@ export function ChatWidget() {
 
       socket.on("dm:blocked", (msg: DirectMessage & { reason?: string }) => {
         if (cancelled) return;
-        setDmMessages((prev) => [
-          ...prev,
-          { ...msg, blocked: true, blockedReason: msg.reason },
-        ]);
+        setDmMessages((prev) => [...prev, { ...msg, blocked: true, blockedReason: msg.reason }]);
       });
 
       socket.on("dm:unread-count", (data: { count: number }) => {
@@ -284,7 +277,7 @@ export function ChatWidget() {
       lastHistoryIdRef.current = null;
       historyLoadedRef.current = false;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address]);
 
   // ── Send public message ──────────────────────────────────────
@@ -435,25 +428,17 @@ export function ChatWidget() {
                 <div className="flex items-baseline gap-2">
                   <span
                     className={`text-xs font-semibold ${
-                      msg.blocked
-                        ? "text-[#ef4444]"
-                        : isMine
-                          ? "text-[#22d3ee]"
-                          : "text-[#10B981]"
+                      msg.blocked ? "text-[#ef4444]" : isMine ? "text-[#22d3ee]" : "text-[#10B981]"
                     }`}
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     {msg.fromUsername}
                   </span>
-                  <span className="text-[10px] text-white/20">
-                    {formatTime(msg.createdAt)}
-                  </span>
+                  <span className="text-[10px] text-white/20">{formatTime(msg.createdAt)}</span>
                 </div>
                 <p
                   className={`mt-0.5 text-[13px] leading-relaxed ${
-                    msg.blocked
-                      ? "text-[#ef4444]/70 line-through"
-                      : "text-white/80"
+                    msg.blocked ? "text-[#ef4444]/70 line-through" : "text-white/80"
                   }`}
                 >
                   {msg.content}
@@ -521,9 +506,7 @@ export function ChatWidget() {
           >
             Community Chat
           </h3>
-          {connected && (
-            <span className="h-2 w-2 rounded-full bg-[#10B981]" title="Connected" />
-          )}
+          {connected && <span className="h-2 w-2 rounded-full bg-[#10B981]" title="Connected" />}
           {!connected && (
             <span className="h-2 w-2 rounded-full bg-[#ef4444]" title="Disconnected" />
           )}
@@ -564,16 +547,11 @@ export function ChatWidget() {
           </div>
         )}
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`mb-3 ${msg.shadowed ? "opacity-50" : ""}`}
-          >
+          <div key={msg.id} className={`mb-3 ${msg.shadowed ? "opacity-50" : ""}`}>
             {/* System messages */}
             {msg.isSystem && (
               <div className="rounded-lg border border-[#10B981]/20 bg-[#10B981]/5 px-3 py-2">
-                <p className="text-[12px] leading-relaxed text-[#10B981]/80">
-                  {msg.content}
-                </p>
+                <p className="text-[12px] leading-relaxed text-[#10B981]/80">{msg.content}</p>
               </div>
             )}
 
@@ -608,9 +586,7 @@ export function ChatWidget() {
                       <Mail size={11} />
                     </button>
                   )}
-                  <span className="text-[10px] text-white/20">
-                    {formatTime(msg.createdAt)}
-                  </span>
+                  <span className="text-[10px] text-white/20">{formatTime(msg.createdAt)}</span>
                 </div>
                 <p
                   className={`mt-0.5 text-[13px] leading-relaxed ${
@@ -682,9 +658,7 @@ export function ChatWidget() {
               setInput(e.target.value);
               if (error) setError(null);
             }}
-            placeholder={
-              connected ? "Type a message..." : "Connecting..."
-            }
+            placeholder={connected ? "Type a message..." : "Connecting..."}
             disabled={!connected}
             maxLength={500}
             className="flex-1 rounded-lg bg-white/5 px-3 py-2 text-[13px] text-white placeholder-white/25 outline-none transition-colors focus:bg-white/8 focus:ring-1 focus:ring-[#7c3aed]/40 disabled:opacity-40"

@@ -191,35 +191,35 @@ Run these checks after both deploys complete:
 
 ### Frontend Tests
 
-| Test | URL | Expected |
-|------|-----|----------|
-| Homepage | `https://fuzzynuts.xyz` | Hero + games section loads |
-| Leaderboard | `https://fuzzynuts.xyz/leaderboard/` | Tab UI with scores |
-| Profile (no wallet) | `https://fuzzynuts.xyz/profile/` | "Connect Wallet" prompt |
-| Game page | `https://fuzzynuts.xyz/games/mario/` | Mario iframe loads |
-| Litepaper | `https://fuzzynuts.xyz/litepaper.html` | Static HTML renders |
-| 404 page | `https://fuzzynuts.xyz/nonexistent/` | Custom 404 |
-| Robots.txt | `https://fuzzynuts.xyz/robots.txt` | Sitemap reference |
+| Test                | URL                                    | Expected                   |
+| ------------------- | -------------------------------------- | -------------------------- |
+| Homepage            | `https://fuzzynuts.xyz`                | Hero + games section loads |
+| Leaderboard         | `https://fuzzynuts.xyz/leaderboard/`   | Tab UI with scores         |
+| Profile (no wallet) | `https://fuzzynuts.xyz/profile/`       | "Connect Wallet" prompt    |
+| Game page           | `https://fuzzynuts.xyz/games/mario/`   | Mario iframe loads         |
+| Litepaper           | `https://fuzzynuts.xyz/litepaper.html` | Static HTML renders        |
+| 404 page            | `https://fuzzynuts.xyz/nonexistent/`   | Custom 404                 |
+| Robots.txt          | `https://fuzzynuts.xyz/robots.txt`     | Sitemap reference          |
 
 ### Backend Tests
 
-| Test | Command | Expected |
-|------|---------|----------|
-| Health check | `curl https://world.fuzzynuts.xyz/` | `{"name":"Fuzzynuts World",...}` |
-| Scores GET | `curl "https://world.fuzzynuts.xyz/api/scores"` | JSON array of scores |
-| Rewards eligibility | `curl "https://world.fuzzynuts.xyz/api/rewards/eligibility?wallet=rTestAddress123"` | `{"eligible":false,...}` |
-| Rewards health | `curl "https://world.fuzzynuts.xyz/api/rewards/health"` | `{"ok":true,"mongoConnected":true,...}` |
-| Claim status | `curl "https://world.fuzzynuts.xyz/api/rewards/claim/status?wallet=rTest&week=2026-W20"` | `{"status":"not_found",...}` |
-| CORS preflight | `curl -X OPTIONS https://world.fuzzynuts.xyz/api/rewards/eligibility -I` | `Access-Control-Allow-Origin: *` |
+| Test                | Command                                                                                  | Expected                                |
+| ------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------- |
+| Health check        | `curl https://world.fuzzynuts.xyz/`                                                      | `{"name":"Fuzzynuts World",...}`        |
+| Scores GET          | `curl "https://world.fuzzynuts.xyz/api/scores"`                                          | JSON array of scores                    |
+| Rewards eligibility | `curl "https://world.fuzzynuts.xyz/api/rewards/eligibility?wallet=rTestAddress123"`      | `{"eligible":false,...}`                |
+| Rewards health      | `curl "https://world.fuzzynuts.xyz/api/rewards/health"`                                  | `{"ok":true,"mongoConnected":true,...}` |
+| Claim status        | `curl "https://world.fuzzynuts.xyz/api/rewards/claim/status?wallet=rTest&week=2026-W20"` | `{"status":"not_found",...}`            |
+| CORS preflight      | `curl -X OPTIONS https://world.fuzzynuts.xyz/api/rewards/eligibility -I`                 | `Access-Control-Allow-Origin: *`        |
 
 ### Integration Tests
 
-| Test | Steps | Expected |
-|------|-------|----------|
-| Wallet connect | Click Xaman → approve | Navbar shows truncated address |
-| Profile loads | Navigate to /profile/ | Stats cards + ClaimRewards card |
-| Score submission | Play Mario → score > 0 | Toast: "Score saved to leaderboard" |
-| Leaderboard update | Submit score → check /leaderboard/ | New score appears |
+| Test               | Steps                              | Expected                            |
+| ------------------ | ---------------------------------- | ----------------------------------- |
+| Wallet connect     | Click Xaman → approve              | Navbar shows truncated address      |
+| Profile loads      | Navigate to /profile/              | Stats cards + ClaimRewards card     |
+| Score submission   | Play Mario → score > 0             | Toast: "Score saved to leaderboard" |
+| Leaderboard update | Submit score → check /leaderboard/ | New score appears                   |
 
 ---
 
@@ -288,10 +288,10 @@ git push origin develop
 
 ## Post-Deploy Monitoring
 
-| What | Where |
-|------|-------|
-| Frontend errors | Vercel → Analytics / Functions |
-| Backend logs | Railway → Fuzzynuts World → Logs |
-| MongoDB metrics | Railway → MongoDB → Metrics |
+| What              | Where                                                          |
+| ----------------- | -------------------------------------------------------------- |
+| Frontend errors   | Vercel → Analytics / Functions                                 |
+| Backend logs      | Railway → Fuzzynuts World → Logs                               |
+| MongoDB metrics   | Railway → MongoDB → Metrics                                    |
 | XRPL transactions | https://xrpscan.com/account/rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh |
-| Uptime | Railway Dashboard → Service health |
+| Uptime            | Railway Dashboard → Service health                             |

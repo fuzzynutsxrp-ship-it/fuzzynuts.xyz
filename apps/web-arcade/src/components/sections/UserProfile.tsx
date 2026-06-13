@@ -51,12 +51,12 @@ const GAME_EMOJIS: Record<string, string> = {
   rsc: "⚔️",
   "dragon-hoard": "🐉",
   "cosmic-blaster": "🚀",
-  "snake": "🐍",
-  "breakout": "🧱",
-  "pong": "🏓",
-  "tetris": "🟦",
-  "asteroids": "☄️",
-  "flappy": "🐦",
+  snake: "🐍",
+  breakout: "🧱",
+  pong: "🏓",
+  tetris: "🟦",
+  asteroids: "☄️",
+  flappy: "🐦",
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -165,22 +165,32 @@ function ConnectPrompt() {
       className="flex flex-col items-center justify-center py-20 px-6 text-center"
     >
       {/* Floating nuts around connect prompt */}
-      <span className="absolute top-8 left-1/4 text-xl float-nut-1 opacity-50 pointer-events-none">🥜</span>
-      <span className="absolute top-12 right-1/4 text-lg float-nut-2 opacity-40 pointer-events-none">🥜</span>
-      <span className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-35 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
+      <span className="absolute top-8 left-1/4 text-xl float-nut-1 opacity-50 pointer-events-none">
+        🥜
+      </span>
+      <span className="absolute top-12 right-1/4 text-lg float-nut-2 opacity-40 pointer-events-none">
+        🥜
+      </span>
+      <span
+        className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-35 pointer-events-none"
+        style={{ animationDelay: "0.8s" }}
+      >
+        🥜
+      </span>
 
       <div
         className="w-24 h-24 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center mb-6"
-        style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
+        style={{
+          boxShadow:
+            "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)",
+        }}
       >
         <Wallet size={40} className="text-brand-gold" />
       </div>
-      <h2 className="font-display text-2xl font-bold text-cream mb-3">
-        Connect Your Wallet
-      </h2>
+      <h2 className="font-display text-2xl font-bold text-cream mb-3">Connect Your Wallet</h2>
       <p className="text-cream-dim text-sm max-w-md mb-8 leading-relaxed">
-        Link your XRPL wallet to view your personal score history, track your
-        best runs, and verify your $NUT prize eligibility.
+        Link your XRPL wallet to view your personal score history, track your best runs, and verify
+        your $NUT prize eligibility.
       </p>
       <div className="flex flex-col sm:flex-row gap-3">
         {[
@@ -268,9 +278,7 @@ export function UserProfile() {
         }
 
         const data = await response.json();
-        const scores: ScoreEntry[] = Array.isArray(data)
-          ? data
-          : data.scores || data.data || [];
+        const scores: ScoreEntry[] = Array.isArray(data) ? data : data.scores || data.data || [];
 
         // Sort by most recent first
         const sorted = scores.sort((a, b) => (b.ts || 0) - (a.ts || 0));
@@ -287,7 +295,7 @@ export function UserProfile() {
         });
       }
     },
-    [address]
+    [address],
   );
 
   /* ── Fetch on connect ── */
@@ -324,20 +332,15 @@ export function UserProfile() {
   /* ── Derived stats ── */
   const totalGames = state.scores.length;
   const uniqueGames = new Set(state.scores.map((s) => s.game)).size;
-  const topScore = state.scores.length
-    ? Math.max(...state.scores.map((s) => s.score))
-    : 0;
+  const topScore = state.scores.length ? Math.max(...state.scores.map((s) => s.score)) : 0;
 
   // Best score per game
-  const bestByGame = state.scores.reduce<Record<string, ScoreEntry>>(
-    (acc, entry) => {
-      if (!acc[entry.game] || entry.score > acc[entry.game].score) {
-        acc[entry.game] = entry;
-      }
-      return acc;
-    },
-    {}
-  );
+  const bestByGame = state.scores.reduce<Record<string, ScoreEntry>>((acc, entry) => {
+    if (!acc[entry.game] || entry.score > acc[entry.game].score) {
+      acc[entry.game] = entry;
+    }
+    return acc;
+  }, {});
 
   // XP progress
   const xpProgress = (unlockedAchievements.size / ACHIEVEMENTS.length) * 100;
@@ -345,20 +348,28 @@ export function UserProfile() {
   return (
     <section id="user-profile" className="py-16 relative">
       <div className="container-main space-y-6">
-
         {/* ═══ PROFILE HEADER — Squirrel Profile Card ═══ */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div
             className="bg-degen-950 border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
-            style={{ boxShadow: "0 0 40px rgba(251,191,36,0.1), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)" }}
+            style={{
+              boxShadow:
+                "0 0 40px rgba(251,191,36,0.1), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)",
+            }}
           >
             {/* Floating nuts around header */}
-            <span className="absolute top-4 right-8 text-lg float-nut-1 opacity-60 pointer-events-none z-10">🥜</span>
-            <span className="absolute bottom-6 left-12 text-base float-nut-2 opacity-45 pointer-events-none z-10">🥜</span>
-            <span className="absolute top-1/2 right-1/4 text-sm float-nut-3 opacity-40 pointer-events-none z-10" style={{ animationDelay: "1.1s" }}>🥜</span>
+            <span className="absolute top-4 right-8 text-lg float-nut-1 opacity-60 pointer-events-none z-10">
+              🥜
+            </span>
+            <span className="absolute bottom-6 left-12 text-base float-nut-2 opacity-45 pointer-events-none z-10">
+              🥜
+            </span>
+            <span
+              className="absolute top-1/2 right-1/4 text-sm float-nut-3 opacity-40 pointer-events-none z-10"
+              style={{ animationDelay: "1.1s" }}
+            >
+              🥜
+            </span>
 
             {/* Gold accent stripe */}
             <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
@@ -368,7 +379,10 @@ export function UserProfile() {
                   {/* Avatar — Fuzzynuts logo */}
                   <div
                     className="w-20 h-20 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center shrink-0"
-                    style={{ boxShadow: "0 0 24px rgba(251,191,36,0.2), 0 0 48px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
+                    style={{
+                      boxShadow:
+                        "0 0 24px rgba(251,191,36,0.2), 0 0 48px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)",
+                    }}
                   >
                     <img
                       src="/images/branding/logo.webp"
@@ -415,10 +429,7 @@ export function UserProfile() {
                                disabled:opacity-40 cursor-pointer"
                     title="Refresh scores"
                   >
-                    <RefreshCw
-                      size={14}
-                      className={isRefreshing ? "animate-spin" : ""}
-                    />
+                    <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
                     Refresh
                   </motion.button>
                   <motion.button
@@ -483,12 +494,17 @@ export function UserProfile() {
             <div
               key={stat.label}
               className={`${stat.bg} border-2 ${stat.borderColor} rounded-xl ${stat.glowColor} p-4 sm:p-5 text-center`}
-              style={{ boxShadow: stat.label === "Best Score" ? "0 0 25px rgba(245,158,11,0.15), 0 0 50px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.15)" : stat.label === "Games Played" ? "0 0 25px rgba(251,191,36,0.15), 0 0 50px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)" : "0 0 25px rgba(16,185,129,0.15), 0 0 50px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.15)" }}
+              style={{
+                boxShadow:
+                  stat.label === "Best Score"
+                    ? "0 0 25px rgba(245,158,11,0.15), 0 0 50px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.15)"
+                    : stat.label === "Games Played"
+                      ? "0 0 25px rgba(251,191,36,0.15), 0 0 50px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)"
+                      : "0 0 25px rgba(16,185,129,0.15), 0 0 50px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.15)",
+              }}
             >
               <div className="flex justify-center mb-2">{stat.icon}</div>
-              <p className="font-display text-xl sm:text-2xl font-bold text-cream">
-                {stat.value}
-              </p>
+              <p className="font-display text-xl sm:text-2xl font-bold text-cream">{stat.value}</p>
               <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
                 {stat.label}
               </p>
@@ -557,12 +573,12 @@ export function UserProfile() {
           {/* XP Progress Bar */}
           <div
             className="mb-4 bg-degen-950 border-2 border-brand-gold/30 rounded-xl p-4"
-            style={{ boxShadow: "0 0 20px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" }}
+            style={{
+              boxShadow: "0 0 20px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)",
+            }}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-cream">
-                Achievement Progress
-              </span>
+              <span className="text-sm font-semibold text-cream">Achievement Progress</span>
               <span className="text-sm font-mono text-brand-gold">
                 {unlockedAchievements.size}/{ACHIEVEMENTS.length}
               </span>
@@ -592,7 +608,14 @@ export function UserProfile() {
                         ? "bg-[#0f0a00] border-brand-gold/40"
                         : "bg-degen-950 border-hot-pink/15 opacity-50"
                     }`}
-                    style={isUnlocked ? { boxShadow: "0 0 20px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.12)" } : undefined}
+                    style={
+                      isUnlocked
+                        ? {
+                            boxShadow:
+                              "0 0 20px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.12)",
+                          }
+                        : undefined
+                    }
                   >
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 ${
@@ -611,9 +634,7 @@ export function UserProfile() {
                       >
                         {achievement.title}
                       </p>
-                      <p className="text-[11px] text-cream-dim">
-                        {achievement.description}
-                      </p>
+                      <p className="text-[11px] text-cream-dim">{achievement.description}</p>
                     </div>
                   </div>
                   {/* Tooltip for locked achievements */}
@@ -643,7 +664,11 @@ export function UserProfile() {
             style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}
           >
             {/* Loading */}
-            {state.loading && <div className="p-4 sm:p-5"><SkeletonRows /></div>}
+            {state.loading && (
+              <div className="p-4 sm:p-5">
+                <SkeletonRows />
+              </div>
+            )}
 
             {/* Error */}
             <AnimatePresence>
@@ -658,9 +683,7 @@ export function UserProfile() {
                   <p className="font-display text-base font-bold text-cream mb-2">
                     Server Unreachable
                   </p>
-                  <p className="text-sm text-cream-dim mb-5 max-w-sm">
-                    {state.error}
-                  </p>
+                  <p className="text-sm text-cream-dim mb-5 max-w-sm">{state.error}</p>
                   <button
                     onClick={() => fetchUserScores(true)}
                     className="btn-secondary text-sm cursor-pointer"
@@ -675,23 +698,24 @@ export function UserProfile() {
             {!state.loading && !state.error && state.scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center relative">
                 {/* Floating nuts */}
-                <span className="absolute top-10 left-1/4 text-xl float-nut-1 opacity-40 pointer-events-none">🥜</span>
-                <span className="absolute top-8 right-1/4 text-lg float-nut-2 opacity-30 pointer-events-none">🥜</span>
-                <span className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-25 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
+                <span className="absolute top-10 left-1/4 text-xl float-nut-1 opacity-40 pointer-events-none">
+                  🥜
+                </span>
+                <span className="absolute top-8 right-1/4 text-lg float-nut-2 opacity-30 pointer-events-none">
+                  🥜
+                </span>
+                <span
+                  className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-25 pointer-events-none"
+                  style={{ animationDelay: "0.6s" }}
+                >
+                  🥜
+                </span>
 
-                <Gamepad2
-                  size={32}
-                  className="text-neon-green mb-4 opacity-40"
-                />
-                <p className="font-display text-lg font-bold text-cream mb-2">
-                  No scores yet
-                </p>
+                <Gamepad2 size={32} className="text-neon-green mb-4 opacity-40" />
+                <p className="font-display text-lg font-bold text-cream mb-2">No scores yet</p>
                 <p className="text-sm text-cream-dim max-w-sm">
                   Play a game to set your first record! Head to the{" "}
-                  <a
-                    href="#games"
-                    className="text-neon-green hover:underline font-semibold"
-                  >
+                  <a href="#games" className="text-neon-green hover:underline font-semibold">
                     Arcade
                   </a>{" "}
                   and start earning $NUT.
@@ -721,12 +745,8 @@ export function UserProfile() {
                           className="absolute -left-5 top-3.5 w-3 h-3 rounded-full border-2"
                           style={{
                             borderColor: getGameColor(entry.game),
-                            background: isRecent
-                              ? getGameColor(entry.game)
-                              : "#0a0a0a",
-                            boxShadow: isRecent
-                              ? `0 0 8px ${getGameColor(entry.game)}40`
-                              : "none",
+                            background: isRecent ? getGameColor(entry.game) : "#0a0a0a",
+                            boxShadow: isRecent ? `0 0 8px ${getGameColor(entry.game)}40` : "none",
                           }}
                         />
 
@@ -737,12 +757,17 @@ export function UserProfile() {
                               ? "border-brand-gold/30"
                               : "border-hot-pink/10 hover:border-hot-pink/20"
                           }`}
-                          style={isRecent ? { boxShadow: "0 0 15px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" } : undefined}
+                          style={
+                            isRecent
+                              ? {
+                                  boxShadow:
+                                    "0 0 15px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)",
+                                }
+                              : undefined
+                          }
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-base">
-                              {GAME_EMOJIS[entry.game] || "🎮"}
-                            </span>
+                            <span className="text-base">{GAME_EMOJIS[entry.game] || "🎮"}</span>
                             <span
                               className="text-sm font-bold truncate"
                               style={{ color: getGameColor(entry.game) }}
@@ -775,9 +800,7 @@ export function UserProfile() {
 
 function AdminLinks() {
   const { address, isConnected } = useWalletStore();
-  const ADMIN =
-    process.env.NEXT_PUBLIC_ADMIN_WALLET ||
-    "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
+  const ADMIN = process.env.NEXT_PUBLIC_ADMIN_WALLET || "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
 
   if (!isConnected || !address) return null;
   if (address.toLowerCase() !== ADMIN.toLowerCase()) return null;

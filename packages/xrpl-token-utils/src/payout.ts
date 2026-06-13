@@ -65,10 +65,7 @@ export function buildPayment(args: PayoutArgs): Payment {
  *         REFUSES to run in production unless ALLOW_SINGLE_SIG_PAYOUT
  *         is explicitly set.
  */
-export async function submitPayout(
-  args: PayoutArgs,
-  seeds: PayoutSeeds,
-): Promise<SubmitResponse> {
+export async function submitPayout(args: PayoutArgs, seeds: PayoutSeeds): Promise<SubmitResponse> {
   const payment = buildPayment(args);
 
   if (seeds.signerSeeds && seeds.signerSeeds.length >= 2) {

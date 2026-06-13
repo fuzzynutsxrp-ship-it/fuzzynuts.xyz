@@ -33,34 +33,35 @@
 
 ### Channel Settings
 
-| Channel | Permissions | Slow Mode |
-|---------|------------|-----------|
-| #announcements | Read-only (admin posts only) | None |
-| #patch-notes | Read-only | None |
-| #weekly-winners | Read-only (bot posts only) | None |
-| #leaderboard-discuss | @everyone can post | 5s |
-| #game-chat | @everyone can post | None |
-| #fuzzynuts-world | @everyone can post | None |
-| #super-fuzzynuts | @everyone can post | None |
-| #rsc-classic | @everyone can post | None |
-| #bug-reports | @everyone can post | 30s |
-| #feature-requests | @everyone can post | 30s |
-| #web3-rewards | @everyone can post | 10s |
+| Channel              | Permissions                  | Slow Mode |
+| -------------------- | ---------------------------- | --------- |
+| #announcements       | Read-only (admin posts only) | None      |
+| #patch-notes         | Read-only                    | None      |
+| #weekly-winners      | Read-only (bot posts only)   | None      |
+| #leaderboard-discuss | @everyone can post           | 5s        |
+| #game-chat           | @everyone can post           | None      |
+| #fuzzynuts-world     | @everyone can post           | None      |
+| #super-fuzzynuts     | @everyone can post           | None      |
+| #rsc-classic         | @everyone can post           | None      |
+| #bug-reports         | @everyone can post           | 30s       |
+| #feature-requests    | @everyone can post           | 30s       |
+| #web3-rewards        | @everyone can post           | 10s       |
 
 ### Roles
 
-| Role | Color | Purpose |
-|------|-------|---------|
-| @everyone | Default | Base access to all public channels |
-| 🏆 Champion | Gold (#FBBF24) | Auto-assigned to weekly Top 3 winners |
-| 🎮 Gamer | Green (#4ade80) | Verified players (played at least 1 game) |
-| 🐿️ OG | Purple (#a855f7) | Early adopters / first 100 members |
-| 👑 Admin | Red (#ef4444) | Server administrators |
-| 🤖 Bot | Blue (#3b82f6) | FuzzyNuts bot account |
+| Role        | Color            | Purpose                                   |
+| ----------- | ---------------- | ----------------------------------------- |
+| @everyone   | Default          | Base access to all public channels        |
+| 🏆 Champion | Gold (#FBBF24)   | Auto-assigned to weekly Top 3 winners     |
+| 🎮 Gamer    | Green (#4ade80)  | Verified players (played at least 1 game) |
+| 🐿️ OG       | Purple (#a855f7) | Early adopters / first 100 members        |
+| 👑 Admin    | Red (#ef4444)    | Server administrators                     |
+| 🤖 Bot      | Blue (#3b82f6)   | FuzzyNuts bot account                     |
 
 ### Invite Link
 
 Generate a permanent invite link with:
+
 - **Settings → Invites → Create Link**
 - Set to **Never Expire**
 - Set max uses to **No Limit**
@@ -74,6 +75,7 @@ Generate a permanent invite link with:
 ### Bot Recommendation
 
 **Custom webhook** (not MEE6/Statbot) — because:
+
 1. We already have MongoDB with score data
 2. We already have `node-cron` in the API
 3. We already have `DISCORD_WEBHOOK_URL` in server.ts
@@ -91,6 +93,7 @@ Generate a permanent invite link with:
 ### Cron Job: `apps/api/src/cron/weekly-discord-winners.ts`
 
 Schedule: `0 0 * * 1` (Every Monday at 00:00 UTC)
+
 - Matches the leaderboard reset timer exactly
 - Queries `arcade_scores` for the just-completed week
 - Fetches Top 3 by total score across all games
@@ -99,21 +102,23 @@ Schedule: `0 0 * * 1` (Every Monday at 00:00 UTC)
 
 ### Environment Variables Needed
 
-| Variable | Where | Purpose |
-|----------|-------|---------|
-| `DISCORD_WEEKLY_WINNERS_WEBHOOK_URL` | Railway | Webhook URL for #weekly-winners channel |
-| `DISCORD_INVITE_URL` | Railway / .env | Permanent invite link for the server |
+| Variable                             | Where          | Purpose                                 |
+| ------------------------------------ | -------------- | --------------------------------------- |
+| `DISCORD_WEEKLY_WINNERS_WEBHOOK_URL` | Railway        | Webhook URL for #weekly-winners channel |
+| `DISCORD_INVITE_URL`                 | Railway / .env | Permanent invite link for the server    |
 
 ---
 
 ## Phase 3: Homepage Linkage
 
 ### Current State
+
 - Footer has Discord link: `https://discord.gg/fuzzynuts` ✓
 - Community section has Discord link ✓
 - GameModal sidebar has NO Discord CTA ✗
 
 ### Changes Needed
+
 1. Add Discord CTA banner to GameModal sidebar (between game cards and live chat)
 2. CTA text: "Join 500+ players on Discord →"
 3. Opens in new tab, tracks engagement
@@ -122,11 +127,11 @@ Schedule: `0 0 * * 1` (Every Monday at 00:00 UTC)
 
 ## Implementation Files
 
-| File | Purpose |
-|------|---------|
-| `apps/api/src/cron/weekly-discord-winners.ts` | Cron job — posts weekly winners to Discord |
-| `apps/web-arcade/src/components/game/GameModal.tsx` | Add Discord CTA to sidebar |
-| `apps/api/src/server.ts` | Wire up the new cron job |
+| File                                                | Purpose                                    |
+| --------------------------------------------------- | ------------------------------------------ |
+| `apps/api/src/cron/weekly-discord-winners.ts`       | Cron job — posts weekly winners to Discord |
+| `apps/web-arcade/src/components/game/GameModal.tsx` | Add Discord CTA to sidebar                 |
+| `apps/api/src/server.ts`                            | Wire up the new cron job                   |
 
 ## Rollout Checklist
 

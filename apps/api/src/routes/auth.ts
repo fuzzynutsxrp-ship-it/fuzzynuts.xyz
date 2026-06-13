@@ -82,7 +82,11 @@ export function buildAuthRouter(env: {
     res.setHeader("Set-Cookie", [
       `fuzzy_wallet_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
       `fuzzy_session_meta=${encodeURIComponent(
-        JSON.stringify({ address: parsed.data.address, provider: "xaman", cookieExp: cookieExp * 1000 }),
+        JSON.stringify({
+          address: parsed.data.address,
+          provider: "xaman",
+          cookieExp: cookieExp * 1000,
+        }),
       )}; Secure; SameSite=Lax; Domain=.fuzzynuts.xyz; Path=/; Max-Age=${COOKIE_TTL_SEC}`,
     ]);
 

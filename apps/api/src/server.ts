@@ -45,11 +45,7 @@ const app = express();
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      frameAncestors: [
-        "'self'",
-        "https://www.fuzzynuts.xyz",
-        "http://localhost:3000",
-      ],
+      frameAncestors: ["'self'", "https://www.fuzzynuts.xyz", "http://localhost:3000"],
     },
   }),
 );
@@ -91,10 +87,7 @@ app.get("/healthz", (_req, res) => {
 
 async function bootstrap() {
   // Shared challenge store
-  const challengeStore = new Map<
-    string,
-    { address: string; challenge: string; exp: number }
-  >();
+  const challengeStore = new Map<string, { address: string; challenge: string; exp: number }>();
 
   // Session router (supports both Web2 NextAuth + Web3 wallet)
   try {
@@ -111,11 +104,14 @@ async function bootstrap() {
   if (MONGODB_URI) {
     try {
       const { buildScoresRouter } = await import("./routes/scores");
-      app.use("/api/scores", buildScoresRouter({
-        MONGODB_URI,
-        GAME_SESSION_SECRET,
-        WALLET_JWT_SECRET,
-      }));
+      app.use(
+        "/api/scores",
+        buildScoresRouter({
+          MONGODB_URI,
+          GAME_SESSION_SECRET,
+          WALLET_JWT_SECRET,
+        }),
+      );
     } catch (e) {
       console.error("[api] Failed to load scores router:", e);
       app.use("/api/scores", (_req, res) => {
@@ -127,10 +123,7 @@ async function bootstrap() {
   // Auth router (depends on xrpl-token-utils)
   try {
     const { buildAuthRouter } = await import("./routes/auth");
-    app.use(
-      "/api/auth",
-      buildAuthRouter({ WALLET_JWT_SECRET, challengeStore }),
-    );
+    app.use("/api/auth", buildAuthRouter({ WALLET_JWT_SECRET, challengeStore }));
   } catch (e) {
     console.error("[api] Failed to load auth router:", e);
     app.use("/api/auth", (_req, res) => {
@@ -160,13 +153,16 @@ async function bootstrap() {
   if (MONGODB_URI && RSC_PASSWORD_SECRET) {
     try {
       const { buildRscRouter } = await import("./routes/rsc");
-      app.use("/api/rsc", buildRscRouter({
-        MONGODB_URI,
-        RSC_PASSWORD_SECRET,
-        WALLET_JWT_SECRET,
-        VPS_ACCOUNT_URL,
-        VPS_ACCOUNT_SECRET,
-      }));
+      app.use(
+        "/api/rsc",
+        buildRscRouter({
+          MONGODB_URI,
+          RSC_PASSWORD_SECRET,
+          WALLET_JWT_SECRET,
+          VPS_ACCOUNT_URL,
+          VPS_ACCOUNT_SECRET,
+        }),
+      );
     } catch (e) {
       console.error("[api] Failed to load RSC router:", e);
       app.use("/api/rsc", (_req, res) => {
@@ -175,7 +171,9 @@ async function bootstrap() {
     }
   } else {
     app.use("/api/rsc", (_req, res) => {
-      res.status(503).json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
+      res
+        .status(503)
+        .json({ error: "E_SERVICE_UNAVAILABLE", detail: "RSC feature not configured" });
     });
   }
 
@@ -183,10 +181,7 @@ async function bootstrap() {
   if (MONGODB_URI && ADMIN_WALLET_ADDRESS) {
     try {
       const { buildMonitoringRouter } = await import("./routes/monitoring");
-      app.use(
-        "/api/monitoring",
-        buildMonitoringRouter({ MONGODB_URI, ADMIN_WALLET_ADDRESS }),
-      );
+      app.use("/api/monitoring", buildMonitoringRouter({ MONGODB_URI, ADMIN_WALLET_ADDRESS }));
     } catch (e) {
       console.error("[api] Failed to load monitoring router:", e);
       app.use("/api/monitoring", (_req, res) => {
@@ -199,10 +194,7 @@ async function bootstrap() {
   if (MONGODB_URI && ADMIN_WALLET_ADDRESS) {
     try {
       const { buildKanbanRouter } = await import("./routes/kanban");
-      app.use(
-        "/api/kanban",
-        buildKanbanRouter({ MONGODB_URI, ADMIN_WALLET_ADDRESS }),
-      );
+      app.use("/api/kanban", buildKanbanRouter({ MONGODB_URI, ADMIN_WALLET_ADDRESS }));
     } catch (e) {
       console.error("[api] Failed to load kanban router:", e);
       app.use("/api/kanban", (_req, res) => {
@@ -226,9 +218,7 @@ async function bootstrap() {
 
     // Weekly Discord winners announcement (Monday 00:00 UTC)
     try {
-      const { startWeeklyDiscordWinners } = await import(
-        "./cron/weekly-discord-winners"
-      );
+      const { startWeeklyDiscordWinners } = await import("./cron/weekly-discord-winners");
       startWeeklyDiscordWinners({
         DISCORD_WEBHOOK_URL: DISCORD_WEBHOOK_URL || undefined,
       });
@@ -257,11 +247,10 @@ async function bootstrap() {
       if (ADMIN_WALLET_ADDRESS) {
         try {
           const { buildAdminChatRouter } = await import("./routes/chat");
-          app.use("/api/chat/admin", buildAdminChatRouter(
-            MONGODB_URI,
-            WALLET_JWT_SECRET,
-            ADMIN_WALLET_ADDRESS,
-          ));
+          app.use(
+            "/api/chat/admin",
+            buildAdminChatRouter(MONGODB_URI, WALLET_JWT_SECRET, ADMIN_WALLET_ADDRESS),
+          );
         } catch (e) {
           console.error("[api] Failed to load admin chat router:", e);
         }

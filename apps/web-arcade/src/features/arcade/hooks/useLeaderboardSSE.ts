@@ -59,10 +59,7 @@ const RECONNECT_DELAYS_MS = [1_000, 2_000, 5_000, 10_000, 30_000];
  * @param game - Game ID to filter scores by
  * @param week - ISO week key (defaults to current week)
  */
-export function useLeaderboardSSE(
-  game: string,
-  week?: string,
-): LeaderboardReturn {
+export function useLeaderboardSSE(game: string, week?: string): LeaderboardReturn {
   const resolvedWeek = week || getCurrentWeekKey();
 
   /* ── SSE-driven state ── */
@@ -121,9 +118,7 @@ export function useLeaderboardSSE(
 
       const localScores = getLocalScores(toBackendSlug(game), resolvedWeek);
       const merged = mergeScores(normalized, localScores);
-      const sorted = merged
-        .sort((a, b) => b.score - a.score)
-        .slice(0, MAX_ENTRIES);
+      const sorted = merged.sort((a, b) => b.score - a.score).slice(0, MAX_ENTRIES);
 
       setSseScores(sorted);
       setSseError(null);
@@ -165,8 +160,9 @@ export function useLeaderboardSSE(
     es.onmessage = (event) => {
       if (!mountedRef.current) return;
       try {
-        const update: { type: "initial" | "update" | "replace"; data: ScoreEntry[] } =
-          JSON.parse(event.data);
+        const update: { type: "initial" | "update" | "replace"; data: ScoreEntry[] } = JSON.parse(
+          event.data,
+        );
 
         if (update.type === "replace" || update.type === "initial") {
           processScores(update.data);
@@ -178,8 +174,7 @@ export function useLeaderboardSSE(
             for (const entry of update.data) {
               const idx = merged.findIndex(
                 (e) =>
-                  e.wallet?.toLowerCase() === entry.wallet?.toLowerCase() &&
-                  e.game === entry.game,
+                  e.wallet?.toLowerCase() === entry.wallet?.toLowerCase() && e.game === entry.game,
               );
               if (idx >= 0) {
                 if (entry.score > merged[idx].score) {
@@ -224,8 +219,7 @@ export function useLeaderboardSSE(
           if (!prev) return prev;
           const existing = prev.findIndex(
             (s) =>
-              s.wallet?.toLowerCase() === update.wallet?.toLowerCase() &&
-              s.game === update.game,
+              s.wallet?.toLowerCase() === update.wallet?.toLowerCase() && s.game === update.game,
           );
           const updated = [...prev];
           if (existing >= 0) {
@@ -235,9 +229,7 @@ export function useLeaderboardSSE(
           } else {
             updated.push(update);
           }
-          return updated
-            .sort((a, b) => b.score - a.score)
-            .slice(0, MAX_ENTRIES);
+          return updated.sort((a, b) => b.score - a.score).slice(0, MAX_ENTRIES);
         });
         setLastSseUpdate(Date.now());
         resetHeartbeat();
@@ -260,13 +252,10 @@ export function useLeaderboardSSE(
       setSseError("SSE connection lost — using cached data");
 
       const attempt = reconnectAttemptRef.current;
-      const delay =
-        RECONNECT_DELAYS_MS[Math.min(attempt, RECONNECT_DELAYS_MS.length - 1)];
+      const delay = RECONNECT_DELAYS_MS[Math.min(attempt, RECONNECT_DELAYS_MS.length - 1)];
       reconnectAttemptRef.current = attempt + 1;
 
-      console.warn(
-        `[SSE] Reconnecting in ${delay}ms (attempt ${attempt + 1})`,
-      );
+      console.warn(`[SSE] Reconnecting in ${delay}ms (attempt ${attempt + 1})`);
 
       reconnectTimerRef.current = setTimeout(() => {
         if (mountedRef.current) connectSSE();
@@ -295,18 +284,13 @@ export function useLeaderboardSSE(
   /* ── Reconnect when tab becomes visible ── */
   useEffect(() => {
     const handleVisibility = () => {
-      if (
-        document.visibilityState === "visible" &&
-        canUseSSE &&
-        !eventSourceRef.current
-      ) {
+      if (document.visibilityState === "visible" && canUseSSE && !eventSourceRef.current) {
         reconnectAttemptRef.current = 0;
         connectSSE();
       }
     };
     document.addEventListener("visibilitychange", handleVisibility);
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [canUseSSE, connectSSE]);
 
   /* ── Manual refresh ── */
@@ -326,9 +310,7 @@ export function useLeaderboardSSE(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _userRank =
     isConnected && walletAddress
-      ? sseScores?.find(
-          (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase(),
-        ) ?? null
+      ? (sseScores?.find((s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase()) ?? null)
       : null;
 
   /* ═══════════════════════════════════════════════════════════════
@@ -370,9 +352,7 @@ export function useLeaderboardSSEWithOptions({
 
   const userRank =
     isConnected && walletAddress
-      ? hook.scores.find(
-          (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase(),
-        ) ?? null
+      ? (hook.scores.find((s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase()) ?? null)
       : null;
 
   return {

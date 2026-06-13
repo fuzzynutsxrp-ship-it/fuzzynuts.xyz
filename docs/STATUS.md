@@ -3,24 +3,24 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-13T10:58:49.231Z** from `04aa4c8` on `main`._
+_Generated **2026-06-13T12:47:01.898Z** from `4461977` on `fix/ci-pipeline-fixes`._
 
-`migration_phase: in-progress`  ·  `version: 0.2.0`
+`migration_phase: in-progress` · `version: 0.2.0`
 
 ---
 
 ## Red flags from the original audit
 
-| # | Flag | Owner | Status | Evidence |
-|---|---|---|---|---|
-| 1 | Spoofable base64 wallet cookie | @api | 🟡 partial | `apps/api/src/middleware/walletAuth.ts` |
-| 2 | Divergent `SCORE_CAPS` (3 copies) | @core | ✅ fixed | `packages/arcade-core/src/constants/score-caps.ts` |
-| 3 | Wrong `nutracer` slug in submitter | @core | ✅ fixed | `packages/arcade-core/tests/slugs.test.ts` |
-| 4 | Unsigned score submissions (no HMAC) | @anticheat | 🟡 partial | `packages/shared-anticheat/src/hmac.ts` |
-| 5 | Duplicate game source trees | @games | 🟡 partial | `apps/games-build/games/` |
-| 6 | Hot-wallet seed in plaintext env | @api | 🟡 partial | `docs/adr/0006-xrpl-regularkey-multisig-distributor.md` |
-| 7 | Vercel `immutable` over-caching | @web | ✅ fixed | `apps/web-arcade/vercel.json` |
-| 8 | No XRPL signature verification path | @xrpl | 🟡 partial | `packages/xrpl-token-utils/src/verify.ts` |
+| #   | Flag                                 | Owner      | Status     | Evidence                                                |
+| --- | ------------------------------------ | ---------- | ---------- | ------------------------------------------------------- |
+| 1   | Spoofable base64 wallet cookie       | @api       | 🟡 partial | `apps/api/src/middleware/walletAuth.ts`                 |
+| 2   | Divergent `SCORE_CAPS` (3 copies)    | @core      | ✅ fixed   | `packages/arcade-core/src/constants/score-caps.ts`      |
+| 3   | Wrong `nutracer` slug in submitter   | @core      | ✅ fixed   | `packages/arcade-core/tests/slugs.test.ts`              |
+| 4   | Unsigned score submissions (no HMAC) | @anticheat | 🟡 partial | `packages/shared-anticheat/src/hmac.ts`                 |
+| 5   | Duplicate game source trees          | @games     | 🟡 partial | `apps/games-build/games/`                               |
+| 6   | Hot-wallet seed in plaintext env     | @api       | 🟡 partial | `docs/adr/0006-xrpl-regularkey-multisig-distributor.md` |
+| 7   | Vercel `immutable` over-caching      | @web       | ✅ fixed   | `apps/web-arcade/vercel.json`                           |
+| 8   | No XRPL signature verification path  | @xrpl      | 🟡 partial | `packages/xrpl-token-utils/src/verify.ts`               |
 
 Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
@@ -28,50 +28,51 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 ## Migration checklist
 
-| Phase | Description | Status |
-|---|---|---|
-| A | Restructure root | ✅ done |
-| B | Shared packages + SCORE_CAPS fix | ✅ done |
-| C | Two-tier auth scaffolding | ✅ done |
-| D | Games-build pipeline | 🟡 scaffolded (real impl pending) |
-| E | XRPL utilities package | ✅ done |
-| F+G | Tauri desktop + Capacitor mobile scaffolding | 🟡 scaffolded (real impl pending) |
-| H+I | Diátaxis docs + community files | ✅ done |
-| J | CI/CD workflows | ✅ done |
-| K+L | Env examples + verification | ✅ done |
+| Phase | Description                                  | Status                            |
+| ----- | -------------------------------------------- | --------------------------------- |
+| A     | Restructure root                             | ✅ done                           |
+| B     | Shared packages + SCORE_CAPS fix             | ✅ done                           |
+| C     | Two-tier auth scaffolding                    | ✅ done                           |
+| D     | Games-build pipeline                         | 🟡 scaffolded (real impl pending) |
+| E     | XRPL utilities package                       | ✅ done                           |
+| F+G   | Tauri desktop + Capacitor mobile scaffolding | 🟡 scaffolded (real impl pending) |
+| H+I   | Diátaxis docs + community files              | ✅ done                           |
+| J     | CI/CD workflows                              | ✅ done                           |
+| K+L   | Env examples + verification                  | ✅ done                           |
 
 ---
 
 ## Manual steps still owed by the human
 
-| # | Step | Status |
-|---|---|---|
-| 1 | Push pre-migration commits to `main` | ✅ done |
-| 2 | Push `migration/monorepo` branch and open PR | 🔴 todo |
-| 3 | Merge the migration PR | 🔴 todo |
-| 4 | Vercel → Root Directory → `apps/web-arcade` | 🔴 todo |
-| 5 | Vercel → Build Command → `cd ../.. && pnpm build:web` | 🔴 todo |
-| 6 | Railway → repo + root → `apps/api` | 🔴 todo |
-| 7 | Railway env: `WALLET_JWT_SECRET` (≥32 random bytes) | 🔴 todo |
-| 8 | Railway env: `GAME_SESSION_SECRET` (≥32 random bytes) | 🔴 todo |
-| 9 | NUT distributor `SetRegularKey` (ADR 0006) | 🔴 todo |
-| 10 | NUT distributor `SignerListSet` 2-of-3 (ADR 0006) | 🔴 todo |
-| 11 | NUT distributor `AccountSet asfDisableMaster` | 🔴 todo |
-| 12 | First mobile init: `cap add android` | 🔴 todo |
-| 13 | Tauri Linux deps install | 🔴 todo |
+| #   | Step                                                  | Status  |
+| --- | ----------------------------------------------------- | ------- |
+| 1   | Push pre-migration commits to `main`                  | ✅ done |
+| 2   | Push `migration/monorepo` branch and open PR          | 🔴 todo |
+| 3   | Merge the migration PR                                | 🔴 todo |
+| 4   | Vercel → Root Directory → `apps/web-arcade`           | 🔴 todo |
+| 5   | Vercel → Build Command → `cd ../.. && pnpm build:web` | 🔴 todo |
+| 6   | Railway → repo + root → `apps/api`                    | 🔴 todo |
+| 7   | Railway env: `WALLET_JWT_SECRET` (≥32 random bytes)   | 🔴 todo |
+| 8   | Railway env: `GAME_SESSION_SECRET` (≥32 random bytes) | 🔴 todo |
+| 9   | NUT distributor `SetRegularKey` (ADR 0006)            | 🔴 todo |
+| 10  | NUT distributor `SignerListSet` 2-of-3 (ADR 0006)     | 🔴 todo |
+| 11  | NUT distributor `AccountSet asfDisableMaster`         | 🔴 todo |
+| 12  | First mobile init: `cap add android`                  | 🔴 todo |
+| 13  | Tauri Linux deps install                              | 🔴 todo |
 
 ---
 
 ## Recent activity
 
-Last 10 commits on `main`:
+Last 10 commits on `fix/ci-pipeline-fixes`:
 
-- `04aa4c8` Merge pull request #34 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 3 hours ago_
-- `ae3aa74` feat: add Batch 6 unique games (maze-escape, frogger, bomberman, capture-flag, tower-stack) — _fuzzynutsxrp-ship-it, 3 hours ago_
-- `6db0630` Merge pull request #32 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 3 hours ago_
-- `adabcce` feat: add Batch 5 sports/racing games (boxing, bowling, archery, surf-up, rally) — _fuzzynutsxrp-ship-it, 3 hours ago_
-- `1dded56` Merge pull request #31 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 4 hours ago_
-- `4703b13` feat: add Batch 4 action games (tank-battle, helicopter, fruit-ninja, tower-defense, space-invaders) — _fuzzynutsxrp-ship-it, 4 hours ago_
-- `a853b05` Merge pull request #30 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 4 hours ago_
-- `724c8ea` feat: add Batch 3 puzzle games (2048, memory, minesweeper, sudoku, wordle) — _fuzzynutsxrp-ship-it, 4 hours ago_
-- `786d101` Merge pull request #28 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 4 hours ago_
+- `4461977` fix: resolve CI pipeline failures — score-caps ceiling, ESLint flat config, typecheck, STATUS.md — _Hermes Dev Worker, 2 hours ago_
+- `04aa4c8` Merge pull request #34 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 5 hours ago_
+- `ae3aa74` feat: add Batch 6 unique games (maze-escape, frogger, bomberman, capture-flag, tower-stack) — _fuzzynutsxrp-ship-it, 5 hours ago_
+- `6db0630` Merge pull request #32 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 5 hours ago_
+- `adabcce` feat: add Batch 5 sports/racing games (boxing, bowling, archery, surf-up, rally) — _fuzzynutsxrp-ship-it, 5 hours ago_
+- `1dded56` Merge pull request #31 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 5 hours ago_
+- `4703b13` feat: add Batch 4 action games (tank-battle, helicopter, fruit-ninja, tower-defense, space-invaders) — _fuzzynutsxrp-ship-it, 5 hours ago_
+- `a853b05` Merge pull request #30 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 6 hours ago_
+- `724c8ea` feat: add Batch 3 puzzle games (2048, memory, minesweeper, sudoku, wordle) — _fuzzynutsxrp-ship-it, 6 hours ago_
+- `786d101` Merge pull request #28 from fuzzynutsxrp-ship-it/fix/fuzzy-score-audit-fixes — _fuzzynutsxrp-ship-it, 6 hours ago_

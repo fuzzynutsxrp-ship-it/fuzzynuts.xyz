@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { getJoeyAdapter } from "@/lib/wallet/joeyAdapter";
-import {
-  connectXaman,
-  disconnectXaman,
-  tryRestoreXamanSession,
-} from "@/lib/wallet/xamanService";
+import { connectXaman, disconnectXaman, tryRestoreXamanSession } from "@/lib/wallet/xamanService";
 
 /* ═══════════════════════════════════════════════════════════════
    Encrypted Storage Utilities (AES-GCM via Web Crypto)
@@ -50,11 +46,7 @@ async function encryptAndStore(data: { address: string; provider: string }): Pro
     const key = await deriveStorageKey();
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const encoded = new TextEncoder().encode(JSON.stringify(data));
-    const ciphertext = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      key,
-      encoded,
-    );
+    const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
     // Store as base64: iv(16) + ciphertext
     const combined = new Uint8Array(iv.length + new Uint8Array(ciphertext).length);
     combined.set(iv);
@@ -81,11 +73,7 @@ async function decryptFromStorage(): Promise<{ address: string; provider: string
     const iv = combined.slice(0, 12);
     const ciphertext = combined.slice(12);
     const key = await deriveStorageKey();
-    const decrypted = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv },
-      key,
-      ciphertext,
-    );
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
     return JSON.parse(new TextDecoder().decode(decrypted));
   } catch {
     // Fallback: try plaintext
@@ -98,12 +86,7 @@ async function decryptFromStorage(): Promise<{ address: string; provider: string
   }
 }
 
-export type WalletProvider =
-  | "xaman"
-  | "gemwallet"
-  | "crossmark"
-  | "joey"
-  | "none";
+export type WalletProvider = "xaman" | "gemwallet" | "crossmark" | "joey" | "none";
 
 interface WalletState {
   address: string | null;
@@ -159,9 +142,7 @@ export const useWalletStore = create<WalletState>((set) => ({
         case "xaman": {
           const apiKey = process.env.NEXT_PUBLIC_XAMAN_API_KEY;
           if (!apiKey) {
-            throw new Error(
-              "Xaman API key not configured. Please contact support."
-            );
+            throw new Error("Xaman API key not configured. Please contact support.");
           }
 
           if (typeof window === "undefined") {
@@ -188,9 +169,7 @@ export const useWalletStore = create<WalletState>((set) => ({
             ).GemWallet;
             if (!gem) {
               window.open("https://gemwallet.app", "_blank");
-              throw new Error(
-                "GemWallet extension not found. Please install it."
-              );
+              throw new Error("GemWallet extension not found. Please install it.");
             }
             const connected = await gem.isConnected();
             if (!connected?.result?.isConnected) {
@@ -215,9 +194,7 @@ export const useWalletStore = create<WalletState>((set) => ({
             ).crossmark;
             if (!sdk) {
               window.open("https://crossmark.io", "_blank");
-              throw new Error(
-                "Crossmark extension not found. Please install it."
-              );
+              throw new Error("Crossmark extension not found. Please install it.");
             }
             const result = await sdk.signInAndWait();
             address = result?.response?.data?.address || null;
@@ -259,8 +236,7 @@ export const useWalletStore = create<WalletState>((set) => ({
         throw new Error("No wallet address returned");
       }
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Connection failed";
+      const message = err instanceof Error ? err.message : "Connection failed";
       console.error("[Wallet] Connection error:", message);
       set({ error: message, isConnecting: false });
     }
@@ -359,7 +335,9 @@ export const useWalletStore = create<WalletState>((set) => ({
         error: null,
       });
 
-      console.log(`[Wallet] autoReconnect: restored ${stored.provider} session for ${stored.address.slice(0, 8)}...`);
+      console.log(
+        `[Wallet] autoReconnect: restored ${stored.provider} session for ${stored.address.slice(0, 8)}...`,
+      );
 
       // Xaman: silently re-validate the SDK session in the background using
       // the cached OAuth2 JWT. If it resolves an account we refresh state;

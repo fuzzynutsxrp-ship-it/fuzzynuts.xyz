@@ -143,12 +143,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {!ALLOW_INDEXING && (
           <>
             <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-            <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+            <meta
+              name="googlebot"
+              content="noindex, nofollow, noarchive, nosnippet, noimageindex"
+            />
           </>
         )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -157,13 +164,13 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <SessionProvider>
-        <MotionProvider>
-          <JoeyProvider>
-            <AppMount />
-            {children}
-            <ChatWidget />
-          </JoeyProvider>
-        </MotionProvider>
+          <MotionProvider>
+            <JoeyProvider>
+              <AppMount />
+              {children}
+              <ChatWidget />
+            </JoeyProvider>
+          </MotionProvider>
         </SessionProvider>
       </body>
     </html>

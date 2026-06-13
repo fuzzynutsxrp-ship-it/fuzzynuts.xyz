@@ -62,8 +62,8 @@ export function Community() {
             More Than Just Games
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            Compete, connect, and climb. FuzzyNuts is a gaming community where
-            skill is the only currency that matters.
+            Compete, connect, and climb. FuzzyNuts is a gaming community where skill is the only
+            currency that matters.
           </p>
         </motion.div>
 
@@ -104,7 +104,10 @@ export function Community() {
               <p className="text-sm text-[var(--color-cream-dim)] leading-relaxed mb-4 flex-1">
                 {link.desc}
               </p>
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity" style={{ color: link.color }}>
+              <span
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity"
+                style={{ color: link.color }}
+              >
                 {link.cta}
                 <ExternalLink size={11} />
               </span>
@@ -121,8 +124,8 @@ export function Community() {
           className="text-center"
         >
           <p className="text-xs text-[var(--color-cream-dim)] opacity-40 max-w-lg mx-auto leading-relaxed">
-            🦊 Web3 integrations: Connect your XRPL wallet to unlock exclusive
-            on-chain rewards and token-gated features.
+            🦊 Web3 integrations: Connect your XRPL wallet to unlock exclusive on-chain rewards and
+            token-gated features.
           </p>
         </motion.div>
       </div>

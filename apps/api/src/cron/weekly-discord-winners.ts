@@ -34,14 +34,10 @@ const RANK_LABELS = ["1st Place", "2nd Place", "3rd Place"];
  * e.g. "2026-W23"
  */
 function getWeekKeyForDate(date: Date): string {
-  const d = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
-  );
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNum = Math.ceil(
-    ((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7,
-  );
+  const weekNum = Math.ceil(((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
   return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
 }
 
@@ -92,10 +88,7 @@ async function getWeeklyWinners(weekKey: string): Promise<WinnerEntry[]> {
   const db = await getDb(process.env.MONGODB_URI!);
 
   // Fetch all scores for the week
-  const scores = await db
-    .collection(SCORES_COLLECTION)
-    .find({ weekKey })
-    .toArray();
+  const scores = await db.collection(SCORES_COLLECTION).find({ weekKey }).toArray();
 
   if (scores.length === 0) return [];
 
@@ -130,7 +123,11 @@ async function getWeeklyWinners(weekKey: string): Promise<WinnerEntry[]> {
   // Convert string IDs to ObjectId where possible for _id lookup
   const objectIds: ObjectId[] = [];
   for (const id of userIds) {
-    try { objectIds.push(new ObjectId(id)); } catch { /* not a valid ObjectId */ }
+    try {
+      objectIds.push(new ObjectId(id));
+    } catch {
+      /* not a valid ObjectId */
+    }
   }
 
   const users = await db
@@ -196,13 +193,11 @@ async function postToDiscord(
 
   const payload = {
     username: "FuzzyNuts Tournaments",
-    avatar_url:
-      "https://www.fuzzynuts.xyz/images/branding/logo-nav.webp",
+    avatar_url: "https://www.fuzzynuts.xyz/images/branding/logo-nav.webp",
     embeds: [
       {
         title: "🏆 WEEKLY CHAMPIONS 🏆",
-        description:
-          "The leaderboard has reset! Here are this week's top players:",
+        description: "The leaderboard has reset! Here are this week's top players:",
         color: DISCORD_EMBED_COLOR_GOLD,
         fields,
         thumbnail: {
@@ -224,23 +219,17 @@ async function postToDiscord(
 
   if (!res.ok) {
     const body = await res.text().catch(() => "(no body)");
-    throw new Error(
-      `Discord webhook failed: HTTP ${res.status} — ${body}`,
-    );
+    throw new Error(`Discord webhook failed: HTTP ${res.status} — ${body}`);
   }
 }
 
 /**
  * Post a "no winners" message when the week had zero scores.
  */
-async function postNoWinners(
-  webhookUrl: string,
-  weekKey: string,
-): Promise<void> {
+async function postNoWinners(webhookUrl: string, weekKey: string): Promise<void> {
   const payload = {
     username: "FuzzyNuts Tournaments",
-    avatar_url:
-      "https://www.fuzzynuts.xyz/images/branding/logo-nav.webp",
+    avatar_url: "https://www.fuzzynuts.xyz/images/branding/logo-nav.webp",
     embeds: [
       {
         title: "🏆 WEEKLY CHAMPIONS 🏆",
@@ -273,9 +262,7 @@ async function postNoWinners(
 
 async function handleWeeklyReset(webhookUrl: string): Promise<void> {
   const weekKey = getPreviousWeekKey();
-  console.log(
-    `[weekly-discord] Processing week ${weekKey} at ${new Date().toISOString()}`,
-  );
+  console.log(`[weekly-discord] Processing week ${weekKey} at ${new Date().toISOString()}`);
 
   try {
     const winners = await getWeeklyWinners(weekKey);
@@ -302,21 +289,15 @@ async function handleWeeklyReset(webhookUrl: string): Promise<void> {
  * Start the weekly Discord winners cron job.
  * Called from server.ts bootstrap.
  */
-export function startWeeklyDiscordWinners(opts: {
-  DISCORD_WEBHOOK_URL?: string;
-}): void {
+export function startWeeklyDiscordWinners(opts: { DISCORD_WEBHOOK_URL?: string }): void {
   const { DISCORD_WEBHOOK_URL } = opts;
 
   if (!DISCORD_WEBHOOK_URL) {
-    console.warn(
-      "[weekly-discord] DISCORD_WEBHOOK_URL not set — cron job disabled",
-    );
+    console.warn("[weekly-discord] DISCORD_WEBHOOK_URL not set — cron job disabled");
     return;
   }
 
-  console.log(
-    "[weekly-discord] Starting cron job (Monday 00:00 UTC)",
-  );
+  console.log("[weekly-discord] Starting cron job (Monday 00:00 UTC)");
 
   cron.schedule(SCHEDULE, async () => {
     try {

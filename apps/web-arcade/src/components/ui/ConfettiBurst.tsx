@@ -49,10 +49,7 @@ interface ConfettiBurstProps {
   emojiRatio?: number;
 }
 
-export function ConfettiBurst({
-  intensity = "high",
-  emojiRatio = 0.18,
-}: ConfettiBurstProps) {
+export function ConfettiBurst({ intensity = "high", emojiRatio = 0.18 }: ConfettiBurstProps) {
   // useMemo so re-renders of the parent don't reshuffle the burst.
   const particles = useMemo(() => {
     const n = INTENSITY_COUNT[intensity];

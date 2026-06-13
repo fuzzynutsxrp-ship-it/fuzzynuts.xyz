@@ -20,8 +20,7 @@ import {
    ═══════════════════════════════════════════════════════════════ */
 
 const CHAT_API =
-  process.env.NEXT_PUBLIC_CHAT_API ||
-  "https://fuzzynutsxyz-production.up.railway.app";
+  process.env.NEXT_PUBLIC_CHAT_API || "https://fuzzynutsxyz-production.up.railway.app";
 
 const ADMIN_WALLET = process.env.NEXT_PUBLIC_ADMIN_WALLET || "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
 
@@ -182,7 +181,10 @@ export default function AdminChatPage() {
       <div className="flex min-h-screen items-center justify-center bg-[#0a0613]">
         <div className="text-center">
           <Shield size={48} className="mx-auto mb-4 text-[#ef4444]/40" />
-          <h1 className="text-xl font-bold text-[#ef4444]" style={{ fontFamily: "var(--font-display)" }}>
+          <h1
+            className="text-xl font-bold text-[#ef4444]"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             Access Denied
           </h1>
           <p className="mt-2 text-sm text-white/30">
@@ -243,18 +245,21 @@ export default function AdminChatPage() {
           )}
           <div className="space-y-3">
             {reports.map((report) => (
-              <div
-                key={report._id}
-                className="rounded-lg border border-white/5 bg-[#120a22] p-4"
-              >
+              <div key={report._id} className="rounded-lg border border-white/5 bg-[#120a22] p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-[#e8943a]" style={{ fontFamily: "var(--font-display)" }}>
+                      <span
+                        className="text-xs font-semibold text-[#e8943a]"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
                         {report.reporterUsername}
                       </span>
                       <span className="text-xs text-white/20">reported</span>
-                      <span className="text-xs font-semibold text-[#ef4444]" style={{ fontFamily: "var(--font-display)" }}>
+                      <span
+                        className="text-xs font-semibold text-[#ef4444]"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
                         {report.reportedUsername}
                       </span>
                     </div>
@@ -299,13 +304,13 @@ export default function AdminChatPage() {
           )}
           <div className="space-y-3">
             {mutes.map((mute) => (
-              <div
-                key={mute._id}
-                className="rounded-lg border border-white/5 bg-[#120a22] p-4"
-              >
+              <div key={mute._id} className="rounded-lg border border-white/5 bg-[#120a22] p-4">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <span className="text-sm font-semibold text-[#FBBF24]" style={{ fontFamily: "var(--font-display)" }}>
+                    <span
+                      className="text-sm font-semibold text-[#FBBF24]"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
                       {mute.username}
                     </span>
                     <p className="mt-0.5 text-[11px] text-white/30 font-mono">

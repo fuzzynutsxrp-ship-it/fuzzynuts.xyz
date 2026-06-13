@@ -22,7 +22,10 @@ import type { Request, Response } from "express";
 const USERNAME_RE = /^[a-zA-Z0-9]{3,12}$/;
 const ClaimBody = z.object({
   username: z.string().min(3).max(12).regex(USERNAME_RE),
-  address: z.string().regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/).optional(),
+  address: z
+    .string()
+    .regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/)
+    .optional(),
 });
 
 // ── AES-256-GCM helpers ─────────────────────────────────────────
@@ -77,14 +80,12 @@ async function getCollection(uri: string): Promise<Collection<WalletMapping>> {
     await _client.connect();
     _db = _client.db(); // uses DB name from URI
     // Ensure unique indexes
-    await _db.collection<WalletMapping>("wallet_mappings").createIndex(
-      { walletAddress: 1 },
-      { unique: true },
-    );
-    await _db.collection<WalletMapping>("wallet_mappings").createIndex(
-      { username: 1 },
-      { unique: true },
-    );
+    await _db
+      .collection<WalletMapping>("wallet_mappings")
+      .createIndex({ walletAddress: 1 }, { unique: true });
+    await _db
+      .collection<WalletMapping>("wallet_mappings")
+      .createIndex({ username: 1 }, { unique: true });
   }
   return _db.collection<WalletMapping>("wallet_mappings");
 }
@@ -92,25 +93,18 @@ async function getCollection(uri: string): Promise<Collection<WalletMapping>> {
 // ── JWT cookie helper ───────────────────────────────────────────
 const COOKIE_NAME = "fuzzy_wallet_session";
 
-async function getWalletFromCookie(
-  req: Request,
-  secret: string,
-): Promise<string | null> {
+async function getWalletFromCookie(req: Request, secret: string): Promise<string | null> {
   const cookieHeader = req.headers.cookie;
   if (!cookieHeader) return null;
 
-  const match = cookieHeader.match(
-    new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`),
-  );
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`));
   const token = match?.[1];
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(secret),
-      { issuer: "fuzzynuts.xyz" },
-    );
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), {
+      issuer: "fuzzynuts.xyz",
+    });
     return typeof payload.address === "string" ? payload.address : null;
   } catch {
     return null;
@@ -182,7 +176,7 @@ export function buildRscRouter(env: {
             body: JSON.stringify({ username, password: gamePassword }),
             signal: AbortSignal.timeout(10000),
           });
-          const vpsData = await vpsRes.json() as { success: boolean; error?: string };
+          const vpsData = (await vpsRes.json()) as { success: boolean; error?: string };
           if (!vpsRes.ok || !vpsData.success) {
             console.error("[rsc] VPS account creation failed:", vpsData);
             if (vpsRes.status === 409) {
@@ -195,7 +189,9 @@ export function buildRscRouter(env: {
           return res.status(502).json({ error: "E_ACCOUNT_SERVER_DOWN" });
         }
       } else {
-        console.warn("[rsc] VPS_ACCOUNT_URL or VPS_ACCOUNT_SECRET not set — skipping game account creation");
+        console.warn(
+          "[rsc] VPS_ACCOUNT_URL or VPS_ACCOUNT_SECRET not set — skipping game account creation",
+        );
       }
 
       const encryptedPassword = encrypt(gamePassword, env.RSC_PASSWORD_SECRET);

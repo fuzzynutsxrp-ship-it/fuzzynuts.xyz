@@ -69,6 +69,7 @@ src/features/arcade/
 ## Hook Responsibilities
 
 ### `useLeaderboard(game, week?)`
+
 - Fetches scores from `GET /api/scores?game=X&week=Y`
 - Auto-polls every 30 seconds
 - Re-fetches on browser tab visibility change
@@ -76,6 +77,7 @@ src/features/arcade/
 - Merges local + API scores with deduplication
 
 ### `useScoreSubmission(slug)`
+
 - Listens for `postMessage` events from game iframes
 - Validates score caps per game
 - Enforces minimum play duration (5s anti-cheat)
@@ -83,6 +85,7 @@ src/features/arcade/
 - Tracks session uniqueness via localStorage
 
 ### `usePayoutEligibility(wallet)`
+
 - Checks `GET /api/rewards/eligibility?wallet=X&week=Y`
 - Manages confirmation → claim → polling lifecycle
 - Executes `POST /api/rewards/claim` with wallet + week
@@ -91,6 +94,7 @@ src/features/arcade/
 - Auto-checks on wallet connect
 
 ### `useSyncLocalScores(game, wallet)`
+
 - Fire-and-forget sync on wallet connect
 - Finds best unsynced score from localStorage
 - POSTs to backend to ensure it appears on leaderboard
@@ -132,25 +136,25 @@ src/features/arcade/
 
 ## Component Mapping
 
-| Component | Hook(s) Used | Path |
-|-----------|-------------|------|
-| `GamePage` | `useLeaderboard`, `useScoreSubmission`, `usePayoutEligibility`, `useSyncLocalScores` | `components/game/GamePage.tsx` |
-| `GameWrapper` | `useScoreSubmission` | `components/game/GameWrapper.tsx` |
-| `Leaderboard` | `useLeaderboard`, `usePayoutEligibility` | `components/sections/Leaderboard.tsx` |
-| `ClaimRewards` | `usePayoutEligibility` | `components/sections/ClaimRewards.tsx` |
-| `LeaderboardClient` | Composes `Leaderboard` + `ClaimRewards` | `app/leaderboard/client.tsx` |
-| `GameHeader` | `getCurrentWeekKey`, `getWeekKeyOffset` | `components/game/GameHeader.tsx` |
-| `GameSidebar` | (types only: `ScoreEntry`, `EligibilityData`) | `components/game/GameSidebar.tsx` |
-| `ScoreSubmissionPanel` | `timeAgo` | `components/game/ScoreSubmissionPanel.tsx` |
+| Component              | Hook(s) Used                                                                         | Path                                       |
+| ---------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------ |
+| `GamePage`             | `useLeaderboard`, `useScoreSubmission`, `usePayoutEligibility`, `useSyncLocalScores` | `components/game/GamePage.tsx`             |
+| `GameWrapper`          | `useScoreSubmission`                                                                 | `components/game/GameWrapper.tsx`          |
+| `Leaderboard`          | `useLeaderboard`, `usePayoutEligibility`                                             | `components/sections/Leaderboard.tsx`      |
+| `ClaimRewards`         | `usePayoutEligibility`                                                               | `components/sections/ClaimRewards.tsx`     |
+| `LeaderboardClient`    | Composes `Leaderboard` + `ClaimRewards`                                              | `app/leaderboard/client.tsx`               |
+| `GameHeader`           | `getCurrentWeekKey`, `getWeekKeyOffset`                                              | `components/game/GameHeader.tsx`           |
+| `GameSidebar`          | (types only: `ScoreEntry`, `EligibilityData`)                                        | `components/game/GameSidebar.tsx`          |
+| `ScoreSubmissionPanel` | `timeAgo`                                                                            | `components/game/ScoreSubmissionPanel.tsx` |
 
 ---
 
 ## Shared Dependencies (Not in Arcade Domain)
 
-| Module | Path | Reason |
-|--------|------|--------|
-| `gameRegistry` | `src/lib/gameRegistry.ts` | Shared across homepage, game pages, and arcade |
-| `wallet` | `src/store/wallet.ts` | Zustand store used by navbar, profile, and arcade |
+| Module         | Path                      | Reason                                            |
+| -------------- | ------------------------- | ------------------------------------------------- |
+| `gameRegistry` | `src/lib/gameRegistry.ts` | Shared across homepage, game pages, and arcade    |
+| `wallet`       | `src/store/wallet.ts`     | Zustand store used by navbar, profile, and arcade |
 
 These remain in their current locations because they serve the entire application, not just the arcade domain.
 

@@ -2,15 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Trophy,
-  Clock,
-  RefreshCw,
-  WifiOff,
-  Radio,
-  ChevronDown,
-  Gamepad2,
-} from "lucide-react";
+import { Trophy, Clock, RefreshCw, WifiOff, Radio, ChevronDown, Gamepad2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { TopNav } from "@/components/layout/TopNav";
@@ -18,12 +10,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { useWalletStore } from "@/store/wallet";
 import { useSession } from "next-auth/react";
-import {
-  useLeaderboardSSE,
-  getCurrentWeekKey,
-  getWeekKeyOffset,
-  timeAgo,
-} from "@/features/arcade";
+import { useLeaderboardSSE, getCurrentWeekKey, getWeekKeyOffset, timeAgo } from "@/features/arcade";
 import type { ScoreEntry } from "@/features/arcade";
 import { API_SCORES, MAX_ENTRIES } from "@/features/arcade/constants";
 import { toBackendSlug } from "@/features/arcade/slugAliases";
@@ -42,9 +29,7 @@ const TIMEFRAMES = [
   { id: "alltime", label: "All Time" },
 ];
 
-const GAME_EMOJIS: Record<string, string> = Object.fromEntries(
-  GAMES.map((g) => [g.id, g.image]),
-);
+const GAME_EMOJIS: Record<string, string> = Object.fromEntries(GAMES.map((g) => [g.id, g.image]));
 
 /* ═══════════════════════════════════════════════════════════════
    Podium Component — Top 3 players
@@ -99,9 +84,7 @@ function Podium({
           entry.displayName ||
           entry.name ||
           (entry.wallet ? truncateAddress(entry.wallet) : "Anonymous");
-        const isYou =
-          currentUserId &&
-          entry.wallet?.toLowerCase() === currentUserId.toLowerCase();
+        const isYou = currentUserId && entry.wallet?.toLowerCase() === currentUserId.toLowerCase();
 
         return (
           <div
@@ -110,7 +93,9 @@ function Podium({
             style={{ boxShadow: cfg.shadowStyle }}
           >
             <div className="text-3xl sm:text-4xl mb-2">{cfg.medal}</div>
-            <p className={`text-[10px] font-bold uppercase tracking-widest ${cfg.textClass} mb-1.5`}>
+            <p
+              className={`text-[10px] font-bold uppercase tracking-widest ${cfg.textClass} mb-1.5`}
+            >
               {cfg.label}
             </p>
             <p className="font-display text-sm sm:text-base font-bold text-cream truncate">
@@ -140,9 +125,7 @@ function RankBadge({ rank }: { rank: number }) {
   if (rank === 2) return <span className="text-lg">🥈</span>;
   if (rank === 3) return <span className="text-lg">🥉</span>;
   return (
-    <span className="text-xs font-mono text-[var(--color-cream-dim)] w-8 text-center">
-      #{rank}
-    </span>
+    <span className="text-xs font-mono text-[var(--color-cream-dim)] w-8 text-center">#{rank}</span>
   );
 }
 
@@ -243,9 +226,7 @@ export function LeaderboardClient() {
         }
       } catch (err) {
         if (!cancelled) {
-          setAllError(
-            err instanceof Error ? err.message : "Failed to load scores",
-          );
+          setAllError(err instanceof Error ? err.message : "Failed to load scores");
         }
       } finally {
         if (!cancelled) setAllLoading(false);
@@ -261,24 +242,16 @@ export function LeaderboardClient() {
   }, [selectedGame, timeframe, weekKey]);
 
   // Resolve which data to use
-  const scores =
-    selectedGame === "all" ? allScores : singleGameHook.scores;
-  const loading =
-    selectedGame === "all" ? allLoading : singleGameHook.loading;
-  const error =
-    selectedGame === "all" ? allError : singleGameHook.error;
-  const isRefreshing =
-    selectedGame === "all" ? false : singleGameHook.isRefreshing;
-  const lastFetched =
-    selectedGame === "all" ? null : singleGameHook.lastFetched;
-  const manualRefresh =
-    selectedGame === "all" ? () => {} : singleGameHook.manualRefresh;
+  const scores = selectedGame === "all" ? allScores : singleGameHook.scores;
+  const loading = selectedGame === "all" ? allLoading : singleGameHook.loading;
+  const error = selectedGame === "all" ? allError : singleGameHook.error;
+  const isRefreshing = selectedGame === "all" ? false : singleGameHook.isRefreshing;
+  const lastFetched = selectedGame === "all" ? null : singleGameHook.lastFetched;
+  const manualRefresh = selectedGame === "all" ? () => {} : singleGameHook.manualRefresh;
 
   // ── Find current user's rank ──
   const userRankIndex = walletAddress
-    ? scores.findIndex(
-        (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase(),
-      )
+    ? scores.findIndex((s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase())
     : -1;
   const userRank = userRankIndex >= 0 ? userRankIndex + 1 : null;
   const userEntry = userRank ? scores[userRankIndex] : null;
@@ -287,8 +260,7 @@ export function LeaderboardClient() {
   const tableScores = scores.slice(3);
 
   // Game title for empty state
-  const selectedGameMeta =
-    selectedGame !== "all" ? GAMES.find((g) => g.id === selectedGame) : null;
+  const selectedGameMeta = selectedGame !== "all" ? GAMES.find((g) => g.id === selectedGame) : null;
   const selectedGameLabel = selectedGameMeta?.title || "All Games";
 
   return (
@@ -425,10 +397,7 @@ export function LeaderboardClient() {
                 disabled={isRefreshing}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[var(--color-cream-dim)] hover:text-cream bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 transition-all disabled:opacity-40"
               >
-                <RefreshCw
-                  size={14}
-                  className={isRefreshing ? "animate-spin" : ""}
-                />
+                <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
             </div>
@@ -480,13 +449,8 @@ export function LeaderboardClient() {
                 <p className="font-display text-lg font-bold text-cream mb-2">
                   Unable to load scores
                 </p>
-                <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">
-                  {error}
-                </p>
-                <button
-                  onClick={manualRefresh}
-                  className="btn-secondary text-sm"
-                >
+                <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">{error}</p>
+                <button onClick={manualRefresh} className="btn-secondary text-sm">
                   <RefreshCw size={14} />
                   Try Again
                 </button>
@@ -496,19 +460,12 @@ export function LeaderboardClient() {
             {/* Empty state */}
             {!loading && !error && scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-                <Gamepad2
-                  size={48}
-                  className="text-brand-gold/30 mb-4"
-                />
-                <p className="font-display text-xl font-bold text-cream mb-2">
-                  No scores yet
-                </p>
+                <Gamepad2 size={48} className="text-brand-gold/30 mb-4" />
+                <p className="font-display text-xl font-bold text-cream mb-2">No scores yet</p>
                 <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">
                   Be the first to play{" "}
-                  <span className="text-cream font-semibold">
-                    {selectedGameLabel}
-                  </span>{" "}
-                  and claim the #1 spot!
+                  <span className="text-cream font-semibold">{selectedGameLabel}</span> and claim
+                  the #1 spot!
                 </p>
                 <Link
                   href="/"
@@ -525,18 +482,12 @@ export function LeaderboardClient() {
                 {tableScores.map((entry, index) => {
                   const rank = index + 4; // offset by 3 for podium
                   const isCurrentUser =
-                    walletAddress &&
-                    entry.wallet?.toLowerCase() ===
-                      walletAddress.toLowerCase();
+                    walletAddress && entry.wallet?.toLowerCase() === walletAddress.toLowerCase();
                   const displayName =
                     entry.displayName ||
                     entry.name ||
-                    (entry.wallet
-                      ? truncateAddress(entry.wallet)
-                      : "Anonymous");
-                  const gameMeta = GAMES.find(
-                    (g) => g.id === entry.game,
-                  );
+                    (entry.wallet ? truncateAddress(entry.wallet) : "Anonymous");
+                  const gameMeta = GAMES.find((g) => g.id === entry.game);
 
                   return (
                     <div
@@ -556,9 +507,7 @@ export function LeaderboardClient() {
                       <div className="flex-1 min-w-0 flex items-center">
                         <span
                           className={`text-sm font-medium truncate ${
-                            isCurrentUser
-                              ? "text-brand-gold font-bold"
-                              : "text-cream"
+                            isCurrentUser ? "text-brand-gold font-bold" : "text-cream"
                           }`}
                         >
                           {displayName}
@@ -612,9 +561,7 @@ export function LeaderboardClient() {
           {lastFetched && (
             <p className="text-[11px] text-[var(--color-cream-dim)]/60 text-center mt-4 font-mono">
               Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} ·{" "}
-              {timeframe === "weekly"
-                ? "Resets Monday 00:00 UTC"
-                : "All Time"}
+              {timeframe === "weekly" ? "Resets Monday 00:00 UTC" : "All Time"}
             </p>
           )}
 

@@ -3,22 +3,24 @@
 ## What Was Wrong (Two Bugs)
 
 ### Bug 1: Game session route never mounted
+
 `server.ts` mounted `buildAuthRouter` (handles `/challenge` and `/verify`) but
 never imported or mounted `buildGameSessionRouter` (handles `/game-session`).
 Hitting `/api/auth/game-session` returned 404.
 
 ### Bug 2: No CORS middleware
+
 The frontend at `fuzzynuts.xyz` makes a cross-origin POST to
 `world.fuzzynuts.xyz`. Without CORS headers on the API, the browser blocks
 the response entirely — showing "Failed to fetch" instead of the actual 404.
 
 ## What Changed
 
-| File | Change |
-|------|--------|
+| File                     | Change                                                                                                                                                                                                                            |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/api/src/server.ts` | Added `cors` middleware (allows `fuzzynuts.xyz` + `www.fuzzynuts.xyz` with credentials). Mounted `buildGameSessionRouter` at `/api/auth`. Created shared `challengeStore` so auth and game-session routers share challenge state. |
-| `apps/api/package.json` | Added `cors` + `@types/cors` dependencies |
-| `.env.example` | Documented `NEXT_PUBLIC_API_URL` (commented, defaults to `https://world.fuzzynuts.xyz`) |
+| `apps/api/package.json`  | Added `cors` + `@types/cors` dependencies                                                                                                                                                                                         |
+| `.env.example`           | Documented `NEXT_PUBLIC_API_URL` (commented, defaults to `https://world.fuzzynuts.xyz`)                                                                                                                                           |
 
 ## How to Deploy (Railway)
 

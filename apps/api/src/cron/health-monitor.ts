@@ -90,15 +90,10 @@ async function performHealthCheck(port: number): Promise<HealthCheckResult> {
   return { timestamp: new Date(), status, responseTime, httpStatus, envVars, error, alerts };
 }
 
-async function sendDiscordAlert(
-  webhookUrl: string,
-  result: HealthCheckResult,
-): Promise<void> {
+async function sendDiscordAlert(webhookUrl: string, result: HealthCheckResult): Promise<void> {
   const isDown = result.status === "down";
   const color = isDown ? DISCORD_EMBED_COLOR_RED : DISCORD_EMBED_COLOR_GREEN;
-  const title = isDown
-    ? "🔴 FuzzyNuts API is DOWN"
-    : "⚠️ FuzzyNuts API degraded";
+  const title = isDown ? "🔴 FuzzyNuts API is DOWN" : "⚠️ FuzzyNuts API degraded";
 
   const fields = [
     { name: "Status", value: result.status, inline: true },

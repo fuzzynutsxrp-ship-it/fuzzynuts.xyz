@@ -16,19 +16,14 @@ import { PlayNowSidebar } from "@/components/game/PlayNowSidebar";
    ═══════════════════════════════════════════════════════════════ */
 
 const Leaderboard = dynamic(
-  () =>
-    import("@/components/sections/Leaderboard").then(
-      (mod) => mod.Leaderboard,
-    ),
+  () => import("@/components/sections/Leaderboard").then((mod) => mod.Leaderboard),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-32">
         <div className="text-center">
           <div className="text-5xl mb-4">🏆</div>
-          <p className="text-brand-gold animate-pulse font-display text-lg">
-            Loading leaderboard…
-          </p>
+          <p className="text-brand-gold animate-pulse font-display text-lg">Loading leaderboard…</p>
         </div>
       </div>
     ),

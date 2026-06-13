@@ -16,19 +16,14 @@ import { PlayNowSidebar } from "@/components/game/PlayNowSidebar";
    ═══════════════════════════════════════════════════════════════ */
 
 const UserProfile = dynamic(
-  () =>
-    import("@/components/sections/UserProfile").then(
-      (mod) => mod.UserProfile,
-    ),
+  () => import("@/components/sections/UserProfile").then((mod) => mod.UserProfile),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-32">
         <div className="text-center">
           <div className="text-5xl mb-4">🐿️</div>
-          <p className="text-neon-green animate-pulse font-display text-lg">
-            Loading profile…
-          </p>
+          <p className="text-neon-green animate-pulse font-display text-lg">Loading profile…</p>
         </div>
       </div>
     ),

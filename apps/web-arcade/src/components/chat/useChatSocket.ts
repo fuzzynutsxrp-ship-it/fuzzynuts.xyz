@@ -11,8 +11,7 @@ import { io, type Socket } from "socket.io-client";
    ═══════════════════════════════════════════════════════════════ */
 
 const CHAT_API =
-  process.env.NEXT_PUBLIC_CHAT_API ||
-  "https://fuzzynutsxyz-production.up.railway.app";
+  process.env.NEXT_PUBLIC_CHAT_API || "https://fuzzynutsxyz-production.up.railway.app";
 
 export interface ChatMessage {
   id: string;

@@ -67,7 +67,10 @@ export function SearchPanel({ open, onClose, searchQuery, onSearchChange }: Sear
                 <ArrowLeft size={20} className="text-cream" />
               </button>
               <div className="flex-1 relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-cream-dim)]/40 pointer-events-none" />
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-cream-dim)]/40 pointer-events-none"
+                />
                 <input
                   ref={inputRef}
                   type="text"

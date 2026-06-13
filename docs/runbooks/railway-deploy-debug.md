@@ -12,6 +12,7 @@ Railway should be watching the `main` branch of `fuzzynutsxrp-ship-it/fuzzynuts.
 ## Why Railway Might Not Auto-Deploy
 
 Railway only auto-deploys when:
+
 1. It's connected to the correct repo AND branch
 2. Auto-deploy is enabled in project settings
 3. The push event reaches Railway (GitHub webhook)
@@ -63,21 +64,23 @@ Once a deployment starts:
 
 Make sure these are set in Railway → Variables:
 
-| Variable | Value |
-|----------|-------|
-| `GAME_SERVER_READY` | `true` |
-| `GAME_SESSION_SECRET` | (your hex secret) |
-| `WALLET_JWT_SECRET` | (your hex secret) |
-| `OPENRSC_GAME_ENDPOINT` | `fuzzynuts.xyz:43594` |
-| `XRPL_NETWORK` | `mainnet` |
-| `MONGO_URL` | (your MongoDB connection string) |
+| Variable                | Value                            |
+| ----------------------- | -------------------------------- |
+| `GAME_SERVER_READY`     | `true`                           |
+| `GAME_SESSION_SECRET`   | (your hex secret)                |
+| `WALLET_JWT_SECRET`     | (your hex secret)                |
+| `OPENRSC_GAME_ENDPOINT` | `fuzzynuts.xyz:43594`            |
+| `XRPL_NETWORK`          | `mainnet`                        |
+| `MONGO_URL`             | (your MongoDB connection string) |
 
 ## After Deploy Succeeds
 
 Test the health check:
+
 - Open `https://world.fuzzynuts.xyz/healthz` in your browser
 - Should show: `{"ok":true}`
 
 Then test the game flow:
+
 - Go to `https://fuzzynuts.xyz/play/rsc/`
 - Connect wallet → should see download card (no more "Failed to fetch")

@@ -36,7 +36,7 @@ async function injectMockWallet(page: Page, address = "rTestE2EWallet12345678901
         connected: true,
         address: addr,
         provider: "crossmark",
-      })
+      }),
     );
   }, address);
 }
@@ -54,7 +54,7 @@ async function simulateScoreSubmission(page: Page, score: number) {
         score: s,
         game: "mario",
       },
-      "*"
+      "*",
     );
   }, score);
 }
@@ -63,12 +63,7 @@ async function simulateScoreSubmission(page: Page, score: number) {
  * Helper: Write a score directly to localStorage in the
  * fuzzy-score.js format, simulating an offline game session.
  */
-async function injectLocalScore(
-  page: Page,
-  game: string,
-  score: number,
-  address: string
-) {
+async function injectLocalScore(page: Page, game: string, score: number, address: string) {
   await page.evaluate(
     ({ g, s, a }) => {
       // Compute current week key
@@ -100,7 +95,7 @@ async function injectLocalScore(
 
       localStorage.setItem("fuzzy_arcade_scores", JSON.stringify(data));
     },
-    { g: game, s: score, a: address }
+    { g: game, s: score, a: address },
   );
 }
 
@@ -141,7 +136,7 @@ test.describe("Leaderboard System", () => {
     await page.waitForTimeout(2000);
 
     // Find and click the Mario tab (🍄)
-    const marioTab = page.locator('button[aria-pressed]').filter({ hasText: "🍄" });
+    const marioTab = page.locator("button[aria-pressed]").filter({ hasText: "🍄" });
     if (await marioTab.isVisible()) {
       await marioTab.click();
       // The table should refresh
@@ -154,7 +149,10 @@ test.describe("Leaderboard System", () => {
     await page.waitForTimeout(2000);
 
     // Open week dropdown
-    const weekButton = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /W\d+/ }).first();
+    const weekButton = page
+      .locator('button[aria-haspopup="listbox"]')
+      .filter({ hasText: /W\d+/ })
+      .first();
     if (await weekButton.isVisible()) {
       await weekButton.click();
       await page.waitForTimeout(300);
@@ -179,7 +177,7 @@ test.describe("Leaderboard System", () => {
     await page.waitForTimeout(3000);
 
     // Check for personal best banner
-    const personalBest = page.locator('text=Your Best');
+    const personalBest = page.locator("text=Your Best");
     if (await personalBest.isVisible({ timeout: 3000 }).catch(() => false)) {
       // Personal best banner should be visible
       expect(await personalBest.isVisible()).toBe(true);
@@ -218,7 +216,7 @@ test.describe("Leaderboard System", () => {
 
       // The spinner should appear briefly
       const spinnerVisible = await page
-        .locator('.animate-spin')
+        .locator(".animate-spin")
         .isVisible({ timeout: 2000 })
         .catch(() => false);
 
@@ -232,7 +230,7 @@ test.describe("Leaderboard System", () => {
     await page.waitForTimeout(2000);
 
     // Should show "Resets in" countdown
-    const countdown = page.locator('text=Resets in');
+    const countdown = page.locator("text=Resets in");
     if (await countdown.isVisible({ timeout: 3000 }).catch(() => false)) {
       expect(await countdown.isVisible()).toBe(true);
     }
@@ -254,8 +252,8 @@ test.describe("Leaderboard System", () => {
     await page.waitForTimeout(3000);
 
     // Should show either cached scores warning or error state
-    const warning = page.locator('text=cached');
-    const errorState = page.locator('text=Unreachable');
+    const warning = page.locator("text=cached");
+    const errorState = page.locator("text=Unreachable");
 
     const showsCached = await warning.isVisible({ timeout: 3000 }).catch(() => false);
     const showsError = await errorState.isVisible({ timeout: 3000 }).catch(() => false);

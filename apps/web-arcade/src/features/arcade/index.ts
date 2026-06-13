@@ -55,7 +55,6 @@ export type { CountdownState } from "./hooks/useWeeklyCountdown";
 // ── Components ──
 export { LeaderboardSkeleton } from "./components/LeaderboardSkeleton";
 
-
 // ── Validation ──
 export {
   ScorePayloadSchema,

@@ -24,13 +24,9 @@ import {
    Visual task board for autonomous worker agents.
    ═══════════════════════════════════════════════════════════════ */
 
-const API =
-  process.env.NEXT_PUBLIC_CHAT_API ||
-  "https://fuzzynutsxyz-production.up.railway.app";
+const API = process.env.NEXT_PUBLIC_CHAT_API || "https://fuzzynutsxyz-production.up.railway.app";
 
-const ADMIN_WALLET =
-  process.env.NEXT_PUBLIC_ADMIN_WALLET ||
-  "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
+const ADMIN_WALLET = process.env.NEXT_PUBLIC_ADMIN_WALLET || "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
 
 const REFRESH_INTERVAL = 30_000;
 
@@ -262,8 +258,7 @@ export default function KanbanPage() {
                 Kanban Board
               </h1>
               <p className="text-xs text-white/30">
-                {totalTasks} task{totalTasks !== 1 ? "s" : ""} · Auto-refreshes
-                every 30s
+                {totalTasks} task{totalTasks !== 1 ? "s" : ""} · Auto-refreshes every 30s
               </p>
             </div>
           </div>
@@ -285,10 +280,7 @@ export default function KanbanPage() {
               disabled={loading}
               className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
             >
-              <RefreshCw
-                size={14}
-                className={loading ? "animate-spin" : ""}
-              />
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
               Refresh
             </button>
           </div>
@@ -315,9 +307,7 @@ export default function KanbanPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-xs text-white/40">
-                    Title
-                  </label>
+                  <label className="mb-1 block text-xs text-white/40">Title</label>
                   <input
                     type="text"
                     value={createTitle}
@@ -331,9 +321,7 @@ export default function KanbanPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs text-white/40">
-                    Description
-                  </label>
+                  <label className="mb-1 block text-xs text-white/40">Description</label>
                   <textarea
                     value={createDesc}
                     onChange={(e) => setCreateDesc(e.target.value)}
@@ -344,26 +332,20 @@ export default function KanbanPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs text-white/40">
-                    Priority
-                  </label>
+                  <label className="mb-1 block text-xs text-white/40">Priority</label>
                   <div className="flex gap-2">
                     {(["low", "med", "high"] as const).map((p) => (
                       <button
                         key={p}
                         onClick={() => setCreatePriority(p)}
                         className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                          createPriority === p
-                            ? "ring-1"
-                            : "opacity-50 hover:opacity-75"
+                          createPriority === p ? "ring-1" : "opacity-50 hover:opacity-75"
                         }`}
                         style={{
                           backgroundColor: PRIORITY_CONFIG[p].bg,
                           color: PRIORITY_CONFIG[p].color,
                           outline:
-                            createPriority === p
-                              ? `1px solid ${PRIORITY_CONFIG[p].color}`
-                              : "none",
+                            createPriority === p ? `1px solid ${PRIORITY_CONFIG[p].color}` : "none",
                         }}
                       >
                         {p === "high" ? (
@@ -391,11 +373,7 @@ export default function KanbanPage() {
                     disabled={!createTitle.trim() || creating}
                     className="flex items-center gap-2 rounded-lg bg-[#7c3aed]/20 px-4 py-2 text-sm font-semibold text-[#7c3aed] transition-colors hover:bg-[#7c3aed]/30 disabled:opacity-40"
                   >
-                    {creating ? (
-                      <Loader size={14} className="animate-spin" />
-                    ) : (
-                      <Plus size={14} />
-                    )}
+                    {creating ? <Loader size={14} className="animate-spin" /> : <Plus size={14} />}
                     Create
                   </button>
                 </div>
@@ -450,8 +428,7 @@ export default function KanbanPage() {
                         style={{
                           backgroundColor:
                             PRIORITY_CONFIG[task.priority]?.bg ?? PRIORITY_CONFIG.med.bg,
-                          color:
-                            PRIORITY_CONFIG[task.priority]?.color ?? PRIORITY_CONFIG.med.color,
+                          color: PRIORITY_CONFIG[task.priority]?.color ?? PRIORITY_CONFIG.med.color,
                         }}
                       >
                         {task.priority}

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -52,7 +46,7 @@ const ID_TO_SLUG: Record<string, string> = {
 
 // Reverse: slug → GAMES[].id  (for sidebar card clicks)
 const SLUG_TO_ID: Record<string, string> = Object.fromEntries(
-  Object.entries(ID_TO_SLUG).map(([id, slug]) => [slug, id])
+  Object.entries(ID_TO_SLUG).map(([id, slug]) => [slug, id]),
 );
 
 function slugToGamesId(slug: string): string {
@@ -99,7 +93,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
   // DEGEN CHAT START — live chat via Socket.io
   const { address } = useWalletStore();
-  const { messages: chatMessages, onlineUsers: chatOnlineUsers, connected: chatConnected, sendMessage: sendChatMessage } = useChatSocket(address);
+  const {
+    messages: chatMessages,
+    onlineUsers: chatOnlineUsers,
+    connected: chatConnected,
+    sendMessage: sendChatMessage,
+  } = useChatSocket(address);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const chatMessagesEndRef = useRef<HTMLDivElement>(null);
@@ -186,7 +185,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
       try {
         iframeRef.current?.contentWindow?.postMessage(
           { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.origin },
-          "*"
+          "*",
         );
       } catch {
         /* cross-origin, noop */
@@ -269,26 +268,26 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     } catch {
       /* noop */
     }
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: "setMute", muted: next },
-      "*"
-    );
+    iframeRef.current?.contentWindow?.postMessage({ type: "setMute", muted: next }, "*");
   }, [isMuted]);
 
   const handleGameSwitch = useCallback(
     (newGamesId: string) => {
       // Kill any accidental text selection from the sidebar click
-      try { window.getSelection()?.removeAllRanges(); } catch { /* noop */ }
+      try {
+        window.getSelection()?.removeAllRanges();
+      } catch {
+        /* noop */
+      }
       onGameSwitch?.(newGamesId);
     },
-    [onGameSwitch]
+    [onGameSwitch],
   );
 
   // Don't render anything if no game
   if (!game) return null;
 
-  const defaultSandbox =
-    "allow-scripts allow-same-origin allow-popups allow-forms";
+  const defaultSandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
 
   return createPortal(
     <dialog
@@ -491,10 +490,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                 {/* Info */}
                 <div className="play-next-card__info">
                   <span className="play-next-card__title">{rec.title}</span>
-                  <span
-                    className="play-next-card__genre"
-                    style={{ color: rec.color }}
-                  >
+                  <span className="play-next-card__genre" style={{ color: rec.color }}>
                     {rec.genre}
                   </span>
                 </div>
@@ -514,9 +510,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
           {/* Victory banner — shows after a score is submitted */}
           {showVictory && lastScore && (
             <div className="mx-3 mt-2 mb-1 px-3 py-3 rounded-lg bg-gradient-to-r from-brand-gold/15 to-[var(--color-hot-pink)]/15 border border-brand-gold/30">
-              <p className="text-xs font-bold text-brand-gold mb-1">
-                🏆 Score Submitted!
-              </p>
+              <p className="text-xs font-bold text-brand-gold mb-1">🏆 Score Submitted!</p>
               <p className="text-[11px] text-[var(--color-cream)]">
                 {lastScore.score.toLocaleString()} on {lastScore.game}
               </p>
@@ -570,7 +564,9 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                 <span className="sidebar-chat__count">{chatOnlineUsers.length || ""}</span>
               )}
               {!chatConnected && (
-                <span className="sidebar-chat__count" style={{ opacity: 0.4 }}>...</span>
+                <span className="sidebar-chat__count" style={{ opacity: 0.4 }}>
+                  ...
+                </span>
               )}
               <ChevronDown
                 size={13}
@@ -591,7 +587,14 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                   {/* Message list */}
                   <div className="sidebar-chat__messages">
                     {chatMessages.length === 0 && (
-                      <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: "0.7rem", padding: "1rem" }}>
+                      <div
+                        style={{
+                          textAlign: "center",
+                          color: "rgba(255,255,255,0.3)",
+                          fontSize: "0.7rem",
+                          padding: "1rem",
+                        }}
+                      >
                         {chatConnected ? "No messages yet" : "Connecting..."}
                       </div>
                     )}
@@ -600,15 +603,18 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                         <span
                           className="sidebar-chat__user"
                           style={{
-                            color: msg.muted ? "#FBBF24" : msg.shadowed ? "#ef4444" : "#7c3aed"
+                            color: msg.muted ? "#FBBF24" : msg.shadowed ? "#ef4444" : "#7c3aed",
                           }}
                         >
                           {msg.username}
                         </span>
-                        <span className="sidebar-chat__text" style={{
-                          textDecoration: (msg.shadowed || msg.muted) ? "line-through" : "none",
-                          opacity: msg.shadowed ? 0.6 : 1
-                        }}>
+                        <span
+                          className="sidebar-chat__text"
+                          style={{
+                            textDecoration: msg.shadowed || msg.muted ? "line-through" : "none",
+                            opacity: msg.shadowed ? 0.6 : 1,
+                          }}
+                        >
                           {msg.content}
                         </span>
                       </div>
@@ -653,6 +659,6 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
       </div>
       {/* DEGEN OVERHAUL END */}
     </dialog>,
-    document.body
+    document.body,
   );
 }

@@ -19,28 +19,13 @@ import { Router } from "express";
 import { z } from "zod";
 import { jwtVerify } from "jose";
 import { type Db, MongoClient } from "mongodb";
-import {
-  verifySessionToken,
-  type SessionClaims,
-} from "@fuzzynuts/shared-anticheat";
-import {
-  getUsers,
-  upsertGoogleUser,
-  upsertWalletUser,
-  type UserDocument,
-} from "../models/User";
+import { verifySessionToken, type SessionClaims } from "@fuzzynuts/shared-anticheat";
+import { getUsers, upsertGoogleUser, upsertWalletUser, type UserDocument } from "../models/User";
 
 // ── Constants ──────────────────────────────────────────────────
 
 const COLLECTION = "arcade_scores";
-const VALID_GAMES = [
-  "fuzzynuts-world",
-  "mario",
-  "survivors",
-  "minigolf",
-  "racer",
-  "rsc",
-] as const;
+const VALID_GAMES = ["fuzzynuts-world", "mario", "survivors", "minigolf", "racer", "rsc"] as const;
 
 const SCORE_CAPS: Record<string, number> = {
   "fuzzynuts-world": 10_000_000,
@@ -58,7 +43,10 @@ const ScoreBody = z.object({
   score: z.number().int().positive().max(99_999_999),
   sessionToken: z.string().min(1).optional(), // Web3 session token
   duration: z.number().min(3).optional(), // Play duration in seconds
-  weekKey: z.string().regex(/^\d{4}-W\d{2}$/).optional(),
+  weekKey: z
+    .string()
+    .regex(/^\d{4}-W\d{2}$/)
+    .optional(),
 });
 
 // ── Types ──────────────────────────────────────────────────────
@@ -88,14 +76,10 @@ interface ScoreDocument {
 /** ISO 8601 week key (matches rewards-api.js and discord cron) */
 function getCurrentWeekKey(): string {
   const now = new Date();
-  const d = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNum = Math.ceil(
-    ((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7,
-  );
+  const weekNum = Math.ceil(((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
   return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
 }
 
@@ -156,8 +140,7 @@ async function resolveWalletUser(
   return {
     userId: user._id!,
     wallet,
-    displayName:
-      user.name ?? `Player_${wallet.slice(1, 7)}`,
+    displayName: user.name ?? `Player_${wallet.slice(1, 7)}`,
     provider: user.provider as "xrpl" | "both",
   };
 }
@@ -220,31 +203,22 @@ export function buildScoresRouter(env: {
     try {
       const parsed = ScoreBody.safeParse(req.body);
       if (!parsed.success) {
-        return res
-          .status(400)
-          .json({ error: "E_SCHEMA", details: parsed.error.flatten() });
+        return res.status(400).json({ error: "E_SCHEMA", details: parsed.error.flatten() });
       }
 
       const { game, score, sessionToken, duration, weekKey } = parsed.data;
       const db = await getDb();
       const clientIP =
-        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
-        req.ip ??
-        "unknown";
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? req.ip ?? "unknown";
 
       // ── Authenticate: try both paths ─────────────────────
 
       let authUser: AuthenticatedUser | null = null;
 
       // Path A: Web3 session token (X-Game-Session header or body)
-      const rawSession =
-        (req.headers["x-game-session"] as string) ?? sessionToken;
+      const rawSession = (req.headers["x-game-session"] as string) ?? sessionToken;
       if (rawSession) {
-        authUser = await resolveWalletUser(
-          db,
-          rawSession,
-          env.GAME_SESSION_SECRET,
-        );
+        authUser = await resolveWalletUser(db, rawSession, env.GAME_SESSION_SECRET);
       }
 
       // Path B: Web2 NextAuth JWT (Authorization header)
@@ -364,9 +338,7 @@ export function buildScoresRouter(env: {
           userId: s.userId,
         }));
 
-      res.write(
-        `data: ${JSON.stringify({ type: "initial", data: leaderboard })}\n\n`,
-      );
+      res.write(`data: ${JSON.stringify({ type: "initial", data: leaderboard })}\n\n`);
 
       // Heartbeat every 15s
       const heartbeat = setInterval(() => {
@@ -404,9 +376,7 @@ export function buildScoresRouter(env: {
               userId: s.userId,
             }));
 
-          res.write(
-            `data: ${JSON.stringify({ type: "replace", data: fresh })}\n\n`,
-          );
+          res.write(`data: ${JSON.stringify({ type: "replace", data: fresh })}\n\n`);
         } catch {
           // Silent — client will reconnect
         }

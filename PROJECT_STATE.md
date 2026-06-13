@@ -1,8 +1,10 @@
 # FuzzyNuts Project State
+
 Last updated: 2026-06-04
 Current focus: Logout detection + redirect fully working (v13b on VPS, parent page deployed)
 
 ## Done
+
 - API routes: `POST /api/rsc/claim-username`, `GET /api/rsc/credentials` (MongoDB + AES-256-GCM)
 - Wallet auth JWT middleware (`walletAuth.ts`)
 - Server mounts RSC routes at `/api/rsc` gated by wallet JWT
@@ -33,19 +35,23 @@ Current focus: Logout detection + redirect fully working (v13b on VPS, parent pa
 - Community Chat Step 3B: Admin commands (/mute, /unmute, /ban, /unban, /clear)
 
 ## In Progress
+
 - Phase 3: Steps 3C (message search), 3D (user profiles), 3E (emoji reactions) remaining
 
 ## Blocked / Next
+
 - Verify OpenAI Tier 2 moderation working (needs OPENAI_API_KEY confirmed active)
 - Railway Express API container crash (env vars not injecting into Docker) — not blocking RSC since auto-login works via direct VPS
 - Account server on VPS (`/opt/account-server/` port 3001) — separate from this work
 - Verify v13 pixel sampling works with Open-RSC's WebGL canvas (may need threshold tuning)
 
 ## Manual Steps Pending (for me)
+
 - Deploy v13 to VPS: `curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/main/tools/fix-teavm-js-autologin.sh | bash`
 - Test logout detection: log in → log out in-game → verify session-guard triggers → verify auto-reconnect
 
 ## Key File Map
+
 - `tools/fix-teavm-js-autologin.sh` — VPS script (v13): WebGL intercept, pixel sampling, WS monitor, session guard
 - `apps/web-arcade/public/games/rsc/index.html` — Parent page: wallet flow, claim modal, session-lost handler
 - `apps/api/src/routes/rsc.ts` — claim-username + credentials endpoints
@@ -56,12 +62,13 @@ Current focus: Logout detection + redirect fully working (v13b on VPS, parent pa
 - `/var/www/rsc-client/index.html` — Live on VPS (needs v13 deploy), game.fuzzynuts.xyz
 
 ## Technical Notes
+
 - TeaVM captures console references at load time → must install Proxy BEFORE classes.js
 - WebGL context must be intercepted BEFORE classes.js to set preserveDrawingBuffer=true
 - Canvas pixel sampling uses offscreen 2D canvas + drawImage from WebGL canvas
 - Login screen is very dark (avg brightness < 20) vs game world (avg > 40)
 - Stale canvas = pixel hash unchanged for 3+ checks (6s) = static login screen
 - Bright-to-dark transition = was playing (avg > 40), now dark (avg < 20) for 2+ checks
-- WebSocket monitor tracks all WS instances; close event sets _wsDisconnected flag
+- WebSocket monitor tracks all WS instances; close event sets \_wsDisconnected flag
 - All shared state must be on `window` object (not `var` in IIFE) for cross-script-block access
 - Parent page reload limit: 3 reloads in 60 seconds, then shows "Connection issues" error

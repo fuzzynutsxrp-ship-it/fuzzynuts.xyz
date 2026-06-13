@@ -9,17 +9,17 @@
 
 ## 0. Summary table
 
-| # | Service | Used for | Status | Creds safe? | Risk if down/rotated |
-|---|---------|----------|--------|-------------|----------------------|
-| 1 | **Vercel** | Hosts `web-arcade` (Next.js frontend) | ACTIVE | OK (gitignored) + expired dev token | Site goes down |
-| 2 | **Railway** | Hosts `apps/api` (Express API) at `world.fuzzynuts.xyz` | ACTIVE | OK (dashboard) | All API/scores/auth/chat break |
-| 3 | **Porkbun** | DNS for `fuzzynuts.xyz` + subdomains | ACTIVE | N/A (no creds in repo) | All domains stop resolving |
-| 4 | **MongoDB** | API persistence (scores, kanban, chat, monitoring) | ACTIVE (gated) | OK (dashboard) | API runs but persistence features disabled |
-| 5 | **Xaman / Xumm** | Wallet auth (primary) | ACTIVE | OK — **TEST key** (in git, accepted by owner) | Wallet sign-in breaks |
-| 6 | **Reown (WalletConnect v2)** | Joey wallet (mobile) connect | ACTIVE (public ID) | OK (public client ID) | Joey/mobile connect breaks |
-| 7 | **DigitalOcean VPS (Open-RSC)** | MMO game server `fuzzynuts.xyz:43594` | STALE / provisioning | ⚠️ SSH password auth | `/play/rsc` stays in "provisioning" |
-| 8 | **GitHub (Actions + Pages)** | CI/CD, dependabot, `gh-pages` | ACTIVE / partly legacy | OK (Actions secrets) | CI + auto-deploy break |
-| 9 | **XRPL mainnet** | On-chain $NUT token, AMM, payouts | ACTIVE | Public addresses; seeds off-repo | Payouts/price/trustlines break |
+| #   | Service                         | Used for                                                | Status                 | Creds safe?                                   | Risk if down/rotated                       |
+| --- | ------------------------------- | ------------------------------------------------------- | ---------------------- | --------------------------------------------- | ------------------------------------------ |
+| 1   | **Vercel**                      | Hosts `web-arcade` (Next.js frontend)                   | ACTIVE                 | OK (gitignored) + expired dev token           | Site goes down                             |
+| 2   | **Railway**                     | Hosts `apps/api` (Express API) at `world.fuzzynuts.xyz` | ACTIVE                 | OK (dashboard)                                | All API/scores/auth/chat break             |
+| 3   | **Porkbun**                     | DNS for `fuzzynuts.xyz` + subdomains                    | ACTIVE                 | N/A (no creds in repo)                        | All domains stop resolving                 |
+| 4   | **MongoDB**                     | API persistence (scores, kanban, chat, monitoring)      | ACTIVE (gated)         | OK (dashboard)                                | API runs but persistence features disabled |
+| 5   | **Xaman / Xumm**                | Wallet auth (primary)                                   | ACTIVE                 | OK — **TEST key** (in git, accepted by owner) | Wallet sign-in breaks                      |
+| 6   | **Reown (WalletConnect v2)**    | Joey wallet (mobile) connect                            | ACTIVE (public ID)     | OK (public client ID)                         | Joey/mobile connect breaks                 |
+| 7   | **DigitalOcean VPS (Open-RSC)** | MMO game server `fuzzynuts.xyz:43594`                   | STALE / provisioning   | ⚠️ SSH password auth                          | `/play/rsc` stays in "provisioning"        |
+| 8   | **GitHub (Actions + Pages)**    | CI/CD, dependabot, `gh-pages`                           | ACTIVE / partly legacy | OK (Actions secrets)                          | CI + auto-deploy break                     |
+| 9   | **XRPL mainnet**                | On-chain $NUT token, AMM, payouts                       | ACTIVE                 | Public addresses; seeds off-repo              | Payouts/price/trustlines break             |
 
 ⚠️ = needs attention (see §3 and Phase 5).
 
@@ -28,8 +28,9 @@
 ## 1. Where credentials & configs live
 
 ### Files that hold REAL secrets (all gitignored, NOT committed — verified with `git check-ignore`)
+
 - `apps/web-arcade/.env.local`
-  - `NEXT_PUBLIC_XAMAN_API_KEY` = `f4f7****a7f5` (Xaman) — *also exposed in tracked docs, see §3*
+  - `NEXT_PUBLIC_XAMAN_API_KEY` = `f4f7****a7f5` (Xaman) — _also exposed in tracked docs, see §3_
   - `SITE_LOCKDOWN_PASSWORD` = `Pass****d7` (weak, pre-launch HTTP Basic Auth)
   - public XRPL token addresses, site URLs (not secret)
 - `.vercel/.env.local`
@@ -38,11 +39,13 @@
   - `projectId` = `prj_Asbq****4RGe`, `orgId` = `team_cJRI****E9D` (link identifiers, not secrets but not for sharing)
 
 ### Files tracked in git (templates / configs — safe by design)
+
 - `.env.example` (root) and `apps/web-arcade/.env.example` — documented variable templates
 - `railway.toml`, `apps/web-arcade/vercel.json`, `Dockerfile.api`, `apps/api/Dockerfile`, `apps/games-build/Dockerfile`, `apps/games-build/docker-compose.yml`
 - `.github/workflows/*.yml` (5 workflows) — reference secrets via `${{ secrets.* }}`, no inline values
 
 ### Secrets stored OFF-repo (correct location)
+
 - Railway dashboard: `MONGODB_URI`, `WALLET_JWT_SECRET`, `GAME_SESSION_SECRET`, `XUMM_API_KEY`, etc.
 - Vercel dashboard: `NEXT_PUBLIC_*`, `SITE_LOCKDOWN_PASSWORD`, `NEXT_PUBLIC_PROJECT_ID`
 - GitHub Actions secrets: `VPS_HOST`, `VPS_PASSWORD`, `GITHUB_TOKEN`
@@ -53,50 +56,59 @@
 ## 2. Service-by-service detail
 
 ### 1. Vercel — ACTIVE
+
 - **Use:** hosts the Next.js `web-arcade` app. `vercel.json` defines security headers, cache rules, SSE for `/api/scores/stream`, and rewrites to Railway (`fuzzynutsxyz-production.up.railway.app`, `world.fuzzynuts.xyz`).
 - **Config:** `.vercel/project.json` (project `fuzzynuts-optimized`, org `shafster-s-projects`), `apps/web-arcade/vercel.json`.
 - **Creds:** `.vercel/` is gitignored. The local OIDC token is expired and harmless; the CLI refreshes it.
 - **Risk:** primary public site. If down → arcade offline. Build depends on pnpm 9.15.0 + `build:web`.
 
 ### 2. Railway — ACTIVE
+
 - **Use:** runs `apps/api/src/server.ts` (Express). Healthcheck `/healthz`. Public domain `world.fuzzynuts.xyz`; internal `fuzzynutsxyz-production.up.railway.app`. Serves `/api/scores`, `/api/auth`, `/api/chat`, `/api/kanban`, `/api/rsc`, monitoring.
 - **Config:** `railway.toml` (nixpacks, `npx tsx apps/api/src/server.ts`). Two Dockerfiles (`Dockerfile.api` + `apps/api/Dockerfile`) are **byte-identical duplicates**.
 - **Creds:** all in Railway dashboard.
 - **Risk:** every dynamic feature (scores, wallet auth, chat, kanban, RSC proxy) depends on this. The frontend hardcodes `https://world.fuzzynuts.xyz` as default API URL.
 
 ### 3. Porkbun — ACTIVE (no repo footprint)
+
 - **Use:** DNS registrar/host for `fuzzynuts.xyz` and subdomains `world.` (Railway), `game.` (CORS-allowed in API), and apex (Vercel).
 - **Config:** none in repo — managed entirely on the Porkbun dashboard. Only referenced in `docs/runbooks/` and deploy checklists.
 - **Risk:** DNS outage or accidental record change takes down all domains. No API credentials present locally (good).
 
 ### 4. MongoDB — ACTIVE (feature-gated)
+
 - **Use:** persistence for scores, kanban, chat history, monitoring. Code only mounts these routers when `MONGODB_URI` is set (`apps/api/src/server.ts:33`, `128`, `151`, `167`, `183`, `197`).
 - **Creds:** `MONGODB_URI` lives in Railway. **Not in repo.**
 - **⚠️ Naming mismatch:** `.env.example` documents `MONGO_URL` and `MONGODB_URL`, but the code reads **`MONGODB_URI`**. The example file is misleading/stale — a developer copying it would get a non-working DB config. (Flag for Phase 3 doc fix.)
 - **Prod vs dev:** connection string not visible locally, so prod/staging cannot be confirmed from the repo — **must be checked on the Railway dashboard** (Phase 5 checklist).
 
 ### 5. Xaman / Xumm — ACTIVE (test key)
+
 - **Use:** primary wallet authentication (`NEXT_PUBLIC_XAMAN_API_KEY`, consumed in 3 source locations).
 - **Creds:** key in gitignored `apps/web-arcade/.env.local`; same value also in two tracked archive docs (`docs/_archive/legacy-web-arcade/fuzzynuts_handoff.md:260`, `docs/_archive/original-archive/fuzzynuts_handoff.md:260`).
 - **Classification (per owner, 2026-06-06):** this is a **TEST token**. Its presence in git history is **accepted/known and NOT a concern**. Removed from the critical-rotation list. No action required.
 
 ### 6. Reown (WalletConnect v2) — ACTIVE (public ID)
+
 - **Use:** Joey wallet (mobile-only) connect via `apps/web-arcade/src/lib/wallet/joeyConfig.ts`, reads `NEXT_PUBLIC_PROJECT_ID`.
 - **Value:** `238a1bd9e657a0efbe275e457e73c426` — a **public client ID** (NEXT_PUBLIC, exposed in browser by design). Documented in `apps/web-arcade/CLAUDE.md` and archive docs.
 - **Risk:** low. Confirm it matches the live Reown Cloud project and that the project's allowed domains include `fuzzynuts.xyz` (Phase 5).
 
-### 7. DigitalOcean VPS — Open-RSC game server — STALE / provisioning  ⚠️
+### 7. DigitalOcean VPS — Open-RSC game server — STALE / provisioning ⚠️
+
 - **Use:** self-hosted MMO ("Fuzzynuts World") game server at `fuzzynuts.xyz:43594` (`OPENRSC_GAME_ENDPOINT`). Companion account API in `tools/vps-account-server/server.js` (reads `ACCOUNT_SECRET`, `DB_PATH`, `PORT`).
 - **Status:** `.env.example` ships `GAME_SERVER_READY=false`; while false the `/api/auth/game-session` endpoint 503s and `/play/rsc` shows "Server Provisioning." So this is **set up but not yet live**.
 - **Deploy:** `.github/workflows/deploy-openrsc.yml` SSHes into the VPS using `secrets.VPS_HOST` + `secrets.VPS_PASSWORD`. **IP `137.184.194.158` is hardcoded** in the workflow.
 - **⚠️ Risk:** SSH **password** auth (not keys) is weaker; password is a GitHub secret. Workflow `curl|bash`-es a script from raw GitHub — supply-chain sensitive. Confirm whether this VPS is still paid-for/running (Phase 5).
 
 ### 8. GitHub — Actions + Pages
+
 - **Use:** repo `github.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz`. Workflows: `ci.yml` (typecheck/lint/test/build games), `release.yml` (changesets), `docs-status.yml`, `deploy-gh-pages.yml`, `deploy-openrsc.yml`. Dependabot active (several open PR branches).
 - **Creds:** `GITHUB_TOKEN` (auto), `VPS_HOST`, `VPS_PASSWORD` in Actions secrets.
 - **⚠️ Possibly legacy:** `deploy-gh-pages.yml` builds with `npm ci`/`npm run build` (not pnpm) and pushes to a `gh-pages` branch — inconsistent with the pnpm monorepo and likely a **leftover from the pre-monorepo single-app setup**. Confirm whether GitHub Pages still serves anything (Phase 5 / Phase 2 will flag).
 
 ### 9. XRPL mainnet
+
 - **Use:** on-chain $NUT token. Public addresses (issuer `rpL6...xMP7`, distributor `rEAg...4BZh`, AMM pool `r3Uz...Jxtg`), node `wss://xrplcluster.com`. Payout logic in `packages/xrpl-token-utils` (server-side, multisig-aware).
 - **Creds:** distributor **seed/secret is NOT in the repo** (correct). Docs describe generating/disabling master key + RegularKey multisig (ADR-0006).
 - **Risk:** money-adjacent. Any leak of the distributor seed = loss of funds. Currently safe in-repo.
@@ -105,13 +117,13 @@
 
 ## 3. Hardcoded / committed secrets found (cross-referenced against git)
 
-| Secret | Where | In git history? | Verdict |
-|--------|-------|-----------------|---------|
-| Xaman API key `f4f7****a7f5` | `docs/_archive/.../fuzzynuts_handoff.md:260` (×2, **tracked**) + `.env.local` | YES (tracked) | **No action — TEST key, accepted by owner** |
-| `GAME_SESSION_SECRET` `a3f8****7f80` (64-hex) | `.env.example:23` + `docs/railway-deploy-checklist.md:31,83` (**tracked**) | **YES (tracked)** | **Rotate** — a real-looking value shipped as the "example"; if it's the live Railway value it's leaked |
-| Reown `NEXT_PUBLIC_PROJECT_ID` `238a1bd9...` | `CLAUDE.md`, archive docs (**tracked**) | YES | OK — public by design (NEXT_PUBLIC) |
-| `SITE_LOCKDOWN_PASSWORD` `Pass****d7` | `.env.local` only | **No** (gitignored) | Weak but not leaked; strengthen |
-| XRPL token addresses | `.env.local`, `.env.example`, docs | YES | OK — public on-chain |
+| Secret                                        | Where                                                                         | In git history?     | Verdict                                                                                                |
+| --------------------------------------------- | ----------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------ |
+| Xaman API key `f4f7****a7f5`                  | `docs/_archive/.../fuzzynuts_handoff.md:260` (×2, **tracked**) + `.env.local` | YES (tracked)       | **No action — TEST key, accepted by owner**                                                            |
+| `GAME_SESSION_SECRET` `a3f8****7f80` (64-hex) | `.env.example:23` + `docs/railway-deploy-checklist.md:31,83` (**tracked**)    | **YES (tracked)**   | **Rotate** — a real-looking value shipped as the "example"; if it's the live Railway value it's leaked |
+| Reown `NEXT_PUBLIC_PROJECT_ID` `238a1bd9...`  | `CLAUDE.md`, archive docs (**tracked**)                                       | YES                 | OK — public by design (NEXT_PUBLIC)                                                                    |
+| `SITE_LOCKDOWN_PASSWORD` `Pass****d7`         | `.env.local` only                                                             | **No** (gitignored) | Weak but not leaked; strengthen                                                                        |
+| XRPL token addresses                          | `.env.local`, `.env.example`, docs                                            | YES                 | OK — public on-chain                                                                                   |
 
 **Positive findings:** `.env.local`, `.vercel/.env.local`, `.vercel/project.json` are correctly gitignored and were **never** committed (verified — no `.env.local`/`.vercel/.env` in `git log --all`). The distributor seed and MongoDB URI are not in the repo.
 
@@ -128,6 +140,7 @@
 ---
 
 ## 5. Items requiring YOUR review before any cleanup
+
 1. **Rotate** the `GAME_SESSION_SECRET` only (in git history, real-looking value). The Xaman key is a **test token** and is intentionally excluded from rotation per owner. Full checklist in Phase 5.
 2. Confirm whether the **Open-RSC VPS** (`137.184.194.158`) is still running/paid — it may be an orphaned cost.
 3. Confirm whether **GitHub Pages** (`gh-pages`, `deploy-gh-pages.yml`) still serves anything or is dead legacy.
@@ -135,4 +148,5 @@
 5. The two **identical Dockerfiles** (`Dockerfile.api` and `apps/api/Dockerfile`) — candidate for consolidation in Phase 3.
 
 ---
-*End of Phase 1. No files were moved, modified, or deleted. Awaiting your review before Phase 2.*
+
+_End of Phase 1. No files were moved, modified, or deleted. Awaiting your review before Phase 2._
