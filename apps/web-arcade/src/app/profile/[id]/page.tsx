@@ -1,21 +1,34 @@
 import type { Metadata } from "next";
 import { ProfileIdClient } from "./client";
 
-interface ProfileIdPageProps {
-  params: Promise<{ id: string }>;
-}
+type PageParams = { id: string };
+
+/**
+ * Dynamic profile route: /profile/[id]
+ *
+ * Supports two ID formats:
+ *   - XRPL wallet address (r...) — fetches scores from API
+ *   - Guest ID (Guest-XXXX) — local-only profile with editable bio
+ */
 
 export async function generateMetadata({
   params,
-}: ProfileIdPageProps): Promise<Metadata> {
+}: {
+  params: Promise<PageParams>;
+}): Promise<Metadata> {
   const { id } = await params;
-  const shortId = `${id.slice(0, 6)}...${id.slice(-4)}`;
+
+  const isWallet = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
+  const displayName = isWallet
+    ? `${id.slice(0, 6)}...${id.slice(-4)}`
+    : id;
+
   return {
-    title: `${shortId} — Player Stats | Fuzzynuts.xyz`,
-    description: `View arcade stats and score history for ${shortId}. Track best runs across all Fuzzynuts games.`,
+    title: `${displayName} | Fuzzynuts.xyz`,
+    description: `View ${displayName}'s arcade stats and score history on Fuzzynuts.`,
     openGraph: {
-      title: `${shortId} — Player Stats | Fuzzynuts.xyz`,
-      description: `View arcade stats and score history for ${shortId} across all FuzzyNuts games.`,
+      title: `${displayName} | Fuzzynuts.xyz`,
+      description: `View ${displayName}'s arcade stats and score history across all FuzzyNuts games.`,
       url: `https://fuzzynuts.xyz/profile/${id}`,
       siteName: "Fuzzynuts",
       type: "profile",
@@ -23,7 +36,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProfileIdPage({ params }: ProfileIdPageProps) {
+export default async function ProfileIdPage({
+  params,
+}: {
+  params: Promise<PageParams>;
+}) {
   const { id } = await params;
-  return <ProfileIdClient deviceId={id} />;
+  return <ProfileIdClient profileId={id} />;
 }

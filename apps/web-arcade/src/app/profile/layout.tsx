@@ -1,9 +1,15 @@
 /**
- * Profile route layout — wraps with SubPageLayout
- * for consistent navbar, footer, video bg, and particles.
+ * Profile route layout — matches the homepage's clean, light style.
+ * No video background, no particles, no dark overlay.
  */
 
-import { SubPageLayout } from "@/components/layout/SubPageLayout";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import dynamic from "next/dynamic";
+
+const Footer = dynamic(
+  () => import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
+  { ssr: false },
+);
 
 export default function ProfileLayout({
   children,
@@ -11,12 +17,12 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SubPageLayout
-      showVideoBg={true}
-      showFallingNuts={true}
-      navbarTransparent={false}
-    >
-      {children}
-    </SubPageLayout>
+    <div className="fnx">
+      <SiteHeader variant="light" />
+      <main className="fn-dashboard">
+        {children}
+        <Footer />
+      </main>
+    </div>
   );
 }

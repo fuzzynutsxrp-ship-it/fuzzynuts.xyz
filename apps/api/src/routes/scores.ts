@@ -73,10 +73,10 @@ export const VALID_GAMES = [
 
 // Authoritative score caps — must match gameRegistry.ts exactly
 export const SCORE_CAPS: Record<string, number> = {
-  "mario": 99_999,
-  "fuzzy-survivors": 999_999,
-  "minigolf": 10_500,
-  "nut-racer": 99_999,
+  "mario": 9_999_990,
+  "fuzzy-survivors": 5_000_000,
+  "minigolf": 100_000,
+  "nut-racer": 2_000_000,
   "fuzzynuts-world": 10_000_000,
   "rsc": 99_000_000,
   "dragon-hoard": 999_999,
