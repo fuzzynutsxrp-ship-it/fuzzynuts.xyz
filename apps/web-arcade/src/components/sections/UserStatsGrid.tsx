@@ -159,7 +159,22 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
       const data = await res.json();
       const entries: ScoreEntry[] = Array.isArray(data)
         ? data
-        : data.scores ?? data.data ?? [];
+        : data.combined ?? data.leaderboard ?? data.scores ?? data.data ?? [];
+
+      // Response shape validation — warn if none of the expected keys exist
+      if (
+        !Array.isArray(data) &&
+        data.combined === undefined &&
+        data.leaderboard === undefined &&
+        data.scores === undefined &&
+        data.data === undefined
+      ) {
+        console.warn(
+          "[UserStatsGrid] Unexpected API response shape — expected one of: combined, leaderboard, scores, data. Got keys:",
+          Object.keys(data),
+        );
+      }
+
       // Sort by most recent
       entries.sort((a, b) => (b.ts || 0) - (a.ts || 0));
       setScores(entries);
