@@ -65,27 +65,27 @@ function Podium({
     {
       rank: 1,
       medal: "🥇",
-      borderClass: "border-brand-gold/40",
-      shadowStyle: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.08)",
-      textClass: "text-brand-gold",
+      borderClass: "border-[#e2e8f0]",
+      shadowStyle: "0 1px 3px rgba(15,23,42,0.08)",
+      textClass: "text-[#6366f1]",
       label: "1st Place",
       order: "order-2", // center on desktop
     },
     {
       rank: 2,
       medal: "🥈",
-      borderClass: "border-gray-400/40",
-      shadowStyle: "0 0 25px rgba(192,192,192,0.15)",
-      textClass: "text-gray-300",
+      borderClass: "border-[#e2e8f0]",
+      shadowStyle: "0 1px 3px rgba(15,23,42,0.08)",
+      textClass: "text-[#64748b]",
       label: "2nd Place",
       order: "order-1",
     },
     {
       rank: 3,
       medal: "🥉",
-      borderClass: "border-amber-700/40",
-      shadowStyle: "0 0 25px rgba(180,83,9,0.15)",
-      textClass: "text-amber-600",
+      borderClass: "border-[#e2e8f0]",
+      shadowStyle: "0 1px 3px rgba(15,23,42,0.08)",
+      textClass: "text-[#92400e]",
       label: "3rd Place",
       order: "order-3",
     },
@@ -107,17 +107,17 @@ function Podium({
         return (
           <div
             key={cfg.rank}
-            className={`relative rounded-2xl border-2 ${cfg.borderClass} bg-[#0a0613] py-5 sm:py-6 px-3 text-center ${cfg.order}`}
+            className={`relative rounded-2xl border-2 ${cfg.borderClass} bg-white py-5 sm:py-6 px-3 text-center ${cfg.order}`}
             style={{ boxShadow: cfg.shadowStyle }}
           >
             <div className="text-3xl sm:text-4xl mb-2">{cfg.medal}</div>
             <p className={`text-[10px] font-bold uppercase tracking-widest ${cfg.textClass} mb-1.5`}>
               {cfg.label}
             </p>
-            <p className="font-display text-sm sm:text-base font-bold text-cream truncate">
+            <p className="font-display text-sm sm:text-base font-bold text-[#0f172a] truncate">
               {name}
               {isYou && (
-                <span className="ml-1 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1 py-0.5 rounded-full">
+                <span className="ml-1 text-[10px] font-mono text-[#6366f1] bg-[#6366f1]/10 border border-[#6366f1]/20 px-1 py-0.5 rounded-full">
                   you
                 </span>
               )}
@@ -141,7 +141,7 @@ function RankBadge({ rank }: { rank: number }) {
   if (rank === 2) return <span className="text-lg">🥈</span>;
   if (rank === 3) return <span className="text-lg">🥉</span>;
   return (
-    <span className="text-xs font-mono text-[var(--color-cream-dim)] w-8 text-center">
+    <span className="text-xs font-mono text-[#64748b] w-8 text-center">
       #{rank}
     </span>
   );
@@ -173,7 +173,7 @@ function ProviderBadge({ entry }: { entry: ScoreEntry }) {
 
   if (hasWallet) {
     return (
-      <span className="inline-flex items-center gap-0.5 ml-1.5 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-neon-green/15 text-neon-green border border-neon-green/20">
+      <span className="inline-flex items-center gap-0.5 ml-1.5 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a] border border-[#16a34a]/20">
         XRPL
       </span>
     );
@@ -293,10 +293,10 @@ export function LeaderboardClient() {
   const selectedGameLabel = selectedGameMeta?.title || "All Games";
 
   return (
-    <div className="min-h-screen bg-[#0a0613] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Top Navigation */}
       <SiteHeader
-        variant="dark"
+        variant="light"
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onMenuToggle={() => setSidebarOpen((o) => !o)}
@@ -317,12 +317,12 @@ export function LeaderboardClient() {
         <main className="flex-1 min-w-0 px-4 md:px-6 lg:px-8 py-6 pb-32">
           {/* Page header */}
           <div className="mb-6">
-            <h1 className="font-display text-2xl sm:text-3xl font-black text-cream flex items-center gap-3">
-              <Trophy className="text-brand-gold" size={28} />
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-[#0f172a] flex items-center gap-3">
+              <Trophy className="text-[#6366f1]" size={28} />
               Global Leaderboard
             </h1>
             {timeframe === "weekly" && (
-              <p className="text-sm text-[var(--color-cream-dim)] mt-1">
+              <p className="text-sm text-[#64748b] mt-1">
                 Resets every Monday 00:00 UTC
               </p>
             )}
@@ -334,15 +334,15 @@ export function LeaderboardClient() {
           {/* ── Filters Bar ── */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
             {/* Game filter — Desktop pills */}
-            <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-white/[0.03] border border-white/5 overflow-x-auto">
+            <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] overflow-x-auto">
               {GAME_FILTERS.map((gf) => (
                 <button
                   key={gf.id}
                   onClick={() => setSelectedGame(gf.id)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     selectedGame === gf.id
-                      ? "bg-brand-gold/15 text-brand-gold border border-brand-gold/30"
-                      : "text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 border border-transparent"
+                      ? "bg-[#6366f1]/15 text-[#6366f1] border border-[#6366f1]/30"
+                      : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9] border border-transparent"
                   }`}
                 >
                   <span>{gf.emoji}</span>
@@ -355,7 +355,7 @@ export function LeaderboardClient() {
             <div className="relative sm:hidden">
               <button
                 onClick={() => setGameDropdownOpen(!gameDropdownOpen)}
-                className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/5 text-cream font-semibold text-sm"
+                className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] font-semibold text-sm"
               >
                 <span className="flex items-center gap-2">
                   <span>{GAME_FILTERS.find((g) => g.id === selectedGame)?.emoji}</span>
@@ -372,7 +372,7 @@ export function LeaderboardClient() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden bg-[#0a0613] border border-white/10 shadow-2xl"
+                    className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white border border-[#e2e8f0] shadow-2xl"
                   >
                     {GAME_FILTERS.map((gf) => (
                       <button
@@ -383,8 +383,8 @@ export function LeaderboardClient() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
                           selectedGame === gf.id
-                            ? "bg-brand-gold/10 text-brand-gold"
-                            : "text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5"
+                            ? "bg-[#6366f1]/10 text-[#6366f1]"
+                            : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
                         }`}
                       >
                         <span>{gf.emoji}</span>
@@ -399,15 +399,15 @@ export function LeaderboardClient() {
             {/* Right side: Timeframe tabs + Refresh */}
             <div className="flex items-center gap-2">
               {/* Timeframe tabs */}
-              <div className="flex items-center p-1 rounded-lg bg-white/[0.03] border border-white/5">
+              <div className="flex items-center p-1 rounded-lg bg-[#f8fafc] border border-[#e2e8f0]">
                 {TIMEFRAMES.map((tf) => (
                   <button
                     key={tf.id}
                     onClick={() => setTimeframe(tf.id as "weekly" | "alltime")}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all ${
                       timeframe === tf.id
-                        ? "bg-brand-gold/15 text-brand-gold"
-                        : "text-[var(--color-cream-dim)] hover:text-cream"
+                        ? "bg-[#6366f1]/15 text-[#6366f1]"
+                        : "text-[#64748b] hover:text-[#0f172a]"
                     }`}
                   >
                     <Clock size={12} />
@@ -418,7 +418,7 @@ export function LeaderboardClient() {
 
               {/* Live indicator */}
               {timeframe === "weekly" && lastFetched && (
-                <span className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-neon-green/70">
+                <span className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-[#16a34a]/70">
                   <Radio size={10} className="animate-pulse" />
                   Live
                 </span>
@@ -428,7 +428,7 @@ export function LeaderboardClient() {
               <button
                 onClick={manualRefresh}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[var(--color-cream-dim)] hover:text-cream bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 transition-all disabled:opacity-40"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[#64748b] hover:text-[#0f172a] bg-[#f8fafc] hover:bg-[#f1f5f9] border border-[#e2e8f0] transition-all disabled:opacity-40"
               >
                 <RefreshCw
                   size={14}
@@ -445,9 +445,9 @@ export function LeaderboardClient() {
           )}
 
           {/* ── Leaderboard Table ── */}
-          <div className="rounded-xl overflow-hidden border border-white/5 bg-[#0a0613]">
+          <div className="rounded-xl overflow-hidden border border-[#e2e8f0] bg-white">
             {/* Table Header */}
-            <div className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cream-dim)] border-b border-white/5 bg-white/[0.02]">
+            <div className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#64748b] border-b border-[#e2e8f0] bg-[#f8fafc]">
               <span className="w-10 text-center">Rank</span>
               <span className="flex-1">Player</span>
               {selectedGame === "all" && (
@@ -463,16 +463,16 @@ export function LeaderboardClient() {
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.03] animate-pulse"
+                    className="flex items-center gap-3 px-4 py-3 border-b border-[#e2e8f0] animate-pulse"
                   >
                     <div className="w-10 flex justify-center">
-                      <div className="w-6 h-6 rounded bg-white/5" />
+                      <div className="w-6 h-6 rounded bg-[#f1f5f9]" />
                     </div>
                     <div className="flex-1 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-white/5" />
-                      <div className="w-24 h-4 rounded bg-white/5" />
+                      <div className="w-8 h-8 rounded-full bg-[#f1f5f9]" />
+                      <div className="w-24 h-4 rounded bg-[#f1f5f9]" />
                     </div>
-                    <div className="w-24 h-4 rounded bg-white/5" />
+                    <div className="w-24 h-4 rounded bg-[#f1f5f9]" />
                   </div>
                 ))}
               </div>
@@ -482,10 +482,10 @@ export function LeaderboardClient() {
             {!loading && error && scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <WifiOff size={32} className="text-orange mb-4 opacity-60" />
-                <p className="font-display text-lg font-bold text-cream mb-2">
+                <p className="font-display text-lg font-bold text-[#0f172a] mb-2">
                   Unable to load scores
                 </p>
-                <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">
+                <p className="text-sm text-[#64748b] max-w-sm mb-6">
                   {error}
                 </p>
                 <button
@@ -503,21 +503,21 @@ export function LeaderboardClient() {
               <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
                 <Gamepad2
                   size={48}
-                  className="text-brand-gold/30 mb-4"
+                  className="text-[#6366f1]/30 mb-4"
                 />
-                <p className="font-display text-xl font-bold text-cream mb-2">
+                <p className="font-display text-xl font-bold text-[#0f172a] mb-2">
                   No scores yet
                 </p>
-                <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">
+                <p className="text-sm text-[#64748b] max-w-sm mb-6">
                   Be the first to play{" "}
-                  <span className="text-cream font-semibold">
+                  <span className="text-[#0f172a] font-semibold">
                     {selectedGameLabel}
                   </span>{" "}
                   and claim the #1 spot!
                 </p>
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-[#0a0613] font-display font-black text-sm hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#6366f1] text-white font-display font-black text-sm hover:shadow-[0_1px_3px_rgba(15,23,42,0.12)] transition-all"
                 >
                   🐿️ Play Now
                 </Link>
@@ -546,10 +546,10 @@ export function LeaderboardClient() {
                   return (
                     <div
                       key={`${entry.wallet || index}-${entry.score}-${entry.game}`}
-                      className={`flex items-center gap-3 px-4 py-3 border-b border-white/[0.03] last:border-0 transition-colors ${
+                      className={`flex items-center gap-3 px-4 py-3 border-b border-[#e2e8f0] last:border-0 transition-colors ${
                         isCurrentUser
-                          ? "bg-brand-gold/[0.06] border-l-2 border-l-brand-gold"
-                          : "hover:bg-white/[0.02]"
+                          ? "bg-[#6366f1]/[0.06] border-l-2 border-l-[#6366f1]"
+                          : "hover:bg-[#f8fafc]"
                       }`}
                     >
                       {/* Rank */}
@@ -562,15 +562,15 @@ export function LeaderboardClient() {
                         <span
                           className={`text-sm font-medium truncate ${
                             isCurrentUser
-                              ? "text-brand-gold font-bold"
-                              : "text-cream"
+                              ? "text-[#6366f1] font-bold"
+                              : "text-[#0f172a]"
                           }`}
                         >
                           {displayName}
                         </span>
                         <ProviderBadge entry={entry} />
                         {isCurrentUser && (
-                          <span className="ml-1.5 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
+                          <span className="ml-1.5 text-[10px] font-mono text-[#6366f1] bg-[#6366f1]/10 border border-[#6366f1]/20 px-1.5 py-0.5 rounded-full">
                             you
                           </span>
                         )}
@@ -579,7 +579,7 @@ export function LeaderboardClient() {
                       {/* Game column (All Games mode only) */}
                       {selectedGame === "all" && (
                         <div className="w-28 text-right shrink-0 hidden md:block">
-                          <span className="text-xs text-[var(--color-cream-dim)]">
+                          <span className="text-xs text-[#64748b]">
                             {gameMeta?.image} {gameMeta?.title || entry.game}
                           </span>
                         </div>
@@ -587,14 +587,14 @@ export function LeaderboardClient() {
 
                       {/* Score */}
                       <div className="w-24 text-right shrink-0">
-                        <span className="font-mono text-sm font-bold tabular-nums text-cream">
+                        <span className="font-mono text-sm font-bold tabular-nums text-[#0f172a]">
                           {formatNumber(entry.score)}
                         </span>
                       </div>
 
                       {/* Time ago */}
                       <div className="w-20 text-right shrink-0 hidden sm:block">
-                        <span className="text-[11px] font-mono text-[var(--color-cream-dim)] opacity-60">
+                        <span className="text-[11px] font-mono text-[#64748b] opacity-60">
                           {entry.ts ? timeAgo(entry.ts) : "—"}
                         </span>
                       </div>
@@ -615,7 +615,7 @@ export function LeaderboardClient() {
 
           {/* Footer meta */}
           {lastFetched && (
-            <p className="text-[11px] text-[var(--color-cream-dim)]/60 text-center mt-4 font-mono">
+            <p className="text-[11px] text-[#64748b]/60 text-center mt-4 font-mono">
               Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} ·{" "}
               {timeframe === "weekly"
                 ? "Resets Monday 00:00 UTC"
@@ -630,15 +630,15 @@ export function LeaderboardClient() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-[#0a0613] border border-brand-gold/30 shadow-[0_0_30px_rgba(251,191,36,0.15)] flex items-center gap-3"
+                className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-white border border-[#6366f1]/30 shadow-[0_1px_3px_rgba(15,23,42,0.08)] flex items-center gap-3"
               >
-                <Trophy size={16} className="text-brand-gold" />
-                <span className="text-sm text-cream">
+                <Trophy size={16} className="text-[#6366f1]" />
+                <span className="text-sm text-[#0f172a]">
                   Your rank is outside the top {MAX_ENTRIES}. Play to climb!
                 </span>
                 <Link
                   href="/"
-                  className="px-3 py-1.5 rounded-lg bg-brand-gold text-[#0a0613] font-bold text-xs"
+                  className="px-3 py-1.5 rounded-lg bg-[#6366f1] text-white font-bold text-xs"
                 >
                   Play
                 </Link>
