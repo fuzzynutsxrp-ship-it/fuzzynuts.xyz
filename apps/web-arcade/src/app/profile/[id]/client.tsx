@@ -375,9 +375,24 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
         }
 
         const data = await response.json();
+        // combined = /api/scores?wallet=X (no game param), leaderboard = single-game queries
         const scores: ScoreEntry[] = Array.isArray(data)
           ? data
-          : data.scores || data.data || [];
+          : data.combined ?? data.leaderboard ?? data.scores ?? data.data ?? [];
+
+        // Response shape validation — warn if none of the expected keys exist
+        if (
+          !Array.isArray(data) &&
+          data.combined === undefined &&
+          data.leaderboard === undefined &&
+          data.scores === undefined &&
+          data.data === undefined
+        ) {
+          console.warn(
+            "[ProfileIdClient] Unexpected API response shape — expected one of: combined, leaderboard, scores, data. Got keys:",
+            Object.keys(data),
+          );
+        }
 
         const sorted = scores.sort((a, b) => (b.ts || 0) - (a.ts || 0));
         setState({ scores: sorted, loading: false, error: null });

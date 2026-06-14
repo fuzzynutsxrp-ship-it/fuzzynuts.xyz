@@ -30,15 +30,15 @@ interface StatsGridProps {
   deviceId: string;
 }
 
-function formatDate(ts: number): string {
+export function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 }
 
-function relativeTime(ts: number): string {
-  const diff = Date.now() - ts;
+export function relativeTime(ts: number, now: number = Date.now()): string {
+  const diff = now - ts;
   const mins = Math.floor(diff / 60_000);
   if (mins < 1) return "just now";
   if (mins < 60) return `${mins}m ago`;
@@ -150,9 +150,22 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
       const res = await fetch(url, { signal: controller.signal });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
-      const entries: ScoreEntry[] = Array.isArray(data)
+      // Handle multiple known API response shapes
+      const raw: unknown[] = Array.isArray(data)
         ? data
-        : data.scores ?? data.data ?? [];
+        : data.combined ?? data.leaderboard ?? data.scores ?? data.data ?? [];
+      if (!Array.isArray(raw)) {
+        throw new Error("Unexpected response format");
+      }
+      // Validate entries have required fields before using them
+      const entries: ScoreEntry[] = raw.filter(
+        (e): e is ScoreEntry =>
+          e != null &&
+          typeof e === "object" &&
+          typeof (e as ScoreEntry).wallet === "string" &&
+          typeof (e as ScoreEntry).score === "number" &&
+          typeof (e as ScoreEntry).game === "string",
+      );
       // Sort by most recent
       entries.sort((a, b) => (b.ts || 0) - (a.ts || 0));
       setScores(entries);
@@ -207,8 +220,10 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
     const seen = new Set<string>();
     const result: ScoreEntry[] = [];
     for (const s of scores) {
-      if (!seen.has(s.game)) {
-        seen.add(s.game);
+      const g = s.game ?? "";
+      if (!g) continue; // guard against undefined/null game
+      if (!seen.has(g)) {
+        seen.add(g);
         result.push(s);
       }
       if (result.length >= 5) break;
