@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -13,6 +13,9 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { gameRegistry } from "@/lib/gameRegistry";
+import type { ScoreEntry } from "@/features/arcade/types/arcade";
+import { API_SCORES } from "@/features/arcade/constants";
+import { formatNumber } from "@/lib/format";
 
 /* ═══════════════════════════════════════════════════════════════
    UserStatsGrid — Profile stats dashboard
@@ -22,25 +25,9 @@ import { gameRegistry } from "@/lib/gameRegistry";
    Fetches scores from /api/scores?wallet={deviceId}.
    ═══════════════════════════════════════════════════════════════ */
 
-interface ScoreEntry {
-  wallet: string;
-  name?: string;
-  score: number;
-  game: string;
-  ts: number;
-}
-
 interface StatsGridProps {
   /** Wallet address or device ID to fetch scores for */
   deviceId: string;
-}
-
-const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
-
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString("en-US");
 }
 
 function formatDate(ts: number): string {
@@ -148,13 +135,19 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const abortRef = useRef<AbortController | null>(null);
+
   /* ── Fetch scores ── */
-  const fetchScores = async () => {
+  const fetchScores = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
     try {
-      const url = `${API_BASE}?wallet=${encodeURIComponent(deviceId)}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      const url = `${API_SCORES}?wallet=${encodeURIComponent(deviceId)}`;
+      const res = await fetch(url, { signal: controller.signal });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       const entries: ScoreEntry[] = Array.isArray(data)
@@ -164,20 +157,21 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
       entries.sort((a, b) => (b.ts || 0) - (a.ts || 0));
       setScores(entries);
     } catch (err) {
+      if (controller.signal.aborted) return;
       setError(
         err instanceof Error && err.name === "TimeoutError"
           ? "Request timed out"
           : "Unable to reach the server",
       );
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
-  };
+  }, [deviceId]);
 
   useEffect(() => {
     if (deviceId) fetchScores();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deviceId]);
+    return () => abortRef.current?.abort();
+  }, [deviceId, fetchScores]);
 
   /* ── Derived stats ── */
   const totalGamesPlayed = scores.length;
@@ -205,6 +199,8 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
     if (scores.length === 0) return null;
     return scores.reduce((best, s) => (s.score > best.score ? s : best), scores[0]);
   }, [scores]);
+
+  const uniqueGames = useMemo(() => new Set(scores.map((s) => s.game)).size, [scores]);
 
   const recentFive = useMemo(() => {
     // Dedupe by game, keep most recent per game, take 5
@@ -363,7 +359,7 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
             <Clock size={20} className="text-[#7c3aed]" />
           </div>
           <p className="font-display text-xl sm:text-2xl font-bold text-cream">
-            {new Set(scores.map((s) => s.game)).size}
+            {uniqueGames}
           </p>
           <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
             Unique Games
