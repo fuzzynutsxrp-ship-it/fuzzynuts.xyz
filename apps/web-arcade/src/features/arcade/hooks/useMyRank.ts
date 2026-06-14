@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { GAMES } from "@/lib/utils";
+import { GAME_LIST } from "@/lib/gameRegistry";
 import { API_SCORES, MAX_ENTRIES } from "../constants";
 import { toBackendSlug } from "../slugAliases";
 import type { ScoreEntry } from "../types/arcade";
@@ -54,8 +54,8 @@ export function useMyRank(userId: string | null): MyRankData {
 
     try {
       // 1. Fetch ALL scores across all games
-      const promises = GAMES.map(async (game) => {
-        const backendSlug = toBackendSlug(game.id);
+      const promises = GAME_LIST.map(async (game) => {
+        const backendSlug = toBackendSlug(game.slug);
         const url = `${API_SCORES}?game=${backendSlug}&limit=${MAX_ENTRIES}`;
         const res = await fetch(url, {
           signal: AbortSignal.timeout(8000),
@@ -67,7 +67,7 @@ export function useMyRank(userId: string | null): MyRankData {
           : data.leaderboard || data.scores || data.data || [];
         return raw.map((e: ScoreEntry) => ({
           ...e,
-          game: e.game || game.id,
+          game: e.game || game.slug,
         }));
       });
 
