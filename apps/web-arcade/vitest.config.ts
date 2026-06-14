@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import path from "path";
 
 /* ═══════════════════════════════════════════════════════════════
    Vitest config
@@ -11,6 +12,11 @@ import { defineConfig } from "vitest/config";
    ═══════════════════════════════════════════════════════════════ */
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
   test: {
     include: ["src/**/*.test.{ts,tsx}"],
     exclude: ["node_modules", "docs", "e2e", ".next", "out"],
