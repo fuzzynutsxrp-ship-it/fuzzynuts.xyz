@@ -11,10 +11,10 @@ import { VALID_GAMES, SCORE_CAPS } from "../src/routes/scores";
 
 // Authoritative cap values from gameRegistry.ts (the SSOT)
 const GAME_REGISTRY_CAPS: Record<string, number> = {
-  "mario": 99_999,
-  "fuzzy-survivors": 999_999,
-  "minigolf": 10_500,
-  "nut-racer": 99_999,
+  "mario": 9_999_990,
+  "fuzzy-survivors": 5_000_000,
+  "minigolf": 100_000,
+  "nut-racer": 2_000_000,
   "fuzzynuts-world": 10_000_000,
   "rsc": 99_000_000,
   "dragon-hoard": 999_999,
@@ -134,12 +134,12 @@ describe("SCORE_CAPS", () => {
   });
 
   it("fuzzy-survivors cap matches (not legacy 'survivors')", () => {
-    expect(SCORE_CAPS["fuzzy-survivors"]).toBe(999_999);
+    expect(SCORE_CAPS["fuzzy-survivors"]).toBe(5_000_000);
     expect(SCORE_CAPS["survivors"]).toBeUndefined();
   });
 
   it("nut-racer cap matches (not legacy 'racer')", () => {
-    expect(SCORE_CAPS["nut-racer"]).toBe(99_999);
+    expect(SCORE_CAPS["nut-racer"]).toBe(2_000_000);
     expect(SCORE_CAPS["racer"]).toBeUndefined();
   });
 });

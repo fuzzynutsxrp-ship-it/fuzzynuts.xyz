@@ -38,6 +38,7 @@ const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
 const ADMIN_WALLET_ADDRESS = optionalEnv("ADMIN_WALLET_ADDRESS");
 const DISCORD_WEBHOOK_URL = optionalEnv("DISCORD_WEBHOOK_URL");
+const REDIS_URL = optionalEnv("REDIS_URL");
 
 const app = express();
 
@@ -270,6 +271,7 @@ async function bootstrap() {
         walletMappingsCollection: "wallet_mappings",
         OPENAI_API_KEY: OPENAI_API_KEY || undefined,
         ADMIN_WALLET_ADDRESS: ADMIN_WALLET_ADDRESS || undefined,
+        REDIS_URL: REDIS_URL || undefined,
       });
 
       // Admin chat routes (protected by JWT + admin wallet check)
