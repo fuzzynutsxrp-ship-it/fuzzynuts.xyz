@@ -11,6 +11,7 @@ import { createServer } from "node:http";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { guestSessionMiddleware } from "./middleware/guest-session";
 
 const PORT = Number(process.env.PORT ?? 4000);
 
@@ -101,6 +102,9 @@ app.use(
 );
 
 app.use(express.json({ limit: "16kb" }));
+
+// ── Guest session — ensure anonymous visitors get a lightweight JWT ──
+app.use(guestSessionMiddleware({ GAME_SESSION_SECRET }));
 
 app.get("/healthz", (_req, res) => {
   res.json({ ok: true });
