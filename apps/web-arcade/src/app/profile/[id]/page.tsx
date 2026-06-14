@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { isWalletAddress, isValidProfileId } from "@/lib/profile-validation";
 import { ProfileIdClient } from "./client";
 
 type PageParams = { id: string };
@@ -18,8 +20,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
 
-  const isWallet = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
-  const displayName = isWallet
+  // Return safe defaults for invalid IDs — prevents OG meta tag injection
+  if (!isValidProfileId(id)) {
+    return {
+      title: "Not Found | Fuzzynuts.xyz",
+      description: "This profile does not exist.",
+    };
+  }
+
+  const displayName = isWalletAddress(id)
     ? `${id.slice(0, 6)}...${id.slice(-4)}`
     : id;
 
@@ -42,5 +51,10 @@ export default async function ProfileIdPage({
   params: Promise<PageParams>;
 }) {
   const { id } = await params;
+
+  if (!isValidProfileId(id)) {
+    notFound();
+  }
+
   return <ProfileIdClient profileId={id} />;
 }

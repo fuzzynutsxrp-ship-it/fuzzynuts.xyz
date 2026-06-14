@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { IdenticonAvatar } from "@/components/ui/IdenticonAvatar";
 import { truncateAddress, formatNumber, GAMES } from "@/lib/utils";
+import { isWalletAddress, isGuestId } from "@/lib/profile-validation";
 
 /* ═══════════════════════════════════════════════════════════════
    Types
@@ -62,16 +63,6 @@ const BIO_STORAGE_PREFIX = "fuzzy_profile_bio_";
 /* ═══════════════════════════════════════════════════════════════
    Helpers
    ═══════════════════════════════════════════════════════════════ */
-
-/** Determine if an ID string is an XRPL wallet address */
-function isWalletAddress(id: string): boolean {
-  return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
-}
-
-/** Determine if an ID string is a guest ID */
-function isGuestId(id: string): boolean {
-  return /^Guest-[0-9a-fA-F]{4,8}$/.test(id);
-}
 
 /** Get the display name for a profile ID */
 function getDisplayName(id: string): string {
@@ -377,7 +368,21 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
         const data = await response.json();
         const scores: ScoreEntry[] = Array.isArray(data)
           ? data
-          : data.scores || data.data || [];
+          : data.combined ?? data.leaderboard ?? data.scores ?? data.data ?? [];
+
+        // Response shape validation u2014 warn if none of the expected keys exist
+        if (
+          !Array.isArray(data) &&
+          data.combined === undefined &&
+          data.leaderboard === undefined &&
+          data.scores === undefined &&
+          data.data === undefined
+        ) {
+          console.warn(
+            "[ProfileIdClient] Unexpected API response shape u2014 expected one of: combined, leaderboard, scores, data. Got keys:",
+            Object.keys(data),
+          );
+        }
 
         const sorted = scores.sort((a, b) => (b.ts || 0) - (a.ts || 0));
         setState({ scores: sorted, loading: false, error: null });
