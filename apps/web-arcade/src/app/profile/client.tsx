@@ -30,7 +30,7 @@ const UserProfile = dynamic(
 export function ProfileClient() {
   return (
     <div className="relative z-10">
-      {/* Back to Home */}
+      {/* Back to Home — matches homepage card style */}
       <div className="container-main pt-6">
         <motion.div
           initial={{ opacity: 0, x: -12 }}
@@ -54,18 +54,12 @@ export function ProfileClient() {
         </motion.div>
       </div>
 
-      {/* DEGEN FINAL POLISH START — solid degen-950, neon-ring-pink border, no glass */}
-      {/* Profile Container */}
+      {/* Profile Content — clean container matching homepage */}
       <div className="container-main py-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="rounded-2xl border-2 border-hot-pink neon-ring-pink
-                     bg-degen-950
-                     shadow-[0_0_24px_rgba(255,46,136,0.25),0_8px_40px_rgba(0,0,0,0.5)]
-                     overflow-hidden"
-          /* DEGEN FINAL POLISH END */
         >
           <UserProfile />
         </motion.div>

@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Calendar,
   Shield,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useWalletStore } from "@/store/wallet";
@@ -158,55 +159,40 @@ function getGameColor(gameId: string): string {
    ═══════════════════════════════════════════════════════════════ */
 
 function ConnectPrompt() {
-  const { connect, isConnecting } = useWalletStore();
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-20 px-6 text-center"
+      className="flex flex-col items-center justify-center py-16 px-6 text-center relative"
     >
-      {/* Floating nuts around connect prompt */}
+      {/* Floating nuts */}
       <span className="absolute top-8 left-1/4 text-xl float-nut-1 opacity-50 pointer-events-none">🥜</span>
       <span className="absolute top-12 right-1/4 text-lg float-nut-2 opacity-40 pointer-events-none">🥜</span>
-      <span className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-35 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
 
-      <div
-        className="w-24 h-24 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center mb-6"
-        style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
-      >
-        <Wallet size={40} className="text-brand-gold" />
+      {/* Icon — matches homepage card style */}
+      <div className="w-20 h-20 rounded-2xl bg-[#1a1030] border border-white/10 flex items-center justify-center mb-5">
+        <User size={36} className="text-brand-gold" />
       </div>
-      <h2 className="font-display text-2xl font-bold text-cream mb-3">
-        Connect Your Wallet
+
+      <h2 className="font-display text-xl sm:text-2xl font-bold text-cream mb-2">
+        Your Profile
       </h2>
-      <p className="text-cream-dim text-sm max-w-md mb-8 leading-relaxed">
-        Link your XRPL wallet to view your personal score history, track your
-        best runs, and verify your $NUT prize eligibility.
+      <p className="text-[var(--color-cream-dim)] text-sm max-w-sm mb-6 leading-relaxed">
+        Play games to build your stats, climb the leaderboard, and track your achievements.
       </p>
-      <div className="flex flex-col sm:flex-row gap-3">
-        {[
-          { id: "xaman" as const, label: "Xaman", icon: "📱" },
-          { id: "joey" as const, label: "Joey", icon: "🦘" },
-        ].map((w) => (
-          <motion.button
-            key={w.id}
-            onClick={() => connect(w.id)}
-            disabled={isConnecting}
-            whileHover={{ scale: 1.04, boxShadow: "0 0 30px rgba(251,191,36,0.4)" }}
-            whileTap={{ scale: 0.96 }}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl
-                       bg-gradient-to-r from-brand-gold to-yellow-500
-                       text-forest-dark font-bold text-sm
-                       hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
-                       active:scale-95 transition-all min-h-[44px]
-                       disabled:opacity-50 cursor-pointer"
-          >
-            <span>{w.icon}</span>
-            {w.label}
-          </motion.button>
-        ))}
-      </div>
+
+      {/* CTA button — matches homepage Play Now style */}
+      <Link
+        href="/#games"
+        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl
+                   bg-gradient-to-r from-brand-gold to-yellow-500
+                   text-forest-dark font-bold text-sm
+                   hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
+                   active:scale-95 transition-all min-h-[44px]"
+      >
+        <Gamepad2 size={16} />
+        Play Games
+      </Link>
     </motion.div>
   );
 }
@@ -311,11 +297,8 @@ export function UserProfile() {
     return (
       <section id="user-profile" className="py-16 relative">
         <div className="container-main">
-          <div
-            className="bg-degen-950 border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
-            style={{ boxShadow: "0 0 40px rgba(251,191,36,0.08), 0 0 80px rgba(251,191,36,0.04)" }}
-          >
-            <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
+          {/* Matches homepage featured card: clean white/cream rounded card */}
+          <div className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.15)]">
             <ConnectPrompt />
           </div>
         </div>
