@@ -124,29 +124,26 @@ test.describe("Leaderboard System", () => {
     await expect(page.locator("h1")).toContainText("Global Leaderboard");
 
     // Wait for either skeleton or actual rows
-    const contentLoaded = await page
+    await page
       .locator('[class*="animate-pulse"], [class*="px-4 py-3"]')
       .first()
-      .waitFor({ timeout: 5000 })
-      .then(() => true)
-      .catch(() => false);
-
-    expect(contentLoaded).toBe(true);
+      .waitFor({ timeout: 5000 });
   });
 
   test("game filter dropdown populated from gameRegistry", async ({ page }) => {
     await page.goto(LEADERBOARD_URL);
-    await page.waitForTimeout(2000);
 
-    // Desktop: game filter pills should be visible (hidden on mobile)
-    // At minimum, "All Games" should be present
+    // Wait for the page to hydrate — look for the game filter area
     const allGamesBtn = page.locator("button").filter({ hasText: "All Games" });
+    await allGamesBtn.first().waitFor({ state: "visible", timeout: 10000 });
     await expect(allGamesBtn.first()).toBeVisible();
   });
 
   test("table columns: Rank, Player, Games Played, Total Score", async ({ page }) => {
     await page.goto(LEADERBOARD_URL);
-    await page.waitForTimeout(3000);
+
+    // Wait for the leaderboard content to load
+    await page.locator("h1").filter({ hasText: "Global Leaderboard" }).waitFor({ state: "visible", timeout: 10000 });
 
     // Check desktop table header has the expected columns
     const header = page.locator('div').filter({ hasText: /Rank/ }).filter({ hasText: /Player/ }).filter({ hasText: /Games Played/ }).filter({ hasText: /Total Score/ });
@@ -157,20 +154,24 @@ test.describe("Leaderboard System", () => {
 
   test("timeframe tabs switch between weekly and all-time", async ({ page }) => {
     await page.goto(LEADERBOARD_URL);
-    await page.waitForTimeout(2000);
+
+    // Wait for page to hydrate
+    const allGamesBtn = page.locator("button").filter({ hasText: "All Games" });
+    await allGamesBtn.first().waitFor({ state: "visible", timeout: 10000 });
 
     // Find and click "All Time" tab
     const allTimeTab = page.locator("button").filter({ hasText: "All Time" });
     if (await allTimeTab.isVisible()) {
       await allTimeTab.click();
-      await page.waitForTimeout(1000);
+      // Wait for the timeframe change to take effect — loading indicator or content refresh
+      await page.locator("h1").filter({ hasText: "Global Leaderboard" }).waitFor({ state: "visible", timeout: 5000 });
     }
 
     // Click back to "This Week"
     const weeklyTab = page.locator("button").filter({ hasText: "This Week" });
     if (await weeklyTab.isVisible()) {
       await weeklyTab.click();
-      await page.waitForTimeout(1000);
+      await page.locator("h1").filter({ hasText: "Global Leaderboard" }).waitFor({ state: "visible", timeout: 5000 });
     }
   });
 
@@ -182,16 +183,18 @@ test.describe("Leaderboard System", () => {
     await injectLocalScore(page, GAME_SLUG, 99999, testAddress);
 
     await page.goto(LEADERBOARD_URL);
-    await page.waitForTimeout(3000);
+
+    // Wait for the leaderboard to load — look for the heading or any player row
+    await page.locator("h1").filter({ hasText: "Global Leaderboard" }).waitFor({ state: "visible", timeout: 10000 });
 
     // If the user's score is in the leaderboard, check for "you" badge
     const youBadge = page.locator("text=you").first();
-    const hasYouBadge = await youBadge.isVisible({ timeout: 3000 }).catch(() => false);
+    const hasYouBadge = await youBadge.isVisible({ timeout: 5000 }).catch(() => false);
 
     // If not in top 100, check for the sticky banner
     if (!hasYouBadge) {
       const banner = page.locator("text=Your rank is outside the top");
-      const hasBanner = await banner.isVisible({ timeout: 3000 }).catch(() => false);
+      const hasBanner = await banner.isVisible({ timeout: 5000 }).catch(() => false);
       // One of these should be true when wallet is connected
       expect(hasYouBadge || hasBanner).toBe(true);
     }
@@ -205,11 +208,11 @@ test.describe("Leaderboard System", () => {
 
     // Navigate to game page
     await page.goto(GAME_URL);
-    await page.waitForTimeout(2000);
+    // Wait for the game page to load
+    await page.locator("h1, h2, [class*='game']").first().waitFor({ timeout: 10000 });
 
     // Simulate score submission
     await simulateScoreSubmission(page, 42000);
-    await page.waitForTimeout(1000);
 
     // Verify no crash occurred
     const pageTitle = await page.title();
@@ -218,7 +221,10 @@ test.describe("Leaderboard System", () => {
 
   test("refresh button triggers data reload", async ({ page }) => {
     await page.goto(LEADERBOARD_URL);
-    await page.waitForTimeout(2000);
+
+    // Wait for the page to hydrate
+    const allGamesBtn = page.locator("button").filter({ hasText: "All Games" });
+    await allGamesBtn.first().waitFor({ state: "visible", timeout: 10000 });
 
     // Find the refresh button (has RefreshCw icon)
     const refreshBtn = page.locator("button").filter({ hasText: "Refresh" });
@@ -226,13 +232,10 @@ test.describe("Leaderboard System", () => {
       await refreshBtn.click();
 
       // The spinner should appear briefly
-      const spinnerVisible = await page
-        .locator(".animate-spin")
-        .isVisible({ timeout: 2000 })
-        .catch(() => false);
+      await page.locator(".animate-spin").waitFor({ state: "visible", timeout: 3000 }).catch(() => {});
 
-      // After refresh, button should not be spinning
-      await page.waitForTimeout(1500);
+      // After refresh, heading should still be visible
+      await page.locator("h1").filter({ hasText: "Global Leaderboard" }).waitFor({ state: "visible", timeout: 5000 });
     }
   });
 
@@ -249,12 +252,10 @@ test.describe("Leaderboard System", () => {
     });
 
     await page.goto(LEADERBOARD_URL);
-    await page.waitForTimeout(3000);
 
     // Should show error state
     const errorState = page.locator("text=Unable to load scores");
-    const showsError = await errorState.isVisible({ timeout: 3000 }).catch(() => false);
-
-    expect(showsError).toBe(true);
+    await errorState.waitFor({ state: "visible", timeout: 10000 });
+    await expect(errorState).toBeVisible();
   });
 });
