@@ -1,11 +1,14 @@
 /**
- * Prizes route layout — wraps with SubPageLayout
- * for consistent navbar, footer, video bg, and particles.
- *
- * Matches /leaderboard and /profile layouts exactly.
+ * Prizes route layout — matches homepage light style.
  */
 
-import { SubPageLayout } from "@/components/layout/SubPageLayout";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import dynamic from "next/dynamic";
+
+const Footer = dynamic(
+  () => import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
+  { ssr: false },
+);
 
 export default function PrizesLayout({
   children,
@@ -13,12 +16,12 @@ export default function PrizesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SubPageLayout
-      showVideoBg={true}
-      showFallingNuts={true}
-      navbarTransparent={false}
-    >
-      {children}
-    </SubPageLayout>
+    <div className="fnx">
+      <SiteHeader variant="light" />
+      <main className="fn-dashboard">
+        {children}
+        <Footer />
+      </main>
+    </div>
   );
 }
