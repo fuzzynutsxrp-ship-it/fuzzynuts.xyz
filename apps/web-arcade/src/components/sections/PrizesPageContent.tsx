@@ -18,14 +18,12 @@ import { formatNumber, formatUsd } from "@/lib/format";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
 import { useWeeklyCountdown } from "@/features/arcade";
-import { CyberCard } from "@/components/ui/CyberCard";
 
 /* ═══════════════════════════════════════════════════════════════
    PrizesPageContent — Full /prizes page component
 
-   Same DNA as the Leaderboard page: solid dark cards (#0a0a0a /
-   #0f0a0a), neon borders/glows, floating nut particles, and the
-   chaotic gaming squirrel energy. Just different content.
+   Light theme matching the homepage. Clean white cards, indigo
+   accents, no glassmorphism or neon effects.
    ═══════════════════════════════════════════════════════════════ */
 
 /** Sub-cent price formatter — matches Leaderboard.tsx */
@@ -137,19 +135,19 @@ export function PrizesPageContent() {
           <span className="absolute top-2 right-1/4 text-xl float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "0.7s" }}>🥜</span>
           <span className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none" style={{ animationDelay: "1.4s" }}>🥜</span>
 
-          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">
+          <span className="inline-block px-3 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] text-xs font-semibold tracking-wide mb-4">
             🥜 Weekly Leaderboard Tournaments
           </span>
-          <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-black text-[#0f172a] mb-4">
             Prizes &amp; Payouts
           </h2>
-          <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#64748b] text-lg max-w-2xl mx-auto leading-relaxed">
             {totalUsdLabel} hoard split every single week. Free to play, real
             payouts, no cap. Skill in, $NUT out. 🐿️
           </p>
-          <p className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-cream-dim/80"} countdown-pulse`}>
+          <p className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-[#f59e0b]" : "text-[#64748b]"}`}>
             ⏱ Resets in{" "}
-            <span className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>
+            <span className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-[#f59e0b]" : "text-[#16a34a]"}`}>
               {countdown.display}
             </span>
             {" "}· Monday 00:00 UTC
@@ -167,51 +165,48 @@ export function PrizesPageContent() {
         >
           {/* 1st Place Pedestal */}
           <div
-            className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
-            style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
+            className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
           >
             <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">🥜</span>
             <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">🥜</span>
             <span className="absolute -bottom-2 left-1/3 text-sm float-nut-3 opacity-60 pointer-events-none" style={{ animationDelay: "0.5s" }}>🥜</span>
             <div className="text-4xl sm:text-5xl mb-2">🥇</div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-gold/70 mb-1">1st Place</p>
-            <p className="font-display text-2xl sm:text-3xl font-black text-brand-gold">{tierUsdLabel(1)}</p>
-            <p className="text-xs font-mono text-cream-dim/60 mt-1">{tierNutLabel(1)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6366f1]/70 mb-1">1st Place</p>
+            <p className="font-display text-2xl sm:text-3xl font-black text-[#6366f1]">{tierUsdLabel(1)}</p>
+            <p className="text-xs font-mono text-[#64748b]/60 mt-1">{tierNutLabel(1)}</p>
           </div>
 
           {/* 2nd Place Pedestal */}
           <div
-            className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
-            style={{ boxShadow: "0 0 25px rgba(192,192,192,0.15), 0 0 50px rgba(192,192,192,0.08), inset 0 1px 0 rgba(192,192,192,0.15)" }}
+            className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
           >
             <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">🥜</span>
             <span className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none" style={{ animationDelay: "0.3s" }}>🥜</span>
             <span className="absolute -bottom-1 right-1/4 text-sm float-nut-1 opacity-55 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
             <div className="text-4xl sm:text-5xl mb-2">🥈</div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400/70 mb-1">2nd Place</p>
-            <p className="font-display text-2xl sm:text-3xl font-black text-gray-300">{tierUsdLabel(2)}</p>
-            <p className="text-xs font-mono text-cream-dim/60 mt-1">{tierNutLabel(2)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#64748b]/70 mb-1">2nd Place</p>
+            <p className="font-display text-2xl sm:text-3xl font-black text-[#64748b]">{tierUsdLabel(2)}</p>
+            <p className="text-xs font-mono text-[#64748b]/60 mt-1">{tierNutLabel(2)}</p>
           </div>
 
           {/* 3rd Place Pedestal */}
           <div
-            className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
-            style={{ boxShadow: "0 0 25px rgba(180,83,9,0.15), 0 0 50px rgba(180,83,9,0.08), inset 0 1px 0 rgba(180,83,9,0.15)" }}
+            className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
           >
             <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">🥜</span>
             <span className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
             <span className="absolute -bottom-2 left-1/2 text-sm float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "1.1s" }}>🥜</span>
             <div className="text-4xl sm:text-5xl mb-2">🥉</div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600/70 mb-1">3rd Place</p>
-            <p className="font-display text-2xl sm:text-3xl font-black text-amber-600">{tierUsdLabel(3)}</p>
-            <p className="text-xs font-mono text-cream-dim/60 mt-1">{tierNutLabel(3)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b]/70 mb-1">3rd Place</p>
+            <p className="font-display text-2xl sm:text-3xl font-black text-[#f59e0b]">{tierUsdLabel(3)}</p>
+            <p className="text-xs font-mono text-[#64748b]/60 mt-1">{tierNutLabel(3)}</p>
           </div>
         </motion.div>
 
         {/* Total pool line */}
-        <p className="text-center text-sm text-[var(--color-cream-dim)] mb-12">
+        <p className="text-center text-sm text-[#64748b] mb-12">
           <span className="opacity-60">Total weekly pool: </span>
-          <span className="font-bold text-[var(--color-gold)]">{totalUsdLabel}</span>
+          <span className="font-bold text-[#6366f1]">{totalUsdLabel}</span>
           <span className="opacity-60">
             {" "}(≈ {totalNutLabel} this week @ {fmtSnapshotPrice(weekTiers?.snapshot_price)})
           </span>
@@ -227,33 +222,33 @@ export function PrizesPageContent() {
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <CyberCard accentColor="gold" className="overflow-hidden bg-degen-950">
+          <div className="overflow-hidden bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             <div className="p-6 sm:p-8 relative">
               {/* Floating nuts */}
               <span className="absolute top-4 right-6 text-xl float-nut-1 opacity-40 pointer-events-none">🥜</span>
               <span className="absolute bottom-4 left-8 text-lg float-nut-2 opacity-30 pointer-events-none" style={{ animationDelay: "0.9s" }}>🥜</span>
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-degen-950 border border-brand-gold/30">
-                  <Trophy size={20} className="text-brand-gold" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#f1f5f9] border border-[#e2e8f0]">
+                  <Trophy size={20} className="text-[#6366f1]" />
                 </div>
-                <h3 className="font-display text-xl sm:text-2xl font-black text-cream">
+                <h3 className="font-display text-xl sm:text-2xl font-black text-[#0f172a]">
                   The Weekly Nut Hoard 🐿️
                 </h3>
               </div>
-              <p className="text-[var(--color-cream-dim)] text-sm sm:text-base leading-relaxed mb-4">
-                Every week, a fresh pool of <span className="text-brand-gold font-bold">{totalUsdLabel}</span> in $NUT
+              <p className="text-[#64748b] text-sm sm:text-base leading-relaxed mb-4">
+                Every week, a fresh pool of <span className="text-[#6366f1] font-bold">{totalUsdLabel}</span> in $NUT
                 is up for grabs. The top 3 scorers across all arcade games split the hoard —
                 1st takes the lion&apos;s share, 2nd and 3rd get their cut. The pool resets
                 every Monday at 00:00 UTC, so every week is a clean slate.
               </p>
-              <p className="text-[var(--color-cream-dim)] text-sm sm:text-base leading-relaxed">
+              <p className="text-[#64748b] text-sm sm:text-base leading-relaxed">
                 No buy-in. No catch. No cap. Just play your best, and if your score
                 sits in the top 3 when the clock hits zero, the $NUT is yours. Connect
                 your XRP wallet (Xaman or Joey) to claim. Skill in, $NUT out. 🥜
               </p>
             </div>
-          </CyberCard>
+          </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════════════════
@@ -267,7 +262,7 @@ export function PrizesPageContent() {
           className="mb-8"
         >
           <div className="text-center mb-6">
-            <span className="neon-chip text-degen-crisp mb-3 text-xs">
+            <span className="inline-block px-3 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] text-xs font-semibold tracking-wide mb-3">
               📖 How It Works
             </span>
           </div>
@@ -281,7 +276,7 @@ export function PrizesPageContent() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ delay: i * 0.08, duration: 0.4 }}
               >
-                <CyberCard accentColor="green" className="h-full bg-degen-950">
+                <div className="h-full bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
                   <div className="p-5 sm:p-6 text-center relative">
                     {/* Step number watermark */}
                     <span className="absolute top-3 right-4 font-display text-5xl font-black opacity-[0.06] pointer-events-none" style={{ color: step.color }}>
@@ -292,7 +287,7 @@ export function PrizesPageContent() {
 
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                      style={{ background: `color-mix(in srgb, ${step.color} 12%, #0a0a0a)` }}
+                      style={{ background: `color-mix(in srgb, ${step.color} 12%, #f1f5f9)` }}
                     >
                       <step.icon size={20} style={{ color: step.color }} strokeWidth={2.5} />
                     </div>
@@ -300,18 +295,18 @@ export function PrizesPageContent() {
                     <p className="font-display text-base font-bold mb-1" style={{ color: step.color }}>
                       {step.title}
                     </p>
-                    <p className="text-xs text-[var(--color-cream-dim)] leading-relaxed">
+                    <p className="text-xs text-[#64748b] leading-relaxed">
                       {step.desc}
                     </p>
                   </div>
-                </CyberCard>
+                </div>
               </motion.div>
             ))}
           </div>
 
           {/* Arrow connectors (desktop only) */}
           <div className="hidden sm:flex justify-center items-center -mt-1 mb-2 pointer-events-none">
-            <div className="flex items-center gap-4 text-cream-dim/20">
+            <div className="flex items-center gap-4 text-[#64748b]/20">
               <span className="text-lg">→</span>
               <span className="w-20" />
               <span className="text-lg">→</span>
@@ -329,9 +324,9 @@ export function PrizesPageContent() {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <CyberCard accentColor="gold" className="overflow-hidden bg-degen-950">
+          <div className="overflow-hidden bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             {/* Header row */}
-            <div className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-cream-dim border-b border-hot-pink/20 bg-degen-950">
+            <div className="flex items-center gap-3 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#64748b] border-b border-[#e2e8f0] bg-[#f8fafc]">
               <span className="w-8 text-center">Rank</span>
               <span className="flex-1">Player</span>
               <span className="hidden sm:block w-28">Game</span>
@@ -341,9 +336,9 @@ export function PrizesPageContent() {
 
             {PAST_WINNERS.map((winner, i) => {
               const rankBorderGlow =
-                winner.rank === 1 ? "border-l-2 border-l-brand-gold shadow-[inset_4px_0_12px_-4px_rgba(251,191,36,0.3)]" :
-                winner.rank === 2 ? "border-l-2 border-l-gray-400 shadow-[inset_4px_0_12px_-4px_rgba(192,192,192,0.2)]" :
-                "border-l-2 border-l-amber-700 shadow-[inset_4px_0_12px_-4px_rgba(180,83,9,0.2)]";
+                winner.rank === 1 ? "border-l-2 border-l-[#6366f1]" :
+                winner.rank === 2 ? "border-l-2 border-l-[#64748b]" :
+                "border-l-2 border-l-[#f59e0b]";
 
               return (
                 <motion.div
@@ -352,8 +347,8 @@ export function PrizesPageContent() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.04, duration: 0.25 }}
-                  className={`flex items-center gap-3 px-4 py-3 border-b border-hot-pink/10 last:border-0
-                    ${winner.rank <= 3 ? `bg-degen-950 ${rankBorderGlow}` : "hover:bg-degen-900"}
+                  className={`flex items-center gap-3 px-4 py-3 border-b border-[#e2e8f0]/50 last:border-0
+                    ${winner.rank <= 3 ? `bg-[#f8fafc] ${rankBorderGlow}` : "hover:bg-[#f1f5f9]"}
                   `}
                 >
                   {/* Rank */}
@@ -363,31 +358,31 @@ export function PrizesPageContent() {
 
                   {/* Name */}
                   <div className="flex-1 min-w-0">
-                    <span className={`text-sm font-medium truncate block ${winner.rank === 1 ? "text-brand-gold font-bold" : "text-cream"}`}>
+                    <span className={`text-sm font-medium truncate block ${winner.rank === 1 ? "text-[#6366f1] font-bold" : "text-[#0f172a]"}`}>
                       {winner.name}
                     </span>
                   </div>
 
                   {/* Game */}
                   <div className="hidden sm:block w-28 shrink-0">
-                    <span className="text-xs text-cream-dim">{winner.game}</span>
+                    <span className="text-xs text-[#64748b]">{winner.game}</span>
                   </div>
 
                   {/* Week */}
                   <div className="w-16 text-right shrink-0">
-                    <span className="text-[11px] font-mono text-cream-dim opacity-60">{winner.week}</span>
+                    <span className="text-[11px] font-mono text-[#64748b] opacity-60">{winner.week}</span>
                   </div>
 
                   {/* Prize */}
                   <div className="w-16 text-right shrink-0">
-                    <span className={`text-sm font-mono font-bold ${winner.rank === 1 ? "text-brand-gold" : winner.rank === 2 ? "text-gray-300" : "text-amber-600"}`}>
+                    <span className={`text-sm font-mono font-bold ${winner.rank === 1 ? "text-[#6366f1]" : winner.rank === 2 ? "text-[#64748b]" : "text-[#f59e0b]"}`}>
                       {winner.prize}
                     </span>
                   </div>
                 </motion.div>
               );
             })}
-          </CyberCard>
+          </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════════════════
@@ -400,17 +395,17 @@ export function PrizesPageContent() {
           transition={{ delay: 0.25 }}
           className="mb-8"
         >
-          <CyberCard accentColor="green" className="overflow-hidden bg-degen-950">
+          <div className="overflow-hidden bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             <div className="p-6 sm:p-8 relative">
               {/* Floating nuts */}
               <span className="absolute top-4 left-6 text-lg float-nut-2 opacity-30 pointer-events-none">🥜</span>
               <span className="absolute bottom-6 right-8 text-xl float-nut-3 opacity-25 pointer-events-none" style={{ animationDelay: "1.2s" }}>🥜</span>
 
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#0a1a0f] border border-neon-green/30">
-                  <Info size={20} className="text-neon-green" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#f1f5f9] border border-[#e2e8f0]">
+                  <Info size={20} className="text-[#16a34a]" />
                 </div>
-                <h3 className="font-display text-xl sm:text-2xl font-black text-cream">
+                <h3 className="font-display text-xl sm:text-2xl font-black text-[#0f172a]">
                   Rules &amp; Payout Info
                 </h3>
               </div>
@@ -423,17 +418,17 @@ export function PrizesPageContent() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.04, duration: 0.25 }}
-                    className="flex items-start gap-3 px-4 py-3 rounded-xl bg-degen-950 border border-hot-pink/10 hover:border-neon-green/20 transition-colors"
+                    className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] hover:border-[#16a34a]/20 transition-colors"
                   >
-                    <span className="text-neon-green font-mono text-xs font-bold mt-0.5 shrink-0">
+                    <span className="text-[#16a34a] font-mono text-xs font-bold mt-0.5 shrink-0">
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <p className="text-sm text-cream-dim leading-relaxed">{rule}</p>
+                    <p className="text-sm text-[#64748b] leading-relaxed">{rule}</p>
                   </motion.div>
                 ))}
               </div>
             </div>
-          </CyberCard>
+          </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════════════════
@@ -449,22 +444,22 @@ export function PrizesPageContent() {
           {connected ? (
             <>
               <div className="flex items-center justify-center gap-2 mb-3">
-                <div className="w-2 h-2 rounded-full bg-[var(--color-neon-green)] animate-pulse" />
-                <span className="text-sm font-medium text-[var(--color-neon-green)]">
+                <div className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse" />
+                <span className="text-sm font-medium text-[#16a34a]">
                   Wallet connected — you&apos;re in the running
                 </span>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <a
                   href="/leaderboard/"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-[var(--color-gold)] hover:bg-[rgba(251,191,36,0.06)] transition-colors min-h-[44px]"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-[#6366f1] hover:bg-[#6366f1]/5 transition-colors min-h-[44px]"
                 >
                   <Trophy size={15} />
                   View Leaderboard
                 </a>
                 <a
                   href="/profile/"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-[var(--color-neon-green)] hover:bg-[rgba(16,185,129,0.06)] transition-colors min-h-[44px]"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-[#16a34a] hover:bg-[#16a34a]/5 transition-colors min-h-[44px]"
                 >
                   <Gift size={15} />
                   Claim Rewards
@@ -476,12 +471,9 @@ export function PrizesPageContent() {
               <motion.button
                 onClick={() => connect("xaman")}
                 disabled={isConnecting}
-                whileHover={{
-                  scale: 1.03,
-                  boxShadow: "0 0 34px rgba(255,46,136,0.55)",
-                }}
+                whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-display font-black text-base sm:text-lg tracking-wide transition-all disabled:opacity-50 cursor-pointer"
+                className="relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-[#6366f1] text-white font-display font-black text-base sm:text-lg tracking-wide transition-all hover:bg-[#4f46e5] disabled:opacity-50 cursor-pointer"
               >
                 <Wallet size={22} strokeWidth={2.5} />
                 <span>
@@ -491,16 +483,13 @@ export function PrizesPageContent() {
               </motion.button>
 
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4">
-                <div className="flex items-center gap-1.5 text-[var(--color-cream-dim)]">
-                  <ShieldCheck
-                    size={13}
-                    className="text-[var(--color-neon-green)]"
-                  />
+                <div className="flex items-center gap-1.5 text-[#64748b]">
+                  <ShieldCheck size={13} className="text-[#16a34a]" />
                   <span className="text-xs">
                     Free · read-only · no transactions
                   </span>
                 </div>
-                <span className="text-xs text-[var(--color-cream-dim)] opacity-50">
+                <span className="text-xs text-[#64748b] opacity-50">
                   Xaman · Joey
                 </span>
               </div>
