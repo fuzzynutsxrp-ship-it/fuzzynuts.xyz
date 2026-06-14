@@ -485,5 +485,156 @@ export function buildScoresRouter(env: {
     }
   });
 
+  // ── GET /api/scores/aggregate — Aggregated leaderboard ─────
+  // Returns merged top-N scores across all games (or specific games)
+  // in a single response — replaces 38+ parallel client fetches.
+  router.get("/aggregate", async (req, res) => {
+    try {
+      const db = await getDb();
+      const week = (req.query.week as string) ?? null;
+      const limit = Math.min(
+        parseInt(req.query.limit as string) || 100,
+        500,
+      );
+      const wallet = (req.query.wallet as string) ?? null;
+
+      // Build query — optionally filter by week
+      const query: Record<string, unknown> = {};
+      if (week) query.weekKey = week;
+
+      // If wallet is provided, return that user's scores + context
+      if (wallet) {
+        const userScores = await db
+          .collection(COLLECTION)
+          .find({ ...query, $or: [{ wallet }, { userId: wallet }] })
+          .toArray();
+
+        // Also get global leaderboard for rank computation
+        const allScores = await db
+          .collection(COLLECTION)
+          .find(query)
+          .sort({ score: -1 })
+          .limit(limit * VALID_GAMES.length) // enough to cover top-N per game
+          .toArray();
+
+        // Group by user+game, keep best per game
+        const bestByUserGame = new Map<string, (typeof allScores)[0]>();
+        for (const s of allScores) {
+          const key = `${s.userId ?? s.wallet ?? "unknown"}_${s.game}`;
+          const existing = bestByUserGame.get(key);
+          if (!existing || s.score > existing.score) {
+            bestByUserGame.set(key, s);
+          }
+        }
+
+        // Aggregate by user (sum scores across games)
+        const userMap = new Map<
+          string,
+          { wallet: string; userId: string; displayName: string; totalScore: number; gamesPlayed: number }
+        >();
+        for (const s of bestByUserGame.values()) {
+          const uid = s.userId ?? s.wallet ?? "unknown";
+          const existing = userMap.get(uid);
+          if (existing) {
+            existing.totalScore += s.score;
+            existing.gamesPlayed += 1;
+          } else {
+            userMap.set(uid, {
+              wallet: s.wallet ?? "",
+              userId: s.userId ?? "",
+              displayName: s.displayName ?? s.name ?? "Player",
+              totalScore: s.score,
+              gamesPlayed: 1,
+            });
+          }
+        }
+
+        // Sort by totalScore desc and find rank
+        const sorted = Array.from(userMap.values()).sort(
+          (a, b) => b.totalScore - a.totalScore,
+        );
+
+        const uid = wallet.toLowerCase();
+        const rankIndex = sorted.findIndex(
+          (u) =>
+            u.wallet.toLowerCase() === uid ||
+            u.userId.toLowerCase() === uid,
+        );
+
+        const userEntry = rankIndex >= 0 ? sorted[rankIndex] : null;
+        const nextEntry = rankIndex > 0 ? sorted[rankIndex - 1] : null;
+        const prevEntry =
+          rankIndex >= 0 && rankIndex < sorted.length - 1
+            ? sorted[rankIndex + 1]
+            : null;
+
+        // Also return the user's raw scores
+        const rawUserScores = userScores.map((s) => ({
+          wallet: s.wallet ?? "",
+          userId: s.userId ?? "",
+          name: s.displayName ?? s.name ?? "Player",
+          score: s.score,
+          game: s.game,
+          ts: s.ts?.getTime?.() ?? Date.now(),
+        }));
+
+        res.setHeader(
+          "Cache-Control",
+          "public, s-maxage=10, stale-while-revalidate=30",
+        );
+        return res.json({
+          rank: rankIndex >= 0 ? rankIndex + 1 : null,
+          totalScore: userEntry?.totalScore ?? 0,
+          gamesPlayed: userEntry?.gamesPlayed ?? 0,
+          nextRankScore: nextEntry?.totalScore ?? null,
+          prevRankScore: prevEntry?.totalScore ?? null,
+          scores: rawUserScores,
+        });
+      }
+
+      // No wallet — return full aggregated leaderboard
+      const allScores = await db
+        .collection(COLLECTION)
+        .find(query)
+        .sort({ score: -1 })
+        .limit(limit * VALID_GAMES.length)
+        .toArray();
+
+      // Group by user+game, keep best per game
+      const bestByUserGame = new Map<string, (typeof allScores)[0]>();
+      for (const s of allScores) {
+        const key = `${s.userId ?? s.wallet ?? "unknown"}_${s.game}`;
+        const existing = bestByUserGame.get(key);
+        if (!existing || s.score > existing.score) {
+          bestByUserGame.set(key, s);
+        }
+      }
+
+      // Return individual entries (not aggregated by user) —
+      // the frontend's aggregateByPlayer() handles user-level merging
+      const leaderboard = Array.from(bestByUserGame.values())
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map((s) => ({
+          wallet: s.wallet ?? "",
+          userId: s.userId ?? "",
+          name: s.displayName ?? s.name ?? "Player",
+          displayName: s.displayName ?? s.name ?? "Player",
+          score: s.score,
+          game: s.game,
+          ts: s.ts?.getTime?.() ?? Date.now(),
+        }));
+
+      res.setHeader(
+        "Cache-Control",
+        "public, s-maxage=10, stale-while-revalidate=30",
+      );
+      return res.json({ leaderboard });
+    } catch (err) {
+      console.error("[scores] Aggregate error:", err);
+      return res.status(500).json({ error: "Aggregation failed" });
+    }
+  });
+
   return router;
 }

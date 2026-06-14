@@ -42,6 +42,7 @@ export const MIN_PLAY_DURATION_MS = MIN_PLAY_DURATION_SECONDS * 1000;
 
 /** Backend API base URLs (web-arcade reads, doesn't write) */
 export const API_SCORES = "https://world.fuzzynuts.xyz/api/scores";
+export const API_SCORES_AGGREGATE = "https://world.fuzzynuts.xyz/api/scores/aggregate";
 export const API_REWARDS = "https://world.fuzzynuts.xyz/api/rewards";
 
 /** Polling interval for auto-refreshing leaderboard (ms) */

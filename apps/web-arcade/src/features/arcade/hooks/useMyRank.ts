@@ -4,9 +4,9 @@
  * ═══════════════════════════════════════════════════════════════
  * useMyRank — Fetch the current user's global rank + personal stats
  *
- * Aggregates scores across all games, computes global rank from
- * the merged leaderboard, and fetches the user's personal score
- * history for stats like total score and games played.
+ * Uses the server-side /api/scores/aggregate?wallet= endpoint
+ * to get rank data in a SINGLE request instead of 38+ parallel
+ * per-game fetches. Properly cleans up AbortController on unmount.
  *
  * Supports two identity sources:
  *   1. XRPL wallet address (from useWalletStore)
@@ -14,11 +14,9 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-import { useState, useEffect, useCallback } from "react";
-import { GAMES } from "@/lib/utils";
-import { API_SCORES, MAX_ENTRIES } from "../constants";
-import { toBackendSlug } from "../slugAliases";
-import type { ScoreEntry } from "../types/arcade";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { API_SCORES_AGGREGATE } from "../constants";
+import { getCurrentWeekKey } from "../utils/scoreHelpers";
 
 export interface MyRankData {
   rank: number | null;
@@ -32,13 +30,16 @@ export interface MyRankData {
 }
 
 /**
- * Fetches aggregated leaderboard across all games and personal
- * scores to compute the user's global rank and stats.
+ * Fetches aggregated rank data in a single request.
  *
  * @param userId - Wallet address or Google session userId
+ * @param timeframe - "weekly" or "alltime"
  * @returns Rank data, personal stats, loading/error states
  */
-export function useMyRank(userId: string | null): MyRankData {
+export function useMyRank(
+  userId: string | null,
+  timeframe: "weekly" | "alltime" = "weekly",
+): MyRankData {
   const [rank, setRank] = useState<number | null>(null);
   const [totalScore, setTotalScore] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
@@ -47,94 +48,50 @@ export function useMyRank(userId: string | null): MyRankData {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Track the current AbortController for cleanup
+  const abortRef = useRef<AbortController | null>(null);
+
   const fetchRank = useCallback(async () => {
     if (!userId) return;
+
+    // Abort any in-flight request
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
 
     try {
-      // 1. Fetch ALL scores across all games
-      const promises = GAMES.map(async (game) => {
-        const backendSlug = toBackendSlug(game.id);
-        const url = `${API_SCORES}?game=${backendSlug}&limit=${MAX_ENTRIES}`;
-        const res = await fetch(url, {
-          signal: AbortSignal.timeout(8000),
-        });
-        if (!res.ok) return [];
-        const data = await res.json();
-        const raw: ScoreEntry[] = Array.isArray(data)
-          ? data
-          : data.leaderboard || data.scores || data.data || [];
-        return raw.map((e: ScoreEntry) => ({
-          ...e,
-          game: e.game || game.id,
-        }));
+      const weekParam =
+        timeframe === "weekly" ? `?week=${getCurrentWeekKey()}` : "";
+      const walletParam = weekParam ? "&" : "?";
+      const url = `${API_SCORES_AGGREGATE}${weekParam}${walletParam}wallet=${encodeURIComponent(userId)}`;
+
+      const res = await fetch(url, {
+        signal: controller.signal,
       });
 
-      // 2. Fetch user's personal scores
-      const userUrl = `${API_SCORES}?wallet=${encodeURIComponent(userId)}`;
-      const userPromise = fetch(userUrl, {
-        signal: AbortSignal.timeout(8000),
-      })
-        .then((r) => (r.ok ? r.json() : []))
-        .then((d) => {
-          const raw: ScoreEntry[] = Array.isArray(d)
-            ? d
-            : d.scores || d.data || [];
-          return raw;
-        })
-        .catch(() => [] as ScoreEntry[]);
-
-      const [gameResults, userScores] = await Promise.all([
-        Promise.all(promises),
-        userPromise,
-      ]);
-
-      // 3. Merge all game scores into one global leaderboard
-      const allScores = gameResults
-        .flat()
-        .sort((a, b) => b.score - a.score)
-        .slice(0, MAX_ENTRIES);
-
-      // 4. Find user rank (case-insensitive match on wallet, or userId)
-      const uid = userId.toLowerCase();
-      const rankIndex = allScores.findIndex(
-        (s) =>
-          s.wallet?.toLowerCase() === uid ||
-          s.userId?.toLowerCase() === uid,
-      );
-      const userRank = rankIndex >= 0 ? rankIndex + 1 : null;
-
-      // 5. Score needed for next rank
-      const nextScore =
-        rankIndex > 0 ? allScores[rankIndex - 1].score : null;
-      // 6. Score of player directly behind (previous rank)
-      const prevScore =
-        rankIndex >= 0 && rankIndex < allScores.length - 1
-          ? allScores[rankIndex + 1].score
-          : null;
-
-      // 7. Personal stats from user's own scores
-      const uniqueGames = new Set(
-        (userScores as ScoreEntry[]).map((s) => s.game),
-      );
-      const bestPerGame = new Map<string, number>();
-      for (const s of userScores as ScoreEntry[]) {
-        const existing = bestPerGame.get(s.game) ?? 0;
-        if (s.score > existing) bestPerGame.set(s.game, s.score);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
       }
-      const userTotal = Array.from(bestPerGame.values()).reduce(
-        (sum, s) => sum + s,
-        0,
-      );
 
-      setRank(userRank);
-      setTotalScore(userTotal);
-      setGamesPlayed(uniqueGames.size);
-      setNextRankScore(nextScore);
-      setPrevRankScore(prevScore);
+      const data = await res.json();
+
+      // The aggregate endpoint returns { rank, totalScore, gamesPlayed,
+      // nextRankScore, prevRankScore, scores } when wallet is provided
+      setRank(data.rank ?? null);
+      setTotalScore(data.totalScore ?? 0);
+      setGamesPlayed(data.gamesPlayed ?? 0);
+      setNextRankScore(data.nextRankScore ?? null);
+      setPrevRankScore(data.prevRankScore ?? null);
       setLoading(false);
     } catch (err) {
+      // Don't update state if this request was aborted
+      if (controller.signal.aborted) return;
+
       setRank(null);
       setTotalScore(0);
       setGamesPlayed(0);
@@ -145,11 +102,19 @@ export function useMyRank(userId: string | null): MyRankData {
         err instanceof Error ? err.message : "Failed to load rank data",
       );
     }
-  }, [userId]);
+  }, [userId, timeframe]);
 
-  // Fetch on mount and when userId changes
+  // Fetch on mount and when dependencies change
   useEffect(() => {
     fetchRank();
+
+    // Cleanup: abort in-flight request on unmount or dep change
+    return () => {
+      if (abortRef.current) {
+        abortRef.current.abort();
+        abortRef.current = null;
+      }
+    };
   }, [fetchRank]);
 
   return {

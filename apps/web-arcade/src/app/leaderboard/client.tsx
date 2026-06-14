@@ -24,8 +24,7 @@ import {
   timeAgo,
 } from "@/features/arcade";
 import type { ScoreEntry } from "@/features/arcade";
-import { API_SCORES } from "@/features/arcade/constants";
-import { toBackendSlug } from "@/features/arcade/slugAliases";
+import { API_SCORES_AGGREGATE } from "@/features/arcade/constants";
 import { MyRankWidget } from "@/components/ui/MyRankWidget";
 import { gameRegistry } from "@/lib/gameRegistry";
 
@@ -294,40 +293,33 @@ export function LeaderboardClient() {
   const [allLoading, setAllLoading] = useState(false);
   const [allError, setAllError] = useState<string | null>(null);
 
-  // Fetch all games when "all" is selected
+  // Fetch all games when "all" is selected — uses single aggregate endpoint
   useEffect(() => {
     if (selectedGame !== "all") return;
 
     let cancelled = false;
+    const controller = new AbortController();
+
     const fetchAll = async () => {
       setAllLoading(true);
       setAllError(null);
       try {
-        const liveGames = gameRegistry
-          .getAll()
-          .filter((g) => g.status === "live" && g.leaderboardEnabled);
-        const params = timeframe === "weekly" ? `&week=${weekKey}` : "";
-        const promises = liveGames.map(async (game) => {
-          const backendSlug = toBackendSlug(game.slug);
-          const url = `${API_SCORES}?game=${backendSlug}&limit=${LEADERBOARD_SIZE}${params}`;
-          const res = await fetch(url);
-          if (!res.ok) return [];
-          const data = await res.json();
-          const raw: ScoreEntry[] = Array.isArray(data)
-            ? data
-            : data.leaderboard || data.scores || data.data || [];
-          return raw.map((e) => ({ ...e, game: e.game || game.slug }));
-        });
-        const results = await Promise.all(promises);
+        const weekParam =
+          timeframe === "weekly" ? `?week=${weekKey}` : "";
+        const limitParam = weekParam ? "&" : "?";
+        const url = `${API_SCORES_AGGREGATE}${weekParam}${limitParam}limit=${LEADERBOARD_SIZE}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const raw: ScoreEntry[] = data.leaderboard || [];
         if (!cancelled) {
-          setAllScores(results.flat());
+          setAllScores(raw);
         }
       } catch (err) {
-        if (!cancelled) {
-          setAllError(
-            err instanceof Error ? err.message : "Failed to load scores",
-          );
-        }
+        if (cancelled || controller.signal.aborted) return;
+        setAllError(
+          err instanceof Error ? err.message : "Failed to load scores",
+        );
       } finally {
         if (!cancelled) setAllLoading(false);
       }
@@ -337,6 +329,7 @@ export function LeaderboardClient() {
     const interval = setInterval(fetchAll, 30_000);
     return () => {
       cancelled = true;
+      controller.abort();
       clearInterval(interval);
     };
   }, [selectedGame, timeframe, weekKey]);
