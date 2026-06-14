@@ -11,6 +11,7 @@ import { createServer } from "node:http";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { guestSessionMiddleware } from "./middleware/guest-session";
 
 const PORT = Number(process.env.PORT ?? 4000);
 
@@ -38,6 +39,7 @@ const VPS_ACCOUNT_SECRET = optionalEnv("VPS_ACCOUNT_SECRET");
 const OPENAI_API_KEY = optionalEnv("OPENAI_API_KEY");
 const ADMIN_WALLET_ADDRESS = optionalEnv("ADMIN_WALLET_ADDRESS");
 const DISCORD_WEBHOOK_URL = optionalEnv("DISCORD_WEBHOOK_URL");
+const REDIS_URL = optionalEnv("REDIS_URL");
 
 const app = express();
 
@@ -47,11 +49,19 @@ app.use(
     directives: {
       frameAncestors: [
         "'self'",
+        "https://fuzzynuts.xyz",
         "https://www.fuzzynuts.xyz",
+        "https://game.fuzzynuts.xyz",
         "http://localhost:3000",
       ],
     },
   }),
+);
+
+// ── Cross-origin headers for game assets (WASM, WebGL, audio) ──
+// crossOriginResourcePolicy: cross-origin — allow iframe games to load assets
+app.use(
+  helmet.crossOriginResourcePolicy({ policy: "cross-origin" }),
 );
 
 // ── CORS — allow the frontend origin to call this API ──────────
@@ -61,6 +71,8 @@ const ALLOWED_ORIGINS = [
   "https://game.fuzzynuts.xyz",
   "http://localhost:3000", // local dev
 ];
+
+// Standard CORS for API routes (JSON, credentialed)
 app.use(
   cors({
     origin(origin, cb) {
@@ -69,10 +81,30 @@ app.use(
       cb(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Range"],
+    exposedHeaders: ["Content-Length", "Content-Range", "X-Request-Id"],
+    maxAge: 86400, // cache preflight for 24h
+  }),
+);
+
+// ── CORS for game asset routes (images, WASM, WebGL binaries) ──
+// Wide-open origin for static game assets — these are public files
+// that games load from <script>, <img>, fetch(), WebAssembly.instantiate()
+app.use(
+  "/games",
+  cors({
+    origin: "*",
+    methods: ["GET", "HEAD", "OPTIONS"],
+    allowedHeaders: ["Range", "Content-Type"],
+    exposedHeaders: ["Content-Length", "Content-Range"],
   }),
 );
 
 app.use(express.json({ limit: "16kb" }));
+
+// ── Guest session — ensure anonymous visitors get a lightweight JWT ──
+app.use(guestSessionMiddleware({ GAME_SESSION_SECRET }));
 
 app.get("/healthz", (_req, res) => {
   res.json({ ok: true });
@@ -243,6 +275,7 @@ async function bootstrap() {
         walletMappingsCollection: "wallet_mappings",
         OPENAI_API_KEY: OPENAI_API_KEY || undefined,
         ADMIN_WALLET_ADDRESS: ADMIN_WALLET_ADDRESS || undefined,
+        REDIS_URL: REDIS_URL || undefined,
       });
 
       // Admin chat routes (protected by JWT + admin wallet check)

@@ -209,6 +209,10 @@
       // ──────────────────────────────────────────────────
 
       window.addEventListener('message', function(event) {
+        // Origin validation — only accept control messages from trusted parent
+        var allowedOrigins = ['https://fuzzynuts.xyz', 'https://www.fuzzynuts.xyz'];
+        if (event.origin !== window.location.origin && allowedOrigins.indexOf(event.origin) === -1) return;
+
         if (event.data && event.data.type === 'setMute') {
           isMuted = event.data.muted;
           console.log('[' + GAME_TITLE + '] Mute:', isMuted);

@@ -280,6 +280,7 @@ export function initChat(
     walletMappingsCollection: string; // e.g. "wallet_mappings"
     OPENAI_API_KEY?: string;
     ADMIN_WALLET_ADDRESS?: string;
+    REDIS_URL?: string;
   },
 ) {
   const io = new Server(httpServer, {
@@ -291,6 +292,13 @@ export function initChat(
     pingInterval: 25_000,
     pingTimeout: 20_000,
   });
+
+  // Attach Redis adapter for multi-instance pub/sub (if REDIS_URL is set)
+  if (opts.REDIS_URL) {
+    import("../lib/redis-adapter.js")
+      .then(({ attachRedisAdapter }) => attachRedisAdapter(io, opts.REDIS_URL!))
+      .catch((err) => console.error("[chat] Redis adapter import failed:", err));
+  }
 
   // Ensure MongoDB indexes exist (runs once, no-ops on restart)
   ensureIndexes(opts.MONGODB_URI).catch((err) => {
