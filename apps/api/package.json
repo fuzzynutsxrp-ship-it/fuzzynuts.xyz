@@ -24,6 +24,8 @@
     "jose": "^5.9.0",
     "mongodb": "^6.10.0",
     "node-cron": "^3.0.3",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "ioredis": "^5.4.1",
     "socket.io": "^4.8.0",
     "xrpl": "^4.0.0",
     "xumm-sdk": "^1.11.0",
