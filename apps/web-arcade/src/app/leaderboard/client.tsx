@@ -143,10 +143,10 @@ function Podium({
     {
       rank: 1,
       medal: "🥇",
-      borderClass: "border-brand-gold/40",
+      borderClass: "border-[#e2e8f0]",
       shadowStyle:
-        "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.08)",
-      textClass: "text-brand-gold",
+        "0 1px 3px rgba(15,23,42,0.08)",
+      textClass: "text-[#6366f1]",
       label: "1st Place",
       order: "order-2",
     },
@@ -183,7 +183,7 @@ function Podium({
         return (
           <div
             key={cfg.rank}
-            className={`relative rounded-2xl border-2 ${cfg.borderClass} bg-[#0a0613] py-5 sm:py-6 px-3 text-center ${cfg.order}`}
+            className={`relative rounded-2xl border-2 ${cfg.borderClass} bg-white py-5 sm:py-6 px-3 text-center ${cfg.order}`}
             style={{ boxShadow: cfg.shadowStyle }}
           >
             <div className="text-3xl sm:text-4xl mb-2">{cfg.medal}</div>
@@ -192,10 +192,10 @@ function Podium({
             >
               {cfg.label}
             </p>
-            <p className="font-display text-sm sm:text-base font-bold text-cream truncate">
+            <p className="font-display text-sm sm:text-base font-bold text-[#0f172a] truncate">
               {entry.displayName}
               {isYou && (
-                <span className="ml-1 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1 py-0.5 rounded-full">
+                <span className="ml-1 text-[10px] font-mono text-[#6366f1] bg-[#6366f1]/10 border border-[#6366f1]/20 px-1 py-0.5 rounded-full">
                   you
                 </span>
               )}
@@ -205,7 +205,7 @@ function Podium({
             >
               {formatNumber(entry.totalScore)}
             </p>
-            <p className="text-[10px] text-[var(--color-cream-dim)] mt-1">
+            <p className="text-[10px] text-[#64748b] mt-1">
               {entry.gamesPlayed} game{entry.gamesPlayed !== 1 ? "s" : ""} played
             </p>
           </div>
@@ -224,7 +224,7 @@ function RankBadge({ rank }: { rank: number }) {
   if (rank === 2) return <span className="text-lg">🥈</span>;
   if (rank === 3) return <span className="text-lg">🥉</span>;
   return (
-    <span className="text-xs font-mono text-[var(--color-cream-dim)] w-8 text-center">
+    <span className="text-xs font-mono text-[#64748b] w-8 text-center">
       #{rank}
     </span>
   );
@@ -380,10 +380,10 @@ export function LeaderboardClient() {
   const selectedGameLabel = selectedGameMeta?.title || "All Games";
 
   return (
-    <div className="min-h-screen bg-[#0a0613] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Top Navigation */}
       <SiteHeader
-        variant="dark"
+        variant="light"
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onMenuToggle={() => setSidebarOpen((o) => !o)}
@@ -404,11 +404,11 @@ export function LeaderboardClient() {
         <main className="flex-1 min-w-0 px-4 md:px-6 lg:px-8 py-6 pb-32">
           {/* Page header */}
           <div className="mb-6">
-            <h1 className="font-display text-2xl sm:text-3xl font-black text-cream flex items-center gap-3">
-              <Trophy className="text-brand-gold" size={28} />
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-[#0f172a] flex items-center gap-3">
+              <Trophy className="text-[#6366f1]" size={28} />
               Global Leaderboard
             </h1>
-            <p className="text-sm text-[var(--color-cream-dim)] mt-1">
+            <p className="text-sm text-[#64748b] mt-1">
               Top {LEADERBOARD_SIZE} players
               {timeframe === "weekly" && " · Resets every Monday 00:00 UTC"}
             </p>
@@ -420,15 +420,15 @@ export function LeaderboardClient() {
           {/* ── Filters Bar ── */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
             {/* Game filter — Desktop pills */}
-            <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-white/[0.03] border border-white/5 overflow-x-auto">
+            <div className="hidden sm:flex items-center gap-1.5 p-1.5 rounded-xl bg-white/[0.03] border border-[#e2e8f0] overflow-x-auto">
               {GAME_FILTERS.map((gf) => (
                 <button
                   key={gf.slug}
                   onClick={() => setSelectedGame(gf.slug)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     selectedGame === gf.slug
-                      ? "bg-brand-gold/15 text-brand-gold border border-brand-gold/30"
-                      : "text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 border border-transparent"
+                      ? "bg-[#6366f1]/15 text-[#6366f1] border border-[#6366f1]/30"
+                      : "text-[#64748b] hover:text-[#0f172a] hover:bg-white/5 border border-transparent"
                   }`}
                 >
                   <span>{gf.title}</span>
@@ -440,7 +440,7 @@ export function LeaderboardClient() {
             <div className="relative sm:hidden">
               <button
                 onClick={() => setGameDropdownOpen(!gameDropdownOpen)}
-                className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/5 text-cream font-semibold text-sm"
+                className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-[#e2e8f0] text-[#0f172a] font-semibold text-sm"
               >
                 <span>
                   {GAME_FILTERS.find((g) => g.slug === selectedGame)?.title}
@@ -456,7 +456,7 @@ export function LeaderboardClient() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden bg-[#0a0613] border border-white/10 shadow-2xl max-h-64 overflow-y-auto"
+                    className="absolute z-30 top-full left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white border border-[#e2e8f0] shadow-2xl max-h-64 overflow-y-auto"
                   >
                     {GAME_FILTERS.map((gf) => (
                       <button
@@ -467,8 +467,8 @@ export function LeaderboardClient() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
                           selectedGame === gf.slug
-                            ? "bg-brand-gold/10 text-brand-gold"
-                            : "text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5"
+                            ? "bg-[#6366f1]/10 text-[#6366f1]"
+                            : "text-[#64748b] hover:text-[#0f172a] hover:bg-white/5"
                         }`}
                       >
                         <span>{gf.title}</span>
@@ -482,15 +482,15 @@ export function LeaderboardClient() {
             {/* Right side: Timeframe tabs + Refresh */}
             <div className="flex items-center gap-2">
               {/* Timeframe tabs */}
-              <div className="flex items-center p-1 rounded-lg bg-white/[0.03] border border-white/5">
+              <div className="flex items-center p-1 rounded-lg bg-white/[0.03] border border-[#e2e8f0]">
                 {TIMEFRAMES.map((tf) => (
                   <button
                     key={tf.id}
                     onClick={() => setTimeframe(tf.id as "weekly" | "alltime")}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all ${
                       timeframe === tf.id
-                        ? "bg-brand-gold/15 text-brand-gold"
-                        : "text-[var(--color-cream-dim)] hover:text-cream"
+                        ? "bg-[#6366f1]/15 text-[#6366f1]"
+                        : "text-[#64748b] hover:text-[#0f172a]"
                     }`}
                   >
                     <Clock size={12} />
@@ -511,7 +511,7 @@ export function LeaderboardClient() {
               <button
                 onClick={manualRefresh}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[var(--color-cream-dim)] hover:text-cream bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 transition-all disabled:opacity-40"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[#64748b] hover:text-[#0f172a] bg-white/[0.03] hover:bg-white/[0.06] border border-[#e2e8f0] transition-all disabled:opacity-40"
               >
                 <RefreshCw
                   size={14}
@@ -528,9 +528,9 @@ export function LeaderboardClient() {
           )}
 
           {/* ── Leaderboard Table ── */}
-          <div className="rounded-xl overflow-hidden border border-white/5 bg-[#0a0613]">
+          <div className="rounded-xl overflow-hidden border border-[#e2e8f0] bg-white">
             {/* Table Header — desktop */}
-            <div className="hidden sm:flex items-center gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cream-dim)] border-b border-white/5 bg-white/[0.02]">
+            <div className="hidden sm:flex items-center gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#64748b] border-b border-[#e2e8f0] bg-white/[0.02]">
               <span className="w-10 text-center">Rank</span>
               <span className="flex-1">Player</span>
               <span className="w-28 text-right">Games Played</span>
@@ -538,7 +538,7 @@ export function LeaderboardClient() {
             </div>
 
             {/* Mobile header */}
-            <div className="sm:hidden px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cream-dim)] border-b border-white/5 bg-white/[0.02]">
+            <div className="sm:hidden px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#64748b] border-b border-[#e2e8f0] bg-white/[0.02]">
               Top Players
             </div>
 
@@ -568,10 +568,10 @@ export function LeaderboardClient() {
             {!loading && error && playerRows.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <WifiOff size={32} className="text-orange mb-4 opacity-60" />
-                <p className="font-display text-lg font-bold text-cream mb-2">
+                <p className="font-display text-lg font-bold text-[#0f172a] mb-2">
                   Unable to load scores
                 </p>
-                <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">
+                <p className="text-sm text-[#64748b] max-w-sm mb-6">
                   {error}
                 </p>
                 <button
@@ -589,21 +589,21 @@ export function LeaderboardClient() {
               <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
                 <Gamepad2
                   size={48}
-                  className="text-brand-gold/30 mb-4"
+                  className="text-[#6366f1]/30 mb-4"
                 />
-                <p className="font-display text-xl font-bold text-cream mb-2">
+                <p className="font-display text-xl font-bold text-[#0f172a] mb-2">
                   No scores yet
                 </p>
-                <p className="text-sm text-[var(--color-cream-dim)] max-w-sm mb-6">
+                <p className="text-sm text-[#64748b] max-w-sm mb-6">
                   Be the first to play{" "}
-                  <span className="text-cream font-semibold">
+                  <span className="text-[#0f172a] font-semibold">
                     {selectedGameLabel}
                   </span>{" "}
                   and claim the #1 spot!
                 </p>
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-gold text-[#0a0613] font-display font-black text-sm hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#6366f1] text-white font-display font-black text-sm hover:shadow-[0_4px_12px_rgba(99,102,241,0.2)] transition-all"
                 >
                   🐿️ Play Now
                 </Link>
@@ -626,7 +626,7 @@ export function LeaderboardClient() {
                       key={`${row.wallet || row.userId || index}`}
                       className={`border-b border-white/[0.03] last:border-0 transition-colors ${
                         isCurrentUser
-                          ? "bg-brand-gold/[0.06] border-l-2 border-l-brand-gold"
+                          ? "bg-[#6366f1]/[0.06] border-l-2 border-l-[#6366f1]"
                           : "hover:bg-white/[0.02]"
                       }`}
                     >
@@ -642,15 +642,15 @@ export function LeaderboardClient() {
                           <span
                             className={`text-sm font-medium truncate ${
                               isCurrentUser
-                                ? "text-brand-gold font-bold"
-                                : "text-cream"
+                                ? "text-[#6366f1] font-bold"
+                                : "text-[#0f172a]"
                             }`}
                           >
                             {row.displayName}
                           </span>
                           <ProviderBadge row={row} />
                           {isCurrentUser && (
-                            <span className="ml-1.5 text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
+                            <span className="ml-1.5 text-[10px] font-mono text-[#6366f1] bg-[#6366f1]/10 border border-[#6366f1]/20 px-1.5 py-0.5 rounded-full">
                               you
                             </span>
                           )}
@@ -658,14 +658,14 @@ export function LeaderboardClient() {
 
                         {/* Games Played */}
                         <div className="w-28 text-right shrink-0">
-                          <span className="font-mono text-sm tabular-nums text-[var(--color-cream-dim)]">
+                          <span className="font-mono text-sm tabular-nums text-[#64748b]">
                             {row.gamesPlayed}
                           </span>
                         </div>
 
                         {/* Total Score */}
                         <div className="w-28 text-right shrink-0">
-                          <span className="font-mono text-sm font-bold tabular-nums text-cream">
+                          <span className="font-mono text-sm font-bold tabular-nums text-[#0f172a]">
                             {formatNumber(row.totalScore)}
                           </span>
                         </div>
@@ -684,25 +684,25 @@ export function LeaderboardClient() {
                             <span
                               className={`text-sm font-medium truncate ${
                                 isCurrentUser
-                                  ? "text-brand-gold font-bold"
-                                  : "text-cream"
+                                  ? "text-[#6366f1] font-bold"
+                                  : "text-[#0f172a]"
                               }`}
                             >
                               {row.displayName}
                             </span>
                             <ProviderBadge row={row} />
                             {isCurrentUser && (
-                              <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/10 border border-brand-gold/20 px-1 py-0.5 rounded-full">
+                              <span className="text-[10px] font-mono text-[#6366f1] bg-[#6366f1]/10 border border-[#6366f1]/20 px-1 py-0.5 rounded-full">
                                 you
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-3 mt-1">
-                            <span className="text-[11px] text-[var(--color-cream-dim)]">
+                            <span className="text-[11px] text-[#64748b]">
                               <Users size={10} className="inline mr-0.5" />
                               {row.gamesPlayed} game{row.gamesPlayed !== 1 ? "s" : ""}
                             </span>
-                            <span className="font-mono text-xs font-bold tabular-nums text-cream">
+                            <span className="font-mono text-xs font-bold tabular-nums text-[#0f172a]">
                               {formatNumber(row.totalScore)}
                             </span>
                           </div>
@@ -725,7 +725,7 @@ export function LeaderboardClient() {
 
           {/* Footer meta */}
           {lastFetched && (
-            <p className="text-[11px] text-[var(--color-cream-dim)]/60 text-center mt-4 font-mono">
+            <p className="text-[11px] text-[#64748b]/60 text-center mt-4 font-mono">
               Updated {timeAgo(lastFetched)} · Top {LEADERBOARD_SIZE} ·{" "}
               {timeframe === "weekly"
                 ? "Resets Monday 00:00 UTC"
@@ -740,15 +740,15 @@ export function LeaderboardClient() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-[#0a0613] border border-brand-gold/30 shadow-[0_0_30px_rgba(251,191,36,0.15)] flex items-center gap-3"
+                className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-white border border-[#6366f1]/30 shadow-[0_1px_3px_rgba(15,23,42,0.08)] flex items-center gap-3"
               >
-                <Trophy size={16} className="text-brand-gold" />
-                <span className="text-sm text-cream">
+                <Trophy size={16} className="text-[#6366f1]" />
+                <span className="text-sm text-[#0f172a]">
                   Your rank is outside the top {LEADERBOARD_SIZE}. Play to climb!
                 </span>
                 <Link
                   href="/"
-                  className="px-3 py-1.5 rounded-lg bg-brand-gold text-[#0a0613] font-bold text-xs"
+                  className="px-3 py-1.5 rounded-lg bg-[#6366f1] text-white font-bold text-xs"
                 >
                   Play
                 </Link>

@@ -328,33 +328,20 @@ export function UserProfile() {
   const xpProgress = (unlockedAchievements.size / ACHIEVEMENTS.length) * 100;
 
   return (
-    <section id="user-profile" className="py-16 relative">
-      <div className="container-main space-y-6">
+    <section id="user-profile" className="relative">
+      <div className="space-y-6">
 
-        {/* ═══ PROFILE HEADER — Squirrel Profile Card ═══ */}
+        {/* ═══ PROFILE HEADER ═══ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div
-            className="bg-degen-950 border-2 border-brand-gold/40 rounded-2xl overflow-hidden relative"
-            style={{ boxShadow: "0 0 40px rgba(251,191,36,0.1), 0 0 80px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.1)" }}
-          >
-            {/* Floating nuts around header */}
-            <span className="absolute top-4 right-8 text-lg float-nut-1 opacity-60 pointer-events-none z-10">🥜</span>
-            <span className="absolute bottom-6 left-12 text-base float-nut-2 opacity-45 pointer-events-none z-10">🥜</span>
-            <span className="absolute top-1/2 right-1/4 text-sm float-nut-3 opacity-40 pointer-events-none z-10" style={{ animationDelay: "1.1s" }}>🥜</span>
-
-            {/* Gold accent stripe */}
-            <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
+          <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.08)] border border-[#e2e8f0]">
             <div className="p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  {/* Avatar — Fuzzynuts logo */}
-                  <div
-                    className="w-20 h-20 rounded-2xl bg-[#0f0a00] border-2 border-brand-gold/40 flex items-center justify-center shrink-0"
-                    style={{ boxShadow: "0 0 24px rgba(251,191,36,0.2), 0 0 48px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
-                  >
+                  {/* Avatar */}
+                  <div className="w-20 h-20 rounded-2xl bg-[#f1f5f9] border border-[#e2e8f0] flex items-center justify-center shrink-0">
                     <Image
                       src="/images/branding/logo.webp"
                       alt="Fuzzynuts"
@@ -366,22 +353,22 @@ export function UserProfile() {
                     />
                   </div>
                   <div>
-                    <h2 className="font-display text-xl sm:text-2xl font-bold text-cream">
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0f172a]">
                       {truncateAddress(address)}
                     </h2>
-                    <p className="text-xs text-cream-dim font-mono mt-0.5 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
+                    <p className="text-xs text-[#64748b] font-mono mt-0.5 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
                       XRPL Player Profile
                     </p>
                     {/* XP mini bar */}
                     <div className="mt-2 flex items-center gap-2">
-                      <div className="w-24 h-1.5 rounded-full bg-degen-900 overflow-hidden">
+                      <div className="w-24 h-1.5 rounded-full bg-[#e2e8f0] overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-500"
+                          className="h-full rounded-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6]"
                           style={{ width: `${xpProgress}%` }}
                         />
                       </div>
-                      <span className="text-[10px] font-mono text-cream-dim">
+                      <span className="text-[10px] font-mono text-[#64748b]">
                         {unlockedAchievements.size}/{ACHIEVEMENTS.length} XP
                       </span>
                     </div>
@@ -396,9 +383,9 @@ export function UserProfile() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs
-                               font-semibold text-cream-dim hover:text-cream
-                               bg-degen-900 hover:bg-[#1a1a1a]
-                               border border-hot-pink/20 hover:border-gold/40
+                               font-semibold text-[#64748b] hover:text-[#0f172a]
+                               bg-[#f8fafc] hover:bg-[#f1f5f9]
+                               border border-[#e2e8f0]
                                transition-all min-h-[40px]
                                disabled:opacity-40 cursor-pointer"
                     title="Refresh scores"
@@ -414,8 +401,8 @@ export function UserProfile() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs
-                               font-semibold text-red-400 hover:bg-[#1a0a0a]
-                               border border-red-400/20 hover:border-red-400/40
+                               font-semibold text-red-500 hover:bg-red-50
+                               border border-red-200
                                transition-all min-h-[40px] cursor-pointer"
                   >
                     Disconnect
@@ -455,38 +442,34 @@ export function UserProfile() {
             {
               label: "Total Plays",
               value: totalGames,
-              icon: <Gamepad2 size={20} className="text-neon-green" />,
-              borderColor: "border-neon-green/40",
-              glowColor: "shadow-[0_0_20px_rgba(16,185,129,0.12)]",
-              bg: "bg-degen-950",
+              icon: <Gamepad2 size={20} className="text-[#10b981]" />,
+              borderColor: "border-[#e2e8f0]",
+              bg: "bg-white",
             },
             {
               label: "Games Played",
               value: uniqueGames,
-              icon: <Trophy size={20} className="text-brand-gold" />,
-              borderColor: "border-brand-gold/40",
-              glowColor: "shadow-[0_0_20px_rgba(251,191,36,0.12)]",
-              bg: "bg-[#0f0a00]",
+              icon: <Trophy size={20} className="text-[#6366f1]" />,
+              borderColor: "border-[#e2e8f0]",
+              bg: "bg-white",
             },
             {
               label: "Best Score",
               value: topScore > 0 ? formatNumber(topScore) : "—",
-              icon: <TrendingUp size={20} className="text-amber-500" />,
-              borderColor: "border-amber-500/40",
-              glowColor: "shadow-[0_0_20px_rgba(245,158,11,0.12)]",
-              bg: "bg-[#0f0a00]",
+              icon: <TrendingUp size={20} className="text-[#f59e0b]" />,
+              borderColor: "border-[#e2e8f0]",
+              bg: "bg-white",
             },
           ].map((stat) => (
             <div
               key={stat.label}
-              className={`${stat.bg} border-2 ${stat.borderColor} rounded-xl ${stat.glowColor} p-4 sm:p-5 text-center`}
-              style={{ boxShadow: stat.label === "Best Score" ? "0 0 25px rgba(245,158,11,0.15), 0 0 50px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.15)" : stat.label === "Games Played" ? "0 0 25px rgba(251,191,36,0.15), 0 0 50px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)" : "0 0 25px rgba(16,185,129,0.15), 0 0 50px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.15)" }}
+              className={`${stat.bg} ${stat.borderColor} border rounded-xl p-4 sm:p-5 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]`}
             >
               <div className="flex justify-center mb-2">{stat.icon}</div>
-              <p className="font-display text-xl sm:text-2xl font-bold text-cream">
+              <p className="font-display text-xl sm:text-2xl font-bold text-[#0f172a]">
                 {stat.value}
               </p>
-              <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
+              <p className="text-[11px] text-[#64748b] mt-1 uppercase tracking-wider">
                 {stat.label}
               </p>
             </div>
@@ -500,16 +483,15 @@ export function UserProfile() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <h3 className="font-display text-lg font-bold text-cream mb-3 flex items-center gap-2">
-              <Trophy size={16} className="text-brand-gold" />
+            <h3 className="font-display text-lg font-bold text-[#0f172a] mb-3 flex items-center gap-2">
+              <Trophy size={16} className="text-[#6366f1]" />
               Personal Bests
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(bestByGame).map(([gameId, entry]) => (
                 <div
                   key={gameId}
-                  className="bg-degen-950 border-2 border-hot-pink/20 hover:border-gold/40 rounded-xl p-4 flex items-center gap-3 transition-all"
-                  style={{ boxShadow: "inset 0 1px 0 var(--color-inset-highlight)" }}
+                  className="bg-white border border-[#e2e8f0] hover:border-[#c7d2fe] rounded-xl p-4 flex items-center gap-3 transition-all shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
                 >
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
@@ -527,11 +509,11 @@ export function UserProfile() {
                     >
                       {getGameTitle(gameId)}
                     </p>
-                    <p className="text-[11px] text-cream-dim">
+                    <p className="text-[11px] text-[#64748b]">
                       {entry.ts ? formatDate(entry.ts) : "—"}
                     </p>
                   </div>
-                  <span className="font-mono text-sm font-bold text-brand-gold tabular-nums">
+                  <span className="font-mono text-sm font-bold text-[#6366f1] tabular-nums">
                     {formatNumber(entry.score)}
                   </span>
                 </div>
@@ -546,31 +528,28 @@ export function UserProfile() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
         >
-          <h3 className="font-display text-lg font-bold text-cream mb-3 flex items-center gap-2">
-            <Award size={16} className="text-brand-gold" />
+          <h3 className="font-display text-lg font-bold text-[#0f172a] mb-3 flex items-center gap-2">
+            <Award size={16} className="text-[#6366f1]" />
             Achievements
           </h3>
 
           {/* XP Progress Bar */}
-          <div
-            className="mb-4 bg-degen-950 border-2 border-brand-gold/30 rounded-xl p-4"
-            style={{ boxShadow: "0 0 20px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" }}
-          >
+          <div className="mb-4 bg-white border border-[#e2e8f0] rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-cream">
+              <span className="text-sm font-semibold text-[#0f172a]">
                 Achievement Progress
               </span>
-              <span className="text-sm font-mono text-brand-gold">
+              <span className="text-sm font-mono text-[#6366f1]">
                 {unlockedAchievements.size}/{ACHIEVEMENTS.length}
               </span>
             </div>
-            <div className="h-2.5 rounded-full bg-degen-900 overflow-hidden">
+            <div className="h-2.5 rounded-full bg-[#e2e8f0] overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-brand-gold to-amber-500 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] transition-all duration-500"
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
-            <p className="text-[11px] text-cream-dim mt-2">
+            <p className="text-[11px] text-[#64748b] mt-2">
               {unlockedAchievements.size === ACHIEVEMENTS.length
                 ? "All achievements unlocked! You're a true legend."
                 : `${ACHIEVEMENTS.length - unlockedAchievements.size} more to unlock — keep playing!`}
@@ -584,18 +563,17 @@ export function UserProfile() {
               return (
                 <div key={achievement.id} className="group relative">
                   <div
-                    className={`p-4 flex items-center gap-3 rounded-xl border-2 transition-all ${
+                    className={`p-4 flex items-center gap-3 rounded-xl border transition-all ${
                       isUnlocked
-                        ? "bg-[#0f0a00] border-brand-gold/40"
-                        : "bg-degen-950 border-hot-pink/15 opacity-50"
+                        ? "bg-white border-[#c7d2fe] shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
+                        : "bg-[#f8fafc] border-[#e2e8f0] opacity-50"
                     }`}
-                    style={isUnlocked ? { boxShadow: "0 0 20px rgba(251,191,36,0.12), 0 0 40px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.12)" } : undefined}
                   >
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 ${
                         isUnlocked
-                          ? "bg-[#0f0a00] border border-brand-gold/30"
-                          : "bg-degen-900 border border-hot-pink/15"
+                          ? "bg-[#eef2ff] border border-[#c7d2fe]"
+                          : "bg-[#f1f5f9] border border-[#e2e8f0]"
                       }`}
                     >
                       {isUnlocked ? achievement.icon : "🔒"}
@@ -603,19 +581,19 @@ export function UserProfile() {
                     <div className="flex-1 min-w-0">
                       <p
                         className={`text-sm font-bold truncate ${
-                          isUnlocked ? "text-brand-gold" : "text-cream-dim"
+                          isUnlocked ? "text-[#6366f1]" : "text-[#64748b]"
                         }`}
                       >
                         {achievement.title}
                       </p>
-                      <p className="text-[11px] text-cream-dim">
+                      <p className="text-[11px] text-[#64748b]">
                         {achievement.description}
                       </p>
                     </div>
                   </div>
                   {/* Tooltip for locked achievements */}
                   {!isUnlocked && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-degen-950 border border-hot-pink/20 text-xs text-cream-dim whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-[#0f172a] text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
                       Play {getGameTitle(achievement.game)} to unlock
                     </div>
                   )}
@@ -631,14 +609,11 @@ export function UserProfile() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h3 className="font-display text-lg font-bold text-cream mb-3 flex items-center gap-2">
-            <Calendar size={16} className="text-neon-green" />
+          <h3 className="font-display text-lg font-bold text-[#0f172a] mb-3 flex items-center gap-2">
+            <Calendar size={16} className="text-[#10b981]" />
             Score History
           </h3>
-          <div
-            className="bg-degen-950 border-2 border-hot-pink/20 rounded-2xl overflow-hidden"
-            style={{ boxShadow: "inset 0 1px 0 var(--color-inset-highlight)" }}
-          >
+          <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             {/* Loading */}
             {state.loading && <div className="p-4 sm:p-5"><SkeletonRows /></div>}
 
@@ -651,11 +626,11 @@ export function UserProfile() {
                   exit={{ opacity: 0 }}
                   className="flex flex-col items-center justify-center py-16 px-6 text-center"
                 >
-                  <WifiOff size={28} className="text-orange mb-3 opacity-60" />
-                  <p className="font-display text-base font-bold text-cream mb-2">
+                  <WifiOff size={28} className="text-[#f59e0b] mb-3 opacity-60" />
+                  <p className="font-display text-base font-bold text-[#0f172a] mb-2">
                     Server Unreachable
                   </p>
-                  <p className="text-sm text-cream-dim mb-5 max-w-sm">
+                  <p className="text-sm text-[#64748b] mb-5 max-w-sm">
                     {state.error}
                   </p>
                   <button
@@ -671,27 +646,22 @@ export function UserProfile() {
             {/* Empty */}
             {!state.loading && !state.error && state.scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center relative">
-                {/* Floating nuts */}
-                <span className="absolute top-10 left-1/4 text-xl float-nut-1 opacity-40 pointer-events-none">🥜</span>
-                <span className="absolute top-8 right-1/4 text-lg float-nut-2 opacity-30 pointer-events-none">🥜</span>
-                <span className="absolute bottom-16 left-1/3 text-base float-nut-3 opacity-25 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
-
                 <Gamepad2
                   size={32}
-                  className="text-neon-green mb-4 opacity-40"
+                  className="text-[#6366f1] mb-4 opacity-40"
                 />
-                <p className="font-display text-lg font-bold text-cream mb-2">
+                <p className="font-display text-lg font-bold text-[#0f172a] mb-2">
                   No scores yet
                 </p>
-                <p className="text-sm text-cream-dim max-w-sm">
+                <p className="text-sm text-[#64748b] max-w-sm">
                   Play a game to set your first record! Head to the{" "}
                   <a
                     href="#games"
-                    className="text-neon-green hover:underline font-semibold"
+                    className="text-[#6366f1] hover:underline font-semibold"
                   >
                     Arcade
                   </a>{" "}
-                  and start earning $NUT.
+                  and start playing.
                 </p>
               </div>
             )}
@@ -701,7 +671,7 @@ export function UserProfile() {
               <div className="p-4 sm:p-5">
                 <div className="relative pl-8">
                   {/* Vertical connecting line */}
-                  <div className="absolute left-3 top-0 bottom-0 w-px bg-degen-800" />
+                  <div className="absolute left-3 top-0 bottom-0 w-px bg-[#e2e8f0]" />
 
                   {state.scores.map((entry, index) => {
                     const isRecent = index === 0;
@@ -720,21 +690,17 @@ export function UserProfile() {
                             borderColor: getGameColor(entry.game),
                             background: isRecent
                               ? getGameColor(entry.game)
-                              : "#0a0a0a",
-                            boxShadow: isRecent
-                              ? `0 0 8px ${getGameColor(entry.game)}40`
-                              : "none",
+                              : "#fff",
                           }}
                         />
 
                         {/* Entry card */}
                         <div
-                          className={`bg-degen-950 border-2 rounded-xl p-3 sm:p-4 transition-all ${
+                          className={`bg-white border rounded-xl p-3 sm:p-4 transition-all ${
                             isRecent
-                              ? "border-brand-gold/30"
-                              : "border-hot-pink/10 hover:border-hot-pink/20"
+                              ? "border-[#c7d2fe] shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
+                              : "border-[#e2e8f0] hover:border-[#c7d2fe]"
                           }`}
-                          style={isRecent ? { boxShadow: "0 0 15px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.08)" } : undefined}
                         >
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-base">
@@ -746,11 +712,11 @@ export function UserProfile() {
                             >
                               {getGameTitle(entry.game)}
                             </span>
-                            <span className="ml-auto font-mono text-sm font-bold text-brand-gold tabular-nums">
+                            <span className="ml-auto font-mono text-sm font-bold text-[#6366f1] tabular-nums">
                               {formatNumber(entry.score)}
                             </span>
                           </div>
-                          <p className="text-[11px] text-cream-dim font-mono">
+                          <p className="text-[11px] text-[#64748b] font-mono">
                             {entry.ts ? formatDate(entry.ts) : "—"}
                           </p>
                         </div>

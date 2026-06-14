@@ -5,11 +5,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-/**
- * Thin Client Component wrapper for the prizes page.
- * Background, navbar, and footer are provided by layout.tsx
- * via SubPageLayout — this component only renders content.
- */
 const PrizesPageContent = dynamic(
   () =>
     import("@/components/sections/PrizesPageContent").then(
@@ -19,7 +14,7 @@ const PrizesPageContent = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-32">
-        <p className="text-neon-green animate-pulse font-display text-lg">
+        <p className="text-[#6366f1] animate-pulse font-display text-lg">
           Loading prizes…
         </p>
       </div>
@@ -29,46 +24,24 @@ const PrizesPageContent = dynamic(
 
 export function PrizesClient() {
   return (
-    <div className="relative z-10">
-      {/* ── Back to Home ── */}
-      <div className="container-main pt-6">
-        <motion.div
-          initial={{ opacity: 0, x: -12 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
+    <>
+      {/* Page Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
+        <Link
+          href="/"
+          className="fn-hero-banner__cta"
+          style={{ padding: "10px 20px", fontSize: "14px" }}
         >
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl
-                       bg-gradient-to-r from-brand-gold to-yellow-500
-                       text-forest-dark font-bold text-sm
-                       hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
-                       active:scale-95 transition-all min-h-[44px]"
-          >
-            <ArrowLeft
-              size={16}
-              className="transition-transform group-hover:-translate-x-1"
-            />
-            Back to Home
-          </Link>
-        </motion.div>
+          <ArrowLeft size={16} />
+          Back to Home
+        </Link>
+        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", margin: 0 }}>
+          Prizes & Payouts
+        </h1>
       </div>
 
-      {/* ── Prizes Content ── */}
-      <div className="container-main py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="rounded-2xl border-2 border-hot-pink neon-ring-pink
-                     bg-degen-950
-                     shadow-[0_0_24px_rgba(255,46,136,0.25),0_8px_40px_rgba(0,0,0,0.5)]
-                     overflow-hidden"
-          /* DEGEN FINAL POLISH END */
-        >
-          <PrizesPageContent />
-        </motion.div>
-      </div>
-    </div>
+      {/* Prizes Content */}
+      <PrizesPageContent />
+    </>
   );
 }
