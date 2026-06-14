@@ -17,7 +17,7 @@
 import { ReactNode, Suspense } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Navbar } from "./Navbar";
+import { SiteHeader } from "./SiteHeader";
 
 const Footer = dynamic(
   () => import("./Footer").then((m) => ({ default: m.Footer })),
@@ -121,7 +121,7 @@ export function SubPageLayout({
       {showFallingNuts && <ClientFallingNuts />}
 
       {/* ── Navbar ── */}
-      {showNavbar && <Navbar />}
+      {showNavbar && <SiteHeader variant="dark" />}
 
       {/* ── Content ── */}
       <div className={`relative ${showVideoBg ? "z-10" : ""}`}>
