@@ -27,6 +27,7 @@ import type { GameMetadata } from "@/lib/gameRegistry";
 import { useChatSocket } from "@/components/chat/useChatSocket";
 import { trackGameStart, trackScoreSubmitted, trackDiscordClick } from "@/lib/analytics";
 import { useWalletStore } from "@/store/wallet";
+import { isAllowedMessageOrigin } from "@/features/arcade/constants";
 import { GameErrorBoundary } from "@/components/GameErrorBoundary";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -113,6 +114,8 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (!event.data || typeof event.data !== "object") return;
+      // ── Strict origin validation — reject untrusted origins ──
+      if (!isAllowedMessageOrigin(event.origin)) return;
       if (event.data.type === "FUZZY_SCORE_SUBMITTED" && event.data.success) {
         const score = event.data.score as number | undefined;
         if (score && score > 0) {
