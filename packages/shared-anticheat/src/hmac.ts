@@ -62,7 +62,7 @@ export async function verifyPayload(
   if (!/^[a-f0-9]{64}$/.test(hexSignature)) return false;
   const key = await importKey(secret);
   const sigBytes = fromHex(hexSignature);
-  return crypto.subtle.verify("HMAC", key, sigBytes as BufferSource, encoder.encode(message));
+  return crypto.subtle.verify("HMAC", key, sigBytes.buffer as ArrayBuffer, encoder.encode(message));
 }
 
 /**
