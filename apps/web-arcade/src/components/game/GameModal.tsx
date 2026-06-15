@@ -205,9 +205,10 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
     const sendConfig = () => {
       try {
+        const gameOrigin = new URL(iframeRef.current?.src || window.location.origin).origin;
         iframeRef.current?.contentWindow?.postMessage(
           { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.origin },
-          "*"
+          gameOrigin
         );
       } catch {
         /* cross-origin, noop */
@@ -218,37 +219,6 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     const timer = setTimeout(sendConfig, 1000);
     return () => clearTimeout(timer);
   }, [isLoading, iframeKey]);
-
-  // ── ESC key + keyboard shortcuts ──
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // <dialog> handles ESC natively via onCancel — we handle others
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-
-      switch (e.key) {
-        case "f":
-        case "F":
-          if (!e.ctrlKey && !e.metaKey) {
-            e.preventDefault();
-            toggleFullscreen();
-          }
-          break;
-        case "m":
-        case "M":
-          if (!e.ctrlKey && !e.metaKey) {
-            e.preventDefault();
-            toggleMute();
-          }
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
 
   // ── Handlers ──
   const handleIframeLoad = useCallback(() => {
@@ -327,9 +297,40 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     }
     iframeRef.current?.contentWindow?.postMessage(
       { type: "setMute", muted: next },
-      "*"
+      new URL(iframeRef.current?.src || window.location.origin).origin
     );
   }, [isMuted]);
+
+  // ── ESC key + keyboard shortcuts ──
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // <dialog> handles ESC natively via onCancel — we handle others
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      switch (e.key) {
+        case "f":
+        case "F":
+          if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            toggleFullscreen();
+          }
+          break;
+        case "m":
+        case "M":
+          if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            toggleMute();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, toggleFullscreen, toggleMute]);
 
   const handleGameSwitch = useCallback(
     (newGamesId: string) => {
