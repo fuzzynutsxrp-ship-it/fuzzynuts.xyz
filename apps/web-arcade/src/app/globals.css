@@ -1677,16 +1677,6 @@ body {
   }
 }
 
-/* Game modal viewport — force GPU compositing layer for iOS iframe touch events.
-   WebKit bug: iframes inside top-layer <dialog> don't receive touch events
-   unless the parent creates a new compositing layer via transform. */
-.game-modal__viewport {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-
 /* Reset native <dialog> — we style everything ourselves */
 .game-modal {
   border: none;
@@ -1713,6 +1703,7 @@ body {
 .game-modal::backdrop {
   background: rgba(2, 4, 10, 0.95);
   animation: modal-backdrop-in 0.25s ease-out;
+  pointer-events: none;
 }
 
 @keyframes modal-backdrop-in {
