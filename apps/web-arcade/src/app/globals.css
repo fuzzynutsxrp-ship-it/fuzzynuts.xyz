@@ -1675,10 +1675,17 @@ body {
     min-height: 44px;
     min-width: 44px;
   }
-  /* Game modal viewport — prevent pinch-zoom interference */
-  .game-modal__viewport {
-    touch-action: manipulation;
-  }
+}
+
+/* Game modal viewport — force GPU compositing layer for iOS iframe touch events.
+   WebKit bug: iframes inside top-layer <dialog> don't receive touch events
+   unless the parent creates a new compositing layer via transform. */
+.game-modal__viewport {
+  position: relative;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Reset native <dialog> — we style everything ourselves */
@@ -1863,6 +1870,7 @@ body {
   min-height: 400px;
   background: black;
   touch-action: manipulation;
+  pointer-events: auto;
   animation: modal-iframe-in 0.35s ease-out;
 }
 
