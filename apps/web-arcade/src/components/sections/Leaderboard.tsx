@@ -767,6 +767,75 @@ export function Leaderboard() {
               </div>
             )}
 
+            {/* ── Your Position — Neighborhood Display (5 above / 5 below) ── */}
+            {!loading && scores.length > 0 && userRank > 0 && (
+              <div className="mt-4 border-t border-hot-pink/15 pt-4">
+                <div className="flex items-center gap-2 px-4 mb-3">
+                  <Radio size={12} className="text-neon-green" />
+                  <span className="text-xs font-bold font-display text-neon-green uppercase tracking-wider">
+                    Your Position
+                  </span>
+                  <span className="text-[10px] text-cream-dim font-mono">
+                    #{userRank} of {scores.length}
+                  </span>
+                </div>
+                <div>
+                  {scores
+                    .slice(
+                      Math.max(0, userRank - 6),
+                      Math.min(scores.length, userRank + 5)
+                    )
+                    .map((entry, sliceIndex) => {
+                      const rank = Math.max(0, userRank - 6) + sliceIndex + 1;
+                      const isCurrentUser =
+                        walletAddress &&
+                        entry.wallet?.toLowerCase() === walletAddress.toLowerCase();
+                      const displayName =
+                        entry.name ||
+                        (entry.wallet
+                          ? truncateAddress(entry.wallet)
+                          : "Anonymous");
+
+                      return (
+                        <motion.div
+                          key={`nbhd-${entry.wallet || sliceIndex}-${entry.score}`}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: sliceIndex * 0.03, duration: 0.2 }}
+                          className={`
+                            flex items-center gap-3 px-4 py-2.5
+                            border-b border-hot-pink/5 last:border-0
+                            ${isCurrentUser
+                              ? "bg-brand-gold/5 border-l-2 border-l-brand-gold"
+                              : "hover:bg-degen-900"
+                            }
+                          `}
+                        >
+                          <div className="w-8 flex justify-center shrink-0">
+                            <RankBadge rank={rank} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-sm truncate block ${isCurrentUser ? "text-brand-gold font-bold" : "text-cream-dim"}`}>
+                              {displayName}
+                              {isCurrentUser && (
+                                <span className="ml-1.5 text-[10px] font-mono text-brand-gold bg-degen-950 border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
+                                  you
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="w-20 text-right shrink-0">
+                            <span className={`font-mono text-sm font-bold tabular-nums ${isCurrentUser ? "text-brand-gold" : "text-cream"}`}>
+                              {formatNumber(entry.score)}
+                            </span>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
             {/* ── Soft Warning Banner (partial error — showing cached data) ── */}
             {error && scores.length > 0 && (
               <div className="px-4 py-2 bg-degen-950 border-t border-orange/30 text-xs text-orange flex items-center gap-2">
