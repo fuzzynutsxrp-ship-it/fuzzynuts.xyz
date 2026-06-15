@@ -1852,6 +1852,7 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--color-degen-950, #0a0613);
+  pointer-events: none;
 }
 
 /* iframe — fills viewport */

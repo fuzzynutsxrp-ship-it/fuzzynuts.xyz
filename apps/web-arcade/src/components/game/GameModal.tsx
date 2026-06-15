@@ -176,7 +176,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     const prevPos = document.body.style.position;
     const prevWidth = document.body.style.width;
     document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
+    document.body.style.touchAction = "manipulation";
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
     return () => {
@@ -458,9 +458,6 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
           ref={containerRef}
           className="game-modal__viewport"
           style={{
-            touchAction: "none",
-            userSelect: "none",
-            WebkitUserSelect: "none",
             position: "relative",
           }}
         >
