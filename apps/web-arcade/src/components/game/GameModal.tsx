@@ -111,26 +111,35 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   // ── Victory detection — listen for score submissions from iframe ──
   const [lastScore, setLastScore] = useState<{ score: number; game: string } | null>(null);
   const [showVictory, setShowVictory] = useState(false);
+  const [showConnectPrompt, setShowConnectPrompt] = useState(false);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (!event.data || typeof event.data !== "object") return;
       // ── Strict origin validation — reject untrusted origins ──
       if (!isAllowedMessageOrigin(event.origin)) return;
-      if (event.data.type === "FUZZY_SCORE_SUBMITTED" && event.data.success) {
-        const score = event.data.score as number | undefined;
-        if (score && score > 0) {
-          setLastScore({ score, game: game?.title ?? "this game" });
-          setShowVictory(true);
-          if (game?.slug) trackScoreSubmitted(game.slug, score);
-          // Auto-hide after 30 seconds
-          setTimeout(() => setShowVictory(false), 30_000);
+      if (event.data.type === "FUZZY_SCORE_SUBMITTED") {
+        if (event.data.success) {
+          const score = event.data.score as number | undefined;
+          if (score && score > 0) {
+            setLastScore({ score, game: game?.title ?? "this game" });
+            setShowVictory(true);
+            setShowConnectPrompt(false);
+            if (game?.slug) trackScoreSubmitted(game.slug, score);
+            // Auto-hide after 30 seconds
+            setTimeout(() => setShowVictory(false), 30_000);
+          }
+        } else if (!address) {
+          // Game ended but score wasn't saved — no wallet connected
+          setShowConnectPrompt(true);
+          setShowVictory(false);
+          setTimeout(() => setShowConnectPrompt(false), 30_000);
         }
       }
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [game?.title]);
+  }, [game?.title, address]);
 
   // ── Play Next recommendations (all live games except current) ──
   const recommendations = useMemo(() => {
@@ -585,6 +594,25 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
               <p className="text-[10px] text-[var(--color-cream-dim)] mt-1">
                 Check the leaderboard to see your rank
               </p>
+            </div>
+          )}
+
+          {/* Connect Wallet prompt — shows when game ends without wallet */}
+          {showConnectPrompt && !address && (
+            <div className="mx-3 mt-2 mb-1 px-3 py-3 rounded-lg bg-gradient-to-r from-[#7c3aed]/15 to-[#22d3ee]/15 border border-[#7c3aed]/30">
+              <p className="text-xs font-bold text-[#7c3aed] mb-1">
+                🎮 Nice run!
+              </p>
+              <p className="text-[11px] text-[var(--color-cream-dim)] mb-2">
+                Connect a wallet to save your score to the leaderboard and compete for $NUT prizes.
+              </p>
+              <button
+                onClick={() => { window.dispatchEvent(new CustomEvent("fuzzynuts:open-login")); }}
+                className="w-full py-1.5 rounded-lg bg-[#7c3aed] text-white text-xs font-bold hover:bg-[#6d28d9] transition-colors"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                Connect Wallet
+              </button>
             </div>
           )}
 
