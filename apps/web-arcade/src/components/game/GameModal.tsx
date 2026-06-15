@@ -207,7 +207,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
       try {
         const gameOrigin = new URL(iframeRef.current?.src || window.location.origin).origin;
         iframeRef.current?.contentWindow?.postMessage(
-          { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.origin },
+          { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.location.origin },
           gameOrigin
         );
       } catch {
@@ -238,6 +238,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
     // Listen for game engine ready signal
     const handleMessage = (event: MessageEvent) => {
+      if (!isAllowedMessageOrigin(event.origin)) return;
       if (event.data?.type === "FUZZY_GAME_READY") {
         clearInterval(interval);
         setLoadProgress(100);
