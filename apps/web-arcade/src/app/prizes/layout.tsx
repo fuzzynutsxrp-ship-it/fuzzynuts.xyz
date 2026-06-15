@@ -3,12 +3,7 @@
  */
 
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import dynamic from "next/dynamic";
-
-const Footer = dynamic(
-  () => import("@/components/layout/Footer").then((m) => ({ default: m.Footer })),
-  { ssr: false },
-);
+import { Footer } from "@/components/layout/Footer";
 
 export default function PrizesLayout({
   children,
