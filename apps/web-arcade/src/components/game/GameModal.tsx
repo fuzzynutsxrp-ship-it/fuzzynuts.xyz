@@ -168,26 +168,29 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     }
   }, [gameId]);
 
-  // ── Lock body scroll while open (preserves scroll position) ──
+  // ── Lock body scroll while open (Qwen fix: avoid position:fixed on body) ──
+  // position:fixed on body blocks iframe touch events on iOS Safari.
+  // Use overflow:hidden on html+body + overscroll-behavior:none instead.
   useEffect(() => {
     if (!isOpen) return;
+    const html = document.documentElement;
     const scrollY = window.scrollY;
-    const prev = document.body.style.overflow;
-    const prevTouch = document.body.style.touchAction;
-    const prevPos = document.body.style.position;
-    const prevWidth = document.body.style.width;
-    const prevTop = document.body.style.top;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyTouch = document.body.style.touchAction;
+    const prevBodyOverscroll = document.body.style.overscrollBehavior;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevHtmlOverscroll = html.style.overscrollBehavior;
     document.body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "none";
+    html.style.overscrollBehavior = "none";
     document.body.style.touchAction = "manipulation";
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
-    document.body.style.top = `-${scrollY}px`;
     return () => {
-      document.body.style.overflow = prev;
-      document.body.style.touchAction = prevTouch;
-      document.body.style.position = prevPos;
-      document.body.style.width = prevWidth;
-      document.body.style.top = prevTop;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.touchAction = prevBodyTouch;
+      document.body.style.overscrollBehavior = prevBodyOverscroll;
+      html.style.overflow = prevHtmlOverflow;
+      html.style.overscrollBehavior = prevHtmlOverscroll;
       window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
