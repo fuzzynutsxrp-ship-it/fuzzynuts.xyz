@@ -16,7 +16,7 @@
  */
 
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('@node-rs/bcrypt');
 const Database = require('better-sqlite3');
 const path = require('path');
 
