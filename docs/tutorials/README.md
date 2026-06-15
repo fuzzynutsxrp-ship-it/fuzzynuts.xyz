@@ -8,3 +8,4 @@ estimate, and ends with a checkable result.
 3. Add a new game *(stub)*
 4. Build the Tauri desktop app *(stub — depends on Phase F readiness)*
 5. Build the Capacitor mobile app *(stub — depends on Phase G readiness)*
+6. [iOS Safari touch & audio QA](./06-test-ios-touch.md)
