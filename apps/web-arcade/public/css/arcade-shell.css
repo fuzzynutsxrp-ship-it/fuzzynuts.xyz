@@ -421,6 +421,15 @@ body.in-iframe .arcade-game {
   -webkit-overflow-scrolling: touch;
 }
 
+/* ── Canvas touch fix (CRITICAL for iOS Safari) ── */
+/* iOS Safari's default touch-action on canvas swallows swipe/drag
+   gestures before game JS listeners fire. Setting none lets the
+   game handle raw pointer events directly. */
+.arcade-game canvas {
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+
 /* In iframe mode, overlays don't need nav-bar padding */
 body.in-iframe .overlay {
   padding-top: 0;

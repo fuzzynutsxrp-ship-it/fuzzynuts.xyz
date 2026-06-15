@@ -151,9 +151,41 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
     if (isOpen && game && !dialog.open) {
       dialog.showModal();
+
+      // iOS Safari fix: force layout repaint after showModal() to rebuild
+      // WebKit's hit-test tree for the top-layer. Without this, touch events
+      // fail to reach iframes inside the dialog (WebKit Bug #264832).
+      void dialog.offsetHeight;
+
       setIsLoading(true);
       setLoadProgress(0);
       setIframeKey(0);
+
+      // iOS Safari fix: strip transform after open animation completes.
+      // A lingering transform (even scale(1)) promotes the dialog to a
+      // compositor layer, which breaks iframe hit-testing on iOS Safari.
+      // Use animationend + fallback timeout for reliability.
+      const stripTransform = () => {
+        dialog.style.transform = "none";
+        dialog.style.willChange = "auto";
+      };
+      const onAnimEnd = (e: AnimationEvent) => {
+        if (e.target === dialog) {
+          stripTransform();
+          dialog.removeEventListener("animationend", onAnimEnd);
+        }
+      };
+      dialog.addEventListener("animationend", onAnimEnd);
+      // Fallback: iOS sometimes drops animationend on rapid show/hide
+      const fallbackTimer = setTimeout(stripTransform, 400);
+
+      // Restore transform for next open (so the CSS animation works again)
+      return () => {
+        clearTimeout(fallbackTimer);
+        dialog.removeEventListener("animationend", onAnimEnd);
+        dialog.style.transform = "";
+        dialog.style.willChange = "";
+      };
     } else if (!isOpen && dialog.open) {
       dialog.close();
     }
@@ -187,12 +219,21 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     document.body.style.overscrollBehavior = "none";
     html.style.overscrollBehavior = "none";
     document.body.style.touchAction = "manipulation";
+
+    // iOS Safari fix (WebKit Bug #33894): register a dummy touchstart listener
+    // on the main frame so Safari doesn't bail out early and fail to propagate
+    // touch events to the iframe. Without this, iOS sometimes discards touch
+    // events at the platform layer before hit-detection reaches the iframe.
+    const noop = () => {};
+    window.addEventListener("touchstart", noop, { passive: true });
+
     return () => {
       document.body.style.overflow = prevBodyOverflow;
       document.body.style.touchAction = prevBodyTouch;
       document.body.style.overscrollBehavior = prevBodyOverscroll;
       html.style.overflow = prevHtmlOverflow;
       html.style.overscrollBehavior = prevHtmlOverscroll;
+      window.removeEventListener("touchstart", noop);
       window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
@@ -230,6 +271,16 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     // Don't hide loading immediately — wait for FUZZY_GAME_READY postMessage
     // or fallback to a timeout after iframe loads
     if (game?.slug) trackGameStart(game.slug);
+
+    // iOS Safari fix: force focus on the iframe after load.
+    // iOS intermittently refuses to assign focus to cross-origin iframes
+    // inside modals, causing the first tap to be silently swallowed as the
+    // OS attempts to grant focus to the iframe window.
+    try {
+      iframeRef.current?.focus();
+    } catch {
+      /* cross-origin, noop */
+    }
   }, [game?.slug]);
 
   // ── Loading progress: fake bar + FUZZY_GAME_READY postMessage bridge ──

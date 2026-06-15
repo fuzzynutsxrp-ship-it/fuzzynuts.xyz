@@ -1691,6 +1691,10 @@ body {
   overflow: hidden;
   position: fixed;
   inset: 0;
+  /* iOS Safari fix: explicit touch-action on every hit-test boundary
+     prevents touch events from being swallowed before reaching iframe.
+     WebKit Bug #264832 — top-layer elements need explicit touch-action. */
+  touch-action: manipulation;
 }
 
 /* Remove default focus outline on dialog */
@@ -1837,6 +1841,12 @@ body {
   background: #000;
   overflow: hidden;
   min-height: 0;
+  /* iOS Safari fix: viewport div is a hit-test boundary between dialog
+     and iframe. Without explicit touch-action, iOS defaults to 'auto'
+     which creates a gesture barrier that blocks iframe touch events. */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Loading overlay — centered spinner */
