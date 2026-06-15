@@ -171,10 +171,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   // ── Lock body scroll while open (Qwen fix: avoid position:fixed on body) ──
   // position:fixed on body blocks iframe touch events on iOS Safari.
   // Use overflow:hidden on html+body + overscroll-behavior:none instead.
+  // Note: overscroll-behavior requires iOS Safari 16+. Older iOS will still
+  // scroll-lock via overflow:hidden but may show rubber-band bounce at edges.
   useEffect(() => {
     if (!isOpen) return;
     const html = document.documentElement;
-    const scrollY = window.scrollY;
+    const scrollY = window.scrollY; // defensive safety net — overflow:hidden preserves position natively, but scrollTo ensures restoration on edge cases
     const prevBodyOverflow = document.body.style.overflow;
     const prevBodyTouch = document.body.style.touchAction;
     const prevBodyOverscroll = document.body.style.overscrollBehavior;
