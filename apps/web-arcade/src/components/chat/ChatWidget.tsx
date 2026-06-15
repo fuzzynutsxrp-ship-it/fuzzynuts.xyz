@@ -351,15 +351,17 @@ export function ChatWidget() {
   if (!isConnected) {
     if (!open) {
       return (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#1c0f33] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#7c3aed]/20 transition-all hover:bg-[#2d1b4e] hover:shadow-[#7c3aed]/30 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50"
-          style={{ fontFamily: "var(--font-display)" }}
-          aria-label="Open community chat"
-        >
-          <MessageSquare size={18} />
-          <span>Chat</span>
-        </button>
+        <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+          <button
+            onClick={() => setOpen(true)}
+            className="pointer-events-auto flex items-center gap-2 rounded-full bg-[#1c0f33] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#7c3aed]/20 transition-all hover:bg-[#2d1b4e] hover:shadow-[#7c3aed]/30 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50"
+            style={{ fontFamily: "var(--font-display)" }}
+            aria-label="Open community chat"
+          >
+            <MessageSquare size={18} />
+            <span>Chat</span>
+          </button>
+        </div>
       );
     }
     return (
@@ -400,9 +402,10 @@ export function ChatWidget() {
   // ── Toggle button ───────────────────────────────────────────
   if (!open) {
     return (
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#1c0f33] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#7c3aed]/20 transition-all hover:bg-[#2d1b4e] hover:shadow-[#7c3aed]/30 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50"
+        className="pointer-events-auto flex items-center gap-2 rounded-full bg-[#1c0f33] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#7c3aed]/20 transition-all hover:bg-[#2d1b4e] hover:shadow-[#7c3aed]/30 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50"
         style={{ fontFamily: "var(--font-display)" }}
         aria-label="Open community chat"
       >
@@ -419,6 +422,7 @@ export function ChatWidget() {
           </span>
         )}
       </button>
+      </div>
     );
   }
 

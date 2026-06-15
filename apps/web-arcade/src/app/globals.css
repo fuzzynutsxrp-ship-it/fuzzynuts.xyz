@@ -2682,3 +2682,42 @@ body {
   color: #FBBF24;
 }
 /* DEGEN OVERHAUL END */
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE TOUCH OPTIMIZATIONS (feat/mobile-optimization)
+   Qwen audit: touch targets, viewport, hover traps, safe areas
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1. Physical touch feedback on game cards (replaces hover) */
+.fn-game-card:active,
+.arcade-card:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease-out;
+}
+
+/* 2. Force hover-only overlays visible on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .arcade-card .hover-overlay,
+  .fn-game-card .play-button,
+  .arcade-card .game-title-overlay {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}
+
+/* 3. Game modal iframe — pass touches directly to canvas */
+.game-modal__iframe {
+  touch-action: none;
+}
+
+/* 4. Safe-area insets for notches */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* 5. Game modal respects safe areas */
+.game-modal[open] {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
