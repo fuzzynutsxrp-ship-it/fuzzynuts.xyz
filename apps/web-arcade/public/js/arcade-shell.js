@@ -317,6 +317,21 @@
         dismissOverlay();
       }, { once: true });
     }
+
+    // MutationObserver fallback — catch games that inject #start-screen
+    // dynamically after DOMContentLoaded (e.g., Phaser, Construct games)
+    if (!overlay) {
+      var observer = new MutationObserver(function (mutations) {
+        var el = document.getElementById('start-screen');
+        if (el) {
+          observer.disconnect();
+          setupStartScreen();
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      // Safety: disconnect after 10s to avoid watching forever
+      setTimeout(function () { observer.disconnect(); }, 10000);
+    }
   }
 
   // ═══════════════════════════════════════════════════════════
