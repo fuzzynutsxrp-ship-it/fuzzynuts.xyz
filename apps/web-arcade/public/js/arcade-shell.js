@@ -259,6 +259,46 @@
   }
 
   // ═══════════════════════════════════════════════════════════
+  // UNIVERSAL START SCREEN HANDLER
+  // ═══════════════════════════════════════════════════════════
+
+  function setupStartScreen() {
+    var startBtn = document.getElementById('start-btn');
+    var startScreen = document.getElementById('start-screen');
+    var restartBtn = document.getElementById('restart-btn');
+    var canvas = document.getElementById('game-canvas') || document.querySelector('canvas');
+
+    function dismissStartScreen() {
+      if (startScreen) {
+        startScreen.classList.add('hidden');
+        startScreen.style.display = 'none';
+      }
+    }
+
+    if (startBtn) {
+      startBtn.addEventListener('click', function () {
+        dismissStartScreen();
+        resetScoreTracking();
+      });
+    }
+
+    if (restartBtn) {
+      restartBtn.addEventListener('click', function () {
+        dismissStartScreen();
+      });
+    }
+
+    // For games that start on canvas click (pong, boxing, etc.) —
+    // dismiss overlay on first canvas interaction so it doesn't block play.
+    if (canvas && startScreen && !startScreen.classList.contains('hidden')) {
+      canvas.addEventListener('pointerdown', function onFirstTouch() {
+        dismissStartScreen();
+        canvas.removeEventListener('pointerdown', onFirstTouch);
+      }, { once: true });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // ACCENT COLOR OVERRIDE
   // ═══════════════════════════════════════════════════════════
 
@@ -329,6 +369,13 @@
 
     // Track game start time
     gameStartTime = Date.now();
+
+    // ── Universal start-btn handler ──
+    // Most games have #start-screen + #start-btn in HTML but many never wire
+    // a click handler in their own JS.  This catches all of them.
+    // Safe for games that DO wire their own handler — hiding an already-hidden
+    // overlay is a no-op, and both listeners fire without conflict.
+    setupStartScreen();
 
     // Fire ready callbacks
     for (var i = 0; i < readyCallbacks.length; i++) {
