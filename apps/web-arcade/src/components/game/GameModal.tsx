@@ -90,6 +90,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
   // ── State ──
   const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [iframeKey, setIframeKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMuted, setIsMuted] = useState(() => {
@@ -151,6 +152,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     if (isOpen && game && !dialog.open) {
       dialog.showModal();
       setIsLoading(true);
+      setLoadProgress(0);
       setIframeKey(0);
     } else if (!isOpen && dialog.open) {
       dialog.close();
@@ -161,6 +163,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   useEffect(() => {
     if (gameId) {
       setIsLoading(true);
+      setLoadProgress(0);
       setIframeKey((k) => k + 1);
     }
   }, [gameId]);
@@ -235,9 +238,43 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
   // ── Handlers ──
   const handleIframeLoad = useCallback(() => {
-    setIsLoading(false);
+    // Don't hide loading immediately — wait for FUZZY_GAME_READY postMessage
+    // or fallback to a timeout after iframe loads
     if (game?.slug) trackGameStart(game.slug);
   }, [game?.slug]);
+
+  // ── Loading progress: fake bar + FUZZY_GAME_READY postMessage bridge ──
+  useEffect(() => {
+    if (!isLoading) return;
+
+    // Fake progress: ramp 0→85% over ~2s for perceived performance
+    const interval = setInterval(() => {
+      setLoadProgress((prev) => (prev < 85 ? prev + Math.random() * 12 : 85));
+    }, 200);
+
+    // Listen for game engine ready signal
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "FUZZY_GAME_READY") {
+        clearInterval(interval);
+        setLoadProgress(100);
+        setTimeout(() => setIsLoading(false), 300);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+
+    // Fallback: if no FUZZY_GAME_READY after 5s, show the game anyway
+    const fallback = setTimeout(() => {
+      clearInterval(interval);
+      setLoadProgress(100);
+      setIsLoading(false);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(fallback);
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [isLoading]);
 
   const handleClose = useCallback(() => {
     // Exit fullscreen if active
@@ -249,6 +286,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
   const handleRetry = useCallback(() => {
     setIsLoading(true);
+    setLoadProgress(0);
     setIframeKey((k) => k + 1);
   }, []);
 
@@ -299,7 +337,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   if (!game) return null;
 
   const defaultSandbox =
-    "allow-scripts allow-same-origin allow-popups allow-forms";
+    "allow-scripts allow-same-origin allow-popups-to-escape-sandbox";
 
   return createPortal(
     <dialog
@@ -453,6 +491,15 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                 <div className="flex items-center gap-2 text-sm text-[var(--color-cream-dim)]">
                   <Loader2 size={16} className="animate-spin" />
                   <span>Booting cabinet…</span>
+                </div>
+                {/* Progress bar */}
+                <div className="w-48 h-1.5 rounded-full bg-white/10 mt-4 overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-[#ff2e88] to-[#fbbf24]"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${loadProgress}%` }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  />
                 </div>
               </motion.div>
             )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   Trophy,
   Gamepad2,
@@ -457,13 +458,13 @@ export function PrizesPageContent() {
                   <Trophy size={15} />
                   View Leaderboard
                 </a>
-                <a
+                <Link
                   href="/profile/"
                   className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-[#16a34a] hover:bg-[#16a34a]/5 transition-colors min-h-[44px]"
                 >
                   <Gift size={15} />
                   Claim Rewards
-                </a>
+                </Link>
               </div>
             </>
           ) : (

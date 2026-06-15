@@ -4,7 +4,7 @@
  */
 
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { Footer } from "@/components/layout/Footer";
+import DynamicFooter from "@/components/DynamicFooter";
 
 export default function ProfileLayout({
   children,
@@ -16,7 +16,7 @@ export default function ProfileLayout({
       <SiteHeader variant="light" />
       <main className="fn-dashboard">
         {children}
-        <Footer />
+        <DynamicFooter />
       </main>
     </div>
   );
