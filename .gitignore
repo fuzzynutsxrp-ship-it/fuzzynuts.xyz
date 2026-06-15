@@ -92,6 +92,9 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
+# ── node_modules backup ───────────────────────────────────────
+node_modules.bak/
+
 # ── Misc ─────────────────────────────────────────────────────
 *.pem
 *.log

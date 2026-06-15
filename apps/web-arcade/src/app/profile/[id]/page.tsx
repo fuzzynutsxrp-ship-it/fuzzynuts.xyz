@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ProfileIdClient } from "./client";
-import { isWalletAddress } from "@/lib/validators";
+import { isWalletAddress, isGuestId } from "@/lib/validators";
 
 type PageParams = { id: string };
 
@@ -18,6 +18,19 @@ export async function generateMetadata({
   params: Promise<PageParams>;
 }): Promise<Metadata> {
   const { id } = await params;
+
+  if (!isWalletAddress(id) && !isGuestId(id)) {
+    return {
+      title: "Player Profile | Fuzzynuts.xyz",
+      description: "View arcade stats and score history on Fuzzynuts.",
+      openGraph: {
+        title: "Player Profile | Fuzzynuts.xyz",
+        description: "View arcade stats and score history across all FuzzyNuts games.",
+        siteName: "Fuzzynuts",
+        type: "profile",
+      },
+    };
+  }
 
   const isWallet = isWalletAddress(id);
   const displayName = isWallet

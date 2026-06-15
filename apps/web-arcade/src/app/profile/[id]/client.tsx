@@ -369,7 +369,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
           ? data
           : data.scores || data.data || [];
 
-        const sorted = scores.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        const sorted = [...scores].sort((a, b) => (b.ts || 0) - (a.ts || 0));
         setState({ scores: sorted, loading: false, error: null });
       } catch (err) {
         setState({
