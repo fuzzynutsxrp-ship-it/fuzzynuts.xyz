@@ -45,6 +45,13 @@ export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange,
   const { address, isConnected, disconnect } = useWalletStore();
   const { data: session } = useSession();
 
+  // Listen for external requests to open login modal (e.g. from ChatWidget)
+  useEffect(() => {
+    const handler = () => setLoginOpen(true);
+    window.addEventListener("fuzzynuts:open-login", handler);
+    return () => window.removeEventListener("fuzzynuts:open-login", handler);
+  }, []);
+
   useEffect(() => {
     if (!dropdownOpen) return;
     const onClick = (e: MouseEvent) => {

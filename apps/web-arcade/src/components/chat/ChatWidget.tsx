@@ -347,9 +347,54 @@ export function ChatWidget() {
     }
   };
 
-  // ── Not connected state ─────────────────────────────────────
+  // ── Not connected state — show button, prompt to connect on click ──
   if (!isConnected) {
-    return null;
+    if (!open) {
+      return (
+        <button
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#1c0f33] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#7c3aed]/20 transition-all hover:bg-[#2d1b4e] hover:shadow-[#7c3aed]/30 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50"
+          style={{ fontFamily: "var(--font-display)" }}
+          aria-label="Open community chat"
+        >
+          <MessageSquare size={18} />
+          <span>Chat</span>
+        </button>
+      );
+    }
+    return (
+      <div
+        className="fixed bottom-0 right-0 z-50 flex h-[100dvh] w-full flex-col bg-[#0a0613] sm:bottom-6 sm:right-6 sm:h-[320px] sm:w-[380px] sm:rounded-xl sm:border sm:border-[#7c3aed]/20 sm:shadow-2xl sm:shadow-[#7c3aed]/10"
+        style={{ fontFamily: "var(--font-body)" }}
+      >
+        <div className="flex items-center justify-between border-b border-[#7c3aed]/15 bg-[#120a22] px-4 py-3 sm:rounded-t-xl">
+          <div className="flex items-center gap-2">
+            <MessageSquare size={16} className="text-[#7c3aed]" />
+            <h3 className="text-sm font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
+              Community Chat
+            </h3>
+          </div>
+          <button
+            onClick={() => setOpen(false)}
+            className="rounded-md p-1 text-white/40 transition-colors hover:bg-white/5 hover:text-white"
+            aria-label="Close chat"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+          <MessageSquare size={40} className="text-[#7c3aed]/40" />
+          <p className="text-sm text-white/60">Connect your wallet to join the community chat.</p>
+          <button
+            onClick={() => { window.dispatchEvent(new CustomEvent("fuzzynuts:open-login")); setOpen(false); }}
+            className="rounded-full bg-[#7c3aed] px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#6d28d9]"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // ── Toggle button ───────────────────────────────────────────
