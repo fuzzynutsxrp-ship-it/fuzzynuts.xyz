@@ -5,7 +5,7 @@
 
 /** XRPL wallet address (classic address starting with 'r') */
 export function isWalletAddress(id: string): boolean {
-  return /^r[1-9A-HJ-NP-Za-km-z]{33}$/.test(id);
+  return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
 }
 
 /** Guest ID format (Guest-XXXX where X is hex) */
