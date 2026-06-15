@@ -263,36 +263,65 @@
   // ═══════════════════════════════════════════════════════════
 
   function setupStartScreen() {
-    var startBtn = document.getElementById('start-btn');
-    var startScreen = document.getElementById('start-screen');
+    // Respect games that handle their own start logic
+    if (document.body.dataset.customStart === 'true') return;
+
+    var overlay = document.getElementById('start-screen');
+    var btn = document.getElementById('start-btn');
     var restartBtn = document.getElementById('restart-btn');
     var canvas = document.getElementById('game-canvas') || document.querySelector('canvas');
 
-    function dismissStartScreen() {
-      if (startScreen) {
-        startScreen.classList.add('hidden');
-        startScreen.style.display = 'none';
+    // Bail gracefully for non-standard games (RSC, Kaetram, etc.)
+    if (!overlay) return;
+
+    function startGame() {
+      // Unlock AudioContext (required for iOS Safari autoplay policy)
+      try {
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx && window.audioContext && window.audioContext.state === 'suspended') {
+          window.audioContext.resume();
+        }
+      } catch (err) { console.warn('[ArcadeShell] Audio unlock failed:', err); }
+
+      // Dismiss overlay
+      overlay.style.display = 'none';
+      overlay.classList.add('hidden');
+
+      // Restore keyboard focus to canvas so keyboard controls work immediately
+      if (canvas) {
+        canvas.setAttribute('tabindex', '0');
+        canvas.focus();
       }
+
+      // Reset score tracking when game actually starts
+      resetScoreTracking();
     }
 
-    if (startBtn) {
-      startBtn.addEventListener('click', function () {
-        dismissStartScreen();
-        resetScoreTracking();
-      });
+    // Wire up start button (pointerdown for better mobile responsiveness)
+    if (btn) {
+      btn.addEventListener('pointerdown', startGame, { once: true });
     }
 
+    // Wire up restart button
     if (restartBtn) {
-      restartBtn.addEventListener('click', function () {
-        dismissStartScreen();
+      restartBtn.addEventListener('pointerdown', function () {
+        overlay.style.display = 'none';
+        overlay.classList.add('hidden');
+        if (canvas) {
+          canvas.setAttribute('tabindex', '0');
+          canvas.focus();
+        }
       });
     }
 
-    // For games that start on canvas click (pong, boxing, etc.) —
-    // dismiss overlay on first canvas interaction so it doesn't block play.
-    if (canvas && startScreen && !startScreen.classList.contains('hidden')) {
+    // Canvas fallback — dismiss overlay on first canvas interaction
+    // (for games like pong/boxing that start on canvas click)
+    if (canvas) {
       canvas.addEventListener('pointerdown', function onFirstTouch() {
-        dismissStartScreen();
+        overlay.style.display = 'none';
+        overlay.classList.add('hidden');
+        canvas.setAttribute('tabindex', '0');
+        canvas.focus();
         canvas.removeEventListener('pointerdown', onFirstTouch);
       }, { once: true });
     }
@@ -375,7 +404,12 @@
     // a click handler in their own JS.  This catches all of them.
     // Safe for games that DO wire their own handler — hiding an already-hidden
     // overlay is a no-op, and both listeners fire without conflict.
-    setupStartScreen();
+    // Uses data-custom-start="true" on <body> to opt out.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupStartScreen);
+    } else {
+      setupStartScreen();
+    }
 
     // Fire ready callbacks
     for (var i = 0; i < readyCallbacks.length; i++) {
