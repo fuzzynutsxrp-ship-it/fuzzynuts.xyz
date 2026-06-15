@@ -1681,7 +1681,6 @@ body {
    WebKit bug: iframes inside top-layer <dialog> don't receive touch events
    unless the parent creates a new compositing layer via transform. */
 .game-modal__viewport {
-  position: relative;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;

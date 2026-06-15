@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ProfileIdClient } from "./client";
+import { isWalletAddress } from "@/lib/validators";
 
 type PageParams = { id: string };
 
@@ -18,7 +19,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
 
-  const isWallet = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
+  const isWallet = isWalletAddress(id);
   const displayName = isWallet
     ? `${id.slice(0, 6)}...${id.slice(-4)}`
     : id;

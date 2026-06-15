@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -15,6 +15,8 @@ import {
 import Link from "next/link";
 import { IdenticonAvatar } from "@/components/ui/IdenticonAvatar";
 import { truncateAddress, formatNumber, GAMES } from "@/lib/utils";
+import { isWalletAddress, isGuestId } from "@/lib/validators";
+import { API_SCORES } from "@/features/arcade/constants";
 
 /* ═══════════════════════════════════════════════════════════════
    Types
@@ -38,8 +40,6 @@ interface ProfileState {
    Constants
    ═══════════════════════════════════════════════════════════════ */
 
-const API_BASE = "https://world.fuzzynuts.xyz/api/scores";
-
 const GAME_EMOJIS: Record<string, string> = {
   "fuzzynuts-world": "🌍",
   mario: "🍄",
@@ -62,16 +62,6 @@ const BIO_STORAGE_PREFIX = "fuzzy_profile_bio_";
 /* ═══════════════════════════════════════════════════════════════
    Helpers
    ═══════════════════════════════════════════════════════════════ */
-
-/** Determine if an ID string is an XRPL wallet address */
-function isWalletAddress(id: string): boolean {
-  return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
-}
-
-/** Determine if an ID string is a guest ID */
-function isGuestId(id: string): boolean {
-  return /^Guest-[0-9a-fA-F]{4,8}$/.test(id);
-}
 
 /** Get the display name for a profile ID */
 function getDisplayName(id: string): string {
@@ -365,7 +355,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
           return;
         }
 
-        const url = `${API_BASE}?wallet=${encodeURIComponent(profileId)}`;
+        const url = `${API_SCORES}?wallet=${encodeURIComponent(profileId)}`;
         const response = await fetch(url, {
           signal: AbortSignal.timeout(8000),
         });
@@ -408,11 +398,14 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
   }, [fetchScores]);
 
   /* ── Derived stats ── */
-  const totalGames = state.scores.length;
-  const uniqueGames = new Set(state.scores.map((s) => s.game)).size;
-  const topScore = state.scores.length
-    ? Math.max(...state.scores.map((s) => s.score))
-    : 0;
+  const { totalGames, uniqueGames, topScore } = useMemo(() => {
+    const scores = state.scores;
+    return {
+      totalGames: scores.length,
+      uniqueGames: new Set(scores.map((s) => s.game)).size,
+      topScore: scores.length ? Math.max(...scores.map((s) => s.score)) : 0,
+    };
+  }, [state.scores]);
 
   return (
     <div className="relative z-10">

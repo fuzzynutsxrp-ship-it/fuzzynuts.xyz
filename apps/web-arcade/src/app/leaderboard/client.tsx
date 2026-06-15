@@ -77,6 +77,7 @@ interface PlayerRow {
 
 function aggregateByPlayer(entries: ScoreEntry[]): PlayerRow[] {
   const map = new Map<string, PlayerRow>();
+  let anonCounter = 0;
 
   for (const entry of entries) {
     // Key by wallet (XRPL) or userId (Google) or name fallback
@@ -85,7 +86,7 @@ function aggregateByPlayer(entries: ScoreEntry[]): PlayerRow[] {
       entry.userId ||
       entry.displayName ||
       entry.name ||
-      `anon-${Math.random()}`;
+      `anon-${anonCounter++}`;
 
     const existing = map.get(key);
     if (existing) {
