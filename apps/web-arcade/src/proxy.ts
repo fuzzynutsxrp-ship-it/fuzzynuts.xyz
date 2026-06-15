@@ -85,7 +85,7 @@ function applySecurityHeaders(response: NextResponse, pathname: string): NextRes
   return response;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const LOCKDOWN_PASSWORD = process.env.SITE_LOCKDOWN_PASSWORD;
 

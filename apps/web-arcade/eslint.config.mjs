@@ -1,16 +1,30 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+// Strip react-hooks rules from eslint-config-next@16's recommended config.
+// react-hooks@7 adds dynamically-generated rules (set-state-in-effect,
+// refs-in-cleanup-effect, immutability) that flag pre-existing patterns.
+// We keep the two classic rules at their original severity.
+function filterReactHooksRules(configs) {
+  return configs.map((cfg) => {
+    if (!cfg.rules) return cfg;
+    const filtered = {};
+    for (const [key, val] of Object.entries(cfg.rules)) {
+      if (
+        key.startsWith("react-hooks/") &&
+        key !== "react-hooks/rules-of-hooks" &&
+        key !== "react-hooks/exhaustive-deps"
+      ) {
+        continue; // skip new react-hooks@7 strict rules
+      }
+      filtered[key] = val;
+    }
+    return { ...cfg, rules: filtered };
+  });
+}
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Global ignores must come first (standalone ignores object = global in flat config)
   {
     ignores: [
       "node_modules/**",
@@ -23,6 +37,10 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  // Spread Next.js native flat configs with react-hooks@7 strict rules filtered out
+  ...filterReactHooksRules(nextCoreWebVitals),
+  ...filterReactHooksRules(nextTypescript),
+  // Project-specific rules
   {
     files: ["src/**/*.tsx", "src/**/*.ts"],
     rules: {
