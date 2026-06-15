@@ -188,9 +188,10 @@ const CSS = `
 .fn-carousel__track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 12px;scrollbar-width:none;}
 .fn-carousel__track::-webkit-scrollbar{display:none;}
 .fn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;}
-.fn-game-card{flex:0 0 180px;width:180px;scroll-snap-align:start;display:flex;flex-direction:column;background:var(--fn-surface);border:none;padding:0;border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--fn-shadow-close);transition:box-shadow .18s,transform .18s;text-align:left;font-family:inherit;}
+.fn-game-card{flex:0 0 180px;width:180px;scroll-snap-align:start;display:flex;flex-direction:column;background:var(--fn-surface);border:none;padding:0;border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--fn-shadow-close);transition:box-shadow .18s,transform .1s ease-out;text-align:left;font-family:inherit;}
 .fn-grid .fn-game-card{flex:none;width:auto;}
 .fn-game-card:hover{box-shadow:var(--fn-shadow-mid);transform:translateY(-3px);}
+.fn-game-card:active{transform:scale(0.96);}
 .fn-game-card__thumb{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .fn-game-card__img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s;}
 .fn-game-card:hover .fn-game-card__img{transform:scale(1.05);}

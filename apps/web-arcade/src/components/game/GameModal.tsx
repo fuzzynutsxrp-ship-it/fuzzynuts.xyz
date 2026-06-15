@@ -168,22 +168,27 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     }
   }, [gameId]);
 
-  // ── Lock body scroll while open ──
+  // ── Lock body scroll while open (preserves scroll position) ──
   useEffect(() => {
     if (!isOpen) return;
+    const scrollY = window.scrollY;
     const prev = document.body.style.overflow;
     const prevTouch = document.body.style.touchAction;
     const prevPos = document.body.style.position;
     const prevWidth = document.body.style.width;
+    const prevTop = document.body.style.top;
     document.body.style.overflow = "hidden";
     document.body.style.touchAction = "manipulation";
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
+    document.body.style.top = `-${scrollY}px`;
     return () => {
       document.body.style.overflow = prev;
       document.body.style.touchAction = prevTouch;
       document.body.style.position = prevPos;
       document.body.style.width = prevWidth;
+      document.body.style.top = prevTop;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
 

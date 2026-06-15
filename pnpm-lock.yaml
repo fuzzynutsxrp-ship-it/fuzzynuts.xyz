@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  esbuild: '>=0.25.0'
+  esbuild: '>=0.28.1'
 
 importers:
 
@@ -18,7 +18,7 @@ importers:
         specifier: ^3.3.0
         version: 3.8.3
       tsx:
-        specifier: ^4.19.0
+        specifier: ^4.22.4
         version: 4.22.4
       turbo:
         specifier: ^2.3.0
@@ -141,7 +141,7 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
       vite:
-        specifier: ^5.4.0
+        specifier: ^5.4.21
         version: 5.4.21(@types/node@25.9.3)
 
   apps/mobile-capacitor:
@@ -260,7 +260,7 @@ importers:
         specifier: 16.2.9
         version: 16.2.9(@typescript-eslint/parser@8.61.0(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
       postcss:
-        specifier: ^8.5.14
+        specifier: ^8.5.15
         version: 8.5.15
       tailwindcss:
         specifier: ^3.4.19
