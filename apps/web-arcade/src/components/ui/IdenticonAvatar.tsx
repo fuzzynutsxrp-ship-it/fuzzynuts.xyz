@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { toSvg } from "jdenticon";
+import DOMPurify from "dompurify";
 
 /**
  * IdenticonAvatar — deterministic SVG identicon from any string value.
@@ -28,7 +29,7 @@ export function IdenticonAvatar({
   const svgMarkup = useMemo(() => {
     if (!value) return "";
     try {
-      return toSvg(value, size, {
+      const raw = toSvg(value, size, {
         backColor: "#0a0613",
         padding: 0.1,
         saturation: {
@@ -39,6 +40,7 @@ export function IdenticonAvatar({
           grayscale: [0.3, 0.6],
         },
       });
+      return DOMPurify.sanitize(raw, { USE_PROFILES: { svg: true } });
     } catch {
       return "";
     }

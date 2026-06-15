@@ -28,6 +28,7 @@
     "@walletconnect/universal-provider": "^2.23.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dompurify": "^3.4.10",
     "framer-motion": "^12.38.0",
     "jdenticon": "^3.3.0",
     "lucide-react": "^1.14.0",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/dompurify": "^3.2.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
