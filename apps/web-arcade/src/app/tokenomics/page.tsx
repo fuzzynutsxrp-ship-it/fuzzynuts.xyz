@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function TokenomicsPage() {
   return (
-    <main className="min-h-screen pt-24 pb-20">
+    <main className="min-h-screen pb-20">
       <TokenomicsClient />
     </main>
   );

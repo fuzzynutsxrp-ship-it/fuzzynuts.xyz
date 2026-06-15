@@ -1,11 +1,11 @@
 /**
- * Prizes route layout — matches homepage light style.
+ * Tokenomics route layout — consistent with prizes/profile light style.
  */
 
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import DynamicFooter from "@/components/DynamicFooter";
 
-export default function PrizesLayout({
+export default function TokenomicsLayout({
   children,
 }: {
   children: React.ReactNode;

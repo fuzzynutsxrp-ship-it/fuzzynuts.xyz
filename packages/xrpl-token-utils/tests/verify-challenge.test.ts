@@ -150,7 +150,7 @@ describe("verifyMessageSignature — real XRPL keypair round-trip", () => {
   it("signs a UTF-8 challenge and verifies with verifyKeypairSignature", () => {
     // Generate a real XRPL wallet
     const wallet = Wallet.generate();
-    const kp = deriveKeypair(wallet.seed);
+    const kp = deriveKeypair(wallet.seed!);
 
     // Produce the canonical challenge
     vi.useFakeTimers();
@@ -181,7 +181,7 @@ describe("verifyMessageSignature — real XRPL keypair round-trip", () => {
 
   it("rejects a tampered challenge with real keypair", () => {
     const wallet = Wallet.generate();
-    const kp = deriveKeypair(wallet.seed);
+    const kp = deriveKeypair(wallet.seed!);
 
     const challenge = formatGameChallenge("test-nonce-xyz", wallet.address);
     const messageHex = Buffer.from(challenge, "utf-8").toString("hex");
@@ -202,7 +202,7 @@ describe("verifyMessageSignature — real XRPL keypair round-trip", () => {
   it("rejects when address does not match public key", () => {
     const wallet = Wallet.generate();
     const otherWallet = Wallet.generate();
-    const kp = deriveKeypair(wallet.seed);
+    const kp = deriveKeypair(wallet.seed!);
 
     const challenge = formatGameChallenge("test-nonce-addr", wallet.address);
     const messageHex = Buffer.from(challenge, "utf-8").toString("hex");
@@ -221,7 +221,7 @@ describe("verifyMessageSignature — real XRPL keypair round-trip", () => {
 
   it("full encoding chain: UTF-8 → hex → sign → verify", () => {
     const wallet = Wallet.generate();
-    const kp = deriveKeypair(wallet.seed);
+    const kp = deriveKeypair(wallet.seed!);
 
     // The challenge is a plain UTF-8 string
     const challenge = "FuzzyNuts-Auth-" + "test123" + "-" + Date.now();

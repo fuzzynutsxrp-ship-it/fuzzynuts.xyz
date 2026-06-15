@@ -11,7 +11,7 @@
  * given environment.
  */
 
-import type { Payment, SubmitResponse } from "xrpl";
+import type { Payment, SubmitResponse, TxResponse, SubmittableTransaction } from "xrpl";
 import { Wallet } from "xrpl";
 import { withClient } from "./client";
 
@@ -68,7 +68,7 @@ export function buildPayment(args: PayoutArgs): Payment {
 export async function submitPayout(
   args: PayoutArgs,
   seeds: PayoutSeeds,
-): Promise<SubmitResponse> {
+): Promise<TxResponse<SubmittableTransaction>> {
   const payment = buildPayment(args);
 
   if (seeds.signerSeeds && seeds.signerSeeds.length >= 2) {

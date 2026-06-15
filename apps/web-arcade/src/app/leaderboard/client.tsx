@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Footer } from "@/components/layout/Footer";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { truncateAddress, formatNumber } from "@/lib/utils";
 import { useWalletStore } from "@/store/wallet";
@@ -756,6 +757,7 @@ export function LeaderboardClient() {
             )}
           </AnimatePresence>
         </main>
+        <Footer />
       </div>
     </div>
   );
