@@ -172,9 +172,18 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
+    const prevTouch = document.body.style.touchAction;
+    const prevPos = document.body.style.position;
+    const prevWidth = document.body.style.width;
     document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
     return () => {
       document.body.style.overflow = prev;
+      document.body.style.touchAction = prevTouch;
+      document.body.style.position = prevPos;
+      document.body.style.width = prevWidth;
     };
   }, [isOpen]);
 
