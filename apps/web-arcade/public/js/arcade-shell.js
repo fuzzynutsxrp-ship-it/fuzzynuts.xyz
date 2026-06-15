@@ -274,24 +274,24 @@
     // Bail gracefully for non-standard games (RSC, Kaetram, etc.)
     if (!overlay) return;
 
-    function startGame() {
-      // Unlock AudioContext (required for iOS Safari autoplay policy)
-      try {
-        var AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx && window.audioContext && window.audioContext.state === 'suspended') {
-          window.audioContext.resume();
-        }
-      } catch (err) { console.warn('[ArcadeShell] Audio unlock failed:', err); }
-
-      // Dismiss overlay
+    function dismissOverlay() {
       overlay.style.display = 'none';
       overlay.classList.add('hidden');
-
-      // Restore keyboard focus to canvas so keyboard controls work immediately
       if (canvas) {
         canvas.setAttribute('tabindex', '0');
         canvas.focus();
       }
+    }
+
+    function startGame() {
+      // Unlock AudioContext (required for iOS Safari autoplay policy)
+      try {
+        if (window.audioContext && window.audioContext.state === 'suspended') {
+          window.audioContext.resume();
+        }
+      } catch (err) { console.warn('[ArcadeShell] Audio unlock failed:', err); }
+
+      dismissOverlay();
 
       // Reset score tracking when game actually starts
       resetScoreTracking();
@@ -305,12 +305,8 @@
     // Wire up restart button
     if (restartBtn) {
       restartBtn.addEventListener('pointerdown', function () {
-        overlay.style.display = 'none';
-        overlay.classList.add('hidden');
-        if (canvas) {
-          canvas.setAttribute('tabindex', '0');
-          canvas.focus();
-        }
+        dismissOverlay();
+        resetScoreTracking();
       });
     }
 
@@ -318,11 +314,7 @@
     // (for games like pong/boxing that start on canvas click)
     if (canvas) {
       canvas.addEventListener('pointerdown', function onFirstTouch() {
-        overlay.style.display = 'none';
-        overlay.classList.add('hidden');
-        canvas.setAttribute('tabindex', '0');
-        canvas.focus();
-        canvas.removeEventListener('pointerdown', onFirstTouch);
+        dismissOverlay();
       }, { once: true });
     }
   }
