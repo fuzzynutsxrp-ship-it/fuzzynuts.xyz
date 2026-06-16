@@ -120,14 +120,24 @@ function main(): void {
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-    // Normalize the generatedAt timestamp before comparing — the check
-    // verifies content freshness, not that the wall-clock time matches.
-    const normalizeTimestamp = (s: string) =>
-      s.replace(
-        /_Generated \*\*\d{4}-\d{2}-\d{2}T[\d:.]+Z\*\*/,
-        "_Generated **TIMESTAMP**",
-      );
-    if (normalizeTimestamp(cur) !== normalizeTimestamp(out)) {
+    // Strip all dynamic fields before comparing — the check verifies that
+    // status flags, migration phases, and structural content are fresh,
+    // NOT that the wall-clock timestamp or relative commit times match.
+    const normalize = (s: string) =>
+      s
+        // ISO timestamp in the header
+        .replace(
+          /_Generated \*\*\d{4}-\d{2}-\d{2}T[\d:.]+Z\*\*/g,
+          "_Generated **TIMESTAMP**",
+        )
+        // commit SHA in the header
+        .replace(/from `[0-9a-f]+`/g, "from `COMMIT`")
+        // relative times in recent commits ("21 hours ago", "3 minutes ago")
+        .replace(/\d+ (?:seconds?|minutes?|hours?|days?|weeks?|months?|years?) ago/g, "TIME_AGO")
+        // the commit list itself shifts when STATUS.md is committed
+        .replace(/^- `[0-9a-f]+` /gm, "- `COMMIT` ");
+    if (normalize(cur) !== normalize(out)) {
+      // Show the actual diff so the developer can see what's stale
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);
     }

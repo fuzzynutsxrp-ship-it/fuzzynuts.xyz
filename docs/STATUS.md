@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-16T12:28:05.068Z** from `140fb71` on `eslint-10-compat-fix`._
+_Generated **2026-06-16T12:29:37.615Z** from `fd3f2dc` on `eslint-10-compat-fix`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,13 +66,13 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `eslint-10-compat-fix`:
 
-- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 21 seconds ago_
-- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 3 minutes ago_
+- `fd3f2dc` fix(ci): normalize timestamp in status:check comparison — _Hermes Dev Worker, 84 seconds ago_
+- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 2 minutes ago_
+- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 4 minutes ago_
 - `7bcb661` chore(deps-dev): bump eslint 9->10 with @eslint/compat shim — _dev-worker, 14 hours ago_
 - `d0e1c02` audit: link tutorial 06 in tutorials README — _Hermes Dev Worker, 14 hours ago_
-- `46ba342` docs: add iOS Safari touch/audio QA matrix — _Shafster, 15 hours ago_
+- `46ba342` docs: add iOS Safari touch/audio QA matrix — _Shafster, 16 hours ago_
 - `bfee3b4` fix: add MutationObserver fallback for dynamic start screens — _Shafster, 16 hours ago_
 - `6cede7f` audit: extract dismissOverlay helper, add resetScoreTracking to restart, remove dead AudioCtx + redundant removeEventListener — _Hermes Dev Worker, 16 hours ago_
 - `956e2db` fix: improve universal start-btn handler with Qwen review — _Shafster, 16 hours ago_
 - `357368c` fix: universal start-btn handler for all games — _Shafster, 17 hours ago_
-- `8718993` audit: document scrollY safety net + iOS Safari 16+ requirement — _Hermes Dev Worker, 21 hours ago_
