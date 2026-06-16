@@ -12,3 +12,4 @@ apps/mobile-capacitor/ios
 pnpm-lock.yaml
 package-lock.json
 *.tsbuildinfo
+docs/STATUS.md
