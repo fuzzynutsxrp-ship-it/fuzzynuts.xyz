@@ -3,24 +3,24 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-16T12:25:34.800Z** from `b52cd3c` on `eslint-10-compat-fix`._
+_Generated **2026-06-16T12:28:05.068Z** from `140fb71` on `eslint-10-compat-fix`._
 
-`migration_phase: in-progress` · `version: 0.2.0`
+`migration_phase: in-progress`  ·  `version: 0.2.0`
 
 ---
 
 ## Red flags from the original audit
 
-| #   | Flag                                 | Owner      | Status     | Evidence                                                |
-| --- | ------------------------------------ | ---------- | ---------- | ------------------------------------------------------- |
-| 1   | Spoofable base64 wallet cookie       | @api       | 🟡 partial | `apps/api/src/middleware/walletAuth.ts`                 |
-| 2   | Divergent `SCORE_CAPS` (3 copies)    | @core      | ✅ fixed   | `packages/arcade-core/src/constants/score-caps.ts`      |
-| 3   | Wrong `nutracer` slug in submitter   | @core      | ✅ fixed   | `packages/arcade-core/tests/slugs.test.ts`              |
-| 4   | Unsigned score submissions (no HMAC) | @anticheat | 🟡 partial | `packages/shared-anticheat/src/hmac.ts`                 |
-| 5   | Duplicate game source trees          | @games     | 🟡 partial | `apps/games-build/games/`                               |
-| 6   | Hot-wallet seed in plaintext env     | @api       | 🟡 partial | `docs/adr/0006-xrpl-regularkey-multisig-distributor.md` |
-| 7   | Vercel `immutable` over-caching      | @web       | ✅ fixed   | `apps/web-arcade/vercel.json`                           |
-| 8   | No XRPL signature verification path  | @xrpl      | 🟡 partial | `packages/xrpl-token-utils/src/verify.ts`               |
+| # | Flag | Owner | Status | Evidence |
+|---|---|---|---|---|
+| 1 | Spoofable base64 wallet cookie | @api | 🟡 partial | `apps/api/src/middleware/walletAuth.ts` |
+| 2 | Divergent `SCORE_CAPS` (3 copies) | @core | ✅ fixed | `packages/arcade-core/src/constants/score-caps.ts` |
+| 3 | Wrong `nutracer` slug in submitter | @core | ✅ fixed | `packages/arcade-core/tests/slugs.test.ts` |
+| 4 | Unsigned score submissions (no HMAC) | @anticheat | 🟡 partial | `packages/shared-anticheat/src/hmac.ts` |
+| 5 | Duplicate game source trees | @games | 🟡 partial | `apps/games-build/games/` |
+| 6 | Hot-wallet seed in plaintext env | @api | 🟡 partial | `docs/adr/0006-xrpl-regularkey-multisig-distributor.md` |
+| 7 | Vercel `immutable` over-caching | @web | ✅ fixed | `apps/web-arcade/vercel.json` |
+| 8 | No XRPL signature verification path | @xrpl | 🟡 partial | `packages/xrpl-token-utils/src/verify.ts` |
 
 Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
@@ -28,37 +28,37 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 ## Migration checklist
 
-| Phase | Description                                  | Status                            |
-| ----- | -------------------------------------------- | --------------------------------- |
-| A     | Restructure root                             | ✅ done                           |
-| B     | Shared packages + SCORE_CAPS fix             | ✅ done                           |
-| C     | Two-tier auth scaffolding                    | ✅ done                           |
-| D     | Games-build pipeline                         | 🟡 scaffolded (real impl pending) |
-| E     | XRPL utilities package                       | ✅ done                           |
-| F+G   | Tauri desktop + Capacitor mobile scaffolding | 🟡 scaffolded (real impl pending) |
-| H+I   | Diátaxis docs + community files              | ✅ done                           |
-| J     | CI/CD workflows                              | ✅ done                           |
-| K+L   | Env examples + verification                  | ✅ done                           |
+| Phase | Description | Status |
+|---|---|---|
+| A | Restructure root | ✅ done |
+| B | Shared packages + SCORE_CAPS fix | ✅ done |
+| C | Two-tier auth scaffolding | ✅ done |
+| D | Games-build pipeline | 🟡 scaffolded (real impl pending) |
+| E | XRPL utilities package | ✅ done |
+| F+G | Tauri desktop + Capacitor mobile scaffolding | 🟡 scaffolded (real impl pending) |
+| H+I | Diátaxis docs + community files | ✅ done |
+| J | CI/CD workflows | ✅ done |
+| K+L | Env examples + verification | ✅ done |
 
 ---
 
 ## Manual steps still owed by the human
 
-| #   | Step                                                  | Status  |
-| --- | ----------------------------------------------------- | ------- |
-| 1   | Push pre-migration commits to `main`                  | ✅ done |
-| 2   | Push `migration/monorepo` branch and open PR          | 🔴 todo |
-| 3   | Merge the migration PR                                | 🔴 todo |
-| 4   | Vercel → Root Directory → `apps/web-arcade`           | 🔴 todo |
-| 5   | Vercel → Build Command → `cd ../.. && pnpm build:web` | 🔴 todo |
-| 6   | Railway → repo + root → `apps/api`                    | 🔴 todo |
-| 7   | Railway env: `WALLET_JWT_SECRET` (≥32 random bytes)   | 🔴 todo |
-| 8   | Railway env: `GAME_SESSION_SECRET` (≥32 random bytes) | 🔴 todo |
-| 9   | NUT distributor `SetRegularKey` (ADR 0006)            | 🔴 todo |
-| 10  | NUT distributor `SignerListSet` 2-of-3 (ADR 0006)     | 🔴 todo |
-| 11  | NUT distributor `AccountSet asfDisableMaster`         | 🔴 todo |
-| 12  | First mobile init: `cap add android`                  | 🔴 todo |
-| 13  | Tauri Linux deps install                              | 🔴 todo |
+| # | Step | Status |
+|---|---|---|
+| 1 | Push pre-migration commits to `main` | ✅ done |
+| 2 | Push `migration/monorepo` branch and open PR | 🔴 todo |
+| 3 | Merge the migration PR | 🔴 todo |
+| 4 | Vercel → Root Directory → `apps/web-arcade` | 🔴 todo |
+| 5 | Vercel → Build Command → `cd ../.. && pnpm build:web` | 🔴 todo |
+| 6 | Railway → repo + root → `apps/api` | 🔴 todo |
+| 7 | Railway env: `WALLET_JWT_SECRET` (≥32 random bytes) | 🔴 todo |
+| 8 | Railway env: `GAME_SESSION_SECRET` (≥32 random bytes) | 🔴 todo |
+| 9 | NUT distributor `SetRegularKey` (ADR 0006) | 🔴 todo |
+| 10 | NUT distributor `SignerListSet` 2-of-3 (ADR 0006) | 🔴 todo |
+| 11 | NUT distributor `AccountSet asfDisableMaster` | 🔴 todo |
+| 12 | First mobile init: `cap add android` | 🔴 todo |
+| 13 | Tauri Linux deps install | 🔴 todo |
 
 ---
 
@@ -66,7 +66,8 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `eslint-10-compat-fix`:
 
-- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 14 seconds ago_
+- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 21 seconds ago_
+- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 3 minutes ago_
 - `7bcb661` chore(deps-dev): bump eslint 9->10 with @eslint/compat shim — _dev-worker, 14 hours ago_
 - `d0e1c02` audit: link tutorial 06 in tutorials README — _Hermes Dev Worker, 14 hours ago_
 - `46ba342` docs: add iOS Safari touch/audio QA matrix — _Shafster, 15 hours ago_
@@ -75,4 +76,3 @@ Last 10 commits on `eslint-10-compat-fix`:
 - `956e2db` fix: improve universal start-btn handler with Qwen review — _Shafster, 16 hours ago_
 - `357368c` fix: universal start-btn handler for all games — _Shafster, 17 hours ago_
 - `8718993` audit: document scrollY safety net + iOS Safari 16+ requirement — _Hermes Dev Worker, 21 hours ago_
-- `b31d2be` fix: remove translateZ(0), add dialog::backdrop pointer-events:none (Qwen round 2) — _Shafster, 21 hours ago_

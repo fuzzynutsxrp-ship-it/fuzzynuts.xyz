@@ -120,7 +120,14 @@ function main(): void {
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-    if (cur !== out) {
+    // Normalize the generatedAt timestamp before comparing — the check
+    // verifies content freshness, not that the wall-clock time matches.
+    const normalizeTimestamp = (s: string) =>
+      s.replace(
+        /_Generated \*\*\d{4}-\d{2}-\d{2}T[\d:.]+Z\*\*/,
+        "_Generated **TIMESTAMP**",
+      );
+    if (normalizeTimestamp(cur) !== normalizeTimestamp(out)) {
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);
     }
