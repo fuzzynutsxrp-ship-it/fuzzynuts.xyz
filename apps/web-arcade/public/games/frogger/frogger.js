@@ -70,7 +70,9 @@
   function resize() {
     const parent = canvas.parentElement || document.body;
     const maxW = parent.clientWidth || 800;
+    if (const maxW =  < 100) const maxW =  = (window.innerWidth || 800) - 16;
     const maxH = parent.clientHeight || 600;
+    if (const maxH =  < 100) const maxH =  = (window.innerHeight || 600) - 16;
     const scale = Math.min(maxW / W, maxH / H, 2);
     canvas.width = W;
     canvas.height = H;
@@ -144,8 +146,8 @@
     gameActive = false;
     cancelAnimationFrame(animFrame);
 
-    const best = parseInt(localStorage.getItem('frogger_best') || '0', 10);
-    if (score > best) localStorage.setItem('frogger_best', score);
+    const best = parseInt((function(){try{return localStorage.getItem('frogger_best')}catch(e){return null}})() || '0', 10);
+    if (score > best) try { localStorage.setItem('frogger_best', score) } catch(e) {};
 
     if (typeof FuzzyScoreSubmit === 'function') {
       try { FuzzyScoreSubmit('frogger', score, gameDuration); } catch (e) { /* */ }

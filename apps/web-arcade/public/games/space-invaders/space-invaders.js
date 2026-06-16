@@ -60,7 +60,7 @@
   let alienDir, alienDropNext, alienSpeed, alienAnimFrame, alienMoveTimer;
   let mysteryTimer, shootCooldown, invincibleTimer, gameOverTimer;
 
-  best = parseInt(localStorage.getItem("space-invaders_best") || "0", 10);
+  best = parseInt((function(){try{return localStorage.getItem("space-invaders_best")}catch(e){return null}})() || "0", 10);
 
   function resetAliens() {
     aliens = [];
@@ -355,7 +355,7 @@
     gameOverTimer = 0;
     if (score > best) {
       best = score;
-      localStorage.setItem("space-invaders_best", String(best));
+      try { localStorage.setItem("space-invaders_best", String(best) } catch(e) {});
     }
     const duration = Math.round((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === "function") {

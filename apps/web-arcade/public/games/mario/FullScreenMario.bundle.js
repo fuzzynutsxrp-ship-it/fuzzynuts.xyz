@@ -4567,7 +4567,7 @@ var ItemsHoldr;
          * @returns {Mixed}
          */
         ItemValue.prototype.retrieveLocalStorage = function () {
-            var value = localStorage.getItem(this.ItemsHolder.getPrefix() + this.key);
+            try { var value = localStorage.getItem(this.ItemsHolder.getPrefix() } catch(e) { var value = null } + this.key);
             if (value === "undefined") {
                 return undefined;
             }
@@ -16817,7 +16817,7 @@ var ItemsHoldr;
          * @returns {Mixed}
          */
         ItemValue.prototype.retrieveLocalStorage = function () {
-            var value = localStorage.getItem(this.ItemsHolder.getPrefix() + this.key);
+            try { var value = localStorage.getItem(this.ItemsHolder.getPrefix() } catch(e) { var value = null } + this.key);
             if (value === "undefined") {
                 return undefined;
             }

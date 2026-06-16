@@ -42,7 +42,7 @@
     canvas = el('game-canvas');
     if (!canvas) return;
     ctx = canvas.getContext('2d');
-    bestScore = parseInt(localStorage.getItem('breakout_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('breakout_best')}catch(e){return null}})() || '0', 10);
     resize();
     bindEvents();
     resetGame();
@@ -347,7 +347,7 @@
     const duration = Math.floor((Date.now() - gameStartTime) / 1000);
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('breakout_best', bestScore);
+      try { localStorage.setItem('breakout_best', bestScore) } catch(e) {};
     }
     window.__gameScore = score;
     updateHUD();

@@ -37,7 +37,7 @@
   let canvas, ctx, W, H;
   let gameActive = false, gameOver = false, countdown = 0, countdownTimer = 0;
   let raceStartTime = 0, raceDuration = 0;
-  let score = 0, bestScore = parseInt(localStorage.getItem('rally_best') || '0');
+  let score = 0, bestScore = (function() { try { return parseInt((function(){try{return localStorage.getItem('rally_best')}catch(e){return null}})() || '0') } catch(e) { return 0 } })();
   let currentLap = 1, lapStartTime = 0, lastLapTime = 0, bestLapTime = Infinity;
   let cleanLap = true;
   let trackPoints = [], trackPolyLeft = [], trackPolyRight = [];

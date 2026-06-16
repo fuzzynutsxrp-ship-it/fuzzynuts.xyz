@@ -1,5 +1,7 @@
 /* Subway Runner — FuzzyNuts Arcade */
 #game-container {
+  padding: env(safe-area-inset-top, 8px) env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+  box-sizing: border-box;
   width: 100%;
   height: calc(100dvh - var(--arcade-nav-height, 44px));
   position: relative;
@@ -7,7 +9,10 @@
   background: #0a0614;
   font-family: var(--arcade-font, 'Outfit', system-ui, sans-serif);
 }
-body.in-iframe #game-container { height: 100dvh; }
+body.in-iframe #game-container {
+  padding: env(safe-area-inset-top, 8px) env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+  box-sizing: border-box; height: 100%;
+  height: 100dvh; }
 #game-canvas {
   display: block; width: 100%; height: 100%;
   position: absolute; top: 0; left: 0; z-index: 1;

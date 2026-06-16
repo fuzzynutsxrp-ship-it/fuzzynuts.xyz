@@ -167,7 +167,7 @@
 
   function endGame() {
     state = 'gameover';
-    if (totalScore > bestScore) { bestScore = totalScore; localStorage.setItem('archery_best', bestScore); }
+    if (totalScore > bestScore) { bestScore = totalScore; try { localStorage.setItem('archery_best', bestScore) } catch(e) {}; }
     window.__gameScore = totalScore;
     const duration = Math.round((Date.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') FuzzyScoreSubmit('archery', totalScore, duration);

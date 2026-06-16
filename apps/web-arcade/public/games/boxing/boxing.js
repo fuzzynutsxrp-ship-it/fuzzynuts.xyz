@@ -296,7 +296,7 @@ function endGame(playerWon){
   // best score
   if(score > bestScore){
     bestScore = score;
-    try{ localStorage.setItem(BEST_KEY, ''+bestScore); }catch(e){}
+    try{ try { localStorage.setItem(BEST_KEY, ''+bestScore) } catch(e) {}; }catch(e){}
   }
   // global score
   window.__gameScore = score;

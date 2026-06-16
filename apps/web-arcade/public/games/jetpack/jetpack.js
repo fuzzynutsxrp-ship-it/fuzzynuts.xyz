@@ -442,7 +442,7 @@
   // --- Game lifecycle ---
   function init() {
     setupCanvas();
-    bestScore = parseInt(localStorage.getItem('jetpack_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('jetpack_best')}catch(e){return null}})() || '0', 10);
     resetGame();
     gameState = 'menu';
     drawMenu();
@@ -485,7 +485,7 @@
 
     if (totalScore > bestScore) {
       bestScore = totalScore;
-      localStorage.setItem('jetpack_best', String(bestScore));
+      try { localStorage.setItem('jetpack_best', String(bestScore) } catch(e) {});
     }
 
     FuzzyScoreSubmit('jetpack', totalScore, duration);

@@ -220,12 +220,12 @@
 
   function saveBest() {
     const key = "bowling_best";
-    const prev = parseInt(localStorage.getItem(key) || "0", 10);
-    if (score > prev) localStorage.setItem(key, score);
+    const prev = parseInt((function(){try{return localStorage.getItem(key)}catch(e){return null}})() || "0", 10);
+    if (score > prev) try { localStorage.setItem(key, score) } catch(e) {};
   }
 
   function getBest() {
-    return parseInt(localStorage.getItem("bowling_best") || "0", 10);
+    return parseInt((function(){try{return localStorage.getItem("bowling_best")}catch(e){return null}})() || "0", 10);
   }
 
   /* ---------- resize ---------- */

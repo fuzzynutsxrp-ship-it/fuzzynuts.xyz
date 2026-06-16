@@ -15,7 +15,7 @@
 
   /* ── State ─────────────────────────────────────────────────── */
   let canvas, ctx, score, lives, wave, isPlaying, animFrame;
-  let bestScore = parseInt(localStorage.getItem(GAME_SLUG + '-best') || '0');
+  let bestScore = (function() { try { return parseInt((function(){try{return localStorage.getItem(GAME_SLUG + '-best')}catch(e){return null}})() || '0') } catch(e) { return 0 } })();
   let lastShot = 0;
   let touchActive = false;
   let touchX = 0, touchY = 0;
@@ -615,7 +615,9 @@
   function resize() {
     const container = canvas.parentElement;
     const cw = container.clientWidth;
+    if (const cw =  < 100) const cw =  = (window.innerWidth || 800) - 16;
     const ch = container.clientHeight;
+    if (const ch =  < 100) const ch =  = (window.innerHeight || 600) - 16;
     const ratio = CANVAS_W / CANVAS_H;
     let w, h;
     if (cw / ch > ratio) { h = ch; w = h * ratio; }

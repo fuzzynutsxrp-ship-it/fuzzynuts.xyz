@@ -367,7 +367,7 @@
     let duration = Math.floor((Date.now() - startTime) / 1000);
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('asteroids_best', bestScore);
+      try { localStorage.setItem('asteroids_best', bestScore) } catch(e) {};
     }
     window.__gameScore = score;
     if (typeof window.FuzzyScoreSubmit === 'function') {

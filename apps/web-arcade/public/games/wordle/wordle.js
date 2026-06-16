@@ -230,7 +230,7 @@
     }
     ctx = canvas.getContext('2d');
 
-    bestScore = parseInt(localStorage.getItem('wordle_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('wordle_best')}catch(e){return null}})() || '0', 10);
     window.__gameScore = 0;
 
     resize();

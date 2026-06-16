@@ -223,8 +223,8 @@
 223|    updateScoreDisplay();
 224|
 225|    const bestKey = 'minesweeper_best';
-226|    const best = parseInt(localStorage.getItem(bestKey) || '0');
-227|    if (score > best) localStorage.setItem(bestKey, score.toString());
+226|    const best = (function() { try { return parseInt((function(){try{return localStorage.getItem(bestKey)}catch(e){return null}})() || '0') } catch(e) { return 0 } })();
+227|    if (score > best) try { localStorage.setItem(bestKey, score.toString() } catch(e) {});
 228|
 229|    draw();
 230|
@@ -435,7 +435,7 @@
 435|
 436|  function showGameOverScreen(won) {
 437|    let best = 0;
-    try { best = parseInt(localStorage.getItem('minesweeper_best') || '0'); } catch (e) { /* storage blocked */ }
+    try { best = (function() { try { return parseInt((function(){try{return localStorage.getItem('minesweeper_best')}catch(e){return null}})() || '0') } catch(e) { return 0 } })(); } catch (e) { /* storage blocked */ }
 438|
 439|    ctx.fillStyle = 'rgba(10,6,20,0.85)';
 440|    ctx.fillRect(0, 0, canvas.width, canvas.height);

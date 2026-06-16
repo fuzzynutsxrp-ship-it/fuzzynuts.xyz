@@ -434,7 +434,7 @@
     // Save best score
     const bestKey = 'maze-escape_best';
     const prev = parseInt(localStorage.getItem(bestKey)) || 0;
-    if (score > prev) localStorage.setItem(bestKey, score);
+    if (score > prev) try { localStorage.setItem(bestKey, score) } catch(e) {};
 
     window.__gameScore = score;
     if (typeof FuzzyScoreSubmit === 'function') {
