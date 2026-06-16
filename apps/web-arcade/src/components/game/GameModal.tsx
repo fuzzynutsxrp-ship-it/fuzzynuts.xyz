@@ -33,16 +33,18 @@ import { GameErrorBoundary } from "@/components/GameErrorBoundary";
 /* ═══════════════════════════════════════════════════════════════
    GameModal — CrazyGames-style lightbox for instant game play
 
+   Uses a plain <div> overlay instead of <dialog showModal()>.
+   iOS Safari's top-layer rendering breaks touch events inside
+   iframes. A position:fixed div sidesteps the bug entirely.
+
    Battle-tested patterns:
    • React Portal → renders at document.body (no z-index wars)
-   • <dialog> native element → ESC-to-close, focus trap, inert bg
+   • position:fixed div overlay → iOS-safe iframe touch
    • iframe sandbox + allow → sandboxed game embedding
    • FUZZY_CONFIG postMessage → nav suppression inside iframe
    • LoadingOverlay reuse → branded spinner while iframe boots
    • Fullscreen API → same toggle as the full game page
    • Play Next sidebar → CrazyGames-style game switching
-
-   This is the ONLY game shell. Just the iframe + chrome controls.
    ═══════════════════════════════════════════════════════════════ */
 
 // ── GAMES id → gameRegistry slug bridge ──
@@ -84,7 +86,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   const game = gameId ? resolveGameMetadata(gameId) : undefined;
 
   // ── Refs ──
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -144,50 +146,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
       }));
   }, [game]);
 
-  // ── Open / close <dialog> ──
+  // ── Open / close: reset state when modal opens ──
   useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (isOpen && game && !dialog.open) {
-      dialog.showModal();
-
-      // iOS Safari fix: force layout repaint after showModal() to rebuild
-      // WebKit's hit-test tree for the top-layer. Without this, touch events
-      // fail to reach iframes inside the dialog (WebKit Bug #264832).
-      void dialog.offsetHeight;
-
+    if (isOpen && game) {
       setIsLoading(true);
       setLoadProgress(0);
       setIframeKey(0);
-
-      // iOS Safari fix: strip transform after open animation completes.
-      // A lingering transform (even scale(1)) promotes the dialog to a
-      // compositor layer, which breaks iframe hit-testing on iOS Safari.
-      // Use animationend + fallback timeout for reliability.
-      const stripTransform = () => {
-        dialog.style.transform = "none";
-        dialog.style.willChange = "auto";
-      };
-      const onAnimEnd = (e: AnimationEvent) => {
-        if (e.target === dialog) {
-          stripTransform();
-          dialog.removeEventListener("animationend", onAnimEnd);
-        }
-      };
-      dialog.addEventListener("animationend", onAnimEnd);
-      // Fallback: iOS sometimes drops animationend on rapid show/hide
-      const fallbackTimer = setTimeout(stripTransform, 400);
-
-      // Restore transform for next open (so the CSS animation works again)
-      return () => {
-        clearTimeout(fallbackTimer);
-        dialog.removeEventListener("animationend", onAnimEnd);
-        dialog.style.transform = "";
-        dialog.style.willChange = "";
-      };
-    } else if (!isOpen && dialog.open) {
-      dialog.close();
     }
   }, [isOpen, game]);
 
@@ -200,15 +164,13 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     }
   }, [gameId]);
 
-  // ── Lock body scroll while open (Qwen fix: avoid position:fixed on body) ──
-  // position:fixed on body blocks iframe touch events on iOS Safari.
-  // Use overflow:hidden on html+body + overscroll-behavior:none instead.
-  // Note: overscroll-behavior requires iOS Safari 16+. Older iOS will still
-  // scroll-lock via overflow:hidden but may show rubber-band bounce at edges.
+  // ── Lock body scroll while open ──
+  // Use overflow:hidden on html+body + overscroll-behavior:none.
+  // position:fixed on body is avoided — it breaks iframe touch on iOS.
   useEffect(() => {
     if (!isOpen) return;
     const html = document.documentElement;
-    const scrollY = window.scrollY; // defensive safety net — overflow:hidden preserves position natively, but scrollTo ensures restoration on edge cases
+    const scrollY = window.scrollY;
     const prevBodyOverflow = document.body.style.overflow;
     const prevBodyTouch = document.body.style.touchAction;
     const prevBodyOverscroll = document.body.style.overscrollBehavior;
@@ -220,20 +182,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     html.style.overscrollBehavior = "none";
     document.body.style.touchAction = "manipulation";
 
-    // iOS Safari fix (WebKit Bug #33894): register a dummy touchstart listener
-    // on the main frame so Safari doesn't bail out early and fail to propagate
-    // touch events to the iframe. Without this, iOS sometimes discards touch
-    // events at the platform layer before hit-detection reaches the iframe.
-    const noop = () => {};
-    window.addEventListener("touchstart", noop, { passive: true });
-
     return () => {
       document.body.style.overflow = prevBodyOverflow;
       document.body.style.touchAction = prevBodyTouch;
       document.body.style.overscrollBehavior = prevBodyOverscroll;
       html.style.overflow = prevHtmlOverflow;
       html.style.overscrollBehavior = prevHtmlOverscroll;
-      window.removeEventListener("touchstart", noop);
       window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
@@ -272,10 +226,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     // or fallback to a timeout after iframe loads
     if (game?.slug) trackGameStart(game.slug);
 
-    // iOS Safari fix: force focus on the iframe after load.
-    // iOS intermittently refuses to assign focus to cross-origin iframes
-    // inside modals, causing the first tap to be silently swallowed as the
-    // OS attempts to grant focus to the iframe window.
+    // Force focus on iframe after load (iOS Safari needs this)
     try {
       iframeRef.current?.focus();
     } catch {
@@ -363,11 +314,14 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // <dialog> handles ESC natively via onCancel — we handle others
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       switch (e.key) {
+        case "Escape":
+          e.preventDefault();
+          handleClose();
+          break;
         case "f":
         case "F":
           if (!e.ctrlKey && !e.metaKey) {
@@ -387,7 +341,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, toggleFullscreen, toggleMute]);
+  }, [isOpen, handleClose, toggleFullscreen, toggleMute]);
 
   const handleGameSwitch = useCallback(
     (newGamesId: string) => {
@@ -412,22 +366,20 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     "allow-scripts allow-same-origin allow-popups-to-escape-sandbox";
 
   return createPortal(
-    <dialog
-      ref={dialogRef}
-      className="game-modal"
-      onClose={handleClose}
-      onCancel={(e) => {
-        // Native ESC triggers this — close cleanly
-        e.preventDefault();
-        handleClose();
-      }}
-      // Click on backdrop (the ::backdrop pseudo) closes
-      onClick={(e) => {
-        if (e.target === dialogRef.current) {
-          handleClose();
-        }
-      }}
+    <div
+      ref={overlayRef}
+      className={`game-modal ${isOpen ? "game-modal--open" : ""}`}
+      role="dialog"
+      aria-modal={isOpen}
+      aria-label={game ? `Play ${game.title}` : "Game"}
     >
+      {/* Backdrop — click to close */}
+      <div
+        className="game-modal__backdrop"
+        onClick={handleClose}
+        aria-hidden="true"
+      />
+
       {/* DEGEN OVERHAUL START — game modal chrome + Play Next sidebar */}
 
       {/* ── Header bar ── */}
@@ -783,7 +735,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
         </aside>
       </div>
       {/* DEGEN OVERHAUL END */}
-    </dialog>,
+    </div>,
     document.body
   );
 }
