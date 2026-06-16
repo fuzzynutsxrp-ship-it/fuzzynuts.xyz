@@ -120,24 +120,18 @@ function main(): void {
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-    // Strip all dynamic fields before comparing — the check verifies that
-    // status flags, migration phases, and structural content are fresh,
-    // NOT that the wall-clock timestamp or relative commit times match.
-    const normalize = (s: string) =>
-      s
-        // ISO timestamp in the header
-        .replace(
-          /_Generated \*\*\d{4}-\d{2}-\d{2}T[\d:.]+Z\*\*/g,
-          "_Generated **TIMESTAMP**",
-        )
-        // commit SHA in the header
-        .replace(/from `[0-9a-f]+`/g, "from `COMMIT`")
-        // relative times in recent commits ("21 hours ago", "3 minutes ago")
-        .replace(/\d+ (?:seconds?|minutes?|hours?|days?|weeks?|months?|years?) ago/g, "TIME_AGO")
-        // the commit list itself shifts when STATUS.md is committed
-        .replace(/^- `[0-9a-f]+` /gm, "- `COMMIT` ");
-    if (normalize(cur) !== normalize(out)) {
-      // Show the actual diff so the developer can see what's stale
+    // Only compare the structural content — strip the header (timestamp +
+    // HEAD SHA are always different between generation and check time) and
+    // the entire "Recent activity" section (commit list shifts on every run).
+    const stablePart = (s: string) => {
+      const noHeader = s.replace(
+        /\n_Generated \*\*.*?\*\* from `[^`]*` on `[^`]*`\._\n/,
+        "\n",
+      );
+      const idx = noHeader.indexOf("## Recent activity");
+      return idx >= 0 ? noHeader.slice(0, idx) : noHeader;
+    };
+    if (stablePart(cur) !== stablePart(out)) {
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);
     }
