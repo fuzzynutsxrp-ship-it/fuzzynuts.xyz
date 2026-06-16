@@ -302,6 +302,27 @@
       btn.addEventListener('pointerdown', startGame, { once: true });
     }
 
+    // Wire up difficulty buttons (for games like Minesweeper with difficulty selection)
+    var diffBtns = overlay.querySelectorAll('.difficulty-btn');
+    if (diffBtns.length > 0) {
+      for (var d = 0; d < diffBtns.length; d++) {
+        (function(diffBtn) {
+          diffBtn.addEventListener('pointerdown', function () {
+            var diff = diffBtn.getAttribute('data-difficulty') || 'beginner';
+            try {
+              if (window.audioContext && window.audioContext.state === 'suspended') {
+                window.audioContext.resume();
+              }
+            } catch (err) { console.warn('[ArcadeShell] Audio unlock failed:', err); }
+            dismissOverlay();
+            resetScoreTracking();
+            // Notify game of difficulty selection via same-window postMessage
+            window.postMessage({ action: 'START_GAME', difficulty: diff }, '*');
+          }, { once: true });
+        })(diffBtns[d]);
+      }
+    }
+
     // Wire up restart button
     if (restartBtn) {
       restartBtn.addEventListener('pointerdown', function () {

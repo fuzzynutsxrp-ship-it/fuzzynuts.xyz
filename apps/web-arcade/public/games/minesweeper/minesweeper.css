@@ -3,11 +3,13 @@
   width: 100%; height: calc(100dvh - var(--arcade-nav-height, 44px));
   position: relative; overflow: hidden; background: #0a0614;
   font-family: var(--arcade-font, 'Outfit', system-ui, sans-serif);
+  display: flex; align-items: center; justify-content: center;
 }
 body.in-iframe #game-container { height: 100dvh; }
 #game-canvas {
-  display: block; width: 100%; height: 100%;
-  position: absolute; top: 0; left: 0; z-index: 1;
+  display: block;
+  touch-action: none;
+  -webkit-touch-callout: none;
 }
 .overlay {
   position: absolute; inset: 0; z-index: 10;
@@ -23,12 +25,26 @@ h1 {
   margin: 0 0 0.5rem; text-shadow: 0 0 30px #ef444466;
 }
 .subtitle { color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.5rem; }
+.difficulty-buttons {
+  display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem;
+}
+.difficulty-btn {
+  font-family: var(--arcade-font, 'Outfit', system-ui, sans-serif);
+  font-size: 1rem; font-weight: 700;
+  background: #ef4444; color: #0a0614; border: none;
+  padding: 0.75rem 2rem; border-radius: 0.75rem; cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  min-height: 44px;
+}
+.difficulty-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px #ef444466; }
+.difficulty-btn:active { transform: scale(0.97); }
 .play-btn {
   font-family: var(--arcade-font, 'Outfit', system-ui, sans-serif);
   font-size: 1.1rem; font-weight: 700;
   background: #ef4444; color: #0a0614; border: none;
   padding: 0.9rem 2.5rem; border-radius: 0.75rem; cursor: pointer;
   transition: transform 150ms ease, box-shadow 150ms ease;
+  min-height: 44px;
 }
 .play-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px #ef444466; }
 .controls-info { margin-top: 1.2rem; font-size: 0.8rem; color: #6b7280; line-height: 1.8; }

@@ -22,7 +22,7 @@
   let grid, rows, cols, totalMines;
   let cellSize, offsetX, offsetY;
   let revealed, flagged, mines, numbers;
-  let gameState; // 'start', 'playing', 'won', 'lost'
+  let gameState; // 'idle', 'playing', 'won', 'lost'
   let firstClick;
   let timer, startTime, elapsed;
   let score;
@@ -51,9 +51,35 @@
 
     window.addEventListener('resize', resize);
 
+    // Listen for START_GAME message from arcade-shell
+    window.addEventListener('message', onMessage);
+
+    // Show idle state (blank canvas) until difficulty is selected
+    gameState = 'idle';
+    resize();
+    draw();
+
+    // Signal ready to parent GameModal
+    try {
+      window.parent.postMessage({ type: 'FUZZY_GAME_READY' }, '*');
+    } catch (e) { /* noop */ }
+  }
+
+  function onMessage(e) {
+    if (!e.data || typeof e.data !== 'object') return;
+    if (e.data.action === 'START_GAME' && e.data.difficulty) {
+      if (DIFFICULTIES[e.data.difficulty]) {
+        difficulty = e.data.difficulty;
+        startNewGame();
+      }
+    }
+  }
+
+  function startNewGame() {
     resetGame();
     resize();
-    showStartScreen();
+    gameState = 'playing';
+    draw();
   }
 
   function resetGame() {
@@ -66,7 +92,7 @@
     flagged = new Array(rows).fill(null).map(() => new Array(cols).fill(false));
     mines = new Array(rows).fill(null).map(() => new Array(cols).fill(false));
     numbers = new Array(rows).fill(null).map(() => new Array(cols).fill(0));
-    gameState = 'start';
+    gameState = 'playing';
     firstClick = true;
     timer = null;
     startTime = 0;
@@ -77,11 +103,23 @@
 
   function resize() {
     const container = canvas.parentElement || document.body;
-    const maxW = Math.min(container.clientWidth || 800, 1200);
-    const maxH = Math.min(container.clientHeight || 600, 800) - 60;
+    const maxW = (container.clientWidth || window.innerWidth || 800) - 16;
+    const maxH = (container.clientHeight || window.innerHeight || 600) - 16;
 
+    if (gameState === 'idle') {
+      // Just size canvas to fill container
+      canvas.width = maxW;
+      canvas.height = maxH;
+      cellSize = 32;
+      offsetX = 1;
+      offsetY = 1;
+      draw();
+      return;
+    }
+
+    // Compute cellSize from viewport, clamped to touch-friendly range
     cellSize = Math.floor(Math.min(maxW / cols, maxH / rows, 40));
-    cellSize = Math.max(cellSize, 16);
+    cellSize = Math.max(cellSize, 24);
 
     const w = cols * cellSize + 2;
     const h = rows * cellSize + 2;
@@ -213,12 +251,9 @@
   }
 
   function onClick(e) {
+    if (gameState !== 'playing') return;
     const cell = getCell(e);
     if (!cell) return;
-    if (gameState === 'start') {
-      startGame(cell.r, cell.c);
-    }
-    if (gameState !== 'playing') return;
     if (flagged[cell.r][cell.c]) return;
     if (revealed[cell.r][cell.c]) return;
 
@@ -306,7 +341,15 @@
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (gameState === 'start') return; // start screen overlay handles it
+    if (gameState === 'idle') {
+      // Show waiting message
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Select a difficulty to begin', canvas.width / 2, canvas.height / 2);
+      return;
+    }
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
@@ -385,62 +428,7 @@
     }
   }
 
-  // --- Screens ---
-
-  function showStartScreen() {
-    gameState = 'start';
-    draw();
-    ctx.fillStyle = BG;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold ${Math.floor(cellSize * 0.8)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('💣 MINESWEEPER', canvas.width / 2, canvas.height / 2 - 60);
-
-    const btns = [
-      { label: 'Beginner 9×9', key: 'beginner' },
-      { label: 'Intermediate 16×16', key: 'intermediate' },
-      { label: 'Expert 30×16', key: 'expert' }
-    ];
-
-    btns.forEach((btn, i) => {
-      const bx = canvas.width / 2 - 90;
-      const by = canvas.height / 2 - 10 + i * 40;
-      const bw = 180, bh = 32;
-
-      const isHover = hoverCell && hoverCell._btn === i;
-      ctx.fillStyle = isHover ? '#ef4444' : '#3a3a4a';
-      ctx.fillRect(bx, by, bw, bh);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '14px sans-serif';
-      ctx.fillText(btn.label, canvas.width / 2, by + bh / 2);
-
-      // Store button bounds for click detection
-      btn._x = bx; btn._y = by; btn._w = bw; btn._h = bh;
-    });
-
-    // Override click for start screen
-    canvas.onclick = function (e) {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      for (const btn of btns) {
-        if (mx >= btn._x && mx <= btn._x + btn._w && my >= btn._y && my <= btn._y + btn._h) {
-          difficulty = btn.key;
-          canvas.onclick = null; // restore normal handler
-          resetGame();
-          resize();
-          gameState = 'playing';
-          draw();
-          // Re-attach normal listeners
-          canvas.addEventListener('click', onClick);
-          return;
-        }
-      }
-    };
-  }
+  // --- Game Over Screen ---
 
   function showGameOverScreen(won) {
     const best = parseInt(localStorage.getItem('minesweeper_best') || '0');
@@ -469,17 +457,40 @@
     ctx.font = 'bold 16px sans-serif';
     ctx.fillText('Play Again', canvas.width / 2, by + bh / 2);
 
-    canvas.onclick = function (e) {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      if (mx >= bx && mx <= bx + bw && my >= by && my <= by + bh) {
-        canvas.onclick = null;
-        resetGame();
-        resize();
-        showStartScreen();
+    // Overlay the game-over HTML div
+    const goOverlay = document.getElementById('game-over');
+    const finalScoreEl = document.getElementById('final-score');
+    const newBestEl = document.getElementById('new-best');
+    if (goOverlay) {
+      if (finalScoreEl) finalScoreEl.textContent = score;
+      if (newBestEl) {
+        if (score > best && score > 0) {
+          newBestEl.classList.remove('hidden');
+        } else {
+          newBestEl.classList.add('hidden');
+        }
       }
-    };
+      goOverlay.classList.remove('hidden');
+    }
+
+    // Wire restart button
+    const restartBtn = document.getElementById('restart-btn');
+    if (restartBtn) {
+      restartBtn.addEventListener('pointerdown', function onRestart() {
+        restartBtn.removeEventListener('pointerdown', onRestart);
+        if (goOverlay) goOverlay.classList.add('hidden');
+        // Show start screen again (go back to idle, user picks difficulty)
+        gameState = 'idle';
+        resize();
+        draw();
+        // Show the start screen overlay again
+        const startScreen = document.getElementById('start-screen');
+        if (startScreen) {
+          startScreen.classList.remove('hidden');
+          startScreen.style.display = '';
+        }
+      }, { once: true });
+    }
   }
 
   // --- Bootstrap ---
