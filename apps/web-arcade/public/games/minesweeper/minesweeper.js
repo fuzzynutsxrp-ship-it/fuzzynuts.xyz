@@ -103,8 +103,11 @@
 
   function resize() {
     const container = canvas.parentElement || document.body;
-    const maxW = (container.clientWidth || window.innerWidth || 800) - 16;
-    const maxH = (container.clientHeight || window.innerHeight || 600) - 16;
+    const style = getComputedStyle(container);
+    const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const maxW = (container.clientWidth || window.innerWidth || 800) - padX - 16;
+    const maxH = (container.clientHeight || window.innerHeight || 600) - padY - 16;
 
     if (gameState === 'idle') {
       // Just size canvas to fill container

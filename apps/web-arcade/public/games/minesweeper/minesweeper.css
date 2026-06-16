@@ -4,8 +4,13 @@
   position: relative; overflow: hidden; background: #0a0614;
   font-family: var(--arcade-font, 'Outfit', system-ui, sans-serif);
   display: flex; align-items: center; justify-content: center;
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-body.in-iframe #game-container { height: 100dvh; }
+body.in-iframe #game-container {
+  height: 100dvh;
+  padding: max(env(safe-area-inset-top), 8px) max(env(safe-area-inset-right), 8px) max(env(safe-area-inset-bottom), 8px) max(env(safe-area-inset-left), 8px);
+}
 #game-canvas {
   display: block;
   touch-action: none;
