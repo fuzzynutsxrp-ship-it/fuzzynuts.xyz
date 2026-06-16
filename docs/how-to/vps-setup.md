@@ -37,6 +37,7 @@ bash /root/patch-rsc-teavm-client.sh
 ```
 
 This will:
+
 - Back up the original `mudclient.java` and `classes.js`
 - Patch the Java source to accept username/password from URL hash params 6 and 7
 - Rebuild the TeaVM JavaScript via Maven

@@ -49,8 +49,7 @@ const MAX_CHALLENGE_AGE_MS = 300_000; // 5 minutes
 const XRPL_ACCOUNT_PREFIX = 0x00;
 
 /** Base58 alphabet used by XRPL */
-const BASE58_ALPHABET =
-  "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
+const BASE58_ALPHABET = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
 
 /* ── Hex Utilities ── */
 
@@ -126,9 +125,7 @@ async function accountIdFromPubKey(pubKeyHex: string): Promise<Uint8Array> {
 
 /** Derive r-address from public key (simplified — use xrpl.js for production) */
 async function deriveAddress(publicKey: string): Promise<string> {
-  const cleanKey = publicKey.startsWith("ED")
-    ? publicKey.slice(2)
-    : publicKey;
+  const cleanKey = publicKey.startsWith("ED") ? publicKey.slice(2) : publicKey;
 
   const accountId = await accountIdFromPubKey(cleanKey);
 
@@ -219,8 +216,7 @@ export async function verifyWalletSignature(
 
     // Derive address from public key
     const derived = await deriveAddress(signed.publicKey);
-    const addressMatch =
-      derived.toLowerCase() === expectedAddress.toLowerCase();
+    const addressMatch = derived.toLowerCase() === expectedAddress.toLowerCase();
 
     return {
       valid: true,

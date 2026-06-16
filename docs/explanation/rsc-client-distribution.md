@@ -73,6 +73,7 @@ ecosystem for RSC is immature and would require significant custom
 development. For now, Option A (JAR download) is the pragmatic choice.
 
 If browser play becomes a priority, evaluate:
+
 1. Whether 2003scape/rsc-client can connect to an Open-RSC server
 2. What game features are missing
 3. Whether the effort justifies the improved UX
@@ -83,10 +84,10 @@ If browser play becomes a priority, evaluate:
 The Open-RSC client reads server connection details from config files
 in its working directory:
 
-| File | Content | Default |
-|------|---------|---------|
-| `ip.txt` | Server hostname | `fuzzynuts.xyz` |
-| `port.txt` | Server port | `43594` |
+| File       | Content         | Default         |
+| ---------- | --------------- | --------------- |
+| `ip.txt`   | Server hostname | `fuzzynuts.xyz` |
+| `port.txt` | Server port     | `43594`         |
 
 If the client can't auto-detect these values, players can manually
 edit the files. The `/play/rsc` page includes fallback instructions.

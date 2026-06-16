@@ -21,11 +21,7 @@ interface IdenticonAvatarProps {
   className?: string;
 }
 
-export function IdenticonAvatar({
-  value,
-  size = 80,
-  className = "",
-}: IdenticonAvatarProps) {
+export function IdenticonAvatar({ value, size = 80, className = "" }: IdenticonAvatarProps) {
   const svgMarkup = useMemo(() => {
     if (!value) return "";
     try {

@@ -198,11 +198,11 @@ Always test on XRPL Testnet first:
 
 ## Key Management
 
-| Key | Storage | Access | Purpose |
-|-----|---------|--------|---------|
-| Master | Air-gapped / HSM | Never online | Account recovery only |
-| Regular (distributor) | Railway env var | Daily payouts | Sign Payment txns |
-| Signer keys | Split custody | Multi-sig recovery | Rotate regular key |
+| Key                   | Storage          | Access             | Purpose               |
+| --------------------- | ---------------- | ------------------ | --------------------- |
+| Master                | Air-gapped / HSM | Never online       | Account recovery only |
+| Regular (distributor) | Railway env var  | Daily payouts      | Sign Payment txns     |
+| Signer keys           | Split custody    | Multi-sig recovery | Rotate regular key    |
 
 ## References
 

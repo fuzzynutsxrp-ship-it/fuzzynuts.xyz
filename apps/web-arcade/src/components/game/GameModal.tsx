@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -54,7 +48,7 @@ const ID_TO_SLUG: Record<string, string> = {
 
 // Reverse: slug → GAMES[].id  (for sidebar card clicks)
 const SLUG_TO_ID: Record<string, string> = Object.fromEntries(
-  Object.entries(ID_TO_SLUG).map(([id, slug]) => [slug, id])
+  Object.entries(ID_TO_SLUG).map(([id, slug]) => [slug, id]),
 );
 
 function slugToGamesId(slug: string): string {
@@ -102,7 +96,12 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
 
   // DEGEN CHAT START — live chat via Socket.io
   const { address } = useWalletStore();
-  const { messages: chatMessages, onlineUsers: chatOnlineUsers, connected: chatConnected, sendMessage: sendChatMessage } = useChatSocket(address);
+  const {
+    messages: chatMessages,
+    onlineUsers: chatOnlineUsers,
+    connected: chatConnected,
+    sendMessage: sendChatMessage,
+  } = useChatSocket(address);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const chatMessagesEndRef = useRef<HTMLDivElement>(null);
@@ -213,7 +212,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
         const gameOrigin = new URL(iframeRef.current?.src || window.location.origin).origin;
         iframeRef.current?.contentWindow?.postMessage(
           { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.location.origin },
-          gameOrigin
+          gameOrigin,
         );
       } catch {
         /* cross-origin, noop */
@@ -303,7 +302,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
     }
     iframeRef.current?.contentWindow?.postMessage(
       { type: "setMute", muted: next },
-      new URL(iframeRef.current?.src || window.location.origin).origin
+      new URL(iframeRef.current?.src || window.location.origin).origin,
     );
   }, [isMuted]);
 
@@ -341,10 +340,14 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   const handleGameSwitch = useCallback(
     (newGamesId: string) => {
       // Kill any accidental text selection from the sidebar click
-      try { window.getSelection()?.removeAllRanges(); } catch { /* noop */ }
+      try {
+        window.getSelection()?.removeAllRanges();
+      } catch {
+        /* noop */
+      }
       onGameSwitch?.(newGamesId);
     },
-    [onGameSwitch]
+    [onGameSwitch],
   );
 
   // Build allow policy — add cross-origin-isolated for games that need SharedArrayBuffer.
@@ -357,8 +360,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
   // Don't render anything if no game
   if (!game) return null;
 
-  const defaultSandbox =
-    "allow-scripts allow-same-origin allow-popups-to-escape-sandbox";
+  const defaultSandbox = "allow-scripts allow-same-origin allow-popups-to-escape-sandbox";
 
   return createPortal(
     <dialog
@@ -466,77 +468,77 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
         {/* Game viewport — wrapped in ErrorBoundary so a single game crash
             never kills the entire Next.js app */}
         <GameErrorBoundary onRetry={handleRetry}>
-        <div
-          ref={containerRef}
-          className="game-modal__viewport"
-          style={{
-            position: "relative",
-          }}
-        >
-          {/* Loading state */}
-          <AnimatePresence>
-            {isLoading && (
-              <motion.div
-                initial={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="game-modal__loading"
-                role="status"
-                aria-label={`Loading ${game.title}`}
-              >
+          <div
+            ref={containerRef}
+            className="game-modal__viewport"
+            style={{
+              position: "relative",
+            }}
+          >
+            {/* Loading state */}
+            <AnimatePresence>
+              {isLoading && (
                 <motion.div
-                  animate={{
-                    y: [0, -14, 0],
-                    rotate: [0, 12, -12, 0],
-                  }}
-                  transition={{
-                    y: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
-                    rotate: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                  }}
-                  className="text-5xl sm:text-6xl mb-4 select-none drop-shadow-[0_0_18px_rgba(255,46,136,0.65)]"
-                  aria-hidden="true"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="game-modal__loading"
+                  role="status"
+                  aria-label={`Loading ${game.title}`}
                 >
-                  🌰
-                </motion.div>
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="font-display text-xl sm:text-2xl font-black gradient-text-gold text-hero-glow mb-2"
-                >
-                  {game.title}
-                </motion.h2>
-                <div className="flex items-center gap-2 text-sm text-[var(--color-cream-dim)]">
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Booting cabinet…</span>
-                </div>
-                {/* Progress bar */}
-                <div className="w-48 h-1.5 rounded-full bg-white/10 mt-4 overflow-hidden">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-[#ff2e88] to-[#fbbf24]"
-                    initial={{ width: "0%" }}
-                    animate={{ width: `${loadProgress}%` }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    animate={{
+                      y: [0, -14, 0],
+                      rotate: [0, 12, -12, 0],
+                    }}
+                    transition={{
+                      y: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
+                      rotate: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                    }}
+                    className="text-5xl sm:text-6xl mb-4 select-none drop-shadow-[0_0_18px_rgba(255,46,136,0.65)]"
+                    aria-hidden="true"
+                  >
+                    🌰
+                  </motion.div>
+                  <motion.h2
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="font-display text-xl sm:text-2xl font-black gradient-text-gold text-hero-glow mb-2"
+                  >
+                    {game.title}
+                  </motion.h2>
+                  <div className="flex items-center gap-2 text-sm text-[var(--color-cream-dim)]">
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Booting cabinet…</span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="w-48 h-1.5 rounded-full bg-white/10 mt-4 overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-[#ff2e88] to-[#fbbf24]"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${loadProgress}%` }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* The iframe */}
-          <iframe
-            ref={iframeRef}
-            key={iframeKey}
-            src={game.iframePath}
-            title={`Play ${game.title}`}
-            sandbox={game.sandbox || defaultSandbox}
-            loading="eager"
-            allow={allowPolicy}
-            onLoad={handleIframeLoad}
-            className="game-modal__iframe"
-            aria-label={`${game.title} game window`}
-          />
-        </div>
+            {/* The iframe */}
+            <iframe
+              ref={iframeRef}
+              key={iframeKey}
+              src={game.iframePath}
+              title={`Play ${game.title}`}
+              sandbox={game.sandbox || defaultSandbox}
+              loading="eager"
+              allow={allowPolicy}
+              onLoad={handleIframeLoad}
+              className="game-modal__iframe"
+              aria-label={`${game.title} game window`}
+            />
+          </div>
         </GameErrorBoundary>
 
         {/* ── Play Next sidebar (CrazyGames pattern) ── */}
@@ -571,10 +573,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                 {/* Info */}
                 <div className="play-next-card__info">
                   <span className="play-next-card__title">{rec.title}</span>
-                  <span
-                    className="play-next-card__genre"
-                    style={{ color: rec.color }}
-                  >
+                  <span className="play-next-card__genre" style={{ color: rec.color }}>
                     {rec.genre}
                   </span>
                 </div>
@@ -594,9 +593,7 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
           {/* Victory banner — shows after a score is submitted */}
           {showVictory && lastScore && (
             <div className="mx-3 mt-2 mb-1 px-3 py-3 rounded-lg bg-gradient-to-r from-brand-gold/15 to-[var(--color-hot-pink)]/15 border border-brand-gold/30">
-              <p className="text-xs font-bold text-brand-gold mb-1">
-                🏆 Score Submitted!
-              </p>
+              <p className="text-xs font-bold text-brand-gold mb-1">🏆 Score Submitted!</p>
               <p className="text-[11px] text-[var(--color-cream)]">
                 {lastScore.score.toLocaleString()} on {lastScore.game}
               </p>
@@ -650,7 +647,9 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                 <span className="sidebar-chat__count">{chatOnlineUsers.length || ""}</span>
               )}
               {!chatConnected && (
-                <span className="sidebar-chat__count" style={{ opacity: 0.4 }}>...</span>
+                <span className="sidebar-chat__count" style={{ opacity: 0.4 }}>
+                  ...
+                </span>
               )}
               <ChevronDown
                 size={13}
@@ -671,7 +670,14 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                   {/* Message list */}
                   <div className="sidebar-chat__messages">
                     {chatMessages.length === 0 && (
-                      <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: "0.7rem", padding: "1rem" }}>
+                      <div
+                        style={{
+                          textAlign: "center",
+                          color: "rgba(255,255,255,0.3)",
+                          fontSize: "0.7rem",
+                          padding: "1rem",
+                        }}
+                      >
                         {chatConnected ? "No messages yet" : "Connecting..."}
                       </div>
                     )}
@@ -680,15 +686,18 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
                         <span
                           className="sidebar-chat__user"
                           style={{
-                            color: msg.muted ? "#FBBF24" : msg.shadowed ? "#ef4444" : "#7c3aed"
+                            color: msg.muted ? "#FBBF24" : msg.shadowed ? "#ef4444" : "#7c3aed",
                           }}
                         >
                           {msg.username}
                         </span>
-                        <span className="sidebar-chat__text" style={{
-                          textDecoration: (msg.shadowed || msg.muted) ? "line-through" : "none",
-                          opacity: msg.shadowed ? 0.6 : 1
-                        }}>
+                        <span
+                          className="sidebar-chat__text"
+                          style={{
+                            textDecoration: msg.shadowed || msg.muted ? "line-through" : "none",
+                            opacity: msg.shadowed ? 0.6 : 1,
+                          }}
+                        >
                           {msg.content}
                         </span>
                       </div>
@@ -733,6 +742,6 @@ export function GameModal({ gameId, onClose, onGameSwitch }: GameModalProps) {
       </div>
       {/* DEGEN OVERHAUL END */}
     </dialog>,
-    document.body
+    document.body,
   );
 }

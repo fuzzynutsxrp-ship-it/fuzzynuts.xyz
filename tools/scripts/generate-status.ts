@@ -75,7 +75,9 @@ function fill(tmpl: string, key: string, value: string): string {
 
 function rootVersion(): string {
   try {
-    return (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version as string) ?? "0.0.0";
+    return (
+      (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version as string) ?? "0.0.0"
+    );
   } catch {
     return "0.0.0";
   }
@@ -87,10 +89,12 @@ function recentCommits(n = 10): string {
   const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}'`);
   if (!raw) return "";
   const lines = raw.split("\n").filter(Boolean);
-  return lines.map((l) => {
-    const [sha, subject, author, when] = l.split(SEP);
-    return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
-  }).join("\n");
+  return lines
+    .map((l) => {
+      const [sha, subject, author, when] = l.split(SEP);
+      return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
+    })
+    .join("\n");
 }
 
 function main(): void {

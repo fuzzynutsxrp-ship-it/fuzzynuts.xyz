@@ -14,7 +14,12 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 
 import type { SubmissionStatus, ScoreSubmissionReturn } from "../types/arcade";
-import { SCORE_CAPS, MIN_PLAY_DURATION_MS, SUBMIT_COOLDOWN_MS, isAllowedMessageOrigin } from "../constants";
+import {
+  SCORE_CAPS,
+  MIN_PLAY_DURATION_MS,
+  SUBMIT_COOLDOWN_MS,
+  isAllowedMessageOrigin,
+} from "../constants";
 import { getCurrentWeekKey } from "../utils/scoreHelpers";
 
 /**

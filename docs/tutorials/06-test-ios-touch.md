@@ -10,11 +10,11 @@ Validate that iframe-hosted HTML5 games receive touch events, unlock audio, and 
 
 ## Test Matrix
 
-| iOS Version | Safari Engine | Key Constraint | Priority |
-|-------------|---------------|----------------|----------|
-| 15.x | WebKit ~15 | No `overscroll-behavior`; strict audio gesture rules | 🔴 High |
-| 16.x | WebKit ~16 | Full CSS spec support | 🟡 Medium |
-| 17.x / 18.x | WebKit ~17/18 | Current baseline | 🟢 Low (regression) |
+| iOS Version | Safari Engine | Key Constraint                                       | Priority            |
+| ----------- | ------------- | ---------------------------------------------------- | ------------------- |
+| 15.x        | WebKit ~15    | No `overscroll-behavior`; strict audio gesture rules | 🔴 High             |
+| 16.x        | WebKit ~16    | Full CSS spec support                                | 🟡 Medium           |
+| 17.x / 18.x | WebKit ~17/18 | Current baseline                                     | 🟢 Low (regression) |
 
 ## Game Coverage
 

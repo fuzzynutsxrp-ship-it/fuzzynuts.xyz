@@ -27,7 +27,16 @@ interface LeaderboardSkeletonProps {
 function SkeletonRow({ index }: { index: number }) {
   const isTopThree = index < 3;
   const widthVariants = [
-    "w-20", "w-28", "w-24", "w-32", "w-20", "w-36", "w-24", "w-28", "w-20", "w-32",
+    "w-20",
+    "w-28",
+    "w-24",
+    "w-32",
+    "w-20",
+    "w-36",
+    "w-24",
+    "w-28",
+    "w-20",
+    "w-32",
   ];
 
   return (
@@ -48,11 +57,12 @@ function SkeletonRow({ index }: { index: number }) {
             className="w-7 h-7 rounded-full skeleton-shimmer"
             style={{
               animationDelay: `${index * 100}ms`,
-              background: index === 0
-                ? "linear-gradient(135deg, rgba(245,196,66,0.15), rgba(245,196,66,0.05))"
-                : index === 1
-                ? "linear-gradient(135deg, rgba(192,192,192,0.15), rgba(192,192,192,0.05))"
-                : "linear-gradient(135deg, rgba(205,127,50,0.15), rgba(205,127,50,0.05))",
+              background:
+                index === 0
+                  ? "linear-gradient(135deg, rgba(245,196,66,0.15), rgba(245,196,66,0.05))"
+                  : index === 1
+                    ? "linear-gradient(135deg, rgba(192,192,192,0.15), rgba(192,192,192,0.05))"
+                    : "linear-gradient(135deg, rgba(205,127,50,0.15), rgba(205,127,50,0.05))",
             }}
           />
         ) : (
@@ -123,7 +133,10 @@ export function LeaderboardSkeleton({ rows = 10, showHeader = true }: Leaderboar
             <div className="w-14 h-3 rounded skeleton-shimmer" style={{ animationDelay: "50ms" }} />
           </div>
           <div className="w-20 flex justify-end">
-            <div className="w-10 h-3 rounded skeleton-shimmer" style={{ animationDelay: "100ms" }} />
+            <div
+              className="w-10 h-3 rounded skeleton-shimmer"
+              style={{ animationDelay: "100ms" }}
+            />
           </div>
           <div className="w-16 hidden sm:flex justify-end">
             <div className="w-8 h-3 rounded skeleton-shimmer" style={{ animationDelay: "150ms" }} />
@@ -140,15 +153,20 @@ export function LeaderboardSkeleton({ rows = 10, showHeader = true }: Leaderboar
       <div
         className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
         style={{
-          background: "linear-gradient(to top, var(--color-card, rgba(26,26,36,0.85)), transparent)",
+          background:
+            "linear-gradient(to top, var(--color-card, rgba(26,26,36,0.85)), transparent)",
         }}
       />
 
       {/* Inline styles for skeleton animation */}
       <style jsx global>{`
         @keyframes skeleton-shimmer-move {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
         }
 
         .skeleton-shimmer {
@@ -172,8 +190,13 @@ export function LeaderboardSkeleton({ rows = 10, showHeader = true }: Leaderboar
         }
 
         @keyframes skeleton-ambient-pulse {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
+          0%,
+          100% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 1;
+          }
         }
       `}</style>
     </div>

@@ -9,17 +9,8 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-import {
-  getScoreCap,
-  getWeekKey,
-  normalizeSlug,
-  type GameSlug,
-} from "@fuzzynuts/arcade-core";
-import {
-  buildScoreMessage,
-  mintNonce,
-  signPayload,
-} from "@fuzzynuts/shared-anticheat";
+import { getScoreCap, getWeekKey, normalizeSlug, type GameSlug } from "@fuzzynuts/arcade-core";
+import { buildScoreMessage, mintNonce, signPayload } from "@fuzzynuts/shared-anticheat";
 
 const STORAGE_KEY = "fuzzy_arcade_scores";
 const WALLET_KEY = "fuzzy_wallet";

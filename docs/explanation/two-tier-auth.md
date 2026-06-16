@@ -47,7 +47,7 @@ attack without ever prompting the player.
 
 This gives non-repudiation exactly where it matters and nowhere else.
 
-## What this does *not* defend against
+## What this does _not_ defend against
 
 - A compromised player device that runs the real client honestly but
   is being remote-controlled. HMAC + SignIn both succeed because the

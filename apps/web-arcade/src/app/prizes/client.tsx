@@ -6,17 +6,12 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const PrizesPageContent = dynamic(
-  () =>
-    import("@/components/sections/PrizesPageContent").then(
-      (mod) => mod.PrizesPageContent,
-    ),
+  () => import("@/components/sections/PrizesPageContent").then((mod) => mod.PrizesPageContent),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-32">
-        <p className="text-[#6366f1] animate-pulse font-display text-lg">
-          Loading prizes…
-        </p>
+        <p className="text-[#6366f1] animate-pulse font-display text-lg">Loading prizes…</p>
       </div>
     ),
   },

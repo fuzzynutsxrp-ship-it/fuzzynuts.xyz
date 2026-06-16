@@ -43,8 +43,8 @@ describe("submitPayout — safety rails", () => {
   });
 
   it("rejects unimplemented multisig path with a clear message", async () => {
-    await expect(
-      submitPayout(args, { signerSeeds: ["sEdT...", "sEdU..."] }),
-    ).rejects.toThrow(/multisig path not yet implemented/);
+    await expect(submitPayout(args, { signerSeeds: ["sEdT...", "sEdU..."] })).rejects.toThrow(
+      /multisig path not yet implemented/,
+    );
   });
 });

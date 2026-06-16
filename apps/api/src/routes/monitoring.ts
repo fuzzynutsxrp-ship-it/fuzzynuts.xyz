@@ -58,9 +58,7 @@ export function buildMonitoringRouter(env: {
       const down = checks.filter((c) => c.status === "down").length;
       const avgResponseTime =
         total > 0
-          ? Math.round(
-              checks.reduce((sum, c) => sum + (c.responseTime ?? 0), 0) / total,
-            )
+          ? Math.round(checks.reduce((sum, c) => sum + (c.responseTime ?? 0), 0) / total)
           : 0;
 
       res.json({

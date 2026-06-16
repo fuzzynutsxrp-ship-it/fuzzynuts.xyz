@@ -112,8 +112,7 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
         animate={{ opacity: 1, y: 0 }}
         className={`relative rounded-2xl border-2 border-brand-gold/30 bg-[#0a0613] overflow-hidden ${className}`}
         style={{
-          boxShadow:
-            "0 0 30px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.1)",
+          boxShadow: "0 0 30px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.1)",
         }}
       >
         <div className="h-1 bg-gradient-to-r from-brand-gold via-amber-500 to-brand-gold" />
@@ -184,15 +183,12 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className={`relative rounded-2xl border-2 bg-[#0a0613] overflow-hidden ${
-        isTopRank
-          ? "border-brand-gold/40"
-          : "border-white/10"
+        isTopRank ? "border-brand-gold/40" : "border-white/10"
       } ${className}`}
       style={
         isTopRank
           ? {
-              boxShadow:
-                "0 0 30px rgba(251,191,36,0.12), inset 0 1px 0 rgba(251,191,36,0.15)",
+              boxShadow: "0 0 30px rgba(251,191,36,0.12), inset 0 1px 0 rgba(251,191,36,0.15)",
             }
           : undefined
       }
@@ -240,8 +236,7 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
             style={
               isTopRank
                 ? {
-                    boxShadow:
-                      "0 0 16px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.1)",
+                    boxShadow: "0 0 16px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.1)",
                   }
                 : undefined
             }
@@ -252,10 +247,7 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
                   {rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}
                 </span>
               ) : (
-                <TrendingUp
-                  size={compact ? 18 : 20}
-                  className="text-brand-gold"
-                />
+                <TrendingUp size={compact ? 18 : 20} className="text-brand-gold" />
               )}
             </div>
             <p
@@ -274,15 +266,11 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
           <div
             className="rounded-xl border-2 border-neon-green/30 bg-neon-green/[0.04] p-3 text-center"
             style={{
-              boxShadow:
-                "0 0 16px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.1)",
+              boxShadow: "0 0 16px rgba(16,185,129,0.08), inset 0 1px 0 rgba(16,185,129,0.1)",
             }}
           >
             <div className="flex justify-center mb-1.5">
-              <TrendingUp
-                size={compact ? 18 : 20}
-                className="text-neon-green"
-              />
+              <TrendingUp size={compact ? 18 : 20} className="text-neon-green" />
             </div>
             <p
               className={`font-display font-bold text-cream ${
@@ -300,15 +288,11 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
           <div
             className="rounded-xl border-2 border-amber-500/30 bg-amber-500/[0.04] p-3 text-center"
             style={{
-              boxShadow:
-                "0 0 16px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.1)",
+              boxShadow: "0 0 16px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.1)",
             }}
           >
             <div className="flex justify-center mb-1.5">
-              <Gamepad2
-                size={compact ? 18 : 20}
-                className="text-amber-500"
-              />
+              <Gamepad2 size={compact ? 18 : 20} className="text-amber-500" />
             </div>
             <p
               className={`font-display font-bold text-cream ${
@@ -331,9 +315,7 @@ export function MyRankWidget({ compact = false, className = "" }: MyRankWidgetPr
                 Progress to next rank
               </span>
               <span className="font-mono text-neon-green/80">
-                {scoreToNextRank
-                  ? `+${formatNumber(scoreToNextRank)} pts`
-                  : "—"}
+                {scoreToNextRank ? `+${formatNumber(scoreToNextRank)} pts` : "—"}
               </span>
             </div>
             <div

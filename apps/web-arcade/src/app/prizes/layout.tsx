@@ -5,11 +5,7 @@
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import DynamicFooter from "@/components/DynamicFooter";
 
-export default function PrizesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PrizesLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="fnx">
       <SiteHeader variant="light" />

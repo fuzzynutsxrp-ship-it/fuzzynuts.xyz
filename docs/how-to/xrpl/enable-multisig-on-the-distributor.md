@@ -28,6 +28,7 @@ ADR: [0006](../../adr/0006-xrpl-regularkey-multisig-distributor.md).
 
    Record each address; **store each seed in a different password
    manager owned by a different person**. Never co-locate.
+
 3. Construct the `SignerListSet` transaction (see
    `packages/xrpl-token-utils/src/payout.ts` — multisig path).
 4. Sign offline with the master seed.

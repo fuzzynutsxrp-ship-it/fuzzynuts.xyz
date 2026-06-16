@@ -86,7 +86,7 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
         try {
           localStorage.setItem(
             CLAIM_STORAGE_KEY,
-            JSON.stringify({ wallet, claimed: true, txHash: data.txHash })
+            JSON.stringify({ wallet, claimed: true, txHash: data.txHash }),
           );
         } catch {}
       } else if (data.eligible) {
@@ -155,7 +155,7 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
           try {
             localStorage.setItem(
               CLAIM_STORAGE_KEY,
-              JSON.stringify({ wallet, claimed: true, txHash: null })
+              JSON.stringify({ wallet, claimed: true, txHash: null }),
             );
           } catch {}
           return;
@@ -173,7 +173,7 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
         try {
           localStorage.setItem(
             CLAIM_STORAGE_KEY,
-            JSON.stringify({ wallet, claimed: true, txHash: result.txHash })
+            JSON.stringify({ wallet, claimed: true, txHash: result.txHash }),
           );
         } catch {}
       } else {
@@ -187,7 +187,7 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
           try {
             const pollRes = await fetch(
               `${API_REWARDS}/claim/status?wallet=${encodeURIComponent(wallet)}&week=${getCurrentWeekKey()}`,
-              { signal: AbortSignal.timeout(5000) }
+              { signal: AbortSignal.timeout(5000) },
             );
             if (pollRes.ok) {
               const pollData = await pollRes.json();
@@ -198,7 +198,7 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
                 try {
                   localStorage.setItem(
                     CLAIM_STORAGE_KEY,
-                    JSON.stringify({ wallet, claimed: true, txHash: pollData.txHash })
+                    JSON.stringify({ wallet, claimed: true, txHash: pollData.txHash }),
                   );
                 } catch {}
               } else if (pollData.status === "failed") {
@@ -221,7 +221,10 @@ export function usePayoutEligibility(wallet: string | null): PayoutReturn {
       const message = err instanceof Error ? err.message : "Claim failed — please try again";
       if (message.toLowerCase().includes("reject")) {
         setError("Wallet rejected the transaction");
-      } else if (message.toLowerCase().includes("network") || message.toLowerCase().includes("timeout")) {
+      } else if (
+        message.toLowerCase().includes("network") ||
+        message.toLowerCase().includes("timeout")
+      ) {
         setError("Network error — check your connection and try again");
       } else {
         setError(message);

@@ -27,9 +27,7 @@ export function SectionHeader({
       viewport={{ once: true, amount: 0.1 }}
       className={`text-center mb-12 md:mb-16 ${className}`}
     >
-      <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">
-        {chip}
-      </span>
+      <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">{chip}</span>
       <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
         {title}
       </h2>

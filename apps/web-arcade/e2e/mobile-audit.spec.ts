@@ -27,13 +27,44 @@ const FINDINGS_FILE = path.join(REPORT_DIR, "findings.json");
 
 /** All game slugs from games.json */
 const GAME_SLUGS = [
-  "mario", "fuzzy-survivors", "minigolf", "nut-racer", "fuzzynuts-world",
-  "rsc", "dragon-hoard", "cosmic-blaster", "snake", "breakout", "pong",
-  "tetris", "asteroids", "flappy", "subway-runner", "jetpack", "ski-free",
-  "helicopter", "space-invaders", "doodle-jump", "frogger", "bowling",
-  "boxing", "archery", "bomberman", "capture-flag", "maze-escape", "memory",
-  "minesweeper", "fruit-ninja", "sudoku", "surf-up", "2048", "tank-battle",
-  "tower-defense", "tower-stack", "wordle", "rally",
+  "mario",
+  "fuzzy-survivors",
+  "minigolf",
+  "nut-racer",
+  "fuzzynuts-world",
+  "rsc",
+  "dragon-hoard",
+  "cosmic-blaster",
+  "snake",
+  "breakout",
+  "pong",
+  "tetris",
+  "asteroids",
+  "flappy",
+  "subway-runner",
+  "jetpack",
+  "ski-free",
+  "helicopter",
+  "space-invaders",
+  "doodle-jump",
+  "frogger",
+  "bowling",
+  "boxing",
+  "archery",
+  "bomberman",
+  "capture-flag",
+  "maze-escape",
+  "memory",
+  "minesweeper",
+  "fruit-ninja",
+  "sudoku",
+  "surf-up",
+  "2048",
+  "tank-battle",
+  "tower-defense",
+  "tower-stack",
+  "wordle",
+  "rally",
 ];
 
 interface Finding {
@@ -94,7 +125,11 @@ async function checkHorizontalOverflow(page: Page): Promise<{
         while (ancestor && ancestor !== document.body) {
           const aStyle = window.getComputedStyle(ancestor);
           const overflow = aStyle.overflow + " " + aStyle.overflowX;
-          if (overflow.includes("hidden") || overflow.includes("auto") || overflow.includes("scroll")) {
+          if (
+            overflow.includes("hidden") ||
+            overflow.includes("auto") ||
+            overflow.includes("scroll")
+          ) {
             const aRect = ancestor.getBoundingClientRect();
             // If ancestor clip boundary covers this element's overflow, it's clipped
             if (rect.right <= aRect.right + 1 && rect.left >= aRect.left - 1) {
@@ -183,7 +218,7 @@ async function checkTouchBlocking(page: Page): Promise<{
     const issues: string[] = [];
 
     const fixedElements = document.querySelectorAll(
-      '[style*="position: fixed"], [style*="position:fixed"], nav, header, [class*="fixed"], [class*="sticky"]'
+      '[style*="position: fixed"], [style*="position:fixed"], nav, header, [class*="fixed"], [class*="sticky"]',
     );
 
     const gameArea = document.querySelector("iframe, canvas, [class*='game']");
@@ -191,26 +226,42 @@ async function checkTouchBlocking(page: Page): Promise<{
       const gameRect = gameArea.getBoundingClientRect();
       for (const el of fixedElements) {
         const elRect = el.getBoundingClientRect();
-        const overlapX = Math.max(0, Math.min(gameRect.right, elRect.right) - Math.max(gameRect.left, elRect.left));
-        const overlapY = Math.max(0, Math.min(gameRect.bottom, elRect.bottom) - Math.max(gameRect.top, elRect.top));
+        const overlapX = Math.max(
+          0,
+          Math.min(gameRect.right, elRect.right) - Math.max(gameRect.left, elRect.left),
+        );
+        const overlapY = Math.max(
+          0,
+          Math.min(gameRect.bottom, elRect.bottom) - Math.max(gameRect.top, elRect.top),
+        );
         const overlapArea = overlapX * overlapY;
         const gameAreaPx = gameRect.width * gameRect.height;
 
         if (overlapArea > gameAreaPx * 0.15 && overlapArea > 5000) {
           const tag = el.tagName.toLowerCase();
-          const cls = el.className ? `.${String(el.className).split(" ").slice(0, 2).join(".")}` : "";
+          const cls = el.className
+            ? `.${String(el.className).split(" ").slice(0, 2).join(".")}`
+            : "";
           issues.push(`${tag}${cls} overlaps ${(overlapArea / 1000).toFixed(0)}k px² of game area`);
         }
       }
     }
 
-    const overlays = document.querySelectorAll('[class*="modal"], [class*="drawer"], [class*="overlay"], [class*="chat"]');
+    const overlays = document.querySelectorAll(
+      '[class*="modal"], [class*="drawer"], [class*="overlay"], [class*="chat"]',
+    );
     for (const overlay of overlays) {
       const style = window.getComputedStyle(overlay);
-      if (style.display !== "none" && style.visibility !== "hidden" && parseInt(style.zIndex) > 50) {
+      if (
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        parseInt(style.zIndex) > 50
+      ) {
         const rect = overlay.getBoundingClientRect();
         if (rect.width > 50 && rect.height > 50) {
-          issues.push(`High z-index overlay visible: ${overlay.tagName.toLowerCase()}.${String(overlay.className).split(" ")[0]} (z:${style.zIndex})`);
+          issues.push(
+            `High z-index overlay visible: ${overlay.tagName.toLowerCase()}.${String(overlay.className).split(" ")[0]} (z:${style.zIndex})`,
+          );
         }
       }
     }
@@ -343,7 +394,9 @@ test.describe("Mobile Responsiveness Audit", () => {
         return true;
       });
       fs.writeFileSync(FINDINGS_FILE, JSON.stringify(deduped, null, 2));
-      console.log(`\n📊 Mobile audit complete. ${deduped.length} findings written to ${FINDINGS_FILE}`);
+      console.log(
+        `\n📊 Mobile audit complete. ${deduped.length} findings written to ${FINDINGS_FILE}`,
+      );
     }
   });
 });

@@ -47,7 +47,7 @@ The implementation is correctly scoped and uses the right header values:
 
 ```ts
 const GAME_SESSION_SECRET = optionalEnv("GAME_SESSION_SECRET"); // → ""
-app.use(guestSessionMiddleware({ GAME_SESSION_SECRET }));        // → new TextEncoder().encode("")
+app.use(guestSessionMiddleware({ GAME_SESSION_SECRET })); // → new TextEncoder().encode("")
 ```
 
 With an empty secret, `jose` will still sign/verify JWTs using an empty key. Every guest JWT becomes trivially forgeable — an attacker can mint their own guest cookies with arbitrary `deviceId` values.
@@ -55,6 +55,7 @@ With an empty secret, `jose` will still sign/verify JWTs using an empty key. Eve
 **Impact:** Medium. Guest sessions are anonymous (no PII, no auth-gated actions), but forged deviceIds could be used for leaderboard manipulation (multiple fake identities) or chat spam if guest chat is enabled.
 
 **Recommendation:** Throw at startup or disable guest middleware when `GAME_SESSION_SECRET` is empty:
+
 ```ts
 export function guestSessionMiddleware(env: { GAME_SESSION_SECRET: string }) {
   if (!env.GAME_SESSION_SECRET) {
@@ -72,6 +73,7 @@ export function guestSessionMiddleware(env: { GAME_SESSION_SECRET: string }) {
 **File:** `server.ts` line 107
 
 The guest session middleware runs on every request (including `/healthz`, static assets, SSE streams). Each invocation:
+
 1. Parses the full `Cookie` header string
 2. Runs `jwtVerify()` (crypto operation) on every request with a cookie
 3. On cookie miss: generates UUID + signs JWT + sets cookie
@@ -79,9 +81,10 @@ The guest session middleware runs on every request (including `/healthz`, static
 For a high-traffic arcade, this adds measurable overhead to health checks and static routes.
 
 **Recommendation:** Add a path exclusion for health checks and static routes:
+
 ```ts
 app.use((req, res, next) => {
-  if (req.path === '/healthz' || req.path.startsWith('/static')) return next();
+  if (req.path === "/healthz" || req.path.startsWith("/static")) return next();
   return guestSessionMiddleware({ GAME_SESSION_SECRET })(req, res, next);
 });
 ```
@@ -93,6 +96,7 @@ app.use((req, res, next) => {
 **File:** `guest-session.ts` lines 96-105
 
 The `parseCookies()` function splits on `;` and `=`. Edge cases:
+
 - Cookie values containing `=` (JWT tokens contain `=` padding) — handled correctly (uses `indexOf` for first `=` only)
 - Cookie values containing `%` — handled via `decodeURIComponent`
 - Cookies with no value (`; ;`) — skipped correctly
@@ -106,6 +110,7 @@ This is actually well-implemented for its purpose. Noting for completeness; no a
 **File:** `guest-session.ts` line 57
 
 The cookie uses `sameSite: "strict"`. If a user navigates to fuzzynuts.xyz from an external link, the browser won't send the cookie on that first request. This means:
+
 - First visit from external link: new guest session minted (overwriting any existing one)
 - Subsequent navigations within the site: cookie sent normally
 
@@ -133,6 +138,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 ```
 
 This sets `Cross-Origin-Resource-Policy: cross-origin` on every response from the API server, including:
+
 - `/api/scores` (public — fine)
 - `/api/session` (auth endpoints — should NOT be cross-origin embeddable)
 - `/api/kanban` (admin endpoints — should NOT be cross-origin embeddable)
@@ -141,6 +147,7 @@ This sets `Cross-Origin-Resource-Policy: cross-origin` on every response from th
 **Risk:** An attacker-controlled page could use `<img>` or `<script>` tags to embed responses from admin endpoints. While CORS still blocks reading the response body, CORP `cross-origin` explicitly permits the browser to make the request and deliver the response to the embedder. Combined with timing attacks, this could leak information about admin endpoint existence and response sizes.
 
 **Recommendation:** Scope CORP to game asset routes only:
+
 ```ts
 app.use("/games", helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 ```
@@ -152,12 +159,15 @@ app.use("/games", helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 **File:** `server.ts` lines 94-102
 
 ```ts
-app.use("/games", cors({
-  origin: "*",
-  methods: ["GET", "HEAD", "OPTIONS"],
-  allowedHeaders: ["Range", "Content-Type"],
-  exposedHeaders: ["Content-Length", "Content-Range"],
-}));
+app.use(
+  "/games",
+  cors({
+    origin: "*",
+    methods: ["GET", "HEAD", "OPTIONS"],
+    allowedHeaders: ["Range", "Content-Type"],
+    exposedHeaders: ["Content-Length", "Content-Range"],
+  }),
+);
 ```
 
 The comment says "public files" but the `/games` path prefix is broad. If any authenticated or state-modifying route is ever added under `/games/*`, it would inherit this wide-open CORS. Currently safe since only static assets are served, but fragile.
@@ -185,6 +195,7 @@ The SSE stream endpoint only allows `https://www.fuzzynuts.xyz`. If any page on 
 **File:** `vercel.json` lines 158-180
 
 Vercel headers are static — they always return `Access-Control-Allow-Origin: https://www.fuzzynuts.xyz` regardless of the request's `Origin` header. This means:
+
 - No `Vary: Origin` header (except on SSE endpoint)
 - If the site ever needs to serve multiple origins, this breaks
 
@@ -236,6 +247,7 @@ When a score entry has no wallet, no userId, no displayName, and no name, it get
 **Impact:** Low-medium. Anonymous players without any identifier are edge cases, but the non-deterministic key causes UI instability.
 
 **Recommendation:** Use a stable hash of available fields, or index-based fallback:
+
 ```ts
 const key = entry.wallet?.toLowerCase() || entry.userId || entry.name || `anon-${index}`;
 ```
@@ -253,10 +265,9 @@ const currentUserKey = walletAddress || session?.user?.email || null;
 For Google OAuth users (no wallet), the `currentUserKey` is the user's email. This email is then compared against `row.userId` to highlight the current user's row:
 
 ```ts
-const isCurrentUser = currentUserKey && (
-  row.wallet?.toLowerCase() === currentUserKey.toLowerCase() ||
-  row.userId === currentUserKey
-);
+const isCurrentUser =
+  currentUserKey &&
+  (row.wallet?.toLowerCase() === currentUserKey.toLowerCase() || row.userId === currentUserKey);
 ```
 
 If the backend stores the user's email in the `userId` field of score entries, and if that field is ever exposed in the leaderboard data, the email would be visible to all users. However, examining the `aggregateByPlayer` function, `userId` is used only as a map key and is NOT rendered in the UI — only `displayName` is shown.
@@ -278,6 +289,7 @@ expect(headerVisible || true).toBe(true);
 This assertion always passes regardless of `headerVisible`. It was likely intended as a soft check (header may be hidden on mobile viewport), but it provides zero test coverage.
 
 **Recommendation:** Either remove the assertion or make it meaningful:
+
 ```ts
 // If mobile viewport, skip; otherwise assert visible
 if (page.viewportSize().width >= 640) {
@@ -297,13 +309,13 @@ The prizes page switched from `SubPageLayout` (dark theme with video background,
 
 ## Summary
 
-| PR | CRITICAL | HIGH | MEDIUM | LOW | INFO |
-|----|----------|------|--------|-----|------|
-| #64 (COOP/COEP) | 0 | 0 | 0 | 0 | 0 |
-| #78 (Guest Sessions) | 0 | 0 | 1 | 2 | 1 |
-| #82 (CORS) | 0 | 0 | 2 | 2 | 1 |
-| #83 (Leaderboard) | 0 | 0 | 1 | 2 | 1 |
-| **Total** | **0** | **0** | **4** | **6** | **3** |
+| PR                   | CRITICAL | HIGH  | MEDIUM | LOW   | INFO  |
+| -------------------- | -------- | ----- | ------ | ----- | ----- |
+| #64 (COOP/COEP)      | 0        | 0     | 0      | 0     | 0     |
+| #78 (Guest Sessions) | 0        | 0     | 1      | 2     | 1     |
+| #82 (CORS)           | 0        | 0     | 2      | 2     | 1     |
+| #83 (Leaderboard)    | 0        | 0     | 1      | 2     | 1     |
+| **Total**            | **0**    | **0** | **4**  | **6** | **3** |
 
 ### Prioritized Recommendations
 

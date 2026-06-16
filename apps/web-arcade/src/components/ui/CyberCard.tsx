@@ -30,11 +30,7 @@ export function CyberCard({
 }: CyberCardProps) {
   return (
     <div
-      className={cn(
-        "cyber-card",
-        circuit && "cyber-card-circuit",
-        className,
-      )}
+      className={cn("cyber-card", circuit && "cyber-card-circuit", className)}
       data-accent={accentColor}
     >
       {children}

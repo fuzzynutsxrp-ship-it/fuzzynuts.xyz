@@ -19,13 +19,8 @@ import { Router } from "express";
 import { z } from "zod";
 import { jwtVerify } from "jose";
 import { type Db, MongoClient } from "mongodb";
-import {
-  verifySessionToken,
-} from "@fuzzynuts/shared-anticheat";
-import {
-  upsertGoogleUser,
-  upsertWalletUser,
-} from "../models/User";
+import { verifySessionToken } from "@fuzzynuts/shared-anticheat";
+import { upsertGoogleUser, upsertWalletUser } from "../models/User";
 
 // ── Constants ──────────────────────────────────────────────────
 
@@ -73,42 +68,42 @@ export const VALID_GAMES = [
 
 // Authoritative score caps — must match gameRegistry.ts exactly
 export const SCORE_CAPS: Record<string, number> = {
-  "mario": 9_999_990,
+  mario: 9_999_990,
   "fuzzy-survivors": 5_000_000,
-  "minigolf": 100_000,
+  minigolf: 100_000,
   "nut-racer": 2_000_000,
   "fuzzynuts-world": 10_000_000,
-  "rsc": 99_000_000,
+  rsc: 99_000_000,
   "dragon-hoard": 999_999,
   "cosmic-blaster": 999_999,
-  "snake": 50_000,
-  "breakout": 100_000,
-  "pong": 11,
-  "tetris": 999_999,
-  "asteroids": 500_000,
-  "flappy": 999,
+  snake: 50_000,
+  breakout: 100_000,
+  pong: 11,
+  tetris: 999_999,
+  asteroids: 500_000,
+  flappy: 999,
   "subway-runner": 50_000,
-  "jetpack": 100_000,
+  jetpack: 100_000,
   "ski-free": 99_999,
   "doodle-jump": 500_000,
   "2048": 999_999,
-  "memory": 10_000,
-  "minesweeper": 99_999,
-  "sudoku": 99_999,
-  "wordle": 1_000,
+  memory: 10_000,
+  minesweeper: 99_999,
+  sudoku: 99_999,
+  wordle: 1_000,
   "tank-battle": 500_000,
-  "helicopter": 99_999,
+  helicopter: 99_999,
   "fruit-ninja": 999_999,
   "tower-defense": 999_999,
   "space-invaders": 99_999,
-  "boxing": 99_999,
-  "bowling": 300,
-  "archery": 99_999,
+  boxing: 99_999,
+  bowling: 300,
+  archery: 99_999,
   "surf-up": 99_999,
-  "rally": 99_999,
+  rally: 99_999,
   "maze-escape": 99_999,
-  "frogger": 99_999,
-  "bomberman": 99_999,
+  frogger: 99_999,
+  bomberman: 99_999,
   "capture-flag": 99_999,
   "tower-stack": 99_999,
 };
@@ -120,7 +115,10 @@ const ScoreBody = z.object({
   score: z.number().int().positive().max(99_999_999),
   sessionToken: z.string().min(1).optional(), // Web3 session token
   duration: z.number().min(3).optional(), // Play duration in seconds
-  weekKey: z.string().regex(/^\d{4}-W\d{2}$/).optional(),
+  weekKey: z
+    .string()
+    .regex(/^\d{4}-W\d{2}$/)
+    .optional(),
 });
 
 // ── Types ──────────────────────────────────────────────────────
@@ -150,14 +148,10 @@ interface ScoreDocument {
 /** ISO 8601 week key (matches rewards-api.js and discord cron) */
 function getCurrentWeekKey(): string {
   const now = new Date();
-  const d = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNum = Math.ceil(
-    ((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7,
-  );
+  const weekNum = Math.ceil(((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
   return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
 }
 
@@ -218,8 +212,7 @@ async function resolveWalletUser(
   return {
     userId: user._id!,
     wallet,
-    displayName:
-      user.name ?? `Player_${wallet.slice(1, 7)}`,
+    displayName: user.name ?? `Player_${wallet.slice(1, 7)}`,
     provider: user.provider as "xrpl" | "both",
   };
 }
@@ -282,31 +275,22 @@ export function buildScoresRouter(env: {
     try {
       const parsed = ScoreBody.safeParse(req.body);
       if (!parsed.success) {
-        return res
-          .status(400)
-          .json({ error: "E_SCHEMA", details: parsed.error.flatten() });
+        return res.status(400).json({ error: "E_SCHEMA", details: parsed.error.flatten() });
       }
 
       const { game, score, sessionToken, duration, weekKey } = parsed.data;
       const db = await getDb();
       const clientIP =
-        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
-        req.ip ??
-        "unknown";
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? req.ip ?? "unknown";
 
       // ── Authenticate: try both paths ─────────────────────
 
       let authUser: AuthenticatedUser | null = null;
 
       // Path A: Web3 session token (X-Game-Session header or body)
-      const rawSession =
-        (req.headers["x-game-session"] as string) ?? sessionToken;
+      const rawSession = (req.headers["x-game-session"] as string) ?? sessionToken;
       if (rawSession) {
-        authUser = await resolveWalletUser(
-          db,
-          rawSession,
-          env.GAME_SESSION_SECRET,
-        );
+        authUser = await resolveWalletUser(db, rawSession, env.GAME_SESSION_SECRET);
       }
 
       // Path B: Web2 NextAuth JWT (Authorization header)
@@ -426,9 +410,7 @@ export function buildScoresRouter(env: {
           userId: s.userId,
         }));
 
-      res.write(
-        `data: ${JSON.stringify({ type: "initial", data: leaderboard })}\n\n`,
-      );
+      res.write(`data: ${JSON.stringify({ type: "initial", data: leaderboard })}\n\n`);
 
       // Heartbeat every 15s
       const heartbeat = setInterval(() => {
@@ -466,9 +448,7 @@ export function buildScoresRouter(env: {
               userId: s.userId,
             }));
 
-          res.write(
-            `data: ${JSON.stringify({ type: "replace", data: fresh })}\n\n`,
-          );
+          res.write(`data: ${JSON.stringify({ type: "replace", data: fresh })}\n\n`);
         } catch {
           // Silent — client will reconnect
         }

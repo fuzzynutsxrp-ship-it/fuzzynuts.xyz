@@ -113,7 +113,11 @@ async function main(): Promise<void> {
 
   // Tamper with the payload
   const tamperedPayload = { ...sessionPayload, walletAddress: "rTampered111111111111111111" };
-  const tamperedSessionValid = await verifyGameSession(tamperedPayload, sessionSig, GAME_SESSION_SECRET);
+  const tamperedSessionValid = await verifyGameSession(
+    tamperedPayload,
+    sessionSig,
+    GAME_SESSION_SECRET,
+  );
   assert(tamperedSessionValid === false, "Session HMAC rejects tampered wallet address");
 
   // ── Test 4: Expiry check ─────────────────────────────────────
@@ -134,7 +138,10 @@ async function main(): Promise<void> {
   const nonce1 = mintNonce();
   const nonce2 = mintNonce();
 
-  assert(nonce1 !== nonce2, `Two nonces are different (${nonce1.slice(0, 8)}... vs ${nonce2.slice(0, 8)}...)`);
+  assert(
+    nonce1 !== nonce2,
+    `Two nonces are different (${nonce1.slice(0, 8)}... vs ${nonce2.slice(0, 8)}...)`,
+  );
   assert(nonce1.length > 0, "Nonce is non-empty");
 
   // ── Summary ───────────────────────────────────────────────────

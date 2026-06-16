@@ -10,12 +10,12 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
-| CRITICAL | 0 |
-| HIGH     | 0 |
-| MEDIUM   | 1 |
-| LOW      | 2 |
-| INFO     | 3 |
+| -------- | ----- |
+| CRITICAL | 0     |
+| HIGH     | 0     |
+| MEDIUM   | 1     |
+| LOW      | 2     |
+| INFO     | 3     |
 
 **Verdict: PASS** — All three commits are net-positive for security. The postMessage
 origin hardening, pnpm overrides for CVE-affected packages, and CI audit step are
@@ -28,6 +28,7 @@ well-implemented. One MEDIUM finding on override granularity, two LOW advisories
 ### Commit 43f1207 — "audit: apply fixes for vite/postcss CVEs + code quality improvements"
 
 **Changes:**
+
 - Bumped vite `^5.4.0` → `^5.4.21` in games-build
 - Bumped postcss `^8.5.14` → `^8.5.15` in web-arcade
 - Bumped tsx `^4.19.0` → `^4.22.4` (root)
@@ -43,6 +44,7 @@ changes are purely UX with no security impact.
 ### Commit 3485cea — "audit: fix stale closure, postMessage origins, add pnpm overrides + CI audit step"
 
 **Changes:**
+
 - Fixed stale closure: keyboard shortcuts effect now includes `toggleFullscreen`/`toggleMute` in deps
 - Replaced `"*"` targetOrigin with `gameOrigin` (derived from iframe src) for FUZZY_CONFIG postMessage
 - Replaced `"*"` targetOrigin with iframe origin for setMute postMessage
@@ -59,6 +61,7 @@ potential state desync. The CI audit step is a good addition for ongoing vulnera
 ### Commit eff7fed — "audit: add FUZZY_GAME_READY origin check, ws/uuid overrides, CI cache fix"
 
 **Changes:**
+
 - Added `isAllowedMessageOrigin(event.origin)` check to FUZZY_GAME_READY listener
 - Fixed `window.origin` → `window.location.origin` (more reliable across browsers)
 - Added `ws >=8.20.1` and `uuid >=11.1.1` pnpm overrides
@@ -80,6 +83,7 @@ overrides address known CVEs in transitive dependencies.
 
 **Description:**
 All overrides use `>=` (minimum version floor), not exact pins:
+
 ```json
 "esbuild": ">=0.28.1",
 "postcss": ">=8.5.10",
@@ -94,6 +98,7 @@ for security patches (ensures minimum safe version) but doesn't protect against
 supply-chain attacks in future releases.
 
 **Resolved versions (from lockfile):**
+
 - esbuild: 0.28.1 ✓
 - postcss: 8.5.15 ✓
 - vite: 8.0.16 ✓
@@ -146,17 +151,17 @@ can be reviewed even when the step fails.
 
 All postMessage listeners in GameModal.tsx now validate origin:
 
-| Listener | Line | Origin check | Status |
-|----------|------|-------------|--------|
-| FUZZY_SCORE_SUBMITTED | 119 | `isAllowedMessageOrigin(event.origin)` | ✓ |
-| FUZZY_GAME_READY | 241 | `isAllowedMessageOrigin(event.origin)` | ✓ (added in eff7fed) |
+| Listener              | Line | Origin check                           | Status               |
+| --------------------- | ---- | -------------------------------------- | -------------------- |
+| FUZZY_SCORE_SUBMITTED | 119  | `isAllowedMessageOrigin(event.origin)` | ✓                    |
+| FUZZY_GAME_READY      | 241  | `isAllowedMessageOrigin(event.origin)` | ✓ (added in eff7fed) |
 
 All postMessage senders use specific origins:
 
-| Sender | Line | Target origin | Status |
-|--------|------|--------------|--------|
-| FUZZY_CONFIG | 209 | `gameOrigin` (from iframe src) | ✓ (was `"*"`) |
-| setMute | 299 | iframe src origin | ✓ (was `"*"`) |
+| Sender       | Line | Target origin                  | Status        |
+| ------------ | ---- | ------------------------------ | ------------- |
+| FUZZY_CONFIG | 209  | `gameOrigin` (from iframe src) | ✓ (was `"*"`) |
+| setMute      | 299  | iframe src origin              | ✓ (was `"*"`) |
 
 `isAllowedMessageOrigin()` allowslist: `fuzzynuts.xyz`, `www.fuzzynuts.xyz`,
 `world.fuzzynuts.xyz`, `game.fuzzynuts.xyz`, plus same-origin. Empty/null origins
@@ -166,13 +171,13 @@ are rejected. This is a solid allowlist — no wildcard or pattern matching.
 
 ## pnpm overrides — CVE coverage
 
-| Package | Override | CVE addressed | Resolved | Safe |
-|---------|----------|--------------|----------|------|
-| esbuild | >=0.28.1 | CVE-2024-24790 (Go net/http) | 0.28.1 | ✓ |
-| postcss | >=8.5.10 | CVE-2023-44270 (line return parsing) | 8.5.15 | ✓ |
-| vite | >=6.4.2 | Multiple CVEs in 5.x/6.x | 8.0.16 | ✓ |
-| ws | >=8.20.1 | CVE-2024-37890 (DoS via headers) | 8.20.1 | ✓ |
-| uuid | >=11.1.1 | CVE-2024-29415 (IP handling) | 14.0.0 | ✓ |
+| Package | Override | CVE addressed                        | Resolved | Safe |
+| ------- | -------- | ------------------------------------ | -------- | ---- |
+| esbuild | >=0.28.1 | CVE-2024-24790 (Go net/http)         | 0.28.1   | ✓    |
+| postcss | >=8.5.10 | CVE-2023-44270 (line return parsing) | 8.5.15   | ✓    |
+| vite    | >=6.4.2  | Multiple CVEs in 5.x/6.x             | 8.0.16   | ✓    |
+| ws      | >=8.20.1 | CVE-2024-37890 (DoS via headers)     | 8.20.1   | ✓    |
+| uuid    | >=11.1.1 | CVE-2024-29415 (IP handling)         | 14.0.0   | ✓    |
 
 All overrides are valid and the resolved versions are safe.
 

@@ -58,7 +58,12 @@ export const authConfig: NextAuthConfig = {
         challengeId: { label: "Challenge ID", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.address || !credentials?.signature || !credentials?.publicKey || !credentials?.challengeId) {
+        if (
+          !credentials?.address ||
+          !credentials?.signature ||
+          !credentials?.publicKey ||
+          !credentials?.challengeId
+        ) {
           return null;
         }
 

@@ -3,14 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  Trophy,
-  Gift,
-  TrendingUp,
-  ArrowRight,
-  ShieldCheck,
-  LogIn,
-} from "lucide-react";
+import { Trophy, Gift, TrendingUp, ArrowRight, ShieldCheck, LogIn } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 // DEGEN OVERHAUL — formatters from the lean @/lib/format module
 import { formatNumber, formatUsd } from "@/lib/format";
@@ -75,9 +68,15 @@ export function Prizes() {
     let cancelled = false;
     fetch(`${API_REWARDS}/tiers`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled) setWeekTiers(d); })
-      .catch(() => { if (!cancelled) setWeekTiers(null); });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) setWeekTiers(d);
+      })
+      .catch(() => {
+        if (!cancelled) setWeekTiers(null);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const tierUsd = (rank: number) => weekTiers?.tiers?.[rank - 1]?.usd_value ?? null;
@@ -85,8 +84,14 @@ export function Prizes() {
     const n = weekTiers?.tiers?.[rank - 1]?.nut_amount;
     return n != null ? Number(n) : null;
   };
-  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? formatUsd(u) : "—"; };
-  const tierNutLabel = (rank: number) => { const n = tierNut(rank); return n != null ? `${formatNumber(n)} NUT` : "TBA"; };
+  const tierUsdLabel = (rank: number) => {
+    const u = tierUsd(rank);
+    return u != null ? formatUsd(u) : "—";
+  };
+  const tierNutLabel = (rank: number) => {
+    const n = tierNut(rank);
+    return n != null ? `${formatNumber(n)} NUT` : "TBA";
+  };
 
   const tiers = weekTiers?.tiers ?? null;
   const totalUsdLabel = tiers ? formatUsd(tiers.reduce((s, t) => s + (t.usd_value || 0), 0)) : "—";
@@ -121,20 +126,20 @@ export function Prizes() {
               swaps text-hero-glow → text-hero-glow-crisp for tighter 10+22 px
               blur + text-degen-crisp for antialiasing on the gradient-clip text.
               Glow language and colour identical, just sharp. */}
-          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🥜 Weekly Competitions 🐿️</span>
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">
+            🥜 Weekly Competitions 🐿️
+          </span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             Climb the Leaderboard
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            Every week, the top players are recognized. Free to play, no
-            buy-in, no catch. Skill in, glory out. 🥜
+            Every week, the top players are recognized. Free to play, no buy-in, no catch. Skill in,
+            glory out. 🥜
           </p>
           {/* DEGEN OVERHAUL END */}
           <p className="text-xs sm:text-sm font-mono mt-3 text-[var(--color-cream-dim)]">
             ⏱ Resets in{" "}
-            <span className="font-semibold text-[var(--color-neon-green)]">
-              {countdown.short}
-            </span>{" "}
+            <span className="font-semibold text-[var(--color-neon-green)]">{countdown.short}</span>{" "}
             · Monday 00:00 UTC
           </p>
         </motion.div>
@@ -172,10 +177,7 @@ export function Prizes() {
               >
                 {tier.rank} Place
               </p>
-              <p
-                className="font-display text-3xl font-black"
-                style={{ color: tier.color }}
-              >
+              <p className="font-display text-3xl font-black" style={{ color: tier.color }}>
                 {tierUsdLabel(i + 1)}
               </p>
               <p className="text-xs text-[var(--color-cream-dim)] mt-1">
@@ -205,7 +207,11 @@ export function Prizes() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="flex flex-col items-center text-center sm:items-start sm:text-left p-4 rounded-xl"
-              style={{ background: "#0a0613", border: "1.5px solid rgba(255,46,136,0.15)", boxShadow: "0 0 10px rgba(255,46,136,0.06), inset 0 0 12px rgba(124,58,237,0.06)" }}
+              style={{
+                background: "#0a0613",
+                border: "1.5px solid rgba(255,46,136,0.15)",
+                boxShadow: "0 0 10px rgba(255,46,136,0.06), inset 0 0 12px rgba(124,58,237,0.06)",
+              }}
             >
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
@@ -213,21 +219,12 @@ export function Prizes() {
                   background: `color-mix(in srgb, ${perk.color} 12%, transparent)`,
                 }}
               >
-                <perk.icon
-                  size={18}
-                  style={{ color: perk.color }}
-                  strokeWidth={2.5}
-                />
+                <perk.icon size={18} style={{ color: perk.color }} strokeWidth={2.5} />
               </div>
-              <p
-                className="font-display font-bold text-sm mb-1"
-                style={{ color: perk.color }}
-              >
+              <p className="font-display font-bold text-sm mb-1" style={{ color: perk.color }}>
                 {perk.title}
               </p>
-              <p className="text-xs text-[var(--color-cream-dim)] leading-relaxed">
-                {perk.desc}
-              </p>
+              <p className="text-xs text-[var(--color-cream-dim)] leading-relaxed">{perk.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -280,21 +277,14 @@ export function Prizes() {
                 className="wallet-cta-button-v3 relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-hot-pink)] text-[var(--color-degen-black)] font-display font-black text-base sm:text-lg tracking-wide transition-all cursor-pointer"
               >
                 <LogIn size={22} strokeWidth={2.5} />
-                <span>
-                  Sign In & Start Playing
-                </span>
+                <span>Sign In & Start Playing</span>
                 <ArrowRight size={18} strokeWidth={2.5} />
               </motion.button>
 
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4">
                 <div className="flex items-center gap-1.5 text-[var(--color-cream-dim)]">
-                  <ShieldCheck
-                    size={13}
-                    className="text-[var(--color-neon-green)]"
-                  />
-                  <span className="text-xs">
-                    Free · no wallet required · instant play
-                  </span>
+                  <ShieldCheck size={13} className="text-[var(--color-neon-green)]" />
+                  <span className="text-xs">Free · no wallet required · instant play</span>
                 </div>
               </div>
             </>

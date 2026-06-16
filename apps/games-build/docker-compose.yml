@@ -22,13 +22,13 @@ services:
 
     # ── Port mapping: host ↔ container (explicit, no random ports) ──
     ports:
-      - "3001:3001"   # Mario (Super Fuzzynuts)
-      - "3002:3002"   # Fuzzy Survivors
-      - "3003:3003"   # Fuzzy Putt (Minigolf)
-      - "3004:3004"   # Nut Racer
-      - "3005:3005"   # Fuzzynuts World
-      - "3006:3006"   # New Game (Game #6)
-      - "3099:3099"   # postMessage test harness
+      - "3001:3001" # Mario (Super Fuzzynuts)
+      - "3002:3002" # Fuzzy Survivors
+      - "3003:3003" # Fuzzy Putt (Minigolf)
+      - "3004:3004" # Nut Racer
+      - "3005:3005" # Fuzzynuts World
+      - "3006:3006" # New Game (Game #6)
+      - "3099:3099" # postMessage test harness
 
     # ── Live editing: bind-mount game sources from host ──
     # Changes made on the host are instantly reflected in the container.

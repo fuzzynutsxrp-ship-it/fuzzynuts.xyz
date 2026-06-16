@@ -102,9 +102,7 @@ export function GameControls({
         WebkitBackdropFilter: "blur(12px)",
         borderBottom: "1px solid var(--arcade-border, rgba(245, 166, 35, 0.15))",
         fontFamily: "var(--arcade-font, 'Outfit', system-ui, sans-serif)",
-        ...(accentColor
-          ? ({ "--arcade-accent": accentColor } as React.CSSProperties)
-          : {}),
+        ...(accentColor ? ({ "--arcade-accent": accentColor } as React.CSSProperties) : {}),
       }}
     >
       {/* Left cluster */}

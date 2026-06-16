@@ -1,17 +1,21 @@
 <!-- Thank you for contributing to Fuzzynuts. -->
 
 ## What & why
+
 <!-- One paragraph: what this PR does and why. -->
 
 ## Linked issue
+
 Closes #
 
 ## Type
+
 - [ ] feat
 - [ ] fix
 - [ ] chore / docs / refactor / test
 
 ## Checklist
+
 - [ ] My branch name matches `feat|fix|chore/<scope>-<short>`.
 - [ ] My commits follow Conventional Commits.
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` passes locally.
@@ -21,7 +25,9 @@ Closes #
 - [ ] I did not commit anything under `node_modules/`, `out/`, `.next/`, or `apps/desktop-tauri/src-tauri/target/`.
 
 ## Manual steps required by reviewer / on merge
+
 <!-- e.g. "Set NEW_ENV_VAR on Railway after merge", or "None". -->
 
 ## Risk note
+
 <!-- One line: what could go wrong if this merges today? -->

@@ -4,14 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  Gamepad2,
-  Trophy,
-  TrendingUp,
-  Clock,
-  WifiOff,
-  RefreshCw,
-} from "lucide-react";
+import { Gamepad2, Trophy, TrendingUp, Clock, WifiOff, RefreshCw } from "lucide-react";
 import { gameRegistry } from "@/lib/gameRegistry";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -88,10 +81,7 @@ function RecentGameCard({ game, score, ts }: { game: string; score: number; ts: 
   const color = meta?.color ?? "#4ade80";
 
   return (
-    <Link
-      href={`/games/${game}`}
-      className="group shrink-0 w-40 sm:w-48 snap-start"
-    >
+    <Link href={`/games/${game}`} className="group shrink-0 w-40 sm:w-48 snap-start">
       <motion.div
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -124,15 +114,10 @@ function RecentGameCard({ game, score, ts }: { game: string; score: number; ts: 
         </div>
         {/* Info */}
         <div className="p-3">
-          <p
-            className="text-sm font-bold truncate"
-            style={{ color }}
-          >
+          <p className="text-sm font-bold truncate" style={{ color }}>
             {title}
           </p>
-          <p className="text-[11px] text-cream-dim mt-0.5">
-            {relativeTime(ts)}
-          </p>
+          <p className="text-[11px] text-cream-dim mt-0.5">{relativeTime(ts)}</p>
         </div>
       </motion.div>
     </Link>
@@ -157,9 +142,7 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
       const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
-      const entries: ScoreEntry[] = Array.isArray(data)
-        ? data
-        : data.scores ?? data.data ?? [];
+      const entries: ScoreEntry[] = Array.isArray(data) ? data : (data.scores ?? data.data ?? []);
       // Sort by most recent
       entries.sort((a, b) => (b.ts || 0) - (a.ts || 0));
       setScores(entries);
@@ -225,9 +208,7 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
         <WifiOff size={28} className="text-orange mb-3 opacity-60" />
-        <p className="font-display text-base font-bold text-cream mb-2">
-          Couldn&apos;t Load Stats
-        </p>
+        <p className="font-display text-base font-bold text-cream mb-2">Couldn&apos;t Load Stats</p>
         <p className="text-sm text-cream-dim mb-5 max-w-sm">{error}</p>
         <button
           onClick={fetchScores}
@@ -264,19 +245,13 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
         <Gamepad2 size={32} className="text-neon-green mb-4 opacity-40" />
-        <p className="font-display text-lg font-bold text-cream mb-2">
-          No scores yet
-        </p>
-        <p className="text-sm text-cream-dim max-w-sm">
-          Play some games to see your stats here!
-        </p>
+        <p className="font-display text-lg font-bold text-cream mb-2">No scores yet</p>
+        <p className="text-sm text-cream-dim max-w-sm">Play some games to see your stats here!</p>
       </div>
     );
   }
 
-  const highestMeta = highestScore
-    ? gameRegistry.getBySlug(highestScore.game)
-    : null;
+  const highestMeta = highestScore ? gameRegistry.getBySlug(highestScore.game) : null;
 
   return (
     <div className="space-y-6">
@@ -299,9 +274,7 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
           <p className="font-display text-xl sm:text-2xl font-bold text-cream">
             {totalGamesPlayed}
           </p>
-          <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
-            Games Played
-          </p>
+          <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">Games Played</p>
         </motion.div>
 
         {/* Favorite Genre */}
@@ -318,12 +291,8 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
           <div className="flex justify-center mb-2">
             <Trophy size={20} className="text-brand-gold" />
           </div>
-          <p className="font-display text-xl sm:text-2xl font-bold text-cream">
-            {favoriteGenre}
-          </p>
-          <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
-            Favorite Genre
-          </p>
+          <p className="font-display text-xl sm:text-2xl font-bold text-cream">{favoriteGenre}</p>
+          <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">Favorite Genre</p>
         </motion.div>
 
         {/* Highest Single Score */}
@@ -365,9 +334,7 @@ export function UserStatsGrid({ deviceId }: StatsGridProps) {
           <p className="font-display text-xl sm:text-2xl font-bold text-cream">
             {new Set(scores.map((s) => s.game)).size}
           </p>
-          <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
-            Unique Games
-          </p>
+          <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">Unique Games</p>
         </motion.div>
       </div>
 

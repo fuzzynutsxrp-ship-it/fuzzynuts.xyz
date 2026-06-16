@@ -37,8 +37,10 @@ declare global {
 let xummInstance: XummInstance | null = null;
 
 function isMobile(): boolean {
-  return typeof navigator !== "undefined" &&
-    /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+  return (
+    typeof navigator !== "undefined" &&
+    /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
+  );
 }
 
 function loadXummScript(): Promise<void> {
@@ -52,12 +54,12 @@ function loadXummScript(): Promise<void> {
       return;
     }
     const existing = document.querySelector<HTMLScriptElement>(
-      'script[src*="xumm.min.js"], script[src*="xaman.app/assets/cdn"]'
+      'script[src*="xumm.min.js"], script[src*="xaman.app/assets/cdn"]',
     );
     if (existing) {
       existing.addEventListener("load", () => resolve());
       existing.addEventListener("error", () =>
-        reject(new Error("Failed to load Xaman SDK from CDN"))
+        reject(new Error("Failed to load Xaman SDK from CDN")),
       );
       if (existing.dataset.loaded === "true") resolve();
       return;
@@ -120,16 +122,22 @@ export async function connectXaman(apiKey: string): Promise<string> {
         new Error(
           isMobile()
             ? "Connection timed out. Make sure the Xaman app is installed and try again."
-            : "Connection timed out. Complete sign-in in the Xaman popup, or allow pop-ups for this site."
-        )
+            : "Connection timed out. Complete sign-in in the Xaman popup, or allow pop-ups for this site.",
+        ),
       );
     }, TIMEOUT_MS);
 
     const cleanup = () => {
       clearTimeout(timeout);
-      try { xumm.off?.("success", onSuccess); } catch {}
-      try { xumm.off?.("retrieved", onSuccess); } catch {}
-      try { xumm.off?.("error", onError); } catch {}
+      try {
+        xumm.off?.("success", onSuccess);
+      } catch {}
+      try {
+        xumm.off?.("retrieved", onSuccess);
+      } catch {}
+      try {
+        xumm.off?.("error", onError);
+      } catch {}
     };
 
     const onSuccess = async () => {
@@ -161,7 +169,9 @@ export async function connectXaman(apiKey: string): Promise<string> {
 
     const p = xumm.authorize();
     if (p && typeof (p as Promise<unknown>).catch === "function") {
-      (p as Promise<unknown>).catch(() => { /* events drive resolution */ });
+      (p as Promise<unknown>).catch(() => {
+        /* events drive resolution */
+      });
     }
   });
 }
@@ -185,7 +195,9 @@ export async function tryRestoreXamanSession(apiKey: string): Promise<string | n
       const settle = (val: string | null) => {
         if (settled) return;
         settled = true;
-        try { xumm.off?.("retrieved", onRetrieved); } catch {}
+        try {
+          xumm.off?.("retrieved", onRetrieved);
+        } catch {}
         resolve(val);
       };
       const onRetrieved = async () => {

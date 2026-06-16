@@ -23,13 +23,7 @@ import { createHmac } from "crypto";
 // ── Zod schema for incoming score submission ──────────────────
 
 export const ScoreSubmissionSchema = z.object({
-  gameSlug: z.enum([
-    "mario",
-    "fuzzy-survivors",
-    "minigolf",
-    "nut-racer",
-    "fuzzynuts-world",
-  ]),
+  gameSlug: z.enum(["mario", "fuzzy-survivors", "minigolf", "nut-racer", "fuzzynuts-world"]),
   score: z.number().int().positive(),
   duration: z.number().min(5000), // 5s minimum play time
   walletAddress: z.string().regex(/^r[1-9A-HJ-NP-Za-km-z]{25,34}$/), // XRPL r-address
@@ -222,11 +216,7 @@ export async function validateScoreSubmission(
   // ── 7. Optional: Verify wallet signature if provided ──
   if (data.signature) {
     const message = `${data.gameSlug}:${data.score}:${data.duration}:${data.nonce}:${data.timestamp}`;
-    const verified = await verifyEd25519Signature(
-      data.walletAddress,
-      message,
-      data.signature,
-    );
+    const verified = await verifyEd25519Signature(data.walletAddress, message, data.signature);
     if (!verified) {
       return {
         valid: false,
@@ -250,9 +240,7 @@ export function generateScoreChallenge(
   const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 24);
   const timestamp = Date.now();
   const challenge = `${gameSlug}:${walletAddress}:${nonce}:${timestamp}`;
-  const hash = createHmac("sha256", serverSecret)
-    .update(challenge)
-    .digest("hex");
+  const hash = createHmac("sha256", serverSecret).update(challenge).digest("hex");
 
   return {
     nonce,

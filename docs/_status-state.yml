@@ -1,40 +1,40 @@
 # Hand-edited state for tools/scripts/generate-status.ts.
 # Flip values here after completing each manual step.
 
-migrationPhase: in-progress   # not-started | in-progress | complete
+migrationPhase: in-progress # not-started | in-progress | complete
 
 redFlags:
-  cookieAuth:  partial    # signed-JWT middleware scaffolded (apps/api), not yet live
-  scoreCaps:   fixed      # @fuzzynuts/arcade-core
-  slugAlias:   fixed      # tests/slugs.test.ts asserts the nutracer round-trip
-  scoreHmac:   partial    # @fuzzynuts/shared-anticheat + tests; submitter still legacy
-  gamesDrift:  partial    # canonical source moved into apps/games-build; build step is a stub
-  hotWallet:   partial    # payout.ts refuses single-sig in prod; on-chain SignerList pending
-  vercelCache: fixed      # commit 700dd1e (pre-migration)
-  xrplVerify:  partial    # verify.ts shipped; /api/auth/verify still returns 501 in prod
+  cookieAuth: partial # signed-JWT middleware scaffolded (apps/api), not yet live
+  scoreCaps: fixed # @fuzzynuts/arcade-core
+  slugAlias: fixed # tests/slugs.test.ts asserts the nutracer round-trip
+  scoreHmac: partial # @fuzzynuts/shared-anticheat + tests; submitter still legacy
+  gamesDrift: partial # canonical source moved into apps/games-build; build step is a stub
+  hotWallet: partial # payout.ts refuses single-sig in prod; on-chain SignerList pending
+  vercelCache: fixed # commit 700dd1e (pre-migration)
+  xrplVerify: partial # verify.ts shipped; /api/auth/verify still returns 501 in prod
 
 phases:
-  A:  done
-  B:  done
-  C:  done
-  D:  scaffolded   # build script is a stub; real Vite per-game bundle is follow-up
-  E:  done
-  FG: scaffolded   # Rust + Android native builds require a human's machine
-  HI: done         # 4 ADRs + several stubs; full doc-prose pass is follow-up
-  J:  done
+  A: done
+  B: done
+  C: done
+  D: scaffolded # build script is a stub; real Vite per-game bundle is follow-up
+  E: done
+  FG: scaffolded # Rust + Android native builds require a human's machine
+  HI: done # 4 ADRs + several stubs; full doc-prose pass is follow-up
+  J: done
   KL: done
 
 manualSteps:
-  pushPreMigration:  done
-  openMigrationPR:   todo
-  mergeMigrationPR:  todo
-  vercelRoot:        todo
-  vercelBuild:       todo
-  railwayRoot:       todo
-  jwtSecret:         todo
-  sessionSecret:     todo
-  regularKey:        todo
-  signerList:        todo
-  disableMaster:     todo
-  capAddAndroid:     todo
-  tauriDeps:         todo
+  pushPreMigration: done
+  openMigrationPR: todo
+  mergeMigrationPR: todo
+  vercelRoot: todo
+  vercelBuild: todo
+  railwayRoot: todo
+  jwtSecret: todo
+  sessionSecret: todo
+  regularKey: todo
+  signerList: todo
+  disableMaster: todo
+  capAddAndroid: todo
+  tauriDeps: todo

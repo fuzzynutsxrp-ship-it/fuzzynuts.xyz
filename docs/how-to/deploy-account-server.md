@@ -7,6 +7,7 @@ The Railway API creates username mappings in MongoDB but never creates the actua
 ## Solution
 
 A lightweight Express server on the VPS (port 3001) that:
+
 - Receives username + password from Railway API
 - Hashes the password with bcrypt (work factor 10, matching Open-RSC)
 - Inserts the player into the Open-RSC SQLite database
@@ -21,6 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/
 ```
 
 This script:
+
 - Installs Node.js if missing
 - Creates `/opt/account-server/` with server.js and package.json
 - Installs npm dependencies (express, bcrypt, better-sqlite3)
@@ -105,11 +107,11 @@ Browser → fuzzynuts.xyz/play/rsc
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `tools/vps-account-server/server.js` | Express server source |
-| `tools/vps-account-server/package.json` | npm dependencies |
-| `tools/deploy-vps-account-server.sh` | VPS deployment script |
-| `tools/fix-teavm-js-autologin.sh` | Canvas visibility fix (v8) |
-| `apps/api/src/routes/rsc.ts` | Railway API (calls VPS endpoint) |
-| `apps/api/src/server.ts` | Passes VPS env vars to RSC router |
+| File                                    | Purpose                           |
+| --------------------------------------- | --------------------------------- |
+| `tools/vps-account-server/server.js`    | Express server source             |
+| `tools/vps-account-server/package.json` | npm dependencies                  |
+| `tools/deploy-vps-account-server.sh`    | VPS deployment script             |
+| `tools/fix-teavm-js-autologin.sh`       | Canvas visibility fix (v8)        |
+| `apps/api/src/routes/rsc.ts`            | Railway API (calls VPS endpoint)  |
+| `apps/api/src/server.ts`                | Passes VPS env vars to RSC router |

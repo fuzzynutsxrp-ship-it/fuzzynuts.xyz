@@ -39,6 +39,7 @@ return {
 For non-wallet IDs, `displayName` is the raw `id` string. Any URL-safe character sequence works as a profile ID — including strings crafted for SEO spam, misleading OG previews, or social media card injection.
 
 **Impact:** Not a direct XSS vector (Next.js HTML-escapes metadata values). However:
+
 - Social media crawlers (Twitter, Discord, Slack) render OG cards — a crafted `id` could produce misleading preview cards.
 - The OG `url` field contains the raw unvalidated `id`, which could break link previews.
 - Search engines index the page with the crafted title, enabling SEO pollution.
@@ -80,7 +81,7 @@ Additionally, `jdenticon@3.3.0` has no known CVEs. The transitive dependency `ca
 **Recommendation:** No action required. If defense-in-depth is desired, wrap the SVG with DOMPurify:
 
 ```typescript
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 const cleanSvg = DOMPurify.sanitize(svgMarkup, { USE_PROFILES: { svg: true } });
 ```
 
@@ -110,6 +111,7 @@ The `BioEditor` component stores bio text in `localStorage` under key `fuzzy_pro
 **File:** `pnpm-lock.yaml`
 
 New dependencies introduced:
+
 - `jdenticon@3.3.0` — No known CVEs. Well-maintained (GitHub: dmester/jdenticon).
 - `canvas-renderer@2.2.1` (transitive) — No known CVEs.
 
@@ -146,13 +148,13 @@ The layout component wraps children in `SubPageLayout` with static configuration
 
 ## Changes from main
 
-| Area | Before (main) | After (PR #79) |
-|------|---------------|-----------------|
-| `/profile/[id]` route | Does not exist | New dynamic route with client-side profile page |
-| Identicon library | None | `jdenticon@3.3.0` + `canvas-renderer@2.2.1` |
-| Bio storage | None | localStorage per profile ID |
-| Score display | Leaderboard only | Per-profile score timeline (top 15) |
-| Profile metadata | None | `generateMetadata` with OG tags |
+| Area                  | Before (main)    | After (PR #79)                                  |
+| --------------------- | ---------------- | ----------------------------------------------- |
+| `/profile/[id]` route | Does not exist   | New dynamic route with client-side profile page |
+| Identicon library     | None             | `jdenticon@3.3.0` + `canvas-renderer@2.2.1`     |
+| Bio storage           | None             | localStorage per profile ID                     |
+| Score display         | Leaderboard only | Per-profile score timeline (top 15)             |
+| Profile metadata      | None             | `generateMetadata` with OG tags                 |
 
 ---
 

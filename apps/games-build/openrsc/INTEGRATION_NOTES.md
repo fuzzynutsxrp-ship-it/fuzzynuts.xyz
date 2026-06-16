@@ -164,11 +164,11 @@ For a small server (< 100 players), the default SQLite option may also work.
 
 ## Port Requirements
 
-| Port  | Protocol | Purpose             | Firewall         |
-|-------|----------|---------------------|------------------|
-| 43594 | TCP      | Game client connect | MUST be open     |
-| 43494 | TCP      | WebSocket (optional)| Open if using WS |
-| 22    | TCP      | SSH admin           | Restrict to your IP |
+| Port  | Protocol | Purpose              | Firewall            |
+| ----- | -------- | -------------------- | ------------------- |
+| 43594 | TCP      | Game client connect  | MUST be open        |
+| 43494 | TCP      | WebSocket (optional) | Open if using WS    |
+| 22    | TCP      | SSH admin            | Restrict to your IP |
 
 ## Firewall Notes
 

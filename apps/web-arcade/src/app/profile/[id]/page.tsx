@@ -33,9 +33,7 @@ export async function generateMetadata({
   }
 
   const isWallet = isWalletAddress(id);
-  const displayName = isWallet
-    ? `${id.slice(0, 6)}...${id.slice(-4)}`
-    : id;
+  const displayName = isWallet ? `${id.slice(0, 6)}...${id.slice(-4)}` : id;
 
   return {
     title: `${displayName} | Fuzzynuts.xyz`,
@@ -50,11 +48,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProfileIdPage({
-  params,
-}: {
-  params: Promise<PageParams>;
-}) {
+export default async function ProfileIdPage({ params }: { params: Promise<PageParams> }) {
   const { id } = await params;
   return <ProfileIdClient profileId={id} />;
 }

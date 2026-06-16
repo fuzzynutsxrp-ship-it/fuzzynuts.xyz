@@ -32,9 +32,7 @@ export interface AmmPriceQuote {
  *         downstream code compiles. Wire to real `client.request(amm_info)`
  *         calls in the xrpl-pricing follow-up PR. The shape is final.
  */
-export async function getNutUsdPrice(
-  options: { issuer?: string } = {},
-): Promise<AmmPriceQuote> {
+export async function getNutUsdPrice(options: { issuer?: string } = {}): Promise<AmmPriceQuote> {
   const issuer = options.issuer ?? process.env.NUT_ISSUER ?? DEFAULT_NUT_ISSUER;
   const fallback = Number(process.env.NUT_USD_PRICE_FALLBACK ?? "0.00001");
   return withClient(async (client) => {

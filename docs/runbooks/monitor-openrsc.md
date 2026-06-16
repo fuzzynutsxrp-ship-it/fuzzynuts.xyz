@@ -2,14 +2,14 @@
 
 ## Quick Reference
 
-| What | Where | Check |
-|------|-------|-------|
-| Server process | VPS | `sudo systemctl status openrsc` |
-| Game logs | VPS | `/opt/openrsc/server/logs/` |
-| System logs | VPS | `sudo journalctl -u openrsc --since "1 hour ago"` |
-| Port listener | VPS | `ss -tlnp \| grep 43594` |
-| DNS resolution | Any | `dig +short game.fuzzynuts.xyz` |
-| Port reachable | Any | `nc -zv game.fuzzynuts.xyz 43594` |
+| What           | Where | Check                                             |
+| -------------- | ----- | ------------------------------------------------- |
+| Server process | VPS   | `sudo systemctl status openrsc`                   |
+| Game logs      | VPS   | `/opt/openrsc/server/logs/`                       |
+| System logs    | VPS   | `sudo journalctl -u openrsc --since "1 hour ago"` |
+| Port listener  | VPS   | `ss -tlnp \| grep 43594`                          |
+| DNS resolution | Any   | `dig +short game.fuzzynuts.xyz`                   |
+| Port reachable | Any   | `nc -zv game.fuzzynuts.xyz 43594`                 |
 
 ## Alert Thresholds
 

@@ -36,35 +36,19 @@ const BaseScoreObject = z.object({
   game: z.enum(VALID_GAMES),
 
   /** Player's score — positive integer, capped per game */
-  score: z
-    .number()
-    .int()
-    .positive(),
+  score: z.number().int().positive(),
 
   /** XRPL wallet address (r-address) — optional for guest plays */
-  wallet: z
-    .string()
-    .regex(XRPL_ADDRESS_REGEX)
-    .optional()
-    .nullable(),
+  wallet: z.string().regex(XRPL_ADDRESS_REGEX).optional().nullable(),
 
   /** Unix timestamp (ms) of submission — drift-checked server-side */
-  timestamp: z
-    .number()
-    .int()
-    .positive(),
+  timestamp: z.number().int().positive(),
 
   /** Play duration in seconds — must exceed minimum */
-  duration: z
-    .number()
-    .min(MIN_DURATION_SECONDS)
-    .optional(),
+  duration: z.number().min(MIN_DURATION_SECONDS).optional(),
 
   /** Client-generated nonce for replay attack prevention */
-  nonce: z
-    .string()
-    .regex(NONCE_REGEX)
-    .optional(),
+  nonce: z.string().regex(NONCE_REGEX).optional(),
 
   /** HMAC-SHA256 integrity hash: SHA256(game + score + timestamp + nonce + secret) */
   hash: z
@@ -74,11 +58,7 @@ const BaseScoreObject = z.object({
     .optional(),
 
   /** Optional wallet-signed message (hex-encoded) for high-value scores */
-  signature: z
-    .string()
-    .min(1)
-    .max(512)
-    .optional(),
+  signature: z.string().min(1).max(512).optional(),
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -97,7 +77,7 @@ export const ScorePayloadSchema = BaseScoreObject.refine(
   {
     message: "Score exceeds maximum allowed for this game",
     path: ["score"],
-  }
+  },
 );
 
 export type ScorePayload = z.infer<typeof ScorePayloadSchema>;
@@ -111,31 +91,33 @@ export type ScorePayload = z.infer<typeof ScorePayloadSchema>;
  * mandatory anti-replay fields. Used for wallet-connected players
  * competing for prizes.
  */
-export const SecureScorePayloadSchema = BaseScoreObject
-  .extend({
-    /** Required for secure submissions */
-    nonce: z.string().regex(NONCE_REGEX),
+export const SecureScorePayloadSchema = BaseScoreObject.extend({
+  /** Required for secure submissions */
+  nonce: z.string().regex(NONCE_REGEX),
 
-    /** Required integrity hash */
-    hash: z.string().length(64).regex(/^[a-f0-9]{64}$/),
+  /** Required integrity hash */
+  hash: z
+    .string()
+    .length(64)
+    .regex(/^[a-f0-9]{64}$/),
 
-    /** Required wallet address */
-    wallet: z.string().regex(XRPL_ADDRESS_REGEX),
+  /** Required wallet address */
+  wallet: z.string().regex(XRPL_ADDRESS_REGEX),
 
-    /** Timestamp — will be drift-checked via refine */
-    timestamp: z.number().int().positive(),
-  })
+  /** Timestamp — will be drift-checked via refine */
+  timestamp: z.number().int().positive(),
+})
   .refine(
     (data) => {
       const cap = (SCORE_CAPS as Record<string, number>)[data.game];
       return cap === undefined || data.score <= cap;
     },
-    { message: "Score exceeds maximum allowed for this game", path: ["score"] }
+    { message: "Score exceeds maximum allowed for this game", path: ["score"] },
   )
-  .refine(
-    (data) => Math.abs(Date.now() - data.timestamp) < MAX_TIMESTAMP_DRIFT_MS,
-    { message: `Timestamp must be within ${MAX_TIMESTAMP_DRIFT_MS / 1000}s of server time`, path: ["timestamp"] }
-  );
+  .refine((data) => Math.abs(Date.now() - data.timestamp) < MAX_TIMESTAMP_DRIFT_MS, {
+    message: `Timestamp must be within ${MAX_TIMESTAMP_DRIFT_MS / 1000}s of server time`,
+    path: ["timestamp"],
+  });
 
 export type SecureScorePayload = z.infer<typeof SecureScorePayloadSchema>;
 
@@ -159,7 +141,7 @@ export async function computeScoreHash(
   score: number,
   timestamp: number,
   nonce: string,
-  secret: string
+  secret: string,
 ): Promise<string> {
   const message = `${game}:${score}:${timestamp}:${nonce}`;
   const encoder = new TextEncoder();
@@ -168,7 +150,7 @@ export async function computeScoreHash(
     encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["sign"],
   );
   const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
   return Array.from(new Uint8Array(sig), (b) => b.toString(16).padStart(2, "0")).join("");

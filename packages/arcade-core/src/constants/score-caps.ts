@@ -29,34 +29,34 @@ export const SCORE_CAPS: Record<GameSlug, number> = {
   rsc: 99_000_000, // [MANUAL VERIFICATION REQUIRED] — RSC XP-based scoring, cap TBD
   "dragon-hoard": 999_999, // Endless collect-avoid game, cap for anti-cheat
   "cosmic-blaster": 999_999, // Endless space shooter, cap for anti-cheat
-  "snake": 50_000, // Classic snake with power-ups
-  "breakout": 100_000, // Brick breaker with power-ups
-  "pong": 11, // First to 11 wins
-  "tetris": 999_999, // Falling blocks puzzle
-  "asteroids": 500_000, // Ship vs asteroids
-  "flappy": 999,
+  snake: 50_000, // Classic snake with power-ups
+  breakout: 100_000, // Brick breaker with power-ups
+  pong: 11, // First to 11 wins
+  tetris: 999_999, // Falling blocks puzzle
+  asteroids: 500_000, // Ship vs asteroids
+  flappy: 999,
   "subway-runner": 50_000,
-  "jetpack": 100_000,
+  jetpack: 100_000,
   "ski-free": 99_999,
   "doodle-jump": 500_000,
   "2048": 999_999,
-  "memory": 10_000,
-  "minesweeper": 99_999,
-  "sudoku": 99_999,
-  "wordle": 1_000,
+  memory: 10_000,
+  minesweeper: 99_999,
+  sudoku: 99_999,
+  wordle: 1_000,
   "tank-battle": 500000,
-  "helicopter": 99999,
+  helicopter: 99999,
   "fruit-ninja": 999999,
   "tower-defense": 999999,
   "space-invaders": 99999,
-  "boxing": 99_999,
-  "bowling": 300,
-  "archery": 99_999,
+  boxing: 99_999,
+  bowling: 300,
+  archery: 99_999,
   "surf-up": 99_999,
-  "rally": 99_999,
+  rally: 99_999,
   "maze-escape": 99999,
-  "frogger": 99999,
-  "bomberman": 99999,
+  frogger: 99999,
+  bomberman: 99999,
   "capture-flag": 99999,
   "tower-stack": 99999,
 };

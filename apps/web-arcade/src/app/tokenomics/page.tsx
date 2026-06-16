@@ -7,8 +7,7 @@ export const metadata: Metadata = {
     "FuzzyNuts token distribution, wallet verification, and on-chain transparency. View supply, prize pools, and community allocations.",
   openGraph: {
     title: "Tokenomics | Fuzzynuts.xyz",
-    description:
-      "FuzzyNuts token distribution, wallet verification, and on-chain transparency.",
+    description: "FuzzyNuts token distribution, wallet verification, and on-chain transparency.",
     url: "https://fuzzynuts.xyz/tokenomics",
     siteName: "Fuzzynuts.xyz",
     type: "website",

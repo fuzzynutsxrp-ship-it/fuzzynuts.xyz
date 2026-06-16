@@ -6,17 +6,12 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const UserProfile = dynamic(
-  () =>
-    import("@/components/sections/UserProfile").then(
-      (mod) => mod.UserProfile,
-    ),
+  () => import("@/components/sections/UserProfile").then((mod) => mod.UserProfile),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-32">
-        <p className="text-[#6366f1] animate-pulse font-display text-lg">
-          Loading profile…
-        </p>
+        <p className="text-[#6366f1] animate-pulse font-display text-lg">Loading profile…</p>
       </div>
     ),
   },

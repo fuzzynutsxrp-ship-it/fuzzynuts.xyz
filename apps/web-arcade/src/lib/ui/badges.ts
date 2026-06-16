@@ -11,14 +11,7 @@
  */
 
 /** Available toast/badge style variants */
-export type BadgeVariant =
-  | "info"
-  | "success"
-  | "warning"
-  | "error"
-  | "gold"
-  | "silver"
-  | "bronze";
+export type BadgeVariant = "info" | "success" | "warning" | "error" | "gold" | "silver" | "bronze";
 
 /** Badge size presets */
 export type BadgeSize = "sm" | "md" | "lg";
@@ -59,10 +52,7 @@ const SIZE_CLASSES: Record<BadgeSize, string> = {
  * @param size - Size preset (default: "md")
  * @returns Tailwind class string
  */
-export function getToastClasses(
-  variant: BadgeVariant,
-  size: BadgeSize = "md"
-): string {
+export function getToastClasses(variant: BadgeVariant, size: BadgeSize = "md"): string {
   return `${TOAST_CLASSES[variant]} ${SIZE_CLASSES[size]}`;
 }
 
@@ -73,9 +63,6 @@ export function getToastClasses(
  * @param size - Size preset (default: "sm")
  * @returns Tailwind class string
  */
-export function getPrizeBadgeClasses(
-  rank: 1 | 2 | 3,
-  size: BadgeSize = "sm"
-): string {
+export function getPrizeBadgeClasses(rank: 1 | 2 | 3, size: BadgeSize = "sm"): string {
   return `${PRIZE_BADGE_CLASSES[rank]} ${SIZE_CLASSES[size]}`;
 }

@@ -10,10 +10,7 @@
  */
 
 /** Plausible global function (injected by the script tag) */
-type PlausibleFn = (
-  event: string,
-  opts?: { props?: Record<string, string | number> },
-) => void;
+type PlausibleFn = (event: string, opts?: { props?: Record<string, string | number> }) => void;
 
 declare global {
   interface Window {
@@ -25,10 +22,7 @@ declare global {
  * Track a custom event. No-op if Plausible script hasn't loaded yet
  * (SSR, ad-blocker, slow connection).
  */
-function track(
-  event: string,
-  props?: Record<string, string | number>,
-): void {
+function track(event: string, props?: Record<string, string | number>): void {
   try {
     if (typeof window !== "undefined" && window.plausible) {
       window.plausible(event, props ? { props } : undefined);
@@ -50,10 +44,7 @@ export function trackGameStart(gameSlug: string): void {
  * Track when a score is submitted.
  * Buckets the score into ranges to avoid sending exact values.
  */
-export function trackScoreSubmitted(
-  gameSlug: string,
-  score: number,
-): void {
+export function trackScoreSubmitted(gameSlug: string, score: number): void {
   // Bucket score into ranges for privacy
   const bucket =
     score < 1000

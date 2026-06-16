@@ -94,7 +94,18 @@ export function LeaderboardSkeleton() {
               <div className="space-y-2">
                 <ShimmerBar
                   className={`h-3 ${
-                    ["w-24", "w-28", "w-20", "w-32", "w-24", "w-36", "w-20", "w-28", "w-24", "w-32"][i % 10]
+                    [
+                      "w-24",
+                      "w-28",
+                      "w-20",
+                      "w-32",
+                      "w-24",
+                      "w-36",
+                      "w-20",
+                      "w-28",
+                      "w-24",
+                      "w-32",
+                    ][i % 10]
                   }`}
                   delay={i * 80}
                 />
@@ -104,18 +115,12 @@ export function LeaderboardSkeleton() {
 
             {/* Score */}
             <div className="flex items-center justify-end">
-              <ShimmerBar
-                className={`h-4 ${i < 3 ? "w-16" : "w-12"}`}
-                delay={i * 80 + 60}
-              />
+              <ShimmerBar className={`h-4 ${i < 3 ? "w-16" : "w-12"}`} delay={i * 80 + 60} />
             </div>
 
             {/* Game badge */}
             <div className="flex items-center justify-end">
-              <ShimmerBar
-                className="w-20 h-6 rounded-full"
-                delay={i * 80 + 80}
-              />
+              <ShimmerBar className="w-20 h-6 rounded-full" delay={i * 80 + 80} />
             </div>
           </motion.div>
         ))}

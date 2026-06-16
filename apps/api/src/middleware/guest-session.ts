@@ -61,7 +61,11 @@ export function guestSessionMiddleware(env: { GAME_SESSION_SECRET: string }) {
     });
   }
 
-  return async function guestSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+  return async function guestSession(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     // Try to read existing cookie
     const cookies = parseCookies(req.headers.cookie ?? "");
     const existing = cookies[COOKIE_NAME];

@@ -3,20 +3,17 @@ import { motion } from "framer-motion";
 import { DataStream } from "./DataStream";
 
 /* Lazy-load Three.js RotatingNut — prevents ~150KB bundle from blocking initial render */
-const RotatingNut = dynamic(
-  () => import("./RotatingNut").then((mod) => mod.RotatingNut),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex items-center justify-center">
-        <div
-          className="w-3 h-3 rounded-full animate-pulse"
-          style={{ background: "rgba(251,191,36,0.3)" }}
-        />
-      </div>
-    ),
-  }
-);
+const RotatingNut = dynamic(() => import("./RotatingNut").then((mod) => mod.RotatingNut), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div
+        className="w-3 h-3 rounded-full animate-pulse"
+        style={{ background: "rgba(251,191,36,0.3)" }}
+      />
+    </div>
+  ),
+});
 
 /* ─────────────────────────────────────────────────────────────
    HologramProjector — Futuristic prize display
@@ -85,10 +82,7 @@ export function HologramProjector({
       transition={{ delay, duration: 0.7, ease: "easeOut" }}
     >
       {/* Hologram container */}
-      <div
-        className="relative flex items-center justify-center"
-        style={{ width: px, height: px }}
-      >
+      <div className="relative flex items-center justify-center" style={{ width: px, height: px }}>
         {/* ── Outer ring — dashed, rotating ── */}
         <motion.div
           className="absolute inset-0 rounded-full"
@@ -116,8 +110,7 @@ export function HologramProjector({
           className="absolute flex items-center justify-center"
           style={{
             inset: px * 0.18,
-            clipPath:
-              "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+            clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
             background: `linear-gradient(135deg, ${theme.primary}08, ${theme.secondary}15)`,
           }}
         >

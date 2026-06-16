@@ -57,7 +57,6 @@ export type { MyRankData } from "./hooks/useMyRank";
 // ── Components ──
 export { LeaderboardSkeleton } from "./components/LeaderboardSkeleton";
 
-
 // ── Validation ──
 export {
   ScorePayloadSchema,

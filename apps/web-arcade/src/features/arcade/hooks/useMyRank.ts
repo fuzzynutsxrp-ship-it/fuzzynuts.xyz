@@ -78,17 +78,12 @@ export function useMyRank(userId: string | null): MyRankData {
       })
         .then((r) => (r.ok ? r.json() : []))
         .then((d) => {
-          const raw: ScoreEntry[] = Array.isArray(d)
-            ? d
-            : d.scores || d.data || [];
+          const raw: ScoreEntry[] = Array.isArray(d) ? d : d.scores || d.data || [];
           return raw;
         })
         .catch(() => [] as ScoreEntry[]);
 
-      const [gameResults, userScores] = await Promise.all([
-        Promise.all(promises),
-        userPromise,
-      ]);
+      const [gameResults, userScores] = await Promise.all([Promise.all(promises), userPromise]);
 
       // 3. Merge all game scores into one global leaderboard
       const allScores = gameResults
@@ -99,34 +94,24 @@ export function useMyRank(userId: string | null): MyRankData {
       // 4. Find user rank (case-insensitive match on wallet, or userId)
       const uid = userId.toLowerCase();
       const rankIndex = allScores.findIndex(
-        (s) =>
-          s.wallet?.toLowerCase() === uid ||
-          s.userId?.toLowerCase() === uid,
+        (s) => s.wallet?.toLowerCase() === uid || s.userId?.toLowerCase() === uid,
       );
       const userRank = rankIndex >= 0 ? rankIndex + 1 : null;
 
       // 5. Score needed for next rank
-      const nextScore =
-        rankIndex > 0 ? allScores[rankIndex - 1].score : null;
+      const nextScore = rankIndex > 0 ? allScores[rankIndex - 1].score : null;
       // 6. Score of player directly behind (previous rank)
       const prevScore =
-        rankIndex >= 0 && rankIndex < allScores.length - 1
-          ? allScores[rankIndex + 1].score
-          : null;
+        rankIndex >= 0 && rankIndex < allScores.length - 1 ? allScores[rankIndex + 1].score : null;
 
       // 7. Personal stats from user's own scores
-      const uniqueGames = new Set(
-        (userScores as ScoreEntry[]).map((s) => s.game),
-      );
+      const uniqueGames = new Set((userScores as ScoreEntry[]).map((s) => s.game));
       const bestPerGame = new Map<string, number>();
       for (const s of userScores as ScoreEntry[]) {
         const existing = bestPerGame.get(s.game) ?? 0;
         if (s.score > existing) bestPerGame.set(s.game, s.score);
       }
-      const userTotal = Array.from(bestPerGame.values()).reduce(
-        (sum, s) => sum + s,
-        0,
-      );
+      const userTotal = Array.from(bestPerGame.values()).reduce((sum, s) => sum + s, 0);
 
       setRank(userRank);
       setTotalScore(userTotal);
@@ -141,9 +126,7 @@ export function useMyRank(userId: string | null): MyRankData {
       setNextRankScore(null);
       setPrevRankScore(null);
       setLoading(false);
-      setError(
-        err instanceof Error ? err.message : "Failed to load rank data",
-      );
+      setError(err instanceof Error ? err.message : "Failed to load rank data");
     }
   }, [userId]);
 

@@ -54,9 +54,7 @@ export function GameCard({ game, onPlay, priority = false }: GameCardProps) {
       {/* Card content — below image, clean whitespace */}
       <div className="flex flex-col gap-1 p-3">
         {/* Title */}
-        <h3 className="font-display text-sm font-bold text-cream truncate">
-          {game.title}
-        </h3>
+        <h3 className="font-display text-sm font-bold text-cream truncate">{game.title}</h3>
 
         {/* Star rating */}
         <div className="flex items-center gap-1" aria-label={`${rating} out of 5 stars`}>
@@ -73,9 +71,7 @@ export function GameCard({ game, onPlay, priority = false }: GameCardProps) {
               }
             />
           ))}
-          <span className="text-[10px] text-[var(--color-cream-dim)] ml-0.5">
-            {rating}
-          </span>
+          <span className="text-[10px] text-[var(--color-cream-dim)] ml-0.5">{rating}</span>
         </div>
       </div>
     </button>

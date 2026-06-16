@@ -36,6 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/fuzzynutsxrp-ship-it/fuzzynuts.xyz/
 ```
 
 3. Wait for it to complete. You should see:
+
    ```
    ✓ PATCH COMPLETE
    New hash format:
@@ -68,7 +69,7 @@ If anything goes wrong, copy the error message and show it to Hermes.
 - **apps/api/src/middleware/walletAuth.ts**: JWT cookie verification middleware
 - **apps/api/src/server.ts**: Mounted RSC router at /api/rsc with walletAuth gate
 - **apps/web-arcade/public/games/rsc/index.html**: Auto-login flow with claim modal
-- **apps/web-arcade/vercel.json**: Rewrite rule for /api/rsc/* → Railway API (already existed)
+- **apps/web-arcade/vercel.json**: Rewrite rule for /api/rsc/\* → Railway API (already existed)
 - **tools/patch-rsc-teavm-client.sh**: TeaVM client patch script for auto-login support
 - **apps/api/tsconfig.json**: Added DOM lib for CryptoKey types
 - **packages/shared-anticheat/src/hmac.ts**: Fixed Uint8Array type compatibility

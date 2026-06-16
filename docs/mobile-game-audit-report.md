@@ -10,11 +10,11 @@
 
 ## Summary
 
-| Severity | Count | Description |
-|----------|-------|-------------|
-| Critical | 0 | No real overflow issues found |
-| Info | 2 | Cosmetic observations (non-blocking) |
-| **Total** | **2** | |
+| Severity  | Count | Description                          |
+| --------- | ----- | ------------------------------------ |
+| Critical  | 0     | No real overflow issues found        |
+| Info      | 2     | Cosmetic observations (non-blocking) |
+| **Total** | **2** |                                      |
 
 **Overall verdict:** All 38 game pages and the homepage render correctly at mobile viewports. No horizontal overflow, no broken aspect ratios, and no touch controls blocked by overlapping UI elements.
 
@@ -30,11 +30,11 @@ The initial automated audit flagged 4 "critical" overflow issues. After manual r
 
 ### False Positive Details
 
-| Slug | Issue | Why It's a False Positive |
-|------|-------|--------------------------|
-| homepage | Category tab bar overflow | Tabs are inside `overflow-x: auto` scroll container — this is correct scrollable behavior |
-| mario | `table#dataDisplay` overflow (409px) | Game uses `transform: scale(min(100vw/1265, 100dvh/464))` — visually correct at all viewports |
-| rsc | `span.rsc-particle` overflow (20px) | Particles are in `position: fixed; inset: 0; overflow: hidden` container — visually clipped |
+| Slug     | Issue                                | Why It's a False Positive                                                                     |
+| -------- | ------------------------------------ | --------------------------------------------------------------------------------------------- |
+| homepage | Category tab bar overflow            | Tabs are inside `overflow-x: auto` scroll container — this is correct scrollable behavior     |
+| mario    | `table#dataDisplay` overflow (409px) | Game uses `transform: scale(min(100vw/1265, 100dvh/464))` — visually correct at all viewports |
+| rsc      | `span.rsc-particle` overflow (20px)  | Particles are in `position: fixed; inset: 0; overflow: hidden` container — visually clipped   |
 
 The Playwright test's `checkHorizontalOverflow()` function has been updated to walk up the DOM tree checking computed `overflow` on ancestors and to skip `transform`-scaled elements, eliminating these false positives.
 
@@ -56,52 +56,53 @@ The Fuzzynuts World page at `/games/fuzzynuts-world/index.html` does not contain
 
 All game pages rendered correctly at both mobile viewports with no overflow, proper aspect ratios, and unblocked touch controls:
 
-| Game | iPhone 12 | Pixel 5 | Notes |
-|------|-----------|---------|-------|
-| 2048 | ✅ | ✅ | |
-| archery | ✅ | ✅ | |
-| asteroids | ✅ | ✅ | |
-| bomberman | ✅ | ✅ | |
-| bowling | ✅ | ✅ | |
-| boxing | ✅ | ✅ | |
-| breakout | ✅ | ✅ | |
-| capture-flag | ✅ | ✅ | |
-| cosmic-blaster | ✅ | ✅ | |
-| doodle-jump | ✅ | ✅ | |
-| dragon-hoard | ✅ | ✅ | |
-| flappy | ✅ | ✅ | |
-| frogger | ✅ | ✅ | |
-| fruit-ninja | ✅ | ✅ | |
-| fuzzy-survivors | ✅ | ✅ | |
-| fuzzynuts-world | ✅ | ✅ | No iframe/canvas (by design) |
-| helicopter | ✅ | ✅ | |
-| jetpack | ✅ | ✅ | |
-| mario | ✅ | ✅ | Transform-scaled, mobile touch controls |
-| maze-escape | ✅ | ✅ | |
-| memory | ✅ | ✅ | |
-| minesweeper | ✅ | ✅ | |
-| minigolf | ✅ | ✅ | |
-| nut-racer | ✅ | ✅ | |
-| pong | ✅ | ✅ | |
-| rally | ✅ | ✅ | |
-| rsc | ✅ | ✅ | |
-| ski-free | ✅ | ✅ | |
-| snake | ✅ | ✅ | Touch: swipe controls |
-| space-invaders | ✅ | ✅ | |
-| subway-runner | ✅ | ✅ | |
-| sudoku | ✅ | ✅ | |
-| surf-up | ✅ | ✅ | |
-| tank-battle | ✅ | ✅ | |
-| tetris | ✅ | ✅ | Mobile-optimized portrait layout |
-| tower-defense | ✅ | ✅ | |
-| tower-stack | ✅ | ✅ | |
-| wordle | ✅ | ✅ | |
+| Game            | iPhone 12 | Pixel 5 | Notes                                   |
+| --------------- | --------- | ------- | --------------------------------------- |
+| 2048            | ✅        | ✅      |                                         |
+| archery         | ✅        | ✅      |                                         |
+| asteroids       | ✅        | ✅      |                                         |
+| bomberman       | ✅        | ✅      |                                         |
+| bowling         | ✅        | ✅      |                                         |
+| boxing          | ✅        | ✅      |                                         |
+| breakout        | ✅        | ✅      |                                         |
+| capture-flag    | ✅        | ✅      |                                         |
+| cosmic-blaster  | ✅        | ✅      |                                         |
+| doodle-jump     | ✅        | ✅      |                                         |
+| dragon-hoard    | ✅        | ✅      |                                         |
+| flappy          | ✅        | ✅      |                                         |
+| frogger         | ✅        | ✅      |                                         |
+| fruit-ninja     | ✅        | ✅      |                                         |
+| fuzzy-survivors | ✅        | ✅      |                                         |
+| fuzzynuts-world | ✅        | ✅      | No iframe/canvas (by design)            |
+| helicopter      | ✅        | ✅      |                                         |
+| jetpack         | ✅        | ✅      |                                         |
+| mario           | ✅        | ✅      | Transform-scaled, mobile touch controls |
+| maze-escape     | ✅        | ✅      |                                         |
+| memory          | ✅        | ✅      |                                         |
+| minesweeper     | ✅        | ✅      |                                         |
+| minigolf        | ✅        | ✅      |                                         |
+| nut-racer       | ✅        | ✅      |                                         |
+| pong            | ✅        | ✅      |                                         |
+| rally           | ✅        | ✅      |                                         |
+| rsc             | ✅        | ✅      |                                         |
+| ski-free        | ✅        | ✅      |                                         |
+| snake           | ✅        | ✅      | Touch: swipe controls                   |
+| space-invaders  | ✅        | ✅      |                                         |
+| subway-runner   | ✅        | ✅      |                                         |
+| sudoku          | ✅        | ✅      |                                         |
+| surf-up         | ✅        | ✅      |                                         |
+| tank-battle     | ✅        | ✅      |                                         |
+| tetris          | ✅        | ✅      | Mobile-optimized portrait layout        |
+| tower-defense   | ✅        | ✅      |                                         |
+| tower-stack     | ✅        | ✅      |                                         |
+| wordle          | ✅        | ✅      |                                         |
 
 ---
 
 ## Touch Control Assessment
 
 Most games display mobile-appropriate touch controls:
+
 - **Mario:** Virtual D-pad (left) + A/B buttons (right) overlaid on game canvas
 - **Snake:** "Touch: swipe to change direction" documented
 - **Tetris:** Large "Start Game" button optimized for finger taps
@@ -114,6 +115,7 @@ No games had touch controls blocked by overlapping UI elements (navbar, chat dra
 ## Screenshots
 
 All screenshots saved to `apps/web-arcade/docs/mobile-audit-screenshots/`:
+
 - `homepage-{device}.png` — Homepage at each viewport
 - `homepage-overflow-{device}.png` — Homepage overflow evidence (false positive — tabs are in scrollable container)
 - `{game}-{device}.png` — Each game page at each viewport

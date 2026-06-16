@@ -21,10 +21,9 @@ describe("slugs — single source of truth", () => {
   });
 
   it("every legacy id round-trips back to a canonical slug", () => {
-    for (const [slug, id] of Object.entries(SLUG_TO_LEGACY_ID) as Array<[
-      keyof typeof SLUG_TO_LEGACY_ID,
-      string,
-    ]>) {
+    for (const [slug, id] of Object.entries(SLUG_TO_LEGACY_ID) as Array<
+      [keyof typeof SLUG_TO_LEGACY_ID, string]
+    >) {
       expect(normalizeSlug(id)).toBe(slug);
     }
   });

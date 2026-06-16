@@ -54,12 +54,12 @@ const GAME_EMOJIS: Record<string, string> = {
   rsc: "⚔️",
   "dragon-hoard": "🐉",
   "cosmic-blaster": "🚀",
-  "snake": "🐍",
-  "breakout": "🧱",
-  "pong": "🏓",
-  "tetris": "🟦",
-  "asteroids": "☄️",
-  "flappy": "🐦",
+  snake: "🐍",
+  breakout: "🧱",
+  pong: "🏓",
+  tetris: "🟦",
+  asteroids: "☄️",
+  flappy: "🐦",
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -166,17 +166,19 @@ function ConnectPrompt() {
       className="flex flex-col items-center justify-center py-16 px-6 text-center relative"
     >
       {/* Floating nuts */}
-      <span className="absolute top-8 left-1/4 text-xl float-nut-1 opacity-50 pointer-events-none">🥜</span>
-      <span className="absolute top-12 right-1/4 text-lg float-nut-2 opacity-40 pointer-events-none">🥜</span>
+      <span className="absolute top-8 left-1/4 text-xl float-nut-1 opacity-50 pointer-events-none">
+        🥜
+      </span>
+      <span className="absolute top-12 right-1/4 text-lg float-nut-2 opacity-40 pointer-events-none">
+        🥜
+      </span>
 
       {/* Icon — matches homepage card style */}
       <div className="w-20 h-20 rounded-2xl bg-[#1a1030] border border-white/10 flex items-center justify-center mb-5">
         <User size={36} className="text-brand-gold" />
       </div>
 
-      <h2 className="font-display text-xl sm:text-2xl font-bold text-cream mb-2">
-        Your Profile
-      </h2>
+      <h2 className="font-display text-xl sm:text-2xl font-bold text-cream mb-2">Your Profile</h2>
       <p className="text-[var(--color-cream-dim)] text-sm max-w-sm mb-6 leading-relaxed">
         Play games to build your stats, climb the leaderboard, and track your achievements.
       </p>
@@ -256,9 +258,7 @@ export function UserProfile() {
         }
 
         const data = await response.json();
-        const scores: ScoreEntry[] = Array.isArray(data)
-          ? data
-          : data.scores || data.data || [];
+        const scores: ScoreEntry[] = Array.isArray(data) ? data : data.scores || data.data || [];
 
         // Sort by most recent first
         const sorted = scores.sort((a, b) => (b.ts || 0) - (a.ts || 0));
@@ -275,7 +275,7 @@ export function UserProfile() {
         });
       }
     },
-    [address]
+    [address],
   );
 
   /* ── Fetch on connect ── */
@@ -309,20 +309,15 @@ export function UserProfile() {
   /* ── Derived stats ── */
   const totalGames = state.scores.length;
   const uniqueGames = new Set(state.scores.map((s) => s.game)).size;
-  const topScore = state.scores.length
-    ? Math.max(...state.scores.map((s) => s.score))
-    : 0;
+  const topScore = state.scores.length ? Math.max(...state.scores.map((s) => s.score)) : 0;
 
   // Best score per game
-  const bestByGame = state.scores.reduce<Record<string, ScoreEntry>>(
-    (acc, entry) => {
-      if (!acc[entry.game] || entry.score > acc[entry.game].score) {
-        acc[entry.game] = entry;
-      }
-      return acc;
-    },
-    {}
-  );
+  const bestByGame = state.scores.reduce<Record<string, ScoreEntry>>((acc, entry) => {
+    if (!acc[entry.game] || entry.score > acc[entry.game].score) {
+      acc[entry.game] = entry;
+    }
+    return acc;
+  }, {});
 
   // XP progress
   const xpProgress = (unlockedAchievements.size / ACHIEVEMENTS.length) * 100;
@@ -330,12 +325,8 @@ export function UserProfile() {
   return (
     <section id="user-profile" className="relative">
       <div className="space-y-6">
-
         {/* ═══ PROFILE HEADER ═══ */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.08)] border border-[#e2e8f0]">
             <div className="p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -390,10 +381,7 @@ export function UserProfile() {
                                disabled:opacity-40 cursor-pointer"
                     title="Refresh scores"
                   >
-                    <RefreshCw
-                      size={14}
-                      className={isRefreshing ? "animate-spin" : ""}
-                    />
+                    <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
                     Refresh
                   </motion.button>
                   <motion.button
@@ -536,9 +524,7 @@ export function UserProfile() {
           {/* XP Progress Bar */}
           <div className="mb-4 bg-white border border-[#e2e8f0] rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-[#0f172a]">
-                Achievement Progress
-              </span>
+              <span className="text-sm font-semibold text-[#0f172a]">Achievement Progress</span>
               <span className="text-sm font-mono text-[#6366f1]">
                 {unlockedAchievements.size}/{ACHIEVEMENTS.length}
               </span>
@@ -586,9 +572,7 @@ export function UserProfile() {
                       >
                         {achievement.title}
                       </p>
-                      <p className="text-[11px] text-[#64748b]">
-                        {achievement.description}
-                      </p>
+                      <p className="text-[11px] text-[#64748b]">{achievement.description}</p>
                     </div>
                   </div>
                   {/* Tooltip for locked achievements */}
@@ -615,7 +599,11 @@ export function UserProfile() {
           </h3>
           <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             {/* Loading */}
-            {state.loading && <div className="p-4 sm:p-5"><SkeletonRows /></div>}
+            {state.loading && (
+              <div className="p-4 sm:p-5">
+                <SkeletonRows />
+              </div>
+            )}
 
             {/* Error */}
             <AnimatePresence>
@@ -630,9 +618,7 @@ export function UserProfile() {
                   <p className="font-display text-base font-bold text-[#0f172a] mb-2">
                     Server Unreachable
                   </p>
-                  <p className="text-sm text-[#64748b] mb-5 max-w-sm">
-                    {state.error}
-                  </p>
+                  <p className="text-sm text-[#64748b] mb-5 max-w-sm">{state.error}</p>
                   <button
                     onClick={() => fetchUserScores(true)}
                     className="btn-secondary text-sm cursor-pointer"
@@ -646,19 +632,11 @@ export function UserProfile() {
             {/* Empty */}
             {!state.loading && !state.error && state.scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center relative">
-                <Gamepad2
-                  size={32}
-                  className="text-[#6366f1] mb-4 opacity-40"
-                />
-                <p className="font-display text-lg font-bold text-[#0f172a] mb-2">
-                  No scores yet
-                </p>
+                <Gamepad2 size={32} className="text-[#6366f1] mb-4 opacity-40" />
+                <p className="font-display text-lg font-bold text-[#0f172a] mb-2">No scores yet</p>
                 <p className="text-sm text-[#64748b] max-w-sm">
                   Play a game to set your first record! Head to the{" "}
-                  <a
-                    href="#games"
-                    className="text-[#6366f1] hover:underline font-semibold"
-                  >
+                  <a href="#games" className="text-[#6366f1] hover:underline font-semibold">
                     Arcade
                   </a>{" "}
                   and start playing.
@@ -688,9 +666,7 @@ export function UserProfile() {
                           className="absolute -left-5 top-3.5 w-3 h-3 rounded-full border-2"
                           style={{
                             borderColor: getGameColor(entry.game),
-                            background: isRecent
-                              ? getGameColor(entry.game)
-                              : "#fff",
+                            background: isRecent ? getGameColor(entry.game) : "#fff",
                           }}
                         />
 
@@ -703,9 +679,7 @@ export function UserProfile() {
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-base">
-                              {GAME_EMOJIS[entry.game] || "🎮"}
-                            </span>
+                            <span className="text-base">{GAME_EMOJIS[entry.game] || "🎮"}</span>
                             <span
                               className="text-sm font-bold truncate"
                               style={{ color: getGameColor(entry.game) }}
@@ -738,9 +712,7 @@ export function UserProfile() {
 
 function AdminLinks() {
   const { address, isConnected } = useWalletStore();
-  const ADMIN =
-    process.env.NEXT_PUBLIC_ADMIN_WALLET ||
-    "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
+  const ADMIN = process.env.NEXT_PUBLIC_ADMIN_WALLET || "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
 
   if (!isConnected || !address) return null;
   if (address.toLowerCase() !== ADMIN.toLowerCase()) return null;

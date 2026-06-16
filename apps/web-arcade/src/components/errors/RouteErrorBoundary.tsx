@@ -85,9 +85,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
           animate={{ opacity: 1 }}
         >
           <CyberCard className="max-w-md p-6 text-center">
-            <h3 className="text-xl font-bold text-gold mb-2">
-              Game Session Interrupted
-            </h3>
+            <h3 className="text-xl font-bold text-gold mb-2">Game Session Interrupted</h3>
             <p className="text-sm text-cream/70 mb-4">
               {this.state.error?.message || "An unexpected error occurred"}
             </p>
@@ -119,12 +117,9 @@ export class RouteErrorBoundary extends Component<Props, State> {
       >
         <CyberCard className="max-w-lg w-full p-8 text-center">
           <div className="text-5xl mb-4">🌰</div>
-          <h2 className="text-2xl font-bold text-gold mb-3">
-            Something went sideways
-          </h2>
+          <h2 className="text-2xl font-bold text-gold mb-3">Something went sideways</h2>
           <p className="text-cream/70 mb-6">
-            {this.state.error?.message ||
-              "We hit a snag loading this page"}
+            {this.state.error?.message || "We hit a snag loading this page"}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -132,12 +127,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
               onClick={this.handleRetry}
               className="px-6 py-3 bg-gold text-forest-900 rounded-xl font-semibold hover:opacity-90 transition flex items-center justify-center gap-2"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
