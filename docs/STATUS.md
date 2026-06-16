@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-01T01:01:48.382Z** from `03b8c14` on `migration/monorepo`._
+_Generated **2026-06-16T12:25:08.853Z** from `7bcb661` on `eslint-10-compat-fix`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -64,15 +64,15 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 ## Recent activity
 
-Last 10 commits on `migration/monorepo`:
+Last 10 commits on `eslint-10-compat-fix`:
 
-- `03b8c14` ci: GitHub Actions matrix + STATUS.md generator — _fuzzynutsxrp-ship-it, 27 minutes ago_
-- `2380738` docs: Diátaxis layout, community files, ADRs 0001/0003/0006 — _fuzzynutsxrp-ship-it, 30 minutes ago_
-- `034822b` feat(desktop+mobile): scaffold Tauri 2.x + Capacitor 7 shells — _fuzzynutsxrp-ship-it, 37 minutes ago_
-- `f9ae2da` feat(xrpl-token-utils): client + verify + AMM price + multisig-aware payout — _fuzzynutsxrp-ship-it, 39 minutes ago_
-- `f23571d` feat(games-build): scaffold the bundler that kills source drift — _fuzzynutsxrp-ship-it, 41 minutes ago_
-- `ff753d8` feat(auth): scaffold two-tier auth — shared-anticheat + wallet-client + api routers — _fuzzynutsxrp-ship-it, 43 minutes ago_
-- `bcfcf10` feat(arcade-core): single source of truth for SCORE_CAPS and slug aliases — _fuzzynutsxrp-ship-it, 48 minutes ago_
-- `8df53a0` chore(repo): restructure into monorepo (apps/, packages/, docs/) — _fuzzynutsxrp-ship-it, 52 minutes ago_
-- `b0931c9` fix(fuzzy-survivors): cache-bust styles.css for returning users — _fuzzynutsxrp-ship-it, 2 hours ago_
-- `700dd1e` fix(vercel): scope immutable cache to hashed assets only — _fuzzynutsxrp-ship-it, 2 hours ago_
+- `7bcb661` chore(deps-dev): bump eslint 9->10 with @eslint/compat shim — _dev-worker, 14 hours ago_
+- `d0e1c02` audit: link tutorial 06 in tutorials README — _Hermes Dev Worker, 14 hours ago_
+- `46ba342` docs: add iOS Safari touch/audio QA matrix — _Shafster, 15 hours ago_
+- `bfee3b4` fix: add MutationObserver fallback for dynamic start screens — _Shafster, 16 hours ago_
+- `6cede7f` audit: extract dismissOverlay helper, add resetScoreTracking to restart, remove dead AudioCtx + redundant removeEventListener — _Hermes Dev Worker, 16 hours ago_
+- `956e2db` fix: improve universal start-btn handler with Qwen review — _Shafster, 16 hours ago_
+- `357368c` fix: universal start-btn handler for all games — _Shafster, 17 hours ago_
+- `8718993` audit: document scrollY safety net + iOS Safari 16+ requirement — _Hermes Dev Worker, 21 hours ago_
+- `b31d2be` fix: remove translateZ(0), add dialog::backdrop pointer-events:none (Qwen round 2) — _Shafster, 21 hours ago_
+- `fab2022` fix: replace position:fixed body scroll lock (Qwen diagnosis) — _Shafster, 21 hours ago_
