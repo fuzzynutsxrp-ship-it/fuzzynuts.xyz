@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-16T12:31:18.280Z** from `80689d3` on `eslint-10-compat-fix`._
+_Generated **2026-06-16T12:32:50.286Z** from `e7cdc7e` on `eslint-10-compat-fix`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,13 +66,13 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `eslint-10-compat-fix`:
 
-- `80689d3` fix(ci): also normalize commit SHAs and relative times in status:check — _Hermes Dev Worker, 6 seconds ago_
-- `fd3f2dc` fix(ci): normalize timestamp in status:check comparison — _Hermes Dev Worker, 3 minutes ago_
-- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 4 minutes ago_
-- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 6 minutes ago_
+- `e7cdc7e` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 84 seconds ago_
+- `80689d3` fix(ci): also normalize commit SHAs and relative times in status:check — _Hermes Dev Worker, 2 minutes ago_
+- `fd3f2dc` fix(ci): normalize timestamp in status:check comparison — _Hermes Dev Worker, 5 minutes ago_
+- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 5 minutes ago_
+- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 8 minutes ago_
 - `7bcb661` chore(deps-dev): bump eslint 9->10 with @eslint/compat shim — _dev-worker, 14 hours ago_
 - `d0e1c02` audit: link tutorial 06 in tutorials README — _Hermes Dev Worker, 14 hours ago_
 - `46ba342` docs: add iOS Safari touch/audio QA matrix — _Shafster, 16 hours ago_
 - `bfee3b4` fix: add MutationObserver fallback for dynamic start screens — _Shafster, 16 hours ago_
 - `6cede7f` audit: extract dismissOverlay helper, add resetScoreTracking to restart, remove dead AudioCtx + redundant removeEventListener — _Hermes Dev Worker, 16 hours ago_
-- `956e2db` fix: improve universal start-btn handler with Qwen review — _Shafster, 17 hours ago_
