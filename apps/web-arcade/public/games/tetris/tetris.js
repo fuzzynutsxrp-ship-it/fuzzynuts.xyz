@@ -119,7 +119,7 @@
   function endGame() {
     const dur = ((Date.now() - startTime) / 1000) | 0;
     best = Math.max(best, score);
-    localStorage.setItem('tetris_best', best);
+    try{localStorage.setItem('tetris_best', best)}catch(e){};
     window.__gameScore = score;
     if (overlayOver) { overlayOver.style.display = 'flex'; }
     try { FuzzyScoreSubmit('tetris', score, dur); } catch(e) {}
@@ -274,7 +274,7 @@
     ctx = canvas.getContext('2d');
     overlayStart = document.getElementById('overlay-start');
     overlayOver = document.getElementById('overlay-gameover');
-    best = parseInt(localStorage.getItem('tetris_best')) || 0;
+    best = parseInt((function(){try{return localStorage.getItem('tetris_best')}catch(e){return null}})()) || 0;
     document.addEventListener('keydown', onKeyDown);
     canvas.addEventListener('touchstart', onTouchStart, { passive: true });
     canvas.addEventListener('touchend', onTouchEnd, { passive: true });

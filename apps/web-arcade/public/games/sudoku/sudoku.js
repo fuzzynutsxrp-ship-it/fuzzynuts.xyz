@@ -278,8 +278,8 @@ function gameWon(){
 
   /* best time */
   const key='sudoku_best_'+difficulty;
-  const prev=parseInt(localStorage.getItem(key))||99999;
-  if(timer<prev) localStorage.setItem(key,timer);
+  const prev=parseInt((function(){try{return localStorage.getItem(key)}catch(e){return null}})())||99999;
+  if(timer<prev) try{localStorage.setItem(key,timer)}catch(e){};
 
   if(typeof FuzzyScoreSubmit==='function') FuzzyScoreSubmit('sudoku',score,timer);
   /* signal game over */

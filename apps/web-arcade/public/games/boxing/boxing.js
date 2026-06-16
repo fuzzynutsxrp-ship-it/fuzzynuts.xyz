@@ -106,7 +106,7 @@ function updateHUD(){
 function initGame(){
   score = 0; combo = 0; comboMult = 1; maxCombo = 0;
   round = 1;
-  bestScore = parseInt(localStorage.getItem(BEST_KEY)||'0',10);
+  bestScore = parseInt((function(){try{return localStorage.getItem(BEST_KEY)}catch(e){return null}})()||'0',10);
   particles = [];
   screenShake = 0;
   aiTimer = 1000 + Math.random()*1500;
@@ -720,7 +720,7 @@ canvas.addEventListener('click', ()=>{
 });
 
 /* ── boot ── */
-bestScore = parseInt(localStorage.getItem(BEST_KEY)||'0',10);
+bestScore = parseInt((function(){try{return localStorage.getItem(BEST_KEY)}catch(e){return null}})()||'0',10);
 state = 'start';
 animFrame = requestAnimationFrame(update);
 

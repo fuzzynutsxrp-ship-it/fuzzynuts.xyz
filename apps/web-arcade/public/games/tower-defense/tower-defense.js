@@ -361,7 +361,7 @@ function drawGameOver(){
   ctx.fillText('GAME OVER',canvas.width/2,canvas.height/2-30);
   ctx.fillStyle='#fff'; ctx.font='18px monospace';
   ctx.fillText('Score: '+state.score,canvas.width/2,canvas.height/2+10);
-  const best=parseInt(localStorage.getItem('tower-defense_best')||'0');
+  const best=parseInt((function(){try{return localStorage.getItem('tower-defense_best')}catch(e){return null}})()||'0');
   ctx.fillText('Best: '+Math.max(best,state.score),canvas.width/2,canvas.height/2+35);
   ctx.fillStyle=ACCENT; ctx.font='14px monospace';
   ctx.fillText('Click to restart',canvas.width/2,canvas.height/2+60);
@@ -439,8 +439,8 @@ function upgradeTower(tower){
 // ─── Game flow ───
 function gameOver(){
   state.gameOver=true;
-  const best=parseInt(localStorage.getItem('tower-defense_best')||'0');
-  if(state.score>best) localStorage.setItem('tower-defense_best',state.score);
+  const best=parseInt((function(){try{return localStorage.getItem('tower-defense_best')}catch(e){return null}})()||'0');
+  if(state.score>best) try{localStorage.setItem('tower-defense_best',state.score)}catch(e){};
   const duration=Math.floor((Date.now()-startTime)/1000);
   window.__gameScore=state.score;
   if(typeof FuzzyScoreSubmit==='function') FuzzyScoreSubmit('tower-defense',state.score,duration);
@@ -451,8 +451,8 @@ function victory(){
   state.gameOver=true;
   state.score+=500;
   window.__gameScore=state.score;
-  const best=parseInt(localStorage.getItem('tower-defense_best')||'0');
-  if(state.score>best) localStorage.setItem('tower-defense_best',state.score);
+  const best=parseInt((function(){try{return localStorage.getItem('tower-defense_best')}catch(e){return null}})()||'0');
+  if(state.score>best) try{localStorage.setItem('tower-defense_best',state.score)}catch(e){};
   const duration=Math.floor((Date.now()-startTime)/1000);
   if(typeof FuzzyScoreSubmit==='function') FuzzyScoreSubmit('tower-defense',state.score,duration);
   updateHUD();

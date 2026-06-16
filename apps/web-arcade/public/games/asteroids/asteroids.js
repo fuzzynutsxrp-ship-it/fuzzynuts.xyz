@@ -35,7 +35,7 @@
   let touchJoy = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
   let touchFire = false;
   let animFrame;
-  let bestScore = parseInt(localStorage.getItem('asteroids_best')) || 0;
+  let bestScore = parseInt((function(){try{return localStorage.getItem('asteroids_best')}catch(e){return null}})()) || 0;
 
   // ── Helpers ──
   function rand(min, max) { return Math.random() * (max - min) + min; }
