@@ -124,10 +124,7 @@ function main(): void {
     // HEAD SHA are always different between generation and check time) and
     // the entire "Recent activity" section (commit list shifts on every run).
     const stablePart = (s: string) => {
-      const noHeader = s.replace(
-        /\n_Generated \*\*.*?\*\* from `[^`]*` on `[^`]*`\._\n/,
-        "\n",
-      );
+      const noHeader = s.replace(/\n_Generated \*\*.*?\*\* from `[^`]*` on `[^`]*`\._\n/, "\n");
       const idx = noHeader.indexOf("## Recent activity");
       return idx >= 0 ? noHeader.slice(0, idx) : noHeader;
     };
