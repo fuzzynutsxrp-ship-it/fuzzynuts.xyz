@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T03:32:29.968Z** from `f2c7a4e` on `main`._
+_Generated **2026-06-17T15:23:04.320Z** from `64536c4` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `f2c7a4e` fix: move touchcancel listener outside touchend to prevent listener leak (#96) — _fuzzynutsxrp-ship-it, 25 seconds ago_
+- `64536c4` fix(tetris): sync iOS fixes to deployed web-arcade copy — _Shafster, 47 seconds ago_
