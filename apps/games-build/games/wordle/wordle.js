@@ -897,7 +897,7 @@
 
   function handleClick(e) {
     const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left) * (canvas.width / rect.width;
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
     const my = e.clientY - rect.top;
     handleInteraction(mx, my);
   }
@@ -906,7 +906,7 @@
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const mx = touch.clientX - rect.left) * (canvas.width / rect.width;
+    const mx = (touch.clientX - rect.left) * (canvas.width / rect.width);
     const my = touch.clientY - rect.top;
     handleInteraction(mx, my);
   }
