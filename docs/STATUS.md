@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T02:30:49.728Z** from `da06514` on `main`._
+_Generated **2026-06-17T02:56:56.030Z** from `e77dd94` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `da06514` fix(ios): game-by-game iOS touch audit — 37 games reviewed with Qwen — _Shafster, 66 seconds ago_
+- `e77dd94` fix(fuzzy-survivors): adaptive canvas resolution for mobile portrait/landscape — _Shafster, 41 seconds ago_
