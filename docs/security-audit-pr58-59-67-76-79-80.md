@@ -9,14 +9,14 @@
 
 ## Summary
 
-| PR | Title | Severity | Findings |
-|----|-------|----------|----------|
-| #58 | GameErrorBoundary | NONE | Clean — no security concerns |
-| #59 | Standardize Game UI controls | LOW | 1 LOW |
-| #67 | MyRankWidget | LOW | 2 LOW |
-| #76 | Redis adapter + postMessage origin validation | MEDIUM | 1 MEDIUM, 1 LOW |
-| #79 | Profile/[id] dynamic route | MEDIUM | 2 MEDIUM, 1 LOW |
-| #80 | Profile/[id] stats dashboard | LOW | 1 LOW |
+| PR  | Title                                         | Severity | Findings                     |
+| --- | --------------------------------------------- | -------- | ---------------------------- |
+| #58 | GameErrorBoundary                             | NONE     | Clean — no security concerns |
+| #59 | Standardize Game UI controls                  | LOW      | 1 LOW                        |
+| #67 | MyRankWidget                                  | LOW      | 2 LOW                        |
+| #76 | Redis adapter + postMessage origin validation | MEDIUM   | 1 MEDIUM, 1 LOW              |
+| #79 | Profile/[id] dynamic route                    | MEDIUM   | 2 MEDIUM, 1 LOW              |
+| #80 | Profile/[id] stats dashboard                  | LOW      | 1 LOW                        |
 
 **Overall: 0 CRITICAL, 0 HIGH, 4 MEDIUM, 5 LOW**
 
@@ -30,6 +30,7 @@
 ### Assessment: CLEAN — No findings
 
 The error boundary correctly:
+
 - Catches React errors in the game viewport to prevent app-wide crashes
 - Shows error details only in development mode (`process.env.NODE_ENV === "development"`)
 - Uses `window.location.href = "/"` for navigation (safe, same-origin)
@@ -100,6 +101,7 @@ The `_parentOrigin` variable defaults to `"*"`, meaning `emitScoreEvent()` calls
 **Impact:** MEDIUM — On Railway (where the API runs), Redis connections stay within the private network, reducing exposure. However, if the app is ever deployed to a multi-tenant environment or if Redis is hosted externally, this becomes a data-in-transit encryption gap. Chat messages may contain wallet addresses (usernames).
 
 **Recommendation:**
+
 - Document that `REDIS_URL` should use `rediss://` (TLS) for production
 - Add a runtime warning if `REDIS_URL` starts with `redis://` and `NODE_ENV=production`
 - Consider rejecting plaintext Redis in production: `if (redisUrl.startsWith('redis://') && process.env.NODE_ENV === 'production') warn()`
@@ -114,6 +116,7 @@ The health endpoint previously exposed which env vars were set (`WALLET_JWT_SECR
 **Impact:** N/A — this is a security improvement, not a vulnerability.
 
 **Note:** The postMessage origin validation added across `arcade-shell.ts`, `fuzzy-score.js`, `GameModal.tsx`, `useScoreSubmission.ts`, and `constants/index.ts` is well-implemented:
+
 - Allowlist of trusted origins (`fuzzynuts.xyz`, `www.fuzzynuts.xyz`, `world.fuzzynuts.xyz`, `game.fuzzynuts.xyz`)
 - Same-origin check via `window.location.origin`
 - Rejects `null` and empty origins
@@ -132,6 +135,7 @@ The health endpoint previously exposed which env vars were set (`WALLET_JWT_SECR
 **Lines:** 85-87, 95-98
 
 The `[id]` route parameter is used directly without validation:
+
 ```typescript
 function isWalletAddress(id: string): boolean {
   return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(id);
@@ -139,15 +143,18 @@ function isWalletAddress(id: string): boolean {
 ```
 
 Any string that isn't a wallet address or guest ID is treated as a generic "Player" profile. The `id` flows into:
+
 - `getDisplayName(id)` → rendered as React text (auto-escaped, no XSS)
 - API calls: `${API_BASE}?wallet=${id}` — note: **no `encodeURIComponent`** here
 - The `[id]` is part of the URL path (Next.js routing), not a query param
 
 **Impact:** MEDIUM —
+
 1. **SEO spam / OG injection:** The `generateMetadata` function (in `layout.tsx`) likely uses `[id]` to build page titles/descriptions. Arbitrary strings could inject misleading content into search engine previews.
 2. **API request manipulation:** Without `encodeURIComponent`, special characters in `id` could corrupt the query string (e.g., `&`, `#`, `?`).
 
 **Recommendation:**
+
 - Validate `[id]` against an allowlist pattern: wallet address, guest ID, or alphanumeric username
 - Return 404 for invalid IDs
 - Add `encodeURIComponent` to all API URL constructions using `id`
@@ -202,11 +209,11 @@ const url = `${API_BASE}?wallet=${encodeURIComponent(deviceId)}`;
 
 ### 1. Inconsistent XRPL address validation
 
-| Location | Regex | Total chars |
-|----------|-------|-------------|
-| Server auth (PR #59) | `/^r[1-9A-HJ-NP-Za-km-z]{33}$/` | 34 ✓ |
-| Client profile (PR #79) | `/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/` | 25-35 ✗ |
-| Client useMyRank (PR #67) | No regex (trusts API) | N/A |
+| Location                  | Regex                              | Total chars |
+| ------------------------- | ---------------------------------- | ----------- |
+| Server auth (PR #59)      | `/^r[1-9A-HJ-NP-Za-km-z]{33}$/`    | 34 ✓        |
+| Client profile (PR #79)   | `/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/` | 25-35 ✗     |
+| Client useMyRank (PR #67) | No regex (trusts API)              | N/A         |
 
 **Recommendation:** Extract the XRPL address regex to a shared constant in `@fuzzynuts/shared-anticheat` and use it everywhere.
 

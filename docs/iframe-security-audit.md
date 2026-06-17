@@ -26,10 +26,13 @@ The iframe embedding architecture is **functionally sound for same-origin games*
 
 **Description:**
 The default sandbox is:
+
 ```
 allow-scripts allow-same-origin allow-popups allow-forms
 ```
+
 All game iframes load from same-origin paths (`/games/{slug}/`). Per the HTML spec, `allow-scripts` + `allow-same-origin` on a same-origin iframe allows the framed content to:
+
 - Access the parent DOM via `window.parent.document`
 - Read/write `localStorage` (including wallet store)
 - Programmatically remove its own sandbox attribute (`frameElement.removeAttribute('sandbox')`)
@@ -42,6 +45,7 @@ This effectively means the sandbox provides **zero isolation** for same-origin g
 **Mitigation:** This is an accepted tradeoff — the games NEED `allow-scripts` (for JS execution) and `allow-same-origin` (for localStorage access to wallet state, postMessage for score reporting). The games are self-hosted first-party content under `public/games/`, not third-party.
 
 **Recommendation (defense-in-depth):**
+
 - Consider moving game assets to a separate subdomain (e.g., `games.fuzzynuts.xyz`) so the sandbox provides real cross-origin isolation
 - Alternatively, document this as an accepted risk in PROJECT_STATE.md
 
@@ -54,6 +58,7 @@ This effectively means the sandbox provides **zero isolation** for same-origin g
 
 **Description:**
 The `message` event handler that processes `FUZZY_SCORE_SUBMITTED` events does NOT validate `event.origin`:
+
 ```typescript
 const handleMessage = (event: MessageEvent) => {
   if (!event.data || typeof event.data !== "object") return;
@@ -71,6 +76,7 @@ Any open window, popup, or other iframe on the page could send a crafted `FUZZY_
 **Note:** Contrast with `fuzzy-score.js` (line 51-53) which correctly validates origin via `ALLOWED_ORIGINS` allowlist. The parent-side handler should follow the same pattern.
 
 **Recommendation:**
+
 ```typescript
 const handleMessage = (event: MessageEvent) => {
   const ALLOWED_ORIGINS = [
@@ -90,27 +96,26 @@ const handleMessage = (event: MessageEvent) => {
 
 **Description:**
 Two `postMessage` calls use `"*"` as targetOrigin:
+
 ```typescript
 // Line 189 — FUZZY_CONFIG
 iframeRef.current?.contentWindow?.postMessage(
   { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.origin },
-  "*"
+  "*",
 );
 
 // Line 274 — setMute
-iframeRef.current?.contentWindow?.postMessage(
-  { type: "setMute", muted: next },
-  "*"
-);
+iframeRef.current?.contentWindow?.postMessage({ type: "setMute", muted: next }, "*");
 ```
 
 The `"*"` wildcard means the message is delivered regardless of what origin is loaded in the iframe. Since all games are same-origin static files, this is not exploitable in practice.
 
 **Recommendation:** Replace `"*"` with `window.location.origin` for defense-in-depth:
+
 ```typescript
 iframeRef.current?.contentWindow?.postMessage(
   { type: "FUZZY_CONFIG", hideNav: true, parentOrigin: window.origin },
-  window.location.origin
+  window.location.origin,
 );
 ```
 
@@ -125,12 +130,14 @@ Note: `fuzzy-score.js` (line 203) correctly uses specific origin `'https://fuzzy
 
 **Description:**
 The middleware sets `Content-Security-Policy` with only `frame-ancestors`:
+
 ```
 /games/*:      frame-ancestors 'self'
 everything else: frame-ancestors 'none'
 ```
 
 There is no `script-src`, `connect-src`, `default-src`, `style-src`, or any other CSP directive. This means:
+
 - No CSP protection against XSS (inline scripts, `eval()`, dynamic script injection all allowed)
 - No `connect-src` restriction (fetch/XHR can reach any endpoint)
 - No `style-src` restriction
@@ -138,6 +145,7 @@ There is no `script-src`, `connect-src`, `default-src`, `style-src`, or any othe
 `next.config.ts` has no CSP headers at all — only cache headers for videos/images.
 
 **Recommendation:** Add a broader CSP once the lockdown is lifted. During pre-launch lockdown, the edge Basic Auth provides stronger protection than CSP would. Post-launch, add at minimum:
+
 ```
 default-src 'self';
 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://xumm.app;
@@ -160,14 +168,14 @@ frame-ancestors 'self'  (for /games/*) or 'none' (for everything else);
 
 ## Files Reviewed
 
-| File | Role |
-|------|------|
+| File                                | Role                                                |
+| ----------------------------------- | --------------------------------------------------- |
 | `src/components/game/GameModal.tsx` | Primary iframe shell — sandbox, postMessage, dialog |
-| `src/lib/gameRegistry.ts` | Per-game sandbox overrides, iframe paths |
-| `src/middleware.ts` | Edge security headers, CSP frame-ancestors |
-| `next.config.ts` | Next.js config — no CSP headers |
-| `vercel.json` | Vercel-level headers — basic security, no CSP |
-| `public/games/fuzzy-score.js` | Score submission + postMessage origin validation |
+| `src/lib/gameRegistry.ts`           | Per-game sandbox overrides, iframe paths            |
+| `src/middleware.ts`                 | Edge security headers, CSP frame-ancestors          |
+| `next.config.ts`                    | Next.js config — no CSP headers                     |
+| `vercel.json`                       | Vercel-level headers — basic security, no CSP       |
+| `public/games/fuzzy-score.js`       | Score submission + postMessage origin validation    |
 
 ## NOT Reviewed (out of scope)
 
@@ -180,11 +188,11 @@ frame-ancestors 'self'  (for /games/*) or 'none' (for everything else);
 
 ## Summary Table
 
-| ID | Severity | Title | Status |
-|----|----------|-------|--------|
-| M1 | MEDIUM | Sandbox provides no isolation on same-origin iframes | Accepted risk — games need scripts + storage |
-| M2 | MEDIUM | postMessage listener lacks origin validation | Recommend fix — add origin allowlist |
-| L1 | LOW | postMessage sends use wildcard `"*"` targetOrigin | Recommend fix — use `window.location.origin` |
-| L2 | LOW | No CSP beyond frame-ancestors | Defer to post-launch |
-| I1 | INFO | frame-ancestors split is correct | N/A |
-| I2 | INFO | fuzzy-score.js validates inbound origin | N/A |
+| ID  | Severity | Title                                                | Status                                       |
+| --- | -------- | ---------------------------------------------------- | -------------------------------------------- |
+| M1  | MEDIUM   | Sandbox provides no isolation on same-origin iframes | Accepted risk — games need scripts + storage |
+| M2  | MEDIUM   | postMessage listener lacks origin validation         | Recommend fix — add origin allowlist         |
+| L1  | LOW      | postMessage sends use wildcard `"*"` targetOrigin    | Recommend fix — use `window.location.origin` |
+| L2  | LOW      | No CSP beyond frame-ancestors                        | Defer to post-launch                         |
+| I1  | INFO     | frame-ancestors split is correct                     | N/A                                          |
+| I2  | INFO     | fuzzy-score.js validates inbound origin              | N/A                                          |

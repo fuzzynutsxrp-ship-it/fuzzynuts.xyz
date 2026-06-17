@@ -41,15 +41,15 @@ function useAcornBodyGeometry() {
   return useMemo(() => {
     // Teardrop profile: pointed bottom, fat middle, slight taper at top
     const points = [
-      new THREE.Vector2(0, -0.72),    // bottom tip (pointed)
+      new THREE.Vector2(0, -0.72), // bottom tip (pointed)
       new THREE.Vector2(0.08, -0.68),
       new THREE.Vector2(0.18, -0.58),
       new THREE.Vector2(0.28, -0.42),
       new THREE.Vector2(0.36, -0.22),
-      new THREE.Vector2(0.40, 0.0),   // widest point
+      new THREE.Vector2(0.4, 0.0), // widest point
       new THREE.Vector2(0.38, 0.15),
       new THREE.Vector2(0.34, 0.28),
-      new THREE.Vector2(0.30, 0.35),  // top edge where cap meets
+      new THREE.Vector2(0.3, 0.35), // top edge where cap meets
       new THREE.Vector2(0.28, 0.38),
     ];
     return new THREE.LatheGeometry(points, 32);
@@ -62,14 +62,14 @@ function useAcornCapGeometry() {
   return useMemo(() => {
     // Wider dome that sits on top of body — classic acorn cap shape
     const points = [
-      new THREE.Vector2(0, 0.68),     // top of cap
-      new THREE.Vector2(0.10, 0.66),
+      new THREE.Vector2(0, 0.68), // top of cap
+      new THREE.Vector2(0.1, 0.66),
       new THREE.Vector2(0.18, 0.62),
       new THREE.Vector2(0.26, 0.56),
       new THREE.Vector2(0.32, 0.49),
       new THREE.Vector2(0.36, 0.42),
-      new THREE.Vector2(0.38, 0.38),  // cap rim (matches body top)
-      new THREE.Vector2(0.30, 0.35),  // underside tuck
+      new THREE.Vector2(0.38, 0.38), // cap rim (matches body top)
+      new THREE.Vector2(0.3, 0.35), // underside tuck
     ];
     return new THREE.LatheGeometry(points, 32);
   }, []);
@@ -87,15 +87,15 @@ function AcornModel({ accentColor }: AcornModelProps) {
   const capGeo = useAcornCapGeometry();
 
   // Derive palette from accent color
-  const bodyColor = darkenHex(accentColor, 0.45);      // warm dark brown
-  const bodyColorLight = darkenHex(accentColor, 0.25);  // lighter brown for body
-  const capColor = accentColor;                          // gold/silver/bronze
-  const capColorDark = darkenHex(accentColor, 0.2);     // slightly darker cap
-  const stemColor = darkenHex(accentColor, 0.55);       // dark stem
-  const emissiveColor = darkenHex(accentColor, 0.6);    // subtle inner glow
+  const bodyColor = darkenHex(accentColor, 0.45); // warm dark brown
+  const bodyColorLight = darkenHex(accentColor, 0.25); // lighter brown for body
+  const capColor = accentColor; // gold/silver/bronze
+  const capColorDark = darkenHex(accentColor, 0.2); // slightly darker cap
+  const stemColor = darkenHex(accentColor, 0.55); // dark stem
+  const emissiveColor = darkenHex(accentColor, 0.6); // subtle inner glow
 
   // Ridge positions on the cap (Y coordinates)
-  const ridgePositions = useMemo(() => [0.42, 0.48, 0.54, 0.60], []);
+  const ridgePositions = useMemo(() => [0.42, 0.48, 0.54, 0.6], []);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -152,49 +152,29 @@ function AcornModel({ accentColor }: AcornModelProps) {
         return (
           <mesh key={i} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[r, 0.012, 8, 32]} />
-            <meshStandardMaterial
-              color={capColorDark}
-              roughness={0.5}
-              metalness={0.1}
-            />
+            <meshStandardMaterial color={capColorDark} roughness={0.5} metalness={0.1} />
           </mesh>
         );
       })}
 
       {/* ── Cap cross-hatch detail (diagonal lines) ── */}
       {[0, Math.PI / 3, (2 * Math.PI) / 3].map((rotZ, i) => (
-        <mesh
-          key={`cross-${i}`}
-          position={[0, 0.52, 0]}
-          rotation={[0.3, 0, rotZ]}
-        >
+        <mesh key={`cross-${i}`} position={[0, 0.52, 0]} rotation={[0.3, 0, rotZ]}>
           <torusGeometry args={[0.28, 0.008, 6, 32, Math.PI]} />
-          <meshStandardMaterial
-            color={capColorDark}
-            roughness={0.5}
-            metalness={0.1}
-          />
+          <meshStandardMaterial color={capColorDark} roughness={0.5} metalness={0.1} />
         </mesh>
       ))}
 
       {/* ── Stem — tiny cylinder on top ── */}
       <mesh position={[0, 0.72, 0]}>
         <cylinderGeometry args={[0.025, 0.035, 0.1, 8]} />
-        <meshStandardMaterial
-          color={stemColor}
-          roughness={0.6}
-          metalness={0.0}
-        />
+        <meshStandardMaterial color={stemColor} roughness={0.6} metalness={0.0} />
       </mesh>
 
       {/* ── Stem knob ── */}
       <mesh position={[0, 0.78, 0]}>
         <sphereGeometry args={[0.03, 8, 8]} />
-        <meshStandardMaterial
-          color={stemColor}
-          roughness={0.5}
-          metalness={0.0}
-        />
+        <meshStandardMaterial color={stemColor} roughness={0.5} metalness={0.0} />
       </mesh>
     </group>
   );
@@ -211,34 +191,16 @@ function StudioLights({ accentColor }: { accentColor: string }) {
       <ambientLight intensity={0.6} color="#fef3c7" />
 
       {/* Key light — main illumination from upper-right */}
-      <directionalLight
-        position={[3, 4, 5]}
-        intensity={1.8}
-        color="#fff8e7"
-      />
+      <directionalLight position={[3, 4, 5]} intensity={1.8} color="#fff8e7" />
 
       {/* Fill light — softer from the left to reduce shadows */}
-      <directionalLight
-        position={[-3, 2, 3]}
-        intensity={0.6}
-        color="#e8d5b0"
-      />
+      <directionalLight position={[-3, 2, 3]} intensity={0.6} color="#e8d5b0" />
 
       {/* Rim/back light — creates the edge glow silhouette */}
-      <pointLight
-        position={[0, -1, -3]}
-        intensity={1.5}
-        color={rimColor}
-        distance={8}
-      />
+      <pointLight position={[0, -1, -3]} intensity={1.5} color={rimColor} distance={8} />
 
       {/* Top accent — subtle overhead highlight */}
-      <pointLight
-        position={[0, 3, 0]}
-        intensity={0.8}
-        color={accentColor}
-        distance={6}
-      />
+      <pointLight position={[0, 3, 0]} intensity={0.8} color={accentColor} distance={6} />
     </>
   );
 }
@@ -254,15 +216,9 @@ interface RotatingNutProps {
   size?: number;
 }
 
-export function RotatingNut({
-  color = "#FBBF24",
-  size = 120,
-}: RotatingNutProps) {
+export function RotatingNut({ color = "#FBBF24", size = 120 }: RotatingNutProps) {
   return (
-    <div
-      style={{ width: size, height: size }}
-      className="pointer-events-none"
-    >
+    <div style={{ width: size, height: size }} className="pointer-events-none">
       <Canvas
         camera={{ position: [0, 0.15, 2.8], fov: 40 }}
         style={{ background: "transparent" }}

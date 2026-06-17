@@ -34,9 +34,9 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'What to do'
+        description: "What to do"
         required: true
-        default: 'deploy'
+        default: "deploy"
         type: choice
         options:
           - deploy

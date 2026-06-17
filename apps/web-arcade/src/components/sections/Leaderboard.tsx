@@ -2,7 +2,18 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Trophy, Clock, Wifi, WifiOff, ChevronDown, Radio, Gift, Star, Zap } from "lucide-react";
+import {
+  RefreshCw,
+  Trophy,
+  Clock,
+  Wifi,
+  WifiOff,
+  ChevronDown,
+  Radio,
+  Gift,
+  Star,
+  Zap,
+} from "lucide-react";
 import { GAMES, truncateAddress, formatNumber } from "@/lib/utils";
 import { API_REWARDS } from "@/features/arcade/constants";
 import type { WeeklyTiersResponse } from "@/features/arcade/types/arcade";
@@ -42,12 +53,12 @@ const GAME_ACCENTS: Record<string, "green" | "red" | "purple" | "cyan" | "orange
   rsc: "green",
   "dragon-hoard": "orange",
   "cosmic-blaster": "cyan",
-  "snake": "green",
-  "breakout": "orange",
-  "pong": "cyan",
-  "tetris": "purple",
-  "asteroids": "red",
-  "flappy": "gold",
+  snake: "green",
+  breakout: "orange",
+  pong: "cyan",
+  tetris: "purple",
+  asteroids: "red",
+  flappy: "gold",
 };
 
 /** Map game IDs to emojis for the tab selector */
@@ -60,12 +71,12 @@ const GAME_EMOJIS: Record<string, string> = {
   rsc: "⚔️",
   "dragon-hoard": "🐉",
   "cosmic-blaster": "🚀",
-  "snake": "🐍",
-  "breakout": "🧱",
-  "pong": "🏓",
-  "tetris": "🟦",
-  "asteroids": "☄️",
-  "flappy": "🐦",
+  snake: "🐍",
+  breakout: "🧱",
+  pong: "🏓",
+  tetris: "🟦",
+  asteroids: "☄️",
+  flappy: "🐦",
 };
 
 /** Week options for the week selector dropdown */
@@ -120,11 +131,7 @@ function RankBadge({ rank }: { rank: number }) {
       </span>
     );
   }
-  return (
-    <span className="text-xs font-mono text-cream-dim w-8 text-center">
-      #{rank}
-    </span>
-  );
+  return <span className="text-xs font-mono text-cream-dim w-8 text-center">#{rank}</span>;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -143,7 +150,7 @@ export function Leaderboard() {
   // Compute selected week key
   const selectedWeek = useMemo(
     () => (weekOffset === 0 ? getCurrentWeekKey() : getWeekKeyOffset(weekOffset)),
-    [weekOffset]
+    [weekOffset],
   );
 
   // SSE-powered leaderboard with automatic polling fallback
@@ -161,9 +168,7 @@ export function Leaderboard() {
 
   /* ── Check if user's score is in the list ── */
   const userRank = walletAddress
-    ? scores.findIndex(
-        (s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase()
-      ) + 1
+    ? scores.findIndex((s) => s.wallet?.toLowerCase() === walletAddress.toLowerCase()) + 1
     : 0;
 
   // Prize eligibility for connected wallet
@@ -175,9 +180,15 @@ export function Leaderboard() {
     let cancelled = false;
     fetch(`${API_REWARDS}/tiers?week=${selectedWeek}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled) setWeekTiers(d); })
-      .catch(() => { if (!cancelled) setWeekTiers(null); });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) setWeekTiers(d);
+      })
+      .catch(() => {
+        if (!cancelled) setWeekTiers(null);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [selectedWeek]);
 
   const fmtPrice = (p?: number | null) => (p && isFinite(p) ? `$${Number(p).toPrecision(4)}` : "—");
@@ -186,8 +197,14 @@ export function Leaderboard() {
     const n = weekTiers?.tiers?.[rank - 1]?.nut_amount;
     return n != null ? Number(n) : null;
   };
-  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? `$${u}` : "—"; };
-  const tierNutLabel = (rank: number) => { const n = tierNut(rank); return n != null ? `${formatNumber(n)} NUT` : "TBA"; };
+  const tierUsdLabel = (rank: number) => {
+    const u = tierUsd(rank);
+    return u != null ? `$${u}` : "—";
+  };
+  const tierNutLabel = (rank: number) => {
+    const n = tierNut(rank);
+    return n != null ? `${formatNumber(n)} NUT` : "TBA";
+  };
   const isWinner = isCurrentWeek && userRank > 0 && userRank <= 3;
   const prizeInfo = isWinner ? PRIZE_LABELS[userRank] : null;
 
@@ -204,92 +221,120 @@ export function Leaderboard() {
           className="text-center mb-12 md:mb-16 relative"
         >
           {/* Floating nut particles around header */}
-          <span className="absolute -top-4 left-1/4 text-2xl float-nut-1 opacity-60 pointer-events-none" style={{ animationDelay: "0s" }}>🥜</span>
-          <span className="absolute top-2 right-1/4 text-xl float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "0.7s" }}>🥜</span>
-          <span className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none" style={{ animationDelay: "1.4s" }}>🥜</span>
-
           <span
-            className="neon-chip text-degen-crisp mb-4 animate-glitch-skew"
+            className="absolute -top-4 left-1/4 text-2xl float-nut-1 opacity-60 pointer-events-none"
+            style={{ animationDelay: "0s" }}
           >
+            🥜
+          </span>
+          <span
+            className="absolute top-2 right-1/4 text-xl float-nut-2 opacity-50 pointer-events-none"
+            style={{ animationDelay: "0.7s" }}
+          >
+            🥜
+          </span>
+          <span
+            className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none"
+            style={{ animationDelay: "1.4s" }}
+          >
+            🥜
+          </span>
+
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">
             🏆 Weekly Leaderboard Tournaments
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             Leaderboard
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            Boards wipe every Monday 00:00 UTC. Climb the ranks, win real prizes,
-            and prove you&apos;re the best. Every player gets a fair shot.
+            Boards wipe every Monday 00:00 UTC. Climb the ranks, win real prizes, and prove
+            you&apos;re the best. Every player gets a fair shot.
           </p>
           {isCurrentWeek && (
-            <p className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-cream-dim"} countdown-pulse`}>
-              ⏱ Resets in <span className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}>{countdown.display}</span> · Monday 00:00 UTC
+            <p
+              className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-cream-dim"} countdown-pulse`}
+            >
+              ⏱ Resets in{" "}
+              <span
+                className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-orange" : "text-neon-green"}`}
+              >
+                {countdown.display}
+              </span>{" "}
+              · Monday 00:00 UTC
             </p>
           )}
         </motion.div>
 
         {/* ═══ PRIZE WINNER BANNER ═══ */}
         <AnimatePresence>
-          {isWinner && prizeInfo && isCurrentWeek && claimStatus !== "success" && claimStatus !== "already-claimed" && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", damping: 15, stiffness: 200 }}
-              className="mb-8"
-            >
-              <div className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/50 prize-shimmer bg-degen-950"
-                style={{
-                  boxShadow: "0 0 40px rgba(251,191,36,0.2), 0 0 80px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)"
-                }}
+          {isWinner &&
+            prizeInfo &&
+            isCurrentWeek &&
+            claimStatus !== "success" &&
+            claimStatus !== "already-claimed" && (
+              <motion.div
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ type: "spring", damping: 15, stiffness: 200 }}
+                className="mb-8"
               >
-                <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5 p-6 sm:p-8">
-                  {/* Trophy */}
-                  <div className="trophy-float text-6xl sm:text-7xl shrink-0">
-                    {userRank === 1 ? "🏆" : userRank === 2 ? "🥈" : "🥉"}
-                  </div>
-
-                  {/* Message */}
-                  <div className="flex-1 text-center sm:text-left">
-                    <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                      <Star size={16} className="text-brand-gold" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
-                        You&apos;re a Winner!
-                      </span>
-                      <Star size={16} className="text-brand-gold" />
+                <div
+                  className="relative overflow-hidden rounded-2xl border-2 border-brand-gold/50 prize-shimmer bg-degen-950"
+                  style={{
+                    boxShadow:
+                      "0 0 40px rgba(251,191,36,0.2), 0 0 80px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.15)",
+                  }}
+                >
+                  <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5 p-6 sm:p-8">
+                    {/* Trophy */}
+                    <div className="trophy-float text-6xl sm:text-7xl shrink-0">
+                      {userRank === 1 ? "🏆" : userRank === 2 ? "🥈" : "🥉"}
                     </div>
-                    <h3 className="font-display text-2xl sm:text-3xl font-black text-cream mb-1">
-                      You&apos;re <span className="gradient-text-gold">#{userRank}</span> this week!
-                    </h3>
-                    <p className="text-sm text-cream-dim">
-                      in {currentGameMeta?.title ?? selectedGame}
-                    </p>
-                    <p className="font-display text-3xl sm:text-4xl font-black text-brand-gold text-glow-gold mt-2">
-                      {tierUsdLabel(userRank)}
-                    </p>
-                    <p className="text-xs font-mono text-cream-dim mt-1">
-                      ({tierNutLabel(userRank)} @ {fmtPrice(weekTiers?.snapshot_price)} snapshot)
-                    </p>
-                  </div>
 
-                  {/* Claim CTA */}
-                  {eligibility?.eligible && claimStatus !== "claiming" && (
-                    <motion.a
-                      href="/profile/"
-                      whileHover={{ scale: 1.06, boxShadow: "0 0 50px rgba(251,191,36,0.6)" }}
-                      whileTap={{ scale: 0.95 }}
-                      className="claim-fab-pulse flex items-center gap-2.5 px-7 py-4 rounded-xl
+                    {/* Message */}
+                    <div className="flex-1 text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                        <Star size={16} className="text-brand-gold" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+                          You&apos;re a Winner!
+                        </span>
+                        <Star size={16} className="text-brand-gold" />
+                      </div>
+                      <h3 className="font-display text-2xl sm:text-3xl font-black text-cream mb-1">
+                        You&apos;re <span className="gradient-text-gold">#{userRank}</span> this
+                        week!
+                      </h3>
+                      <p className="text-sm text-cream-dim">
+                        in {currentGameMeta?.title ?? selectedGame}
+                      </p>
+                      <p className="font-display text-3xl sm:text-4xl font-black text-brand-gold text-glow-gold mt-2">
+                        {tierUsdLabel(userRank)}
+                      </p>
+                      <p className="text-xs font-mono text-cream-dim mt-1">
+                        ({tierNutLabel(userRank)} @ {fmtPrice(weekTiers?.snapshot_price)} snapshot)
+                      </p>
+                    </div>
+
+                    {/* Claim CTA */}
+                    {eligibility?.eligible && claimStatus !== "claiming" && (
+                      <motion.a
+                        href="/profile/"
+                        whileHover={{ scale: 1.06, boxShadow: "0 0 50px rgba(251,191,36,0.6)" }}
+                        whileTap={{ scale: 0.95 }}
+                        className="claim-fab-pulse flex items-center gap-2.5 px-7 py-4 rounded-xl
                                  bg-gradient-to-r from-brand-gold to-yellow-500
                                  text-forest-dark font-black text-base shrink-0
                                  cursor-pointer min-h-[52px]"
-                    >
-                      <Gift size={20} />
-                      Claim Prize
-                    </motion.a>
-                  )}
+                      >
+                        <Gift size={20} />
+                        Claim Prize
+                      </motion.a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
         </AnimatePresence>
 
         {/* ── Controls Bar ── */}
@@ -418,7 +463,8 @@ export function Leaderboard() {
                     role="listbox"
                   >
                     {WEEK_OPTIONS.map((opt) => {
-                      const weekKey = opt.offset === 0 ? getCurrentWeekKey() : getWeekKeyOffset(opt.offset);
+                      const weekKey =
+                        opt.offset === 0 ? getCurrentWeekKey() : getWeekKeyOffset(opt.offset);
                       return (
                         <button
                           key={opt.offset}
@@ -507,9 +553,7 @@ export function Leaderboard() {
                   {formatNumber(personalBest)}
                 </span>
                 {userRank > 0 && (
-                  <span className="text-xs text-neon-green font-semibold">
-                    Rank #{userRank}
-                  </span>
+                  <span className="text-xs text-neon-green font-semibold">Rank #{userRank}</span>
                 )}
               </div>
             </motion.div>
@@ -525,41 +569,98 @@ export function Leaderboard() {
             className="mb-8 grid grid-cols-3 gap-3 sm:gap-5"
           >
             {/* 1st Place Pedestal */}
-            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
-              style={{ boxShadow: "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)" }}
+            <div
+              className="relative prize-pedestal-glow rounded-2xl border-2 border-brand-gold/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
+              style={{
+                boxShadow:
+                  "0 0 30px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.1), inset 0 1px 0 rgba(251,191,36,0.2)",
+              }}
             >
-              <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">🥜</span>
-              <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">🥜</span>
-              <span className="absolute -bottom-2 left-1/3 text-sm float-nut-3 opacity-60 pointer-events-none" style={{ animationDelay: "0.5s" }}>🥜</span>
+              <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">
+                🥜
+              </span>
+              <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">
+                🥜
+              </span>
+              <span
+                className="absolute -bottom-2 left-1/3 text-sm float-nut-3 opacity-60 pointer-events-none"
+                style={{ animationDelay: "0.5s" }}
+              >
+                🥜
+              </span>
               <div className="text-4xl sm:text-5xl mb-2">🥇</div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-gold mb-1">1st Place</p>
-              <p className="font-display text-2xl sm:text-3xl font-black text-brand-gold">{tierUsdLabel(1)}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-gold mb-1">
+                1st Place
+              </p>
+              <p className="font-display text-2xl sm:text-3xl font-black text-brand-gold">
+                {tierUsdLabel(1)}
+              </p>
               <p className="text-xs font-mono text-cream-dim/70 mt-1">{tierNutLabel(1)}</p>
             </div>
 
             {/* 2nd Place Pedestal */}
-            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
-              style={{ boxShadow: "0 0 25px rgba(192,192,192,0.15), 0 0 50px rgba(192,192,192,0.08), inset 0 1px 0 rgba(192,192,192,0.15)" }}
+            <div
+              className="relative prize-pedestal-glow rounded-2xl border-2 border-gray-400/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
+              style={{
+                boxShadow:
+                  "0 0 25px rgba(192,192,192,0.15), 0 0 50px rgba(192,192,192,0.08), inset 0 1px 0 rgba(192,192,192,0.15)",
+              }}
             >
-              <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">🥜</span>
-              <span className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none" style={{ animationDelay: "0.3s" }}>🥜</span>
-              <span className="absolute -bottom-1 right-1/4 text-sm float-nut-1 opacity-55 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
+              <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">
+                🥜
+              </span>
+              <span
+                className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none"
+                style={{ animationDelay: "0.3s" }}
+              >
+                🥜
+              </span>
+              <span
+                className="absolute -bottom-1 right-1/4 text-sm float-nut-1 opacity-55 pointer-events-none"
+                style={{ animationDelay: "0.8s" }}
+              >
+                🥜
+              </span>
               <div className="text-4xl sm:text-5xl mb-2">🥈</div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400/80 mb-1">2nd Place</p>
-              <p className="font-display text-2xl sm:text-3xl font-black text-gray-300">{tierUsdLabel(2)}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400/80 mb-1">
+                2nd Place
+              </p>
+              <p className="font-display text-2xl sm:text-3xl font-black text-gray-300">
+                {tierUsdLabel(2)}
+              </p>
               <p className="text-xs font-mono text-cream-dim/70 mt-1">{tierNutLabel(2)}</p>
             </div>
 
             {/* 3rd Place Pedestal */}
-            <div className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
-              style={{ boxShadow: "0 0 25px rgba(180,83,9,0.15), 0 0 50px rgba(180,83,9,0.08), inset 0 1px 0 rgba(180,83,9,0.15)" }}
+            <div
+              className="relative prize-pedestal-glow rounded-2xl border-2 border-amber-700/40 bg-degen-950 py-6 sm:py-8 px-3 text-center"
+              style={{
+                boxShadow:
+                  "0 0 25px rgba(180,83,9,0.15), 0 0 50px rgba(180,83,9,0.08), inset 0 1px 0 rgba(180,83,9,0.15)",
+              }}
             >
-              <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">🥜</span>
-              <span className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
-              <span className="absolute -bottom-2 left-1/2 text-sm float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "1.1s" }}>🥜</span>
+              <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">
+                🥜
+              </span>
+              <span
+                className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none"
+                style={{ animationDelay: "0.6s" }}
+              >
+                🥜
+              </span>
+              <span
+                className="absolute -bottom-2 left-1/2 text-sm float-nut-2 opacity-50 pointer-events-none"
+                style={{ animationDelay: "1.1s" }}
+              >
+                🥜
+              </span>
               <div className="text-4xl sm:text-5xl mb-2">🥉</div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600/80 mb-1">3rd Place</p>
-              <p className="font-display text-2xl sm:text-3xl font-black text-amber-600">{tierUsdLabel(3)}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600/80 mb-1">
+                3rd Place
+              </p>
+              <p className="font-display text-2xl sm:text-3xl font-black text-amber-600">
+                {tierUsdLabel(3)}
+              </p>
               <p className="text-xs font-mono text-cream-dim/70 mt-1">{tierNutLabel(3)}</p>
             </div>
           </motion.div>
@@ -585,24 +686,15 @@ export function Leaderboard() {
             </div>
 
             {/* ── Loading State ── */}
-            {loading && (
-              <LeaderboardSkeleton />
-            )}
+            {loading && <LeaderboardSkeleton />}
 
             {/* ── Error State (full error, no data) ── */}
             {!loading && error && scores.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <WifiOff size={32} className="text-orange mb-4 opacity-60" />
-                <p className="font-display text-lg font-bold text-cream mb-2">
-                  Server Unreachable
-                </p>
-                <p className="text-sm text-cream-dim max-w-sm mb-6">
-                  {error}
-                </p>
-                <button
-                  onClick={() => refetch(true)}
-                  className="btn-secondary text-sm"
-                >
+                <p className="font-display text-lg font-bold text-cream mb-2">Server Unreachable</p>
+                <p className="text-sm text-cream-dim max-w-sm mb-6">{error}</p>
+                <button onClick={() => refetch(true)} className="btn-secondary text-sm">
                   <RefreshCw size={14} />
                   Try Again
                 </button>
@@ -622,23 +714,29 @@ export function Leaderboard() {
                   />
                 </div>
                 {/* Scattered nuts around squirrel */}
-                <span className="absolute top-12 left-1/4 text-2xl nut-scatter-1 pointer-events-none">🥜</span>
-                <span className="absolute top-8 right-1/4 text-xl nut-scatter-2 pointer-events-none">🥜</span>
-                <span className="absolute bottom-20 left-1/3 text-lg nut-scatter-3 pointer-events-none">🥜</span>
-                <span className="absolute bottom-16 right-1/3 text-2xl nut-scatter-4 pointer-events-none">🥜</span>
-                <span className="absolute top-1/2 left-1/5 text-base nut-scatter-5 pointer-events-none">🥜</span>
+                <span className="absolute top-12 left-1/4 text-2xl nut-scatter-1 pointer-events-none">
+                  🥜
+                </span>
+                <span className="absolute top-8 right-1/4 text-xl nut-scatter-2 pointer-events-none">
+                  🥜
+                </span>
+                <span className="absolute bottom-20 left-1/3 text-lg nut-scatter-3 pointer-events-none">
+                  🥜
+                </span>
+                <span className="absolute bottom-16 right-1/3 text-2xl nut-scatter-4 pointer-events-none">
+                  🥜
+                </span>
+                <span className="absolute top-1/2 left-1/5 text-base nut-scatter-5 pointer-events-none">
+                  🥜
+                </span>
 
-                <p className="font-display text-xl font-bold text-cream mb-3">
-                  No scores yet
-                </p>
+                <p className="font-display text-xl font-bold text-cream mb-3">No scores yet</p>
                 <p className="text-sm text-cream-dim max-w-sm mb-6">
                   {isCurrentWeek ? (
                     <>
                       Be the first to set a record in{" "}
-                      <span className="text-cream font-semibold">
-                        {currentGameMeta?.title}
-                      </span>
-                      ! Play now and claim the #1 spot.
+                      <span className="text-cream font-semibold">{currentGameMeta?.title}</span>!
+                      Play now and claim the #1 spot.
                     </>
                   ) : (
                     <>No scores recorded for {selectedWeek}.</>
@@ -658,20 +756,19 @@ export function Leaderboard() {
                 {scores.map((entry, index) => {
                   const rank = index + 1;
                   const isCurrentUser =
-                    walletAddress &&
-                    entry.wallet?.toLowerCase() === walletAddress.toLowerCase();
+                    walletAddress && entry.wallet?.toLowerCase() === walletAddress.toLowerCase();
                   const displayName =
-                    entry.name ||
-                    (entry.wallet
-                      ? truncateAddress(entry.wallet)
-                      : "Anonymous");
+                    entry.name || (entry.wallet ? truncateAddress(entry.wallet) : "Anonymous");
                   const rowPrize = isCurrentWeek ? PRIZE_LABELS[rank] : null;
 
                   const rankBorderGlow =
-                    rank === 1 ? "border-l-2 border-l-brand-gold shadow-[inset_4px_0_12px_-4px_rgba(251,191,36,0.3)]" :
-                    rank === 2 ? "border-l-2 border-l-gray-400 shadow-[inset_4px_0_12px_-4px_rgba(192,192,192,0.2)]" :
-                    rank === 3 ? "border-l-2 border-l-amber-700 shadow-[inset_4px_0_12px_-4px_rgba(180,83,9,0.2)]" :
-                    "";
+                    rank === 1
+                      ? "border-l-2 border-l-brand-gold shadow-[inset_4px_0_12px_-4px_rgba(251,191,36,0.3)]"
+                      : rank === 2
+                        ? "border-l-2 border-l-gray-400 shadow-[inset_4px_0_12px_-4px_rgba(192,192,192,0.2)]"
+                        : rank === 3
+                          ? "border-l-2 border-l-amber-700 shadow-[inset_4px_0_12px_-4px_rgba(180,83,9,0.2)]"
+                          : "";
 
                   return (
                     <motion.div
@@ -687,8 +784,8 @@ export function Leaderboard() {
                           isCurrentUser
                             ? `bg-degen-950 border-l-2 border-l-brand-gold ${rowPrize?.glow ?? ""}`
                             : rank <= 3
-                            ? `bg-degen-950 ${rankBorderGlow} ${rowPrize?.glow ?? ""}`
-                            : "hover:bg-degen-900 hover:shadow-[inset_0_0_24px_rgba(255,46,136,0.06)]"
+                              ? `bg-degen-950 ${rankBorderGlow} ${rowPrize?.glow ?? ""}`
+                              : "hover:bg-degen-900 hover:shadow-[inset_0_0_24px_rgba(255,46,136,0.06)]"
                         }
                       `}
                     >
@@ -706,8 +803,8 @@ export function Leaderboard() {
                               isCurrentUser
                                 ? "text-brand-gold font-bold"
                                 : rank <= 3
-                                ? "text-cream font-semibold"
-                                : "text-cream-dim"
+                                  ? "text-cream font-semibold"
+                                  : "text-cream-dim"
                             }
                           `}
                         >
@@ -723,16 +820,19 @@ export function Leaderboard() {
                       {/* Prize Badge — current week only for top 3 */}
                       {rowPrize && isCurrentWeek && (
                         <div className="hidden sm:flex items-center gap-1 shrink-0">
-                          <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border
-                            ${rank === 1
-                              ? "bg-degen-950 border-brand-gold/40 text-brand-gold"
-                              : rank === 2
-                              ? "bg-degen-950 border-silver/40 text-silver"
-                              : "bg-degen-950 border-bronze/40 text-bronze"
+                          <span
+                            className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border
+                            ${
+                              rank === 1
+                                ? "bg-degen-950 border-brand-gold/40 text-brand-gold"
+                                : rank === 2
+                                  ? "bg-degen-950 border-silver/40 text-silver"
+                                  : "bg-degen-950 border-bronze/40 text-bronze"
                             }`}
                             title={`${tierNutLabel(rank)} @ ${fmtPrice(weekTiers?.snapshot_price)} snapshot`}
                           >
-                            <Zap size={8} className="inline mr-0.5" />{tierUsdLabel(rank)}
+                            <Zap size={8} className="inline mr-0.5" />
+                            {tierUsdLabel(rank)}
                           </span>
                         </div>
                       )}
@@ -746,8 +846,8 @@ export function Leaderboard() {
                               rank === 1
                                 ? "text-brand-gold text-glow-gold"
                                 : rank <= 3
-                                ? "text-neon-green"
-                                : "text-cream"
+                                  ? "text-neon-green"
+                                  : "text-cream"
                             }
                           `}
                         >
@@ -781,20 +881,14 @@ export function Leaderboard() {
                 </div>
                 <div>
                   {scores
-                    .slice(
-                      Math.max(0, userRank - 6),
-                      Math.min(scores.length, userRank + 5)
-                    )
+                    .slice(Math.max(0, userRank - 6), Math.min(scores.length, userRank + 5))
                     .map((entry, sliceIndex) => {
                       const rank = Math.max(0, userRank - 6) + sliceIndex + 1;
                       const isCurrentUser =
                         walletAddress &&
                         entry.wallet?.toLowerCase() === walletAddress.toLowerCase();
                       const displayName =
-                        entry.name ||
-                        (entry.wallet
-                          ? truncateAddress(entry.wallet)
-                          : "Anonymous");
+                        entry.name || (entry.wallet ? truncateAddress(entry.wallet) : "Anonymous");
 
                       return (
                         <motion.div
@@ -805,9 +899,10 @@ export function Leaderboard() {
                           className={`
                             flex items-center gap-3 px-4 py-2.5
                             border-b border-hot-pink/5 last:border-0
-                            ${isCurrentUser
-                              ? "bg-brand-gold/5 border-l-2 border-l-brand-gold"
-                              : "hover:bg-degen-900"
+                            ${
+                              isCurrentUser
+                                ? "bg-brand-gold/5 border-l-2 border-l-brand-gold"
+                                : "hover:bg-degen-900"
                             }
                           `}
                         >
@@ -815,7 +910,9 @@ export function Leaderboard() {
                             <RankBadge rank={rank} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <span className={`text-sm truncate block ${isCurrentUser ? "text-brand-gold font-bold" : "text-cream-dim"}`}>
+                            <span
+                              className={`text-sm truncate block ${isCurrentUser ? "text-brand-gold font-bold" : "text-cream-dim"}`}
+                            >
                               {displayName}
                               {isCurrentUser && (
                                 <span className="ml-1.5 text-[10px] font-mono text-brand-gold bg-degen-950 border border-brand-gold/20 px-1.5 py-0.5 rounded-full">
@@ -825,7 +922,9 @@ export function Leaderboard() {
                             </span>
                           </div>
                           <div className="w-20 text-right shrink-0">
-                            <span className={`font-mono text-sm font-bold tabular-nums ${isCurrentUser ? "text-brand-gold" : "text-cream"}`}>
+                            <span
+                              className={`font-mono text-sm font-bold tabular-nums ${isCurrentUser ? "text-brand-gold" : "text-cream"}`}
+                            >
                               {formatNumber(entry.score)}
                             </span>
                           </div>
@@ -853,7 +952,8 @@ export function Leaderboard() {
             animate={{ opacity: 1 }}
             className="text-[11px] text-cream-dim/60 text-center mt-4 font-mono"
           >
-            Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} · {isCurrentWeek ? "Resets Monday 00:00 UTC" : `Week: ${selectedWeek}`}
+            Updated {timeAgo(lastFetched)} · Top {MAX_ENTRIES} ·{" "}
+            {isCurrentWeek ? "Resets Monday 00:00 UTC" : `Week: ${selectedWeek}`}
           </motion.p>
         )}
       </div>

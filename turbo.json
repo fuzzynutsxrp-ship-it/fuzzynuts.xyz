@@ -5,12 +5,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "!**/*.md",
-        "!**/*.test.ts",
-        "!**/*.spec.ts"
-      ],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.test.ts", "!**/*.spec.ts"],
       "outputs": [
         "dist/**",
         ".next/**",

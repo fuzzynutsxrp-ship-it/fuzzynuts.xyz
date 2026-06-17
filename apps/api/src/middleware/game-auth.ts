@@ -31,9 +31,7 @@ interface GameSessionClaims {
 export function gameAuthMiddleware(secret: string) {
   return async (req: Request, res: Response, next: NextFunction) => {
     // Extract token from header or body
-    const raw =
-      req.headers["x-game-session"] ??
-      (req.body?.gameSession as string | undefined);
+    const raw = req.headers["x-game-session"] ?? (req.body?.gameSession as string | undefined);
 
     if (!raw || typeof raw !== "string") {
       return res.status(401).json({ error: "E_MISSING_GAME_SESSION" });

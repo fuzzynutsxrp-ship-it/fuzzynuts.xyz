@@ -11,6 +11,7 @@ The Railway service `fuzzynuts.xyz` crashed on every deploy with empty deploy lo
 ## What Was Fixed in Code
 
 ### apps/api/src/server.ts
+
 - Replaced `required()` with `optionalEnv()` — warns instead of throwing
 - Wrapped router imports in `try/catch` — broken dependency (e.g. `xrpl` native addon) doesn't kill the process
 - Server starts even if env vars are missing; affected routes return 503
@@ -46,6 +47,7 @@ The `cooperative-caring` service is a duplicate with wrong config:
 ## How to Test
 
 After a successful deploy:
+
 ```bash
 # Health check (should show env status)
 curl https://fuzzynutsxyz-production.up.railway.app/healthz

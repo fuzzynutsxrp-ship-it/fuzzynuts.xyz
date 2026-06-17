@@ -24,7 +24,7 @@ task graph and remote cache. Workspaces under `apps/*`, `packages/*`,
 - Positive: single source of truth for `SCORE_CAPS`, slug map, score
   schema; cross-package refactors land atomically; one CI matrix.
 - Negative: every contributor must use pnpm (enforced via `preinstall`
-  + `packageManager` field).
+  - `packageManager` field).
 - Follow-ups: Vercel + Railway dashboards must point to new sub-paths
   (`apps/web-arcade`, `apps/api`); see migration plan for the exact UI clicks.
 

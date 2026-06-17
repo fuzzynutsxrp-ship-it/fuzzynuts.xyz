@@ -24,12 +24,14 @@ I've been building a browser game arcade for the last few months. It's got 6 pla
 - **RuneScape Classic** — The original 2001 MMORPG, playable in-browser
 
 **What makes it different:**
+
 - Zero friction — click a game, it loads instantly in an iframe
 - Google sign-in to save scores (optional — you can play as a guest)
 - Weekly leaderboard tournaments with automatic resets every Monday
 - Clean, dark UI inspired by Poki.com and CrazyGames
 
 **What I'm looking for:**
+
 - Brutal feedback on the UI/UX
 - Does the game grid feel inviting?
 - Is the "Play Now" flow obvious enough?
@@ -52,6 +54,7 @@ Six months ago I launched a crypto gaming portal. It had wallet connections, tok
 So I did something drastic: I scrubbed every piece of crypto language from the frontend and rebuilt it as a pure Web2 gaming site. Same backend, completely new skin.
 
 **What changed:**
+
 - "Connect XRPL Wallet" → "Sign in with Google"
 - "Don't Trust. Verify." → removed (moved to /tokenomics)
 - "Nut up or shut up" → "Jump in and play"
@@ -59,11 +62,13 @@ So I did something drastic: I scrubbed every piece of crypto language from the f
 - Tokenomics page → buried in footer, noindex'd from Google
 
 **What stayed:**
+
 - The actual game logic (unchanged)
 - The leaderboard system (now unified — Google users and wallet users compete on the same board)
 - The weekly prize system (still runs on XRPL under the hood)
 
 **The tech:**
+
 - Next.js 15 + TypeScript
 - MongoDB for scores + user profiles
 - NextAuth for Google + XRPL dual auth
@@ -72,6 +77,7 @@ So I did something drastic: I scrubbed every piece of crypto language from the f
 - Plausible for privacy-friendly analytics
 
 **Results so far:**
+
 - Homepage is now a clean game grid (Poki-style)
 - No crypto jargon in any user-facing text
 - OG previews show "Play 6 Free Games Instantly" instead of "$NUT on XRPL"

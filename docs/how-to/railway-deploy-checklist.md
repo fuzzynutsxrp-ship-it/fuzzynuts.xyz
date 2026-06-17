@@ -18,9 +18,9 @@ Click on your API service, then click the **"Variables"** tab.
 
 Add these two variables (click "New Variable" for each):
 
-| Name | Value |
-|------|-------|
-| `GAME_SERVER_READY` | `false` |
+| Name                  | Value       |
+| --------------------- | ----------- |
+| `GAME_SERVER_READY`   | `false`     |
 | `GAME_SESSION_SECRET` | (see below) |
 
 ### For GAME_SESSION_SECRET
@@ -41,8 +41,8 @@ This is a random 256-bit hex string. It's safe to use as-is. You can change it l
 
 Add one more variable:
 
-| Name | Value |
-|------|-------|
+| Name                    | Value                 |
+| ----------------------- | --------------------- |
 | `OPENRSC_GAME_ENDPOINT` | `fuzzynuts.xyz:43594` |
 
 This is a placeholder. You'll update it later when the game server VPS is set up.
@@ -77,10 +77,10 @@ If you see that — the API is live and correctly showing the provisioning state
 
 After this setup, your Railway variables should include:
 
-| Name | Value | Notes |
-|------|-------|-------|
-| `GAME_SERVER_READY` | `false` | Change to `true` later when game VPS is ready |
-| `GAME_SESSION_SECRET` | `a3f8c1d...` | Used to sign game session tokens |
-| `OPENRSC_GAME_ENDPOINT` | `fuzzynuts.xyz:43594` | Game server address (placeholder) |
+| Name                    | Value                 | Notes                                         |
+| ----------------------- | --------------------- | --------------------------------------------- |
+| `GAME_SERVER_READY`     | `false`               | Change to `true` later when game VPS is ready |
+| `GAME_SESSION_SECRET`   | `a3f8c1d...`          | Used to sign game session tokens              |
+| `OPENRSC_GAME_ENDPOINT` | `fuzzynuts.xyz:43594` | Game server address (placeholder)             |
 
 Plus any existing variables you already have (MONGO_URL, XRPL_NETWORK, etc.) — don't touch those.

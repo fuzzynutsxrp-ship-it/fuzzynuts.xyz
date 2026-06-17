@@ -12,11 +12,7 @@
  *   0x02 / 0x03 → secp256k1 compressed
  */
 
-import {
-  verifyKeypairSignature,
-  verifySignature,
-  deriveAddress,
-} from "xrpl";
+import { verifyKeypairSignature, verifySignature, deriveAddress } from "xrpl";
 
 export interface VerifyArgs {
   /** Hex-encoded signed-blob OR plain message; see `mode`. */

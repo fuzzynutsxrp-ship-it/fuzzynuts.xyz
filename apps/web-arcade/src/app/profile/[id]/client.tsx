@@ -2,16 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Gamepad2,
-  Trophy,
-  TrendingUp,
-  Pencil,
-  Check,
-  X,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowLeft, Gamepad2, Trophy, TrendingUp, Pencil, Check, X, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { IdenticonAvatar } from "@/components/ui/IdenticonAvatar";
 import { truncateAddress, formatNumber, GAMES } from "@/lib/utils";
@@ -101,13 +92,7 @@ function getGameColor(gameId: string): string {
    BioEditor — inline edit for guest profiles
    ═══════════════════════════════════════════════════════════════ */
 
-function BioEditor({
-  profileId,
-  isEditable,
-}: {
-  profileId: string;
-  isEditable: boolean;
-}) {
+function BioEditor({ profileId, isEditable }: { profileId: string; isEditable: boolean }) {
   const storageKey = `${BIO_STORAGE_PREFIX}${profileId}`;
   const [bio, setBio] = useState("");
   const [editing, setEditing] = useState(false);
@@ -151,9 +136,7 @@ function BioEditor({
   if (!isEditable) {
     // Read-only bio for wallet profiles
     return (
-      <p className="text-cream-dim text-sm mt-2 max-w-md leading-relaxed">
-        {bio || "No bio set."}
-      </p>
+      <p className="text-cream-dim text-sm mt-2 max-w-md leading-relaxed">{bio || "No bio set."}</p>
     );
   }
 
@@ -201,11 +184,7 @@ function BioEditor({
   return (
     <div className="mt-2 flex items-center gap-2 max-w-md group">
       <p className="text-cream-dim text-sm leading-relaxed">
-        {bio || (
-          <span className="italic text-cream-dim/50">
-            No bio yet — click to add one
-          </span>
-        )}
+        {bio || <span className="italic text-cream-dim/50">No bio yet — click to add one</span>}
       </p>
       <motion.button
         onClick={startEditing}
@@ -231,10 +210,7 @@ function ScoreTimeline({ scores }: { scores: ScoreEntry[] }) {
       <div className="text-center py-12">
         <Gamepad2 size={40} className="mx-auto text-cream-dim/30 mb-3" />
         <p className="text-cream-dim text-sm">No scores recorded yet.</p>
-        <Link
-          href="/"
-          className="inline-block mt-3 text-neon-green text-xs hover:underline"
-        >
+        <Link href="/" className="inline-block mt-3 text-neon-green text-xs hover:underline">
           Play some games →
         </Link>
       </div>
@@ -265,12 +241,8 @@ function ScoreTimeline({ scores }: { scores: ScoreEntry[] }) {
 
           <div className="bg-degen-950 border border-hot-pink/10 rounded-xl p-4 hover:border-hot-pink/25 transition-colors">
             <div className="flex items-center gap-2">
-              <span className="text-lg">
-                {GAME_EMOJIS[entry.game] || "🎮"}
-              </span>
-              <span className="text-cream font-semibold text-sm">
-                {getGameTitle(entry.game)}
-              </span>
+              <span className="text-lg">{GAME_EMOJIS[entry.game] || "🎮"}</span>
+              <span className="text-cream font-semibold text-sm">{getGameTitle(entry.game)}</span>
               <span
                 className="ml-auto font-display text-lg font-bold"
                 style={{ color: getGameColor(entry.game) }}
@@ -278,9 +250,7 @@ function ScoreTimeline({ scores }: { scores: ScoreEntry[] }) {
                 {formatNumber(entry.score)}
               </span>
             </div>
-            <p className="text-cream-dim text-[11px] mt-1">
-              {formatDate(entry.ts)}
-            </p>
+            <p className="text-cream-dim text-[11px] mt-1">{formatDate(entry.ts)}</p>
           </div>
         </motion.div>
       ))}
@@ -297,11 +267,7 @@ function SkeletonRows() {
     <div className="relative pl-8">
       <div className="absolute left-3 top-0 bottom-0 w-px bg-hot-pink/10" />
       {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="relative mb-4 last:mb-0"
-          style={{ animationDelay: `${i * 80}ms` }}
-        >
+        <div key={i} className="relative mb-4 last:mb-0" style={{ animationDelay: `${i * 80}ms` }}>
           <div className="absolute -left-5 top-3.5 w-3 h-3 rounded-full bg-degen-900 animate-pulse" />
           <div className="bg-degen-950 border border-hot-pink/10 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -365,9 +331,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
         }
 
         const data = await response.json();
-        const scores: ScoreEntry[] = Array.isArray(data)
-          ? data
-          : data.scores || data.data || [];
+        const scores: ScoreEntry[] = Array.isArray(data) ? data : data.scores || data.data || [];
 
         const sorted = [...scores].sort((a, b) => (b.ts || 0) - (a.ts || 0));
         setState({ scores: sorted, loading: false, error: null });
@@ -382,7 +346,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
         });
       }
     },
-    [profileId, isWallet]
+    [profileId, isWallet],
   );
 
   /* ── Fetch on mount ── */
@@ -424,10 +388,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
                        hover:shadow-[0_0_25px_rgba(251,191,36,0.4)]
                        active:scale-95 transition-all min-h-[44px]"
           >
-            <ArrowLeft
-              size={16}
-              className="transition-transform group-hover:-translate-x-1"
-            />
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             Back to Home
           </Link>
         </motion.div>
@@ -462,10 +423,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
                 {/* Avatar + Info */}
                 <div className="flex items-center gap-4">
-                  <IdenticonAvatar
-                    value={profileId}
-                    size={80}
-                  />
+                  <IdenticonAvatar value={profileId} size={80} />
                   <div>
                     <h2 className="font-display text-xl sm:text-2xl font-bold text-cream">
                       {displayName}
@@ -480,10 +438,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
                     </p>
 
                     {/* Bio editor */}
-                    <BioEditor
-                      profileId={profileId}
-                      isEditable={isBioEditable}
-                    />
+                    <BioEditor profileId={profileId} isEditable={isBioEditable} />
                   </div>
                 </div>
 
@@ -503,10 +458,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
                                  disabled:opacity-40 cursor-pointer"
                       title="Refresh scores"
                     >
-                      <RefreshCw
-                        size={14}
-                        className={isRefreshing ? "animate-spin" : ""}
-                      />
+                      <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
                       Refresh
                     </motion.button>
                   </div>
@@ -554,9 +506,7 @@ export function ProfileIdClient({ profileId }: ProfileIdClientProps) {
               className={`${stat.bg} border-2 ${stat.borderColor} rounded-xl ${stat.glowColor} p-4 sm:p-5 text-center`}
             >
               <div className="flex justify-center mb-2">{stat.icon}</div>
-              <p className="font-display text-xl sm:text-2xl font-bold text-cream">
-                {stat.value}
-              </p>
+              <p className="font-display text-xl sm:text-2xl font-bold text-cream">{stat.value}</p>
               <p className="text-[11px] text-cream-dim mt-1 uppercase tracking-wider">
                 {stat.label}
               </p>

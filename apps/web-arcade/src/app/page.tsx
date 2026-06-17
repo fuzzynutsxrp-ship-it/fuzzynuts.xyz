@@ -17,8 +17,8 @@ const Footer = dynamic(() =>
 
 type Game = (typeof GAMES)[number];
 
-const GameModal = dynamic(() =>
-  import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
+const GameModal = dynamic(
+  () => import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
   { loading: () => <GameModalSkeleton />, ssr: false },
 );
 
@@ -34,7 +34,16 @@ const CATEGORIES = [
 ];
 
 const FEATURED_ID = "rsc";
-const POPULAR_IDS = ["rsc", "cosmic-blaster", "dragon-hoard", "mario", "survivors", "racer", "minigolf", "fuzzynuts-world"];
+const POPULAR_IDS = [
+  "rsc",
+  "cosmic-blaster",
+  "dragon-hoard",
+  "mario",
+  "survivors",
+  "racer",
+  "minigolf",
+  "fuzzynuts-world",
+];
 
 function matchesCat(g: Game, cat: string): boolean {
   if (cat === "all") return true;
@@ -55,7 +64,11 @@ function gamesByIds(ids: string[]): Game[] {
 
 function Card({ game, onPlay, i }: { game: Game; onPlay: (id: string) => void; i: number }) {
   return (
-    <button className="fn-game-card" onClick={() => onPlay(game.id)} aria-label={`Play ${game.title}`}>
+    <button
+      className="fn-game-card"
+      onClick={() => onPlay(game.id)}
+      aria-label={`Play ${game.title}`}
+    >
       <span className={`fn-game-card__thumb fn-game-card__thumb--${(i % 6) + 1}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -63,7 +76,9 @@ function Card({ game, onPlay, i }: { game: Game; onPlay: (id: string) => void; i
           alt={game.title}
           className="fn-game-card__img"
           loading="lazy"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.opacity = "0";
+          }}
         />
         <span className="fn-game-card__badge">{game.type}</span>
       </span>
@@ -82,7 +97,11 @@ export default function Home() {
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return GAMES.filter((g) => matchesCat(g, activeCat)).filter(
-      (g) => !q || g.title.toLowerCase().includes(q) || g.type.toLowerCase().includes(q) || (g.tags ?? []).some((t) => t.toLowerCase().includes(q)),
+      (g) =>
+        !q ||
+        g.title.toLowerCase().includes(q) ||
+        g.type.toLowerCase().includes(q) ||
+        (g.tags ?? []).some((t) => t.toLowerCase().includes(q)),
     );
   }, [activeCat, searchQuery]);
 
@@ -101,10 +120,22 @@ export default function Home() {
             <p className="fn-hero-banner__subtitle">{featured.description}</p>
             <button className="fn-hero-banner__cta" onClick={() => setActiveGameId(featured.id)}>
               Play Now
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
           </div>
-          <div className="fn-hero-banner__visual" style={{ backgroundImage: `url(/images/games/${featured.id}.png)` }} />
+          <div
+            className="fn-hero-banner__visual"
+            style={{ backgroundImage: `url(/images/games/${featured.id}.png)` }}
+          />
         </section>
 
         {/* Category browse */}
@@ -115,9 +146,18 @@ export default function Home() {
               <button
                 key={c.key}
                 className={`fn-cat-tile${activeCat === c.key ? " is-active" : ""}`}
-                onClick={() => { setActiveCat(c.key); document.getElementById("all-games")?.scrollIntoView({ behavior: "smooth" }); }}
+                onClick={() => {
+                  setActiveCat(c.key);
+                  document.getElementById("all-games")?.scrollIntoView({ behavior: "smooth" });
+                }}
               >
-                <span className="fn-cat-tile__icon" style={{ background: c.grad }} aria-hidden="true">🎮</span>
+                <span
+                  className="fn-cat-tile__icon"
+                  style={{ background: c.grad }}
+                  aria-hidden="true"
+                >
+                  🎮
+                </span>
                 <span className="fn-cat-tile__label">{c.label}</span>
               </button>
             ))}
@@ -128,19 +168,27 @@ export default function Home() {
         <section className="fn-carousel-section" aria-label="Popular">
           <h2 className="fn-carousel-section__heading">🕹️ Popular this week</h2>
           <div className="fn-carousel__track">
-            {popular.map((g, i) => <Card key={g.id} game={g} onPlay={setActiveGameId} i={i} />)}
+            {popular.map((g, i) => (
+              <Card key={g.id} game={g} onPlay={setActiveGameId} i={i} />
+            ))}
           </div>
         </section>
 
         {/* All games grid */}
         <section className="fn-carousel-section" id="all-games" aria-label="All games">
           <h2 className="fn-carousel-section__heading">
-            {searchQuery.trim() ? `Results for "${searchQuery}"` : activeCat === "all" ? "All games" : CATEGORIES.find((c) => c.key === activeCat)?.label}
+            {searchQuery.trim()
+              ? `Results for "${searchQuery}"`
+              : activeCat === "all"
+                ? "All games"
+                : CATEGORIES.find((c) => c.key === activeCat)?.label}
             <span className="fnx-count">{filtered.length}</span>
           </h2>
           {filtered.length > 0 ? (
             <div className="fn-grid">
-              {filtered.map((g, i) => <Card key={g.id} game={g} onPlay={setActiveGameId} i={i} />)}
+              {filtered.map((g, i) => (
+                <Card key={g.id} game={g} onPlay={setActiveGameId} i={i} />
+              ))}
             </div>
           ) : (
             <p className="fnx-empty">No games found.</p>
@@ -150,7 +198,11 @@ export default function Home() {
         <Footer />
       </main>
 
-      <GameModal gameId={activeGameId} onClose={() => setActiveGameId(null)} onGameSwitch={setActiveGameId} />
+      <GameModal
+        gameId={activeGameId}
+        onClose={() => setActiveGameId(null)}
+        onGameSwitch={setActiveGameId}
+      />
     </div>
   );
 }

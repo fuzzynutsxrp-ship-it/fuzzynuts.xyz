@@ -55,9 +55,10 @@ export function CategoryTabs({ activeCategory, onCategoryChange }: CategoryTabsP
               onClick={() => onCategoryChange(cat.value)}
               className={`
                 shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer
-                ${isActive
-                  ? "bg-brand-gold text-[#0a0613] font-bold shadow-[0_0_12px_rgba(251,191,36,0.25)]"
-                  : "bg-white/5 text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/10 border border-white/5"
+                ${
+                  isActive
+                    ? "bg-brand-gold text-[#0a0613] font-bold shadow-[0_0_12px_rgba(251,191,36,0.25)]"
+                    : "bg-white/5 text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/10 border border-white/5"
                 }
               `}
             >

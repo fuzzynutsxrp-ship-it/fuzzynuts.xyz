@@ -55,10 +55,7 @@ export function HeroBackground({
     // visual language as GamePage and SubPageLayout (both also use
     // bg-degen-mesh as of rounds 7 + 8). The whole site now reads as
     // one continuous degen den.
-    <div
-      className="absolute inset-0 z-0 overflow-hidden bg-degen-mesh"
-      aria-hidden="true"
-    >
+    <div className="absolute inset-0 z-0 overflow-hidden bg-degen-mesh" aria-hidden="true">
       {/* 1. Photo — heavily crushed forest texture peeking through the
             mesh. Same two-Image desktop/mobile media-query pattern as
             before; only the className changes. */}

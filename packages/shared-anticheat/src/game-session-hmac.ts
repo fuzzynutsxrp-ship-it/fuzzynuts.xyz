@@ -30,10 +30,7 @@ export function buildGameSessionMessage(parts: GameSessionPayload): string {
  * Sign a game session token payload with the server secret.
  * Returns lowercase hex (64 chars).
  */
-export async function signGameSession(
-  token: GameSessionPayload,
-  secret: string,
-): Promise<string> {
+export async function signGameSession(token: GameSessionPayload, secret: string): Promise<string> {
   const message = buildGameSessionMessage(token);
   return signPayload(message, secret);
 }

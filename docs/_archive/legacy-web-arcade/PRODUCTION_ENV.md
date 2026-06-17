@@ -9,23 +9,23 @@
 
 The frontend is a **runtime build on Vercel** (`.next`), with **edge middleware active** (`src/middleware.ts` — the pre-launch Basic-Auth lockdown) — it is **NOT a static export**. `NEXT_PUBLIC_*` env vars are still baked in at build time (client-side), while server/edge vars (e.g. `SITE_LOCKDOWN_PASSWORD`) are read at request time by the middleware.
 
-| Variable | Required | Value | Notes |
-|----------|----------|-------|-------|
+| Variable                     | Required  | Value  | Notes                                                                                                                                                       |
+| ---------------------------- | --------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_ALLOW_INDEXING` | At launch | `true` | **Launch switch.** Unset/`false` = `noindex` (pre-launch default). Set to `true` and redeploy to let search engines index the site. Baked in at build time. |
-| *(others)* | — | — | API URL is hardcoded to `https://world.fuzzynuts.xyz` in components |
+| _(others)_                   | —         | —      | API URL is hardcoded to `https://world.fuzzynuts.xyz` in components                                                                                         |
 
 > [!NOTE]
 > If you later want to make the API URL configurable, add `NEXT_PUBLIC_API_URL` to Vercel's project settings. Then update `ClaimRewards.tsx`, `UserProfile.tsx`, and `Leaderboard.tsx` to use `process.env.NEXT_PUBLIC_API_URL` instead of the hardcoded base URL. The `NEXT_PUBLIC_` prefix is required for client-side access in Next.js.
 
 ### Vercel Project Settings
 
-| Setting | Value |
-|---------|-------|
-| **Framework Preset** | Next.js |
-| **Build Command** | `npm run build` |
+| Setting              | Value                                                                        |
+| -------------------- | ---------------------------------------------------------------------------- |
+| **Framework Preset** | Next.js                                                                      |
+| **Build Command**    | `npm run build`                                                              |
 | **Output Directory** | _(framework default — `.next`; do NOT set `out`, that's static-export only)_ |
-| **Node.js Version** | 20.x |
-| **Root Directory** | `.` (project root) |
+| **Node.js Version**  | 20.x                                                                         |
+| **Root Directory**   | `.` (project root)                                                           |
 
 ---
 
@@ -35,36 +35,37 @@ These are set in the Railway dashboard under **Fuzzynuts World service → Varia
 
 ### Existing Variables (already configured)
 
-| Variable | Value | Purpose |
-|----------|-------|---------|
-| `ACCEPT_LICENSE` | `true` | Fuzzynuts World license acceptance |
-| `NAME` | `Fuzzynuts World` | Server display name |
-| `HOST` | `0.0.0.0` | Bind address |
-| `PORT` | `9001` | Game WebSocket port |
-| `SSL` | `true` | TLS enabled |
-| `CLIENT_REMOTE_HOST` | `world.fuzzynuts.xyz` | Client connection target |
-| `MAX_PLAYERS` | `100` | Max concurrent players |
-| `SKIP_DATABASE` | `false` | Database required |
-| `DATABASE` | `mongodb` | Database type |
-| `MONGO_URL` | `${{MongoDB.MONGO_URL}}` | Railway reference syntax (auto-resolves) |
-| `MONGODB_DATABASE` | `fuzzynuts_world` | Database name |
-| `API_ENABLED` | `true` | REST API active |
-| `API_PORT` | `9002` | REST API port |
-| `HUB_ENABLED` | `false` | Multi-server hub |
-| `DISCORD_ENABLED` | `false` | Discord bot |
-| `TUTORIAL_ENABLED` | `false` | In-game tutorial |
-| `DEBUGGING` | `false` | Debug logs |
-| `GVER` | `1.0.0-fuzzynuts` | Game version |
-| `NODE_OPTIONS` | `--max-old-space-size=1024` | Memory limit |
+| Variable             | Value                       | Purpose                                  |
+| -------------------- | --------------------------- | ---------------------------------------- |
+| `ACCEPT_LICENSE`     | `true`                      | Fuzzynuts World license acceptance       |
+| `NAME`               | `Fuzzynuts World`           | Server display name                      |
+| `HOST`               | `0.0.0.0`                   | Bind address                             |
+| `PORT`               | `9001`                      | Game WebSocket port                      |
+| `SSL`                | `true`                      | TLS enabled                              |
+| `CLIENT_REMOTE_HOST` | `world.fuzzynuts.xyz`       | Client connection target                 |
+| `MAX_PLAYERS`        | `100`                       | Max concurrent players                   |
+| `SKIP_DATABASE`      | `false`                     | Database required                        |
+| `DATABASE`           | `mongodb`                   | Database type                            |
+| `MONGO_URL`          | `${{MongoDB.MONGO_URL}}`    | Railway reference syntax (auto-resolves) |
+| `MONGODB_DATABASE`   | `fuzzynuts_world`           | Database name                            |
+| `API_ENABLED`        | `true`                      | REST API active                          |
+| `API_PORT`           | `9002`                      | REST API port                            |
+| `HUB_ENABLED`        | `false`                     | Multi-server hub                         |
+| `DISCORD_ENABLED`    | `false`                     | Discord bot                              |
+| `TUTORIAL_ENABLED`   | `false`                     | In-game tutorial                         |
+| `DEBUGGING`          | `false`                     | Debug logs                               |
+| `GVER`               | `1.0.0-fuzzynuts`           | Game version                             |
+| `NODE_OPTIONS`       | `--max-old-space-size=1024` | Memory limit                             |
 
 ### 🆕 New Variable Required for Rewards API
 
-| Variable | Required | Example | Purpose |
-|----------|----------|---------|---------|
+| Variable                 | Required        | Example                      | Purpose                                     |
+| ------------------------ | --------------- | ---------------------------- | ------------------------------------------- |
 | `COMMUNITY_NUT_JAR_SEED` | **✅ CRITICAL** | `sEdV...` (XRPL family seed) | Distributor wallet secret for prize payouts |
 
 > [!CAUTION]
 > **`COMMUNITY_NUT_JAR_SEED` is the XRPL secret key for the Community Nut Jar wallet.**
+>
 > - This wallet holds the 18% community allocation (~57.78B $NUT).
 > - **NEVER** commit this seed to source code, `.env` files, or logs.
 > - Set it **exclusively** in Railway's encrypted Variables tab.
@@ -95,16 +96,16 @@ pre-calculated amounts — **price is never fetched at claim time**.
 
 ### New Railway env vars (Rewards API)
 
-| Variable | Required | Default | Purpose |
-|----------|----------|---------|---------|
-| `REWARDS_ADMIN_SECRET` | **✅ CRITICAL** | _(none)_ | Shared secret for `POST /api/rewards/snapshot`. If unset, the snapshot endpoint returns 401 and no week can be announced. |
-| `PRIZE_USD_1` / `PRIZE_USD_2` / `PRIZE_USD_3` | Optional | `250` / `150` / `100` | Announced USD value per tier. |
-| `MAX_WEEKLY_NUT_EMISSION` | Optional | `1000000` | Soft cap on total NUT emitted per week (2× the legacy 500k). If USD tiers would exceed it, all tiers scale down proportionally and `cap_applied:true` is recorded. |
-| `NUT_AMM_COUNTER_IS_XRP` | Optional | `true` | `true` = NUT pool is paired with XRP (price = NUT/XRP × XRP/USD). `false` = NUT paired directly with a USD stable. |
-| `NUT_AMM_COUNTER_CURRENCY` / `NUT_AMM_COUNTER_ISSUER` | If `…IS_XRP=false` | _(none)_ | The USD-stable counter asset when NUT is not XRP-paired. |
-| `USD_REF_CURRENCY` / `USD_REF_ISSUER` | Optional | `RLUSD` / `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De` | On-chain XRP→USD reference AMM (only used when NUT is XRP-paired). Human codes like `RLUSD` are auto-encoded to their 160-bit hex form. |
-| `NUT_USD_PRICE_FALLBACK` | **Recommended at launch** | _(none)_ | USD-per-NUT fallback used **only** if the on-chain AMM query fails. Without it, a failed snapshot throws. |
-| `NUT_ISSUER` / `XRPL_SERVER` | Optional | `rpL6…xMP7` / `wss://xrplcluster.com` | Overridable; defaults match production. |
+| Variable                                              | Required                  | Default                                        | Purpose                                                                                                                                                            |
+| ----------------------------------------------------- | ------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `REWARDS_ADMIN_SECRET`                                | **✅ CRITICAL**           | _(none)_                                       | Shared secret for `POST /api/rewards/snapshot`. If unset, the snapshot endpoint returns 401 and no week can be announced.                                          |
+| `PRIZE_USD_1` / `PRIZE_USD_2` / `PRIZE_USD_3`         | Optional                  | `250` / `150` / `100`                          | Announced USD value per tier.                                                                                                                                      |
+| `MAX_WEEKLY_NUT_EMISSION`                             | Optional                  | `1000000`                                      | Soft cap on total NUT emitted per week (2× the legacy 500k). If USD tiers would exceed it, all tiers scale down proportionally and `cap_applied:true` is recorded. |
+| `NUT_AMM_COUNTER_IS_XRP`                              | Optional                  | `true`                                         | `true` = NUT pool is paired with XRP (price = NUT/XRP × XRP/USD). `false` = NUT paired directly with a USD stable.                                                 |
+| `NUT_AMM_COUNTER_CURRENCY` / `NUT_AMM_COUNTER_ISSUER` | If `…IS_XRP=false`        | _(none)_                                       | The USD-stable counter asset when NUT is not XRP-paired.                                                                                                           |
+| `USD_REF_CURRENCY` / `USD_REF_ISSUER`                 | Optional                  | `RLUSD` / `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De` | On-chain XRP→USD reference AMM (only used when NUT is XRP-paired). Human codes like `RLUSD` are auto-encoded to their 160-bit hex form.                            |
+| `NUT_USD_PRICE_FALLBACK`                              | **Recommended at launch** | _(none)_                                       | USD-per-NUT fallback used **only** if the on-chain AMM query fails. Without it, a failed snapshot throws.                                                          |
+| `NUT_ISSUER` / `XRPL_SERVER`                          | Optional                  | `rpL6…xMP7` / `wss://xrplcluster.com`          | Overridable; defaults match production.                                                                                                                            |
 
 ### Announcement cron (every Monday 00:00 UTC)
 
@@ -135,24 +136,24 @@ Recommended: a Railway cron service or a scheduled GitHub Action.
 
 These collections are used by the rewards system (auto-created on first write):
 
-| Collection | Purpose | Created By |
-|------------|---------|------------|
-| `arcade_scores` | Weekly game scores (wallet, game, score, weekKey) | `scores.ts` (POST /api/scores) |
-| `prize_distributions` | Claim records (prevents double-claiming) | `rewards-api` (POST /api/rewards/claim) |
-| `weekly_prize_tiers` | Per-week USD tiers + NUT/USD snapshot + calculated NUT amounts. Unique index on `weekKey` is auto-created. | `rewards-api` (POST /api/rewards/snapshot) |
-| `reward_queue` | Achievement reward queue | `distribute-achievements.js` |
+| Collection            | Purpose                                                                                                    | Created By                                 |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `arcade_scores`       | Weekly game scores (wallet, game, score, weekKey)                                                          | `scores.ts` (POST /api/scores)             |
+| `prize_distributions` | Claim records (prevents double-claiming)                                                                   | `rewards-api` (POST /api/rewards/claim)    |
+| `weekly_prize_tiers`  | Per-week USD tiers + NUT/USD snapshot + calculated NUT amounts. Unique index on `weekKey` is auto-created. | `rewards-api` (POST /api/rewards/snapshot) |
+| `reward_queue`        | Achievement reward queue                                                                                   | `distribute-achievements.js`               |
 
 ---
 
 ## XRPL Network Configuration
 
-| Setting | Value |
-|---------|-------|
-| **Network** | XRPL Mainnet |
-| **WebSocket** | `wss://xrplcluster.com` |
-| **Token** | `NUT` |
-| **Issuer** | `rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7` (blackholed) |
-| **Explorer** | `https://xrpscan.com/tx/<hash>` |
+| Setting       | Value                                             |
+| ------------- | ------------------------------------------------- |
+| **Network**   | XRPL Mainnet                                      |
+| **WebSocket** | `wss://xrplcluster.com`                           |
+| **Token**     | `NUT`                                             |
+| **Issuer**    | `rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7` (blackholed) |
+| **Explorer**  | `https://xrpscan.com/tx/<hash>`                   |
 
 ---
 
@@ -172,26 +173,26 @@ These collections are used by the rewards system (auto-created on first write):
 
 ### Scores API (port 9001 — µWebSockets)
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/scores` | GET | Fetch leaderboard (query: `?week=2026-W20&game=mario`) |
-| `/api/scores` | POST | Submit a score (body: `{ game, score, wallet, timestamp }`) |
+| Endpoint      | Method | Purpose                                                     |
+| ------------- | ------ | ----------------------------------------------------------- |
+| `/api/scores` | GET    | Fetch leaderboard (query: `?week=2026-W20&game=mario`)      |
+| `/api/scores` | POST   | Submit a score (body: `{ game, score, wallet, timestamp }`) |
 
 ### Rewards API (port 9001 — µWebSockets)
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/rewards/eligibility` | GET | Check top-3 eligibility (query: `?wallet=rXXX&week=2026-W20`) |
-| `/api/rewards/claim` | POST | Execute prize claim (body: `{ wallet, week }`) |
-| `/api/rewards/claim/status` | GET | Poll claim transaction status (query: `?wallet=rXXX&week=2026-W20`) |
-| `/api/rewards/snapshot` | POST | **Admin** (`x-admin-secret`). Lock the week's NUT/USD price + amounts. Body: `{ week?, force? }` |
-| `/api/rewards/tiers` | GET | Public weekly prize tiers (query: `?week=2026-W20`) — USD value + calculated NUT |
-| `/api/rewards/health` | GET | Service health check (MongoDB + XRPL connectivity) |
-| `/api/rewards` | GET | Achievement rewards for a wallet (query: `?wallet=rXXX`) |
+| Endpoint                    | Method | Purpose                                                                                          |
+| --------------------------- | ------ | ------------------------------------------------------------------------------------------------ |
+| `/api/rewards/eligibility`  | GET    | Check top-3 eligibility (query: `?wallet=rXXX&week=2026-W20`)                                    |
+| `/api/rewards/claim`        | POST   | Execute prize claim (body: `{ wallet, week }`)                                                   |
+| `/api/rewards/claim/status` | GET    | Poll claim transaction status (query: `?wallet=rXXX&week=2026-W20`)                              |
+| `/api/rewards/snapshot`     | POST   | **Admin** (`x-admin-secret`). Lock the week's NUT/USD price + amounts. Body: `{ week?, force? }` |
+| `/api/rewards/tiers`        | GET    | Public weekly prize tiers (query: `?week=2026-W20`) — USD value + calculated NUT                 |
+| `/api/rewards/health`       | GET    | Service health check (MongoDB + XRPL connectivity)                                               |
+| `/api/rewards`              | GET    | Achievement rewards for a wallet (query: `?wallet=rXXX`)                                         |
 
 ### Base URLs
 
-| Environment | URL |
-|-------------|-----|
-| Production | `https://world.fuzzynuts.xyz` |
+| Environment      | URL                                              |
+| ---------------- | ------------------------------------------------ |
+| Production       | `https://world.fuzzynuts.xyz`                    |
 | Railway Internal | `efficient-tenderness-production.up.railway.app` |

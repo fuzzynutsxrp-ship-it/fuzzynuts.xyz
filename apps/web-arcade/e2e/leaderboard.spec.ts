@@ -36,7 +36,7 @@ async function injectMockWallet(page: Page, address = "rTestE2EWallet12345678901
         connected: true,
         address: addr,
         provider: "crossmark",
-      })
+      }),
     );
   }, address);
 }
@@ -54,7 +54,7 @@ async function simulateScoreSubmission(page: Page, score: number) {
         score: s,
         game: "mario",
       },
-      "*"
+      "*",
     );
   }, score);
 }
@@ -63,12 +63,7 @@ async function simulateScoreSubmission(page: Page, score: number) {
  * Helper: Write a score directly to localStorage in the
  * fuzzy-score.js format, simulating an offline game session.
  */
-async function injectLocalScore(
-  page: Page,
-  game: string,
-  score: number,
-  address: string
-) {
+async function injectLocalScore(page: Page, game: string, score: number, address: string) {
   await page.evaluate(
     ({ g, s, a }) => {
       // Compute current week key
@@ -100,7 +95,7 @@ async function injectLocalScore(
 
       localStorage.setItem("fuzzy_arcade_scores", JSON.stringify(data));
     },
-    { g: game, s: score, a: address }
+    { g: game, s: score, a: address },
   );
 }
 
@@ -149,8 +144,16 @@ test.describe("Leaderboard System", () => {
     await page.waitForTimeout(3000);
 
     // Check desktop table header has the expected columns
-    const header = page.locator('div').filter({ hasText: /Rank/ }).filter({ hasText: /Player/ }).filter({ hasText: /Games Played/ }).filter({ hasText: /Total Score/ });
-    const headerVisible = await header.first().isVisible({ timeout: 5000 }).catch(() => false);
+    const header = page
+      .locator("div")
+      .filter({ hasText: /Rank/ })
+      .filter({ hasText: /Player/ })
+      .filter({ hasText: /Games Played/ })
+      .filter({ hasText: /Total Score/ });
+    const headerVisible = await header
+      .first()
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
     // Header may be hidden on mobile viewport, so we just check it exists in DOM
     expect(headerVisible || true).toBe(true);
   });

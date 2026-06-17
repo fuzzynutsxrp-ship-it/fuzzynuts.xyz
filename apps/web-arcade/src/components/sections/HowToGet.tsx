@@ -37,13 +37,14 @@ export function HowToGet() {
           className="text-center mb-12 md:mb-16"
         >
           {/* DEGEN OVERHAUL START — neon header, irreverent subcopy */}
-          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">🐿️ Zero to hero</span>
+          <span className="neon-chip text-degen-crisp mb-4 animate-glitch-skew">
+            🐿️ Zero to hero
+          </span>
           <h2 className="font-display text-4xl md:text-5xl font-black gradient-text-gold text-hero-glow-crisp text-degen-crisp mb-4">
             How to Get $NUT
           </h2>
           <p className="text-[var(--color-cream-dim)] text-lg max-w-2xl mx-auto leading-relaxed">
-            4 steps. No sign-ups, no nonsense, no cap. Ape into the nuttiest
-            community on XRPL. 🥜
+            4 steps. No sign-ups, no nonsense, no cap. Ape into the nuttiest community on XRPL. 🥜
           </p>
           {/* DEGEN OVERHAUL END */}
         </motion.div>
@@ -79,11 +80,7 @@ export function HowToGet() {
                 {/* Content */}
                 <div className="flex-1">
                   <h3 className="font-display font-bold text-lg text-[var(--color-cream)] mb-1 flex items-center gap-2 group-hover:text-neon-green transition-colors">
-                    <Icon
-                      size={18}
-                      className="text-neon-green"
-                      strokeWidth={2}
-                    />
+                    <Icon size={18} className="text-neon-green" strokeWidth={2} />
                     {step.title}
                   </h3>
                   <p className="text-sm text-[var(--color-cream-dim)] leading-relaxed">
@@ -113,9 +110,7 @@ export function HowToGet() {
                       </motion.a>
                       {/* DEGEN OVERHAUL END */}
                       <div className="flex items-center gap-2 text-xs">
-                        <span className="text-[var(--color-cream-dim)]">
-                          Or add manually:
-                        </span>
+                        <span className="text-[var(--color-cream-dim)]">Or add manually:</span>
                         <motion.button
                           onClick={handleCopy}
                           whileHover={{ scale: 1.05 }}

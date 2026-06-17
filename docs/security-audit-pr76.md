@@ -18,20 +18,20 @@ PR adds Redis pub/sub adapter for multi-instance Socket.io, postMessage origin v
 
 ## Files Reviewed
 
-| File | Lines | Verdict |
-|------|-------|---------|
-| `apps/api/src/lib/redis-adapter.ts` | +72 | 2 MEDIUM, 1 LOW |
-| `apps/api/src/routes/chat.ts` | +8 | Clean — wiring only |
-| `apps/api/src/routes/scores.ts` | ±4 | Clean — cap adjustments |
-| `apps/api/src/server.ts` | +2 | Clean — env passthrough |
-| `.env.example` | +2 | Clean — commented-out template |
-| `apps/games-build/shared/arcade-shell.ts` | +10 | 1 LOW (default `"*"`) |
-| `apps/games-build/shared/fuzzy-score.js` | +5 | Clean |
-| `apps/games-build/templates/game-starter/index.html` | +4 | Clean |
-| `apps/web-arcade/src/components/game/GameModal.tsx` | +3 | Clean |
-| `apps/web-arcade/src/features/arcade/constants/index.ts` | +29 | Clean — well-structured |
-| `apps/web-arcade/src/features/arcade/hooks/useScoreSubmission.ts` | +5 | Clean |
-| `apps/api/tests/scores-caps.test.ts` | ±12 | Clean — caps synced |
+| File                                                              | Lines | Verdict                        |
+| ----------------------------------------------------------------- | ----- | ------------------------------ |
+| `apps/api/src/lib/redis-adapter.ts`                               | +72   | 2 MEDIUM, 1 LOW                |
+| `apps/api/src/routes/chat.ts`                                     | +8    | Clean — wiring only            |
+| `apps/api/src/routes/scores.ts`                                   | ±4    | Clean — cap adjustments        |
+| `apps/api/src/server.ts`                                          | +2    | Clean — env passthrough        |
+| `.env.example`                                                    | +2    | Clean — commented-out template |
+| `apps/games-build/shared/arcade-shell.ts`                         | +10   | 1 LOW (default `"*"`)          |
+| `apps/games-build/shared/fuzzy-score.js`                          | +5    | Clean                          |
+| `apps/games-build/templates/game-starter/index.html`              | +4    | Clean                          |
+| `apps/web-arcade/src/components/game/GameModal.tsx`               | +3    | Clean                          |
+| `apps/web-arcade/src/features/arcade/constants/index.ts`          | +29   | Clean — well-structured        |
+| `apps/web-arcade/src/features/arcade/hooks/useScoreSubmission.ts` | +5    | Clean                          |
+| `apps/api/tests/scores-caps.test.ts`                              | ±12   | Clean — caps synced            |
 
 ---
 
@@ -47,11 +47,9 @@ PR adds Redis pub/sub adapter for multi-instance Socket.io, postMessage origin v
 **Risk:** LOW exploitation. The URL comes from server-side env vars (not user input), so injection is not possible through normal HTTP paths. However, defense-in-depth suggests validating the URL format before use.
 
 **Recommendation:**
+
 ```typescript
-export async function attachRedisAdapter(
-  io: Server,
-  redisUrl: string,
-): Promise<boolean> {
+export async function attachRedisAdapter(io: Server, redisUrl: string): Promise<boolean> {
   if (!redisUrl.startsWith("redis://") && !redisUrl.startsWith("rediss://")) {
     console.warn("[redis] Invalid REDIS_URL — must start with redis:// or rediss://");
     return false;
@@ -76,6 +74,7 @@ export async function attachRedisAdapter(
 **Risk:** LOW — Railway kills processes after timeout anyway, but leaked connections can accumulate under frequent deploys.
 
 **Recommendation:**
+
 1. Return the clients from `attachRedisAdapter()` so the caller can close them:
    ```typescript
    export async function attachRedisAdapter(
@@ -109,6 +108,7 @@ export async function attachRedisAdapter(
 When Redis connection fails, the catch block logs `err.message`. If `ioredis` includes the connection URL in its error message (which it does for auth failures: `"WRONGPASS invalid username-password pair"` or connection refused errors that may include the host), this could leak Redis credentials to Railway log drains.
 
 The current code is:
+
 ```typescript
 console.warn(
   "[redis] Failed to connect — falling back to in-memory adapter:",
@@ -119,6 +119,7 @@ console.warn(
 **Risk:** LOW — Railway logs are access-controlled, but log drain integrations (Datadog, etc.) may be less restricted.
 
 **Recommendation:** Sanitize the error message or log only the error type:
+
 ```typescript
 console.warn(
   "[redis] Failed to connect — falling back to in-memory adapter:",
@@ -133,6 +134,7 @@ console.warn(
 **File:** `apps/api/src/routes/chat.ts` lines 296-301
 
 The Redis adapter is imported asynchronously:
+
 ```typescript
 if (opts.REDIS_URL) {
   import("../lib/redis-adapter.js")
@@ -146,6 +148,7 @@ The Socket.io server starts accepting connections immediately. If a client conne
 **Risk:** LOW — this is a brief startup race. Single-instance deploys don't use Redis at all. Multi-instance deploys on Railway typically start one instance at a time.
 
 **Recommendation:** Accept the tradeoff (documented in code comment) or await the adapter before accepting connections:
+
 ```typescript
 if (opts.REDIS_URL) {
   await import("../lib/redis-adapter.js")
@@ -153,6 +156,7 @@ if (opts.REDIS_URL) {
     .catch((err) => console.error("[chat] Redis adapter import failed:", err));
 }
 ```
+
 Note: this would require making `initChat` async, which may have downstream implications.
 
 ---
@@ -176,6 +180,7 @@ If the game never receives a `FUZZY_CONFIG` message (e.g., loaded directly witho
 ### L3 — Hardcoded allowed origins in game templates (LOW)
 
 **Files:**
+
 - `apps/games-build/shared/arcade-shell.ts` line 50-51
 - `apps/games-build/shared/fuzzy-score.js` line 45-46
 - `apps/games-build/templates/game-starter/index.html` line 212-213
@@ -193,6 +198,7 @@ All three files hardcode `["https://fuzzynuts.xyz", "https://www.fuzzynuts.xyz"]
 **File:** `apps/api/src/routes/scores.ts`
 
 Four game caps were raised:
+
 - `mario`: 99,999 → 9,999,990
 - `fuzzy-survivors`: 999,999 → 5,000,000
 - `minigolf`: 10,500 → 100,000
@@ -218,18 +224,18 @@ The test file (`scores-caps.test.ts`) was updated to match. These are pure confi
 
 ## OWASP API Security Top 10 Coverage
 
-| Risk | Status | Notes |
-|------|--------|-------|
-| API1: BOLA | N/A | No new object endpoints |
-| API2: Broken Auth | PASS | Redis connection is server-side only; Socket.io auth unchanged |
-| API3: BOPLA | N/A | No new user-facing properties |
-| API4: Resource Consumption | PASS | Rate limiting unchanged (5 msg/10s); Redis doesn't add new attack surface |
-| API5: Function Level Auth | N/A | No new admin endpoints |
-| API6: Unrestricted Sensitive Flows | PASS | Chat rate limiting unchanged |
-| API7: SSRF | PASS | REDIS_URL is env-var only, not user-controlled |
-| API8: Misconfiguration | MEDIUM | REDIS_URL not validated, no graceful shutdown (M1, M2, M3) |
-| API9: Improper Inventory | N/A | No new undocumented endpoints |
-| API10: Unsafe Consumption | N/A | No new third-party API consumption |
+| Risk                               | Status | Notes                                                                     |
+| ---------------------------------- | ------ | ------------------------------------------------------------------------- |
+| API1: BOLA                         | N/A    | No new object endpoints                                                   |
+| API2: Broken Auth                  | PASS   | Redis connection is server-side only; Socket.io auth unchanged            |
+| API3: BOPLA                        | N/A    | No new user-facing properties                                             |
+| API4: Resource Consumption         | PASS   | Rate limiting unchanged (5 msg/10s); Redis doesn't add new attack surface |
+| API5: Function Level Auth          | N/A    | No new admin endpoints                                                    |
+| API6: Unrestricted Sensitive Flows | PASS   | Chat rate limiting unchanged                                              |
+| API7: SSRF                         | PASS   | REDIS_URL is env-var only, not user-controlled                            |
+| API8: Misconfiguration             | MEDIUM | REDIS_URL not validated, no graceful shutdown (M1, M2, M3)                |
+| API9: Improper Inventory           | N/A    | No new undocumented endpoints                                             |
+| API10: Unsafe Consumption          | N/A    | No new third-party API consumption                                        |
 
 ---
 
@@ -238,6 +244,7 @@ The test file (`scores-caps.test.ts`) was updated to match. These are pure confi
 **APPROVE with recommendations.** No blocking issues. The 3 MEDIUM findings are defense-in-depth improvements for the Redis integration — none are exploitable in the current deployment model (server-side env vars, Railway single-process). The postMessage origin validation is a significant security improvement that closes real XSS/CSRF attack surface on the game iframe communication channel.
 
 Recommended follow-ups (non-blocking):
+
 1. Add REDIS_URL scheme validation (M1)
 2. Expose Redis clients for graceful shutdown (M2)
 3. Sanitize Redis error messages in logs (M3)

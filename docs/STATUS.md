@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-01T01:01:48.382Z** from `03b8c14` on `migration/monorepo`._
+_Generated **2026-06-16T13:17:23.785Z** from `206cb81` on `eslint-10-compat-fix`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -64,15 +64,15 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 ## Recent activity
 
-Last 10 commits on `migration/monorepo`:
+Last 10 commits on `eslint-10-compat-fix`:
 
-- `03b8c14` ci: GitHub Actions matrix + STATUS.md generator — _fuzzynutsxrp-ship-it, 27 minutes ago_
-- `2380738` docs: Diátaxis layout, community files, ADRs 0001/0003/0006 — _fuzzynutsxrp-ship-it, 30 minutes ago_
-- `034822b` feat(desktop+mobile): scaffold Tauri 2.x + Capacitor 7 shells — _fuzzynutsxrp-ship-it, 37 minutes ago_
-- `f9ae2da` feat(xrpl-token-utils): client + verify + AMM price + multisig-aware payout — _fuzzynutsxrp-ship-it, 39 minutes ago_
-- `f23571d` feat(games-build): scaffold the bundler that kills source drift — _fuzzynutsxrp-ship-it, 41 minutes ago_
-- `ff753d8` feat(auth): scaffold two-tier auth — shared-anticheat + wallet-client + api routers — _fuzzynutsxrp-ship-it, 43 minutes ago_
-- `bcfcf10` feat(arcade-core): single source of truth for SCORE_CAPS and slug aliases — _fuzzynutsxrp-ship-it, 48 minutes ago_
-- `8df53a0` chore(repo): restructure into monorepo (apps/, packages/, docs/) — _fuzzynutsxrp-ship-it, 52 minutes ago_
-- `b0931c9` fix(fuzzy-survivors): cache-bust styles.css for returning users — _fuzzynutsxrp-ship-it, 2 hours ago_
-- `700dd1e` fix(vercel): scope immutable cache to hashed assets only — _fuzzynutsxrp-ship-it, 2 hours ago_
+- `206cb81` fix: add js-yaml pnpm override (>=4.2.0) for security audit — _Hermes Dev Worker, 73 seconds ago_
+- `9eae62d` fix(ci): apply security overrides (ws/form-data/tar), format merged files, regenerate STATUS.md — _Hermes Dev Worker, 7 minutes ago_
+- `7d28647` merge: resolve dialog→div conflict with main (take iOS Safari fix) — _Hermes Dev Worker, 16 minutes ago_
+- `ed26a0e` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 44 minutes ago_
+- `8e4f34a` fix(ci): compare only structural content in status:check — _Hermes Dev Worker, 45 minutes ago_
+- `e7cdc7e` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 46 minutes ago_
+- `80689d3` fix(ci): also normalize commit SHAs and relative times in status:check — _Hermes Dev Worker, 46 minutes ago_
+- `fd3f2dc` fix(ci): normalize timestamp in status:check comparison — _Hermes Dev Worker, 49 minutes ago_
+- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 50 minutes ago_
+- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 52 minutes ago_

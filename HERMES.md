@@ -19,7 +19,7 @@ Latest session handoff: `docs/audit-2026-06-07/SESSION-HANDOFF.md`
    - run `npx cap add android` / `cap add ios` (no Android SDK / Xcode)
    - issue real XRPL transactions
    - change Vercel or Railway dashboard settings
-   If any of these are needed, stop and tell the human — do not invent a workaround.
+     If any of these are needed, stop and tell the human — do not invent a workaround.
 2. Never roleplay around a limitation. If an environment refuses an operation,
    report the exact error, do not paraphrase it away.
 3. Never fabricate citations to "battle-tested" repositories. Cite repos you
@@ -84,18 +84,18 @@ Halt and message the human for any of:
 
 When editing under any of these paths, read the linked doc first:
 
-| Editing | Read |
-|---|---|
-| `apps/web-arcade/src/components/game/**` | `docs/explanation/architecture.md` |
-| `apps/api/src/routes/scores.ts` | `docs/reference/api/scores.md`, `docs/explanation/anticheat-model.md` |
-| `apps/api/src/routes/{session,auth}.ts` | `docs/explanation/two-tier-auth.md`, ADR `0003` |
-| `apps/api/src/routes/rewards.ts` | `docs/explanation/xrpl-payout-design.md`, ADR `0006` |
-| `apps/games-build/**` | `docs/explanation/games-build-pipeline.md`, ADR `0007` |
-| `apps/desktop-tauri/**` | ADR `0004`, `docs/tutorials/04-build-the-tauri-desktop-app.md` |
-| `apps/mobile-capacitor/**` | ADR `0005`, `docs/tutorials/05-build-the-capacitor-mobile-app.md` |
-| `packages/arcade-core/src/constants/**` | `docs/how-to/anticheat/update-score-caps.md` |
-| `packages/xrpl-token-utils/**` | `docs/explanation/xrpl-payout-design.md` |
-| `packages/shared-anticheat/**` | `docs/explanation/anticheat-model.md` |
+| Editing                                  | Read                                                                  |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `apps/web-arcade/src/components/game/**` | `docs/explanation/architecture.md`                                    |
+| `apps/api/src/routes/scores.ts`          | `docs/reference/api/scores.md`, `docs/explanation/anticheat-model.md` |
+| `apps/api/src/routes/{session,auth}.ts`  | `docs/explanation/two-tier-auth.md`, ADR `0003`                       |
+| `apps/api/src/routes/rewards.ts`         | `docs/explanation/xrpl-payout-design.md`, ADR `0006`                  |
+| `apps/games-build/**`                    | `docs/explanation/games-build-pipeline.md`, ADR `0007`                |
+| `apps/desktop-tauri/**`                  | ADR `0004`, `docs/tutorials/04-build-the-tauri-desktop-app.md`        |
+| `apps/mobile-capacitor/**`               | ADR `0005`, `docs/tutorials/05-build-the-capacitor-mobile-app.md`     |
+| `packages/arcade-core/src/constants/**`  | `docs/how-to/anticheat/update-score-caps.md`                          |
+| `packages/xrpl-token-utils/**`           | `docs/explanation/xrpl-payout-design.md`                              |
+| `packages/shared-anticheat/**`           | `docs/explanation/anticheat-model.md`                                 |
 
 ## 6. Migration-era constraints (active until `docs/STATUS.md` says `migration_phase: complete`)
 

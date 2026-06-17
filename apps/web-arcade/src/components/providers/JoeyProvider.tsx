@@ -25,7 +25,7 @@ const { Provider, useProvider } = joeyReact;
 function extractRAddress(caipAccount: string | undefined): string | null {
   if (!caipAccount) return null;
   const tail = caipAccount.includes(":")
-    ? caipAccount.split(":").pop() ?? caipAccount
+    ? (caipAccount.split(":").pop() ?? caipAccount)
     : caipAccount;
   return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(tail) ? tail : null;
 }
@@ -95,7 +95,7 @@ function JoeyBridge({ children }: { children: React.ReactNode }) {
                 if (pendingRef.current) {
                   clearTimeout(pendingRef.current.timeoutId);
                   pendingRef.current.reject(
-                    new Error(result.error.message || "Joey connection failed")
+                    new Error(result.error.message || "Joey connection failed"),
                   );
                   pendingRef.current = null;
                 }
@@ -105,8 +105,7 @@ function JoeyBridge({ children }: { children: React.ReactNode }) {
             .catch((err: unknown) => {
               if (pendingRef.current) {
                 clearTimeout(pendingRef.current.timeoutId);
-                const message =
-                  err instanceof Error ? err.message : "Joey connection failed";
+                const message = err instanceof Error ? err.message : "Joey connection failed";
                 pendingRef.current.reject(new Error(message));
                 pendingRef.current = null;
               }

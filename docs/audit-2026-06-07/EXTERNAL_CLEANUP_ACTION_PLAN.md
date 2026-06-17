@@ -2,48 +2,56 @@
 
 **Generated:** 2026-06-06 · Based on a **live read-only dashboard audit** (Railway, Vercel, DigitalOcean, GitHub, Porkbun, Reown).
 **Nothing was changed in any dashboard.** Every action below is for **you** to execute; I stopped at every state-changing control.
-Secrets are redacted. The Xaman key is a test token (excluded). 
+Secrets are redacted. The Xaman key is a test token (excluded).
 
 ---
 
 ## 0. Live audit results (what's actually true right now)
 
 ### Railway — project `brilliant-nurturing` (production, Hobby)
+
 Three services (the project card mislabels it "No services" — it actually has three):
+
 - **`efficient-tenderness`** → `world.fuzzynuts.xyz` — Online. **37 variables.** Latest deploy (4 days ago) **FAILED at build**; it's serving a 2-week-old successful deploy. Shows a "40" issues badge.
 - **`fuzzynuts.xyz`** → `fuzzynutsxyz-production.up.railway.app` — Online. **14 variables.** This is the Node API (`apps/api`).
 - **`MongoDB`** → self-hosted on Railway (mongo 8.3.1), Online, `mongodb-volume` attached.
 
 Variable findings:
+
 - **`MONGODB_URI` IS set** on the `fuzzynuts.xyz` API service ✅. It is **absent** on `efficient-tenderness` (that one has `MONGO_URL` + discrete `MONGODB_HOST/PORT/USER/PASSWORD/DATABASE/SRV/TLS`).
 - **Both** app services still carry a now-redundant **`MONGO_URL`** (stale; code uses `MONGODB_URI`).
-- **Leaked `GAME_SESSION_SECRET` is NOT active anywhere.** `fuzzynuts.xyz` = a real base64 secret (redacted, ≠ the git value). `efficient-tenderness` = the literal string **`placeholder-set-real-value-in-dashboard`** — i.e. an *insecure placeholder*, not a real secret.
+- **Leaked `GAME_SESSION_SECRET` is NOT active anywhere.** `fuzzynuts.xyz` = a real base64 secret (redacted, ≠ the git value). `efficient-tenderness` = the literal string **`placeholder-set-real-value-in-dashboard`** — i.e. an _insecure placeholder_, not a real secret.
 - **`RSC_PASSWORD_SECRET`** is a shared variable **not added** to `efficient-tenderness` (shows "ADD"); it is present on `fuzzynuts.xyz`.
 - Present on the API (`fuzzynuts.xyz`): `ADMIN_WALLET_ADDRESS`, `DISCORD_WEBHOOK_URL`, `OPENAI_API_KEY`, `VPS_ACCOUNT_SECRET`, `VPS_ACCOUNT_URL`, `WALLET_JWT_SECRET`, `OPENRSC_GAME_ENDPOINT`, `NEXT_PUBLIC_ADMIN_WALLET`, `XRPL_NETWORK`.
 - Not seen on the API vs new `.env.example`: `SCORE_HMAC_SECRET`, `SERVER_SECRET`, `NUT_ISSUER`, `NUT_DISTRIBUTOR` (may rely on code defaults or live on the other service).
 
 ### Vercel — project `fuzzynuts-optimized` (Hobby, team "Shafster's projects")
+
 - **Environment Variables: NONE.** Zero set (Project + Shared + All all empty). The site currently relies entirely on code-baked `NEXT_PUBLIC_*` defaults. There is **no `NEXT_PUBLIC_PROJECT_ID`** (Reown), **no `NEXT_PUBLIC_XAMAN_API_KEY`**, **no `SITE_LOCKDOWN_PASSWORD`**.
 - **Domains:** only `fuzzynuts-optimized.vercel.app`. The custom **`fuzzynuts.xyz` is NOT attached** to this project.
 
 ### DigitalOcean — one droplet
+
 - **`fuzzynuts-game`**, public IP **`67.205.132.6`** (private `10.116.0.2`), 2 GB / 60 GB, **NYC1**, Ubuntu 24.04 LTS, project "first-project". **Active.** **$18.00/month** ($0.027/hr). CPU ~4.5%, **Memory ~41%** (services are running). Created ~4 days ago.
 - ⚠️ **The repo's `137.184.194.158` is STALE** — no droplet with that IP exists. Only `67.205.132.6` does. All teardown steps below target `67.205.132.6`.
-- **No snapshots exist. Automated backups are OFF.** There is currently *no* restore point — a snapshot is mandatory before destroy.
+- **No snapshots exist. Automated backups are OFF.** There is currently _no_ restore point — a snapshot is mandatory before destroy.
 - A **Web Console** is available (Droplet → Web Console).
 
 ### GitHub — `fuzzynutsxrp-ship-it/fuzzynuts.xyz`
+
 - **`gh-pages` branch exists** (320 behind main). **GitHub Pages IS published** at `https://fuzzynutsxrp-ship-it.github.io/fuzzynuts.xyz/` from `gh-pages` → root, **no custom domain** (so it does NOT serve the real `fuzzynuts.xyz`; that's Vercel). Live-but-orphan.
 - **5 open Dependabot PRs:** **#9** `@types/node` 20→25 (major), **#10** `eslint` 9→10 (major), **#11** `next` group, **#13** `@capacitor/ios` 7→8 (major), **#14** `react` group.
 - **`deploy-openrsc.yml`**: `workflow_dispatch` (manual only), 2 manual runs total.
 - Remote copies of the branches you deleted locally still exist on origin (PRs **#5** headers-crisp-v2, **#6** headers-crisp-v3, **#7** kill-glassmorphism, **#8** migration/monorepo, plus `ui-token-fixes`).
 - `main` is **not protected**.
 
-### Porkbun — `fuzzynuts.xyz`  (UPDATED after live DNS check — see §6)
+### Porkbun — `fuzzynuts.xyz` (UPDATED after live DNS check — see §6)
+
 - **Porkbun IS the authoritative DNS host** (NS = `*.ns.porkbun.com`). The domain is **not on Cloudflare** ("Powered by Cloudflare" is just Porkbun's backend label). My first pass misread the editor as empty (UI load glitch) — **records do exist** and are managed in Porkbun.
 - Live records resolve: apex+www → **Vercel**, `world` → **Railway**, **`game.fuzzynuts.xyz` → A `67.205.132.6` (the live VPS)**. Nothing points to the stale `137.184.194.158`. Full table + actions in **§6**.
 
 ### Reown — team "Shafster", project "Fuzzynuts"
+
 - **Project ID `238a1bd9e657a0efbe275e457e73c426`** — matches the repo exactly ✅.
 - **Allowed domains: only `https://www.fuzzynuts.xyz`** (added 10 days ago). The **apex `https://fuzzynuts.xyz`** (which is `NEXT_PUBLIC_SITE_URL` in code) and the `*.vercel.app` preview domain are **NOT allowlisted** → Joey/WalletConnect will be rejected on the real production origin.
 - No App IDs, no Secrets stored. 0 users / 0 wallets (pre-launch).
@@ -56,8 +64,9 @@ Variable findings:
 
 **1a. (Recommended) Replace the insecure placeholder on `efficient-tenderness`.**
 That service has `GAME_SESSION_SECRET = placeholder-set-real-value-in-dashboard` — a publicly-guessable value. If that service ever signs/validates game-session tokens, set a real secret.
+
 - Generate locally: `openssl rand -hex 32`
-- Railway click-path: **railway.com → project `brilliant-nurturing` → service `efficient-tenderness` → Variables → find `GAME_SESSION_SECRET` → row "⋯" menu → Edit → paste value → Update Variables** (Railway will redeploy). *Only do this if that service actually uses it; if it should match the API, copy the value from `fuzzynuts.xyz`'s `GAME_SESSION_SECRET`.*
+- Railway click-path: **railway.com → project `brilliant-nurturing` → service `efficient-tenderness` → Variables → find `GAME_SESSION_SECRET` → row "⋯" menu → Edit → paste value → Update Variables** (Railway will redeploy). _Only do this if that service actually uses it; if it should match the API, copy the value from `fuzzynuts.xyz`'s `GAME_SESSION_SECRET`._
 
 **1b. (Optional, low priority) Rotate the real API `GAME_SESSION_SECRET` anyway** if you want a clean slate post-audit. Path: **service `fuzzynuts.xyz` → Variables → `GAME_SESSION_SECRET` → ⋯ → Edit → paste `openssl rand -hex 32` → Update.** Note: this invalidates any in-flight game-session tokens (fine pre-launch).
 
@@ -70,6 +79,7 @@ That service has `GAME_SESSION_SECRET = placeholder-set-real-value-in-dashboard`
 All paths start at **railway.com → project `brilliant-nurturing` → [service] → Variables**.
 
 **2a. Remove the stale `MONGO_URL` from BOTH services** (code uses `MONGODB_URI`).
+
 - `fuzzynuts.xyz` → Variables → `MONGO_URL` row → **⋯ → Delete** → confirm. (`MONGODB_URI` is already present, so the API keeps working.)
 - `efficient-tenderness` → Variables → `MONGO_URL` row → ⋯ → Delete — **ONLY IF** that service reads `MONGODB_URI`. ⚠️ It currently has `MONGO_URL` + discrete `MONGODB_*` parts and **no `MONGODB_URI`**. **Before deleting**, confirm what that service's code reads. If it relies on `MONGO_URL`/the parts, **leave it**. (Safer: skip this one unless you know.)
 
@@ -88,6 +98,7 @@ All paths start at **railway.com → project `brilliant-nurturing` → [service]
 The project has **no env vars**, so anything not code-defaulted is missing. Path: **vercel.com → Shafster's projects → fuzzynuts-optimized → Settings → Environment Variables → Add New** (set Environment = Production, and Preview if needed).
 
 Add at minimum (values you hold):
+
 - `NEXT_PUBLIC_PROJECT_ID` = `238a1bd9e657a0efbe275e457e73c426` (Reown — without it, Joey/mobile connect can't init)
 - `NEXT_PUBLIC_XAMAN_API_KEY` = your Xaman key (test key fine for now)
 - `SITE_LOCKDOWN_PASSWORD` = a strong value (the edge is **fail-closed** — unset can 503 the whole site)
@@ -116,6 +127,7 @@ Then **Deployments → ⋯ → Redeploy** to apply.
 Goal (REVISED): take a **safety snapshot/backup only** — the droplet stays live. (Memory is ~41% — services are running real gameplay.) Do **A1–A6 / steps 1–2 below for backup**, then **STOP** before any power-off/destroy.
 
 ### 4a. Local terminal — SSH in and dump the data
+
 You authenticate as **root** with the droplet password (the `VPS_PASSWORD` you set; or reset it at DigitalOcean → Droplet → Access → Reset Root Password). Run from **your** machine:
 
 ```bash
@@ -135,6 +147,7 @@ exit
 ```
 
 ### 4b. Local terminal — copy the backups OFF the droplet
+
 ```bash
 mkdir -p ~/project-backups/vps-fuzzynuts-game
 scp root@67.205.132.6:/root/fuzzynuts_rsc-*.sql ~/project-backups/vps-fuzzynuts-game/
@@ -142,15 +155,19 @@ scp root@67.205.132.6:/root/openrsc-sqlite-*.tar.gz ~/project-backups/vps-fuzzyn
 scp root@67.205.132.6:/root/account_secret.bak ~/project-backups/vps-fuzzynuts-game/
 ls -lh ~/project-backups/vps-fuzzynuts-game/    # verify the transfer locally BEFORE destroying
 ```
+
 **Do not proceed until you've confirmed the files are on your machine and non-empty.**
 
 ### 4c. DigitalOcean dashboard — power off, snapshot, destroy
+
 Path: **cloud.digitalocean.com → Droplets → `fuzzynuts-game`**.
-1. **Power off:** top-right **Power** toggle (or **Actions → Power Off**). Wait until status = Off. *(A snapshot of a powered-off droplet is consistent.)*
+
+1. **Power off:** top-right **Power** toggle (or **Actions → Power Off**). Wait until status = Off. _(A snapshot of a powered-off droplet is consistent.)_
 2. **Snapshot:** **Backups & Snapshots → Take Snapshot** → name e.g. `fuzzynuts-game-final-2026-06-06` → wait for it to finish (a few minutes). This is your full restore image.
-3. **Destroy:** **Actions → Destroy → Destroy this Droplet** → confirm by typing the droplet name. *(Powered-off droplets still bill — only Destroy stops the $18/mo. Snapshot storage costs a small amount, ~$0.06/GB/mo.)*
+3. **Destroy:** **Actions → Destroy → Destroy this Droplet** → confirm by typing the droplet name. _(Powered-off droplets still bill — only Destroy stops the $18/mo. Snapshot storage costs a small amount, ~$0.06/GB/mo.)_
 
 ### 4d. Repo follow-ups (local, optional)
+
 - Keep `GAME_SERVER_READY=false` everywhere (the `/play/rsc` page already degrades gracefully).
 - The deploy scripts/workflow can stay (they're how you'd rebuild from the snapshot), but **update the stale IP** `137.184.194.158` → new IP if you ever re-provision, and consider disabling the workflow trigger (§5d).
 
@@ -159,26 +176,32 @@ Path: **cloud.digitalocean.com → Droplets → `fuzzynuts-game`**.
 ## 5. GitHub cleanup (exact UI steps)
 
 ### 5a. Retire GitHub Pages + delete `gh-pages`
-1. **Disable Pages:** repo → **Settings → Pages → Build and deployment → Source → select "None"** (stops publishing the orphan github.io site). *(There's no Unpublish for branch-source; setting Source to None is the equivalent. An "Unpublish site" button is also present — either works.)*
+
+1. **Disable Pages:** repo → **Settings → Pages → Build and deployment → Source → select "None"** (stops publishing the orphan github.io site). _(There's no Unpublish for branch-source; setting Source to None is the equivalent. An "Unpublish site" button is also present — either works.)_
 2. **Delete the branch:** repo → **Branches** (or `/branches/all?query=gh-pages`) → `gh-pages` row → **trash icon** → confirm.
 3. The remote `deploy-gh-pages.yml` still exists on origin (your local delete isn't pushed). Remove it when you push `main`, or delete via **Code → `.github/workflows/deploy-gh-pages.yml` → trash → commit**.
 
 ### 5b. Close the 5 Dependabot PRs you don't want
+
 Path: repo → **Pull requests → [PR] → Close pull request** (bottom). Decide per PR — the majors are riskier:
-- **#9** `@types/node` 20→25 — **major**, only matters if you move to Node ≥20 (you should; Railway/engines want it). Consider merging *with* a Node-version bump, else close.
+
+- **#9** `@types/node` 20→25 — **major**, only matters if you move to Node ≥20 (you should; Railway/engines want it). Consider merging _with_ a Node-version bump, else close.
 - **#10** `eslint` 9→10 — **major**, may need config migration. Close unless you want to tackle it.
 - **#11** `next` group — review changelog; usually safe to merge.
 - **#13** `@capacitor/ios` 7→8 — **major**; only relevant if you ship the iOS app. Close if mobile is on hold.
 - **#14** `react` group — review; merge if it's a patch/minor.
-To stop future noise: **Settings → Code security → Dependabot → disable version updates**, or add a `.github/dependabot.yml` schedule.
+  To stop future noise: **Settings → Code security → Dependabot → disable version updates**, or add a `.github/dependabot.yml` schedule.
 
 ### 5c. Delete the stale remote feature branches
+
 You deleted them locally; remove the origin copies via **Branches** → trash icon on each: `ui-token-fixes`, `migration/monorepo`, `kill-glassmorphism`, `headers-crisp-v2`, `headers-crisp-v3` (and any other `headers-crisp-*`, `degen-overhaul`, `hero-bg-degen-crush`, `fuzzybear-mobile-degen`). Closing their PRs (#5–#8) happens automatically when the branch is deleted, or close them first.
 
 ### 5d. OpenRSC workflow
+
 It's manual-only, so it won't fire on its own. After teardown, either leave it (for future re-provision, but **fix the stale IP** in `deploy-openrsc.yml`) or delete the workflow file. Also rotate/remove the `VPS_PASSWORD`, `VPS_HOST` Actions secrets once the droplet is destroyed: **Settings → Secrets and variables → Actions → [secret] → Remove/Update**.
 
 ### 5e. (Recommended) Protect `main`
+
 **Settings → Branches → Add branch ruleset/Protect** `main` — block force-push & deletion, optionally require the CI check.
 
 ---
@@ -198,16 +221,17 @@ It's manual-only, so it won't fire on its own. After teardown, either leave it (
 
 **Live records (resolved 2026-06-06 via DNS-over-HTTPS — ground truth):**
 
-| Host | Type | Value | Points to |
-|------|------|-------|-----------|
-| `fuzzynuts.xyz` (apex) | A | `216.198.79.1` | **Vercel** anycast |
-| `www.fuzzynuts.xyz` | CNAME | `3bd0f2457dd48d4c.vercel-dns-017.com` (→ `216.198.79.1`, `64.29.17.1`) | **Vercel** |
-| `world.fuzzynuts.xyz` | CNAME | `efficient-tenderness-production.up.railway.app` (→ `69.46.46.38`) | **Railway** API ✅ |
-| `game.fuzzynuts.xyz` | A | **`67.205.132.6`** | **the live VPS** ⚠️ |
-| `api.fuzzynuts.xyz` | — | NXDOMAIN (does not exist) | — |
-| no `_dmarc`, no MX | — | — | — |
+| Host                   | Type  | Value                                                                  | Points to           |
+| ---------------------- | ----- | ---------------------------------------------------------------------- | ------------------- |
+| `fuzzynuts.xyz` (apex) | A     | `216.198.79.1`                                                         | **Vercel** anycast  |
+| `www.fuzzynuts.xyz`    | CNAME | `3bd0f2457dd48d4c.vercel-dns-017.com` (→ `216.198.79.1`, `64.29.17.1`) | **Vercel**          |
+| `world.fuzzynuts.xyz`  | CNAME | `efficient-tenderness-production.up.railway.app` (→ `69.46.46.38`)     | **Railway** API ✅  |
+| `game.fuzzynuts.xyz`   | A     | **`67.205.132.6`**                                                     | **the live VPS** ⚠️ |
+| `api.fuzzynuts.xyz`    | —     | NXDOMAIN (does not exist)                                              | —                   |
+| no `_dmarc`, no MX     | —     | —                                                                      | —                   |
 
 **Answers to your three questions:**
+
 1. **Records pointing to the VPS IPs:** `game.fuzzynuts.xyz → A → 67.205.132.6` points at the **live droplet**. **Nothing points to the stale `137.184.194.158`** (confirmed absent from DNS). ✅ **UPDATE 2026-06-06: the droplet is live for gameplay — this `game` record is REQUIRED. KEEP it. Do not delete.**
 2. **GitHub Pages records:** **none.** The apex and `www` resolve to Vercel, not `github.io`. GitHub Pages only serves its `*.github.io` URL — no DNS cleanup needed for it (just disable Pages per §5a).
 3. **Apex / www (for the Vercel attach):**
@@ -220,6 +244,7 @@ It's manual-only, so it won't fire on its own. After teardown, either leave it (
 ---
 
 ## 7. Secrets-management recommendation going forward
+
 - Stop shipping real-looking secrets as `.env.example` "examples" (already fixed in Batch 3 — values are now `__GENERATE_WITH_…__`).
 - Adopt one source of truth: **Doppler** or **1Password CLI** (`op run`) to inject env into local/dev, and keep Railway/Vercel dashboards as the prod store. This avoids the current drift (placeholder on one service, real on another, none on Vercel).
 - Turn on **DigitalOcean automated backups** (or scheduled snapshots) for any future always-on droplet — today there were none.
@@ -228,6 +253,7 @@ It's manual-only, so it won't fire on its own. After teardown, either leave it (
 ---
 
 ## Priority order (suggested)
+
 1. ~~Stop the money: VPS snapshot + destroy~~ **REVISED: VPS is live for gameplay — KEEP it running. Take a safety snapshot only (§4); do not destroy. Optionally downsize later if usage allows.**
 2. **Make the site actually work at launch:** §3 Vercel env vars (esp. Reown ID, lockdown pw) + §0 Reown allowlist fix below.
 3. **Reown allowlist:** add `https://fuzzynuts.xyz` (and the vercel.app preview) at dashboard.reown.com → Fuzzynuts → Configuration → Domain → **+ Domain**. Today only `www.` is allowed, so wallet connect fails on the real origin.
@@ -238,6 +264,7 @@ It's manual-only, so it won't fire on its own. After teardown, either leave it (
 ---
 
 ## ✅ Audit concluded (2026-06-06)
+
 All five phases complete. Live read-only inspection covered Railway, Vercel, DigitalOcean, GitHub, Porkbun, Reown, and DNS (via DoH) — **no dashboard state was changed anywhere.** Deliverables in `_audit/`: `EXTERNAL_RESOURCES.md`, `STRUCTURE_AUDIT.md`, `REORGANIZATION_PLAN.md`, this file; plus `CHANGELOG-audit-2026-06-06.md` in the repo. Repo cleanup committed locally on `main` (checkpoint `9adab3c`); nothing pushed. Full restore tarball at `~/project-backups/project-audit-backup-2026-06-06-1612.tar.gz`.
 
 **Top 3 things to do, in order:** (1) take a **safety snapshot only** of the **live** droplet `67.205.132.6` — **KEEP it running**, keep the `game` DNS record (§4, §6); (2) add Vercel env vars + add apex `fuzzynuts.xyz` to the Reown allowlist so the site works at launch (§3, §7); (3) GitHub tidy — disable Pages, delete `gh-pages`, close the 5 Dependabot PRs, delete remote feature branches, protect `main` (do **not** remove the `VPS_*` Actions secrets — they're needed to deploy to the live VPS) (§5).

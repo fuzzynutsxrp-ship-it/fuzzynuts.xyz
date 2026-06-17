@@ -11,12 +11,12 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
-| CRITICAL | 0 |
-| HIGH     | 0 |
-| MEDIUM   | 1 |
-| LOW      | 2 |
-| INFO     | 2 |
+| -------- | ----- |
+| CRITICAL | 0     |
+| HIGH     | 0     |
+| MEDIUM   | 1     |
+| LOW      | 2     |
+| INFO     | 2     |
 
 **Verdict: PASS** — No blocking issues. The PR is primarily CI fixes, layout
 consistency, and a loading UX improvement. The MONEY CODE change is a safe
@@ -78,12 +78,14 @@ const handleMessage = (event: MessageEvent) => {
 **File:** `apps/web-arcade/src/components/game/GameModal.tsx` (line 340)
 
 **Change:**
+
 ```
 - "allow-scripts allow-same-origin allow-popups allow-forms"
 + "allow-scripts allow-same-origin allow-popups-to-escape-sandbox"
 ```
 
 **Analysis:**
+
 - **Removed `allow-forms`** — GOOD. Games no longer can submit forms from
   the iframe, reducing phishing and CSRF-style attack surface.
 - **Changed `allow-popups` → `allow-popups-to-escape-sandbox`** — This is
@@ -116,6 +118,7 @@ silently pass with `undefined` instead of failing loudly.
 **File:** `packages/xrpl-token-utils/src/payout.ts`
 
 **Change:**
+
 ```typescript
 // Import line: added TxResponse, SubmittableTransaction types
 - import type { Payment, SubmitResponse } from "xrpl";
@@ -128,6 +131,7 @@ silently pass with `undefined` instead of failing loudly.
 
 **Analysis:** This is a **pure type signature change** to fix TypeScript
 compatibility with newer xrpl.js versions. Zero behavioral change:
+
 - `buildPayment()` is untouched — same Payment object construction
 - `submitPayout()` logic is untouched — same signing, same submission
 - Amount calculation, issuer, distributor, destination — all unchanged
@@ -141,6 +145,7 @@ but the actual runtime object returned by `client.submitAndWait()` is identical.
 ### INFO-2: Layout/Footer refactoring — no data exposure
 
 **Files:**
+
 - `apps/web-arcade/src/components/DynamicFooter.tsx` (new)
 - `apps/web-arcade/src/app/tokenomics/layout.tsx` (new)
 - `apps/web-arcade/src/app/prizes/layout.tsx` (modified)
@@ -155,12 +160,12 @@ The `tokenomics/layout.tsx` is a standard Next.js layout with `SiteHeader` + `Dy
 
 ## Other Changes (no security impact)
 
-| File | Change | Assessment |
-|------|--------|------------|
-| `leaderboard/client.tsx` | Added `<Footer />` import + render | Cosmetic — adds footer to leaderboard |
-| `Prizes.tsx` | `<a>` → `<Link>` for /profile/ | Client-side nav improvement |
-| `PrizesPageContent.tsx` | `<a>` → `<Link>` for /profile/ | Same as above |
-| `tsconfig.json` | Added `lib: ["ES2022", "DOM", "DOM.Iterable"]` | Build config for newer xrpl.js types |
+| File                     | Change                                         | Assessment                            |
+| ------------------------ | ---------------------------------------------- | ------------------------------------- |
+| `leaderboard/client.tsx` | Added `<Footer />` import + render             | Cosmetic — adds footer to leaderboard |
+| `Prizes.tsx`             | `<a>` → `<Link>` for /profile/                 | Client-side nav improvement           |
+| `PrizesPageContent.tsx`  | `<a>` → `<Link>` for /profile/                 | Same as above                         |
+| `tsconfig.json`          | Added `lib: ["ES2022", "DOM", "DOM.Iterable"]` | Build config for newer xrpl.js types  |
 
 ---
 

@@ -3,5 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "Shared TypeScript configs for the Fuzzynuts monorepo. Extend one of base/next/node/vite.",
-  "files": ["base.json", "next.json", "node.json", "vite.json"]
+  "files": [
+    "base.json",
+    "next.json",
+    "node.json",
+    "vite.json"
+  ]
 }

@@ -57,21 +57,12 @@ export function PlayNowSidebar({ onGameSelect }: PlayNowSidebarProps) {
           >
             {/* Thumbnail */}
             <div className="play-next-card__thumb">
-              <img
-                src={game.iconPath}
-                alt=""
-                aria-hidden="true"
-                loading="lazy"
-                draggable={false}
-              />
+              <img src={game.iconPath} alt="" aria-hidden="true" loading="lazy" draggable={false} />
             </div>
             {/* Info */}
             <div className="play-next-card__info">
               <span className="play-next-card__title">{game.title}</span>
-              <span
-                className="play-next-card__genre"
-                style={{ color: game.color }}
-              >
+              <span className="play-next-card__genre" style={{ color: game.color }}>
                 {game.genre}
               </span>
             </div>

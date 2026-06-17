@@ -1,3 +1,4 @@
+import { fixupConfigRules } from "@eslint/compat";
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
 
@@ -23,6 +24,12 @@ function filterReactHooksRules(configs) {
   });
 }
 
+// ESLint 10 removed the deprecated context.getFilename() API.
+// eslint-plugin-react, jsx-a11y, and import still use it.
+// fixupConfigRules wraps these plugins with compatibility shims.
+const patchedCoreWebVitals = fixupConfigRules(nextCoreWebVitals);
+const patchedTypescript = fixupConfigRules(nextTypescript);
+
 const eslintConfig = [
   // Global ignores must come first (standalone ignores object = global in flat config)
   {
@@ -37,9 +44,10 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
-  // Spread Next.js native flat configs with react-hooks@7 strict rules filtered out
-  ...filterReactHooksRules(nextCoreWebVitals),
-  ...filterReactHooksRules(nextTypescript),
+  // Spread Next.js native flat configs, patched for ESLint 10 compat,
+  // with react-hooks@7 strict rules filtered out
+  ...filterReactHooksRules(patchedCoreWebVitals),
+  ...filterReactHooksRules(patchedTypescript),
   // Project-specific rules
   {
     files: ["src/**/*.tsx", "src/**/*.ts"],

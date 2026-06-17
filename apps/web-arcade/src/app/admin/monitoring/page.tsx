@@ -22,13 +22,9 @@ import {
    Auto-refreshes every 30 seconds.
    ═══════════════════════════════════════════════════════════════ */
 
-const API =
-  process.env.NEXT_PUBLIC_CHAT_API ||
-  "https://fuzzynutsxyz-production.up.railway.app";
+const API = process.env.NEXT_PUBLIC_CHAT_API || "https://fuzzynutsxyz-production.up.railway.app";
 
-const ADMIN_WALLET =
-  process.env.NEXT_PUBLIC_ADMIN_WALLET ||
-  "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
+const ADMIN_WALLET = process.env.NEXT_PUBLIC_ADMIN_WALLET || "rfqADJY5Pn3ye4nTH7PA1dTxbCW1r3jYUt";
 
 const REFRESH_INTERVAL = 30_000; // 30 seconds
 
@@ -133,9 +129,7 @@ export default function MonitoringPage() {
   const currentResponseTime = data?.checks[0]?.responseTime ?? null;
 
   // Alert events (degraded or down)
-  const alerts = data
-    ? data.checks.filter((c) => c.status !== "healthy").slice(0, 10)
-    : [];
+  const alerts = data ? data.checks.filter((c) => c.status !== "healthy").slice(0, 10) : [];
 
   // ── SVG Chart ───────────────────────────────────────────────
   const renderChart = () => {
@@ -168,9 +162,7 @@ export default function MonitoringPage() {
       return { x, y };
     });
 
-    const pathD = coords
-      .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x} ${c.y}`)
-      .join(" ");
+    const pathD = coords.map((c, i) => `${i === 0 ? "M" : "L"} ${c.x} ${c.y}`).join(" ");
 
     const areaD =
       pathD +
@@ -192,11 +184,7 @@ export default function MonitoringPage() {
     }
 
     return (
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="w-full"
-        style={{ fontFamily: "var(--font-mono)" }}
-      >
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: "var(--font-mono)" }}>
         {/* Grid lines */}
         {yLabels.map((v) => {
           const y = PAD.top + chartH - (v / maxVal) * chartH;
@@ -348,10 +336,7 @@ export default function MonitoringPage() {
               disabled={loading}
               className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
             >
-              <RefreshCw
-                size={14}
-                className={loading ? "animate-spin" : ""}
-              />
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
               Refresh
             </button>
           </div>
@@ -403,8 +388,7 @@ export default function MonitoringPage() {
             </p>
             {data && (
               <p className="mt-1 text-[11px] text-white/20">
-                avg {data.summary.avgResponseTime}ms over {data.summary.total}{" "}
-                checks
+                avg {data.summary.avgResponseTime}ms over {data.summary.total} checks
               </p>
             )}
           </div>
@@ -448,9 +432,7 @@ export default function MonitoringPage() {
               Response Time (24h)
             </h2>
           </div>
-          <div className="rounded-lg border border-white/5 bg-[#120a22] p-4">
-            {renderChart()}
-          </div>
+          <div className="rounded-lg border border-white/5 bg-[#120a22] p-4">{renderChart()}</div>
         </section>
 
         {/* Recent Alerts */}
@@ -471,59 +453,38 @@ export default function MonitoringPage() {
           )}
           <div className="space-y-3">
             {alerts.map((alert) => (
-              <div
-                key={alert._id}
-                className="rounded-lg border border-white/5 bg-[#120a22] p-4"
-              >
+              <div key={alert._id} className="rounded-lg border border-white/5 bg-[#120a22] p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center gap-2">
                       {alert.status === "degraded" ? (
-                        <AlertTriangle
-                          size={14}
-                          className="shrink-0 text-[#FBBF24]"
-                        />
+                        <AlertTriangle size={14} className="shrink-0 text-[#FBBF24]" />
                       ) : (
-                        <XCircle
-                          size={14}
-                          className="shrink-0 text-[#ef4444]"
-                        />
+                        <XCircle size={14} className="shrink-0 text-[#ef4444]" />
                       )}
                       <span
                         className="text-sm font-semibold capitalize"
                         style={{
                           fontFamily: "var(--font-display)",
-                          color:
-                            alert.status === "degraded"
-                              ? "#FBBF24"
-                              : "#ef4444",
+                          color: alert.status === "degraded" ? "#FBBF24" : "#ef4444",
                         }}
                       >
                         {alert.status}
                       </span>
-                      <span className="text-[11px] text-white/20">
-                        HTTP {alert.httpStatus}
-                      </span>
-                      <span className="text-[11px] text-white/20">
-                        {alert.responseTime}ms
-                      </span>
+                      <span className="text-[11px] text-white/20">HTTP {alert.httpStatus}</span>
+                      <span className="text-[11px] text-white/20">{alert.responseTime}ms</span>
                     </div>
                     {alert.alerts.length > 0 && (
                       <div className="mt-1 space-y-0.5">
                         {alert.alerts.map((msg, i) => (
-                          <p
-                            key={i}
-                            className="text-[13px] text-white/50"
-                          >
+                          <p key={i} className="text-[13px] text-white/50">
                             {msg}
                           </p>
                         ))}
                       </div>
                     )}
                     {alert.error && (
-                      <p className="mt-1 font-mono text-[11px] text-[#ef4444]/60">
-                        {alert.error}
-                      </p>
+                      <p className="mt-1 font-mono text-[11px] text-[#ef4444]/60">{alert.error}</p>
                     )}
                     <p className="mt-2 flex items-center gap-1 text-[10px] text-white/20">
                       <Clock size={10} />

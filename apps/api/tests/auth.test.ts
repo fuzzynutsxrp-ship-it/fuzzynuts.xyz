@@ -90,9 +90,7 @@ describe("Auth routes", () => {
       const cookies = res.headers["set-cookie"];
       expect(cookies).toBeDefined();
       const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
-      const sessionCookie = cookieArr.find((c: string) =>
-        c.startsWith("fuzzy_wallet_session="),
-      );
+      const sessionCookie = cookieArr.find((c: string) => c.startsWith("fuzzy_wallet_session="));
       expect(sessionCookie).toBeDefined();
       expect(sessionCookie).toContain("HttpOnly");
       expect(sessionCookie).toContain("Secure");
@@ -272,9 +270,7 @@ describe("Auth routes", () => {
       const cookies = res.headers["set-cookie"];
       expect(cookies).toBeDefined();
       const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
-      const sessionCookie = cookieArr.find((c: string) =>
-        c.startsWith("fuzzy_wallet_session="),
-      );
+      const sessionCookie = cookieArr.find((c: string) => c.startsWith("fuzzy_wallet_session="));
       expect(sessionCookie).toBeDefined();
       expect(sessionCookie).toContain("Max-Age=0");
     });
@@ -284,9 +280,7 @@ describe("Auth routes", () => {
 
   describe("POST /api/auth/challenge", () => {
     it("valid address → returns challenge", async () => {
-      const res = await request(app)
-        .post("/api/auth/challenge")
-        .send({ address: TEST_ADDRESS });
+      const res = await request(app).post("/api/auth/challenge").send({ address: TEST_ADDRESS });
 
       expect(res.status).toBe(200);
       expect(res.body.challenge).toContain("fuzzynuts.xyz");
@@ -295,9 +289,7 @@ describe("Auth routes", () => {
     });
 
     it("invalid address → 400 E_SCHEMA", async () => {
-      const res = await request(app)
-        .post("/api/auth/challenge")
-        .send({ address: "bad" });
+      const res = await request(app).post("/api/auth/challenge").send({ address: "bad" });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toBe("E_SCHEMA");
@@ -324,9 +316,7 @@ describe("Auth routes", () => {
       // Extract the JWT cookie
       const cookies = loginRes.headers["set-cookie"];
       const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
-      const sessionCookie = cookieArr.find((c: string) =>
-        c.startsWith("fuzzy_wallet_session="),
-      );
+      const sessionCookie = cookieArr.find((c: string) => c.startsWith("fuzzy_wallet_session="));
       const jwt = sessionCookie!.split("=")[1].split(";")[0];
 
       // Use it with /me (which does the same jwtVerify as walletAuth)
@@ -352,9 +342,7 @@ describe("Auth routes", () => {
 
       const cookies = res.headers["set-cookie"];
       const cookieArr = Array.isArray(cookies) ? cookies : [cookies];
-      const sessionCookie = cookieArr.find((c: string) =>
-        c.startsWith("fuzzy_wallet_session="),
-      );
+      const sessionCookie = cookieArr.find((c: string) => c.startsWith("fuzzy_wallet_session="));
 
       // 24 hours = 86400 seconds. Old was 7 days = 604800.
       expect(sessionCookie).toContain("Max-Age=86400");

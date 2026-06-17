@@ -56,10 +56,10 @@ When you're ready to set up the game server, follow the guide in docs/how-to/vps
 
 ## If Something Is Wrong
 
-| Problem | What to do |
-|---------|------------|
-| Page shows 404 | Wait 2 min, check Vercel deploy status |
-| Red error on page | Check Railway deploy status |
-| "Connect Wallet" does nothing | Make sure you have Xaman or Joey wallet installed |
-| Amber banner doesn't appear | Check that GAME_SERVER_READY=false is set in Railway |
-| White/blank page | Clear browser cache, try incognito mode |
+| Problem                       | What to do                                           |
+| ----------------------------- | ---------------------------------------------------- |
+| Page shows 404                | Wait 2 min, check Vercel deploy status               |
+| Red error on page             | Check Railway deploy status                          |
+| "Connect Wallet" does nothing | Make sure you have Xaman or Joey wallet installed    |
+| Amber banner doesn't appear   | Check that GAME_SERVER_READY=false is set in Railway |
+| White/blank page              | Clear browser cache, try incognito mode              |

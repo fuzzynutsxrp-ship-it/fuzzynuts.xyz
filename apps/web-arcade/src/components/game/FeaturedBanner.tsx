@@ -33,7 +33,8 @@ export function FeaturedBanner({ onPlay }: FeaturedBannerProps) {
             Fuzzynuts World
           </h2>
           <p className="text-sm sm:text-base text-[var(--color-cream-dim)] mb-4 max-w-md leading-relaxed">
-            Explore a massive open world, complete quests, craft items, and compete with players worldwide.
+            Explore a massive open world, complete quests, craft items, and compete with players
+            worldwide.
           </p>
           <button
             onClick={() => onPlay("fuzzynuts-world")}

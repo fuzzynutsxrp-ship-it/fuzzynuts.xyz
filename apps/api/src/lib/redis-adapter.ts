@@ -16,10 +16,7 @@ import type { Server } from "socket.io";
  *
  * @returns `true` if the adapter was attached, `false` if running in-memory.
  */
-export async function attachRedisAdapter(
-  io: Server,
-  redisUrl: string,
-): Promise<boolean> {
+export async function attachRedisAdapter(io: Server, redisUrl: string): Promise<boolean> {
   try {
     const pubClient = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
@@ -34,10 +31,7 @@ export async function attachRedisAdapter(
 
     // Wait for the first connection (or timeout)
     await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(
-        () => reject(new Error("Redis connection timeout (5s)")),
-        5_000,
-      );
+      const timeout = setTimeout(() => reject(new Error("Redis connection timeout (5s)")), 5_000);
       pubClient.once("ready", () => {
         clearTimeout(timeout);
         resolve();
@@ -53,12 +47,8 @@ export async function attachRedisAdapter(
     io.adapter(createAdapter(pubClient, subClient));
 
     // Log lifecycle events
-    pubClient.on("error", (err) =>
-      console.error("[redis:pub] Connection error:", err.message),
-    );
-    subClient.on("error", (err) =>
-      console.error("[redis:sub] Connection error:", err.message),
-    );
+    pubClient.on("error", (err) => console.error("[redis:pub] Connection error:", err.message));
+    subClient.on("error", (err) => console.error("[redis:sub] Connection error:", err.message));
 
     console.log("[redis] Socket.io Redis adapter attached (pub/sub)");
     return true;

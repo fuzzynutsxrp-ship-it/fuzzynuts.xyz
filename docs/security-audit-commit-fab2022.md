@@ -10,12 +10,12 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
-| CRITICAL | 0 |
-| HIGH     | 0 |
-| MEDIUM   | 0 |
-| LOW      | 1 |
-| INFO     | 3 |
+| -------- | ----- |
+| CRITICAL | 0     |
+| HIGH     | 0     |
+| MEDIUM   | 0     |
+| LOW      | 1     |
+| INFO     | 3     |
 
 **Verdict: PASS** — The commit is net-positive for security. It replaces a fragile
 `position:fixed` + negative `top` scroll lock (which blocked iframe touch on iOS Safari)
@@ -30,6 +30,7 @@ One LOW advisory on stale scroll position, three INFO notes.
 ### What changed
 
 The scroll lock useEffect was refactored from:
+
 - **Old:** `position:fixed` + `width:100%` + `top:-${scrollY}px` on `document.body` only
 - **New:** `overflow:hidden` + `overscroll-behavior:none` on both `document.body` AND `document.documentElement`, plus `touchAction:manipulation` on body
 
@@ -79,9 +80,11 @@ a try/catch or guard against stale values, but this is cosmetic.
 
 The task description states "touchAction:manipulation is set on body but NOT cleaned up
 in the useEffect return." **This is incorrect.** The cleanup function at line 190 does:
+
 ```js
 document.body.style.touchAction = prevBodyTouch;
 ```
+
 where `prevBodyTouch` was captured from `document.body.style.touchAction` before the
 modal opened (line 179). The style is properly saved and restored. No leaked style.
 
@@ -100,7 +103,7 @@ malicious styles. Analysis:
 
 2. **The useEffect runs in React's controlled lifecycle.** Even if an attacker could
    trigger rapid open/close via `gameId` prop changes, each effect invocation saves the
-   *current* style before overwriting, and the cleanup restores the *saved* value. React
+   _current_ style before overwriting, and the cleanup restores the _saved_ value. React
    18's strict mode double-invocation is handled correctly (save → set → cleanup → save →
    set → cleanup).
 
@@ -133,6 +136,7 @@ bypass implications.
 
 `overscroll-behavior:none` disables the browser's pull-to-refresh and overscroll bounce.
 This is a standard pattern for modal overlays and does not create a phishing vector because:
+
 - The modal already occludes the entire page (fullscreen `<dialog>` with `::backdrop`)
 - The browser's address bar and HTTPS indicator remain visible
 - This is the same pattern used by YouTube, Twitch, and other major sites for their
@@ -143,6 +147,7 @@ No finding.
 ### Concern #6 — useEffect cleanup on conditional unmount
 
 React guarantees that the cleanup function of a `useEffect` runs when:
+
 1. The component unmounts
 2. The effect dependencies change (cleanup from previous run, then new effect)
 
@@ -161,6 +166,7 @@ No finding.
 ## Diff quality assessment
 
 The refactor is well-executed:
+
 - **Correct:** Saves and restores all 5 style properties (body overflow, body touchAction,
   body overscrollBehavior, html overflow, html overscrollBehavior)
 - **Consistent:** Both body and html are treated symmetrically

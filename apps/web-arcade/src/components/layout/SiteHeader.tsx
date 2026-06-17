@@ -35,7 +35,12 @@ const DROPDOWN_LINKS = [
   { href: "/leaderboard", label: "Leaderboard", Icon: Trophy },
 ];
 
-export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange, onMenuToggle }: SiteHeaderProps) {
+export function SiteHeader({
+  variant = "dark",
+  searchQuery = "",
+  onSearchChange,
+  onMenuToggle,
+}: SiteHeaderProps) {
   const [loginOpen, setLoginOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -55,7 +60,8 @@ export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange,
   useEffect(() => {
     if (!dropdownOpen) return;
     const onClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node))
+        setDropdownOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -83,7 +89,9 @@ export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange,
 
         <nav className="sh-nav">
           {NAV_LINKS.map((l) => (
-            <Link key={l.href} href={l.href}>{l.label}</Link>
+            <Link key={l.href} href={l.href}>
+              {l.label}
+            </Link>
           ))}
         </nav>
 
@@ -98,7 +106,11 @@ export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange,
             </button>
           ) : (
             <div className="sh-account" ref={dropdownRef}>
-              <button className="sh-icon" onClick={() => setDropdownOpen((o) => !o)} aria-label="Account menu">
+              <button
+                className="sh-icon"
+                onClick={() => setDropdownOpen((o) => !o)}
+                aria-label="Account menu"
+              >
                 {session?.user?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img className="sh-avatar" src={session.user.image} alt="" />
@@ -109,18 +121,30 @@ export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange,
               {dropdownOpen && (
                 <div className="sh-dropdown">
                   {session && (
-                    <div className="sh-dd-meta"><small>Signed in as</small><div>{session.user?.name ?? session.user?.email ?? "Player"}</div></div>
+                    <div className="sh-dd-meta">
+                      <small>Signed in as</small>
+                      <div>{session.user?.name ?? session.user?.email ?? "Player"}</div>
+                    </div>
                   )}
                   {isConnected && address && (
-                    <div className="sh-dd-meta"><small>Wallet</small><div>{truncateAddress(address)}</div></div>
+                    <div className="sh-dd-meta">
+                      <small>Wallet</small>
+                      <div>{truncateAddress(address)}</div>
+                    </div>
                   )}
                   {DROPDOWN_LINKS.map(({ href, label, Icon }) => (
-                    <Link key={label} href={href} onClick={() => setDropdownOpen(false)}><Icon size={15} /> {label}</Link>
+                    <Link key={label} href={href} onClick={() => setDropdownOpen(false)}>
+                      <Icon size={15} /> {label}
+                    </Link>
                   ))}
                   <div className="sh-dd-sep" />
                   <button
                     className="sh-dd-signout"
-                    onClick={() => { disconnect(); if (session) signOut({ callbackUrl: "/" }); setDropdownOpen(false); }}
+                    onClick={() => {
+                      disconnect();
+                      if (session) signOut({ callbackUrl: "/" });
+                      setDropdownOpen(false);
+                    }}
                   >
                     <LogOut size={15} /> {session ? "Sign out" : "Disconnect"}
                   </button>
@@ -131,7 +155,12 @@ export function SiteHeader({ variant = "dark", searchQuery = "", onSearchChange,
         </div>
       </header>
 
-      <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} searchQuery={query} onSearchChange={handleSearch} />
+      <SearchPanel
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        searchQuery={query}
+        onSearchChange={handleSearch}
+      />
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </div>
   );

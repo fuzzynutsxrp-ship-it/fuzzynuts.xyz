@@ -78,9 +78,7 @@ test.describe("FuzzyNuts Arcade — Top 10 Game Smoke Tests", () => {
   });
 
   for (const game of TOP_10) {
-    test(`${game.title} (${game.slug}) — page loads with game content`, async ({
-      page,
-    }) => {
+    test(`${game.title} (${game.slug}) — page loads with game content`, async ({ page }) => {
       const consoleErrors = collectConsoleErrors(page);
 
       const response = await page.goto(`/games/${game.slug}/`, {
@@ -94,9 +92,11 @@ test.describe("FuzzyNuts Arcade — Top 10 Game Smoke Tests", () => {
       // Special case: games that launch on external domain
       if (EXTERNAL_LAUNCH.includes(game.slug)) {
         // Verify the launch button exists and is clickable
-        const launchBtn = page.getByRole("button", {
-          name: /Enter World|Start Game|Play Now/i,
-        }).first();
+        const launchBtn = page
+          .getByRole("button", {
+            name: /Enter World|Start Game|Play Now/i,
+          })
+          .first();
         await expect(launchBtn).toBeVisible({ timeout: 10_000 });
         await expect(launchBtn).toBeEnabled();
         // Test passes — the button is present and ready to launch
@@ -106,9 +106,11 @@ test.describe("FuzzyNuts Arcade — Top 10 Game Smoke Tests", () => {
 
         if (!found) {
           // Try clicking a start button if one exists
-          const startBtn = page.getByRole("button", {
-            name: /Start Game|Play Now/i,
-          }).first();
+          const startBtn = page
+            .getByRole("button", {
+              name: /Start Game|Play Now/i,
+            })
+            .first();
           if (await startBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
             await startBtn.click();
             await page.waitForTimeout(5_000);
@@ -120,10 +122,7 @@ test.describe("FuzzyNuts Arcade — Top 10 Game Smoke Tests", () => {
 
         // If canvas is visible, check dimensions
         const canvas = page.locator("canvas").first();
-        if (
-          (await canvas.count()) > 0 &&
-          (await canvas.isVisible().catch(() => false))
-        ) {
+        if ((await canvas.count()) > 0 && (await canvas.isVisible().catch(() => false))) {
           const box = await canvas.boundingBox();
           if (box) {
             expect(box.width).toBeGreaterThan(50);
@@ -154,7 +153,7 @@ test.describe("FuzzyNuts Arcade — Top 10 Game Smoke Tests", () => {
       if (critical.length > 0) {
         console.log(
           `[${game.title}] Console errors:`,
-          critical.map((e) => e.text())
+          critical.map((e) => e.text()),
         );
       }
       expect(critical.length).toBeLessThanOrEqual(5);
@@ -181,8 +180,7 @@ test.describe("FuzzyNuts Arcade — Top 10 Game Smoke Tests", () => {
     ]).catch(() => {});
 
     const onGamePage = /cosmic-blaster/i.test(page.url());
-    const hasModal =
-      (await page.locator("dialog, [role='dialog'], .game-modal").count()) > 0;
+    const hasModal = (await page.locator("dialog, [role='dialog'], .game-modal").count()) > 0;
     const hasCanvas = (await page.locator("canvas").count()) > 0;
     const hasIframe = (await page.locator("iframe").count()) > 0;
 

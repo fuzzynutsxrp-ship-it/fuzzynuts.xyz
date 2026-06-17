@@ -73,106 +73,115 @@ Every game page MUST follow this exact structure. The arcade shell provides nav 
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>{Title} — Fuzzynuts Arcade</title>
-  <meta name="description" content="{description}">
-  <link rel="icon" href="../../logo_512.png" type="image/png">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>{Title} — Fuzzynuts Arcade</title>
+    <meta name="description" content="{description}" />
+    <link rel="icon" href="../../logo_512.png" type="image/png" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="{Title} — Fuzzynuts Arcade">
-  <meta property="og:description" content="{description}">
-  <meta property="og:type" content="website">
+    <!-- Open Graph -->
+    <meta property="og:title" content="{Title} — Fuzzynuts Arcade" />
+    <meta property="og:description" content="{description}" />
+    <meta property="og:type" content="website" />
 
-  <!-- Fonts (non-blocking pattern) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap"
-        rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet"></noscript>
+    <!-- Fonts (non-blocking pattern) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet"
+    /></noscript>
 
-  <!-- Shared arcade shell -->
-  <link rel="stylesheet" href="../../css/design-tokens.css">
-  <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
-  <!-- Game-specific CSS -->
-  <link rel="stylesheet" href="{game}.css">
-</head>
-<body>
-  <!-- Nav injected by arcade-shell.js -->
+    <!-- Shared arcade shell -->
+    <link rel="stylesheet" href="../../css/design-tokens.css" />
+    <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix" />
+    <!-- Game-specific CSS -->
+    <link rel="stylesheet" href="{game}.css" />
+  </head>
+  <body>
+    <!-- Nav injected by arcade-shell.js -->
 
-  <!-- Game canvas/container -->
-  <div id="gameContainer">
-    <!-- Your game renders here -->
-  </div>
+    <!-- Game canvas/container -->
+    <div id="gameContainer">
+      <!-- Your game renders here -->
+    </div>
 
-  <!-- Overlays (pause, game-over, settings, etc.) -->
-  <div id="pauseMenu" class="overlay" style="display: none">
-    <!-- Pause UI -->
-  </div>
-  <div id="gameOver" class="overlay" style="display: none">
-    <!-- Game over UI -->
-  </div>
+    <!-- Overlays (pause, game-over, settings, etc.) -->
+    <div id="pauseMenu" class="overlay" style="display: none">
+      <!-- Pause UI -->
+    </div>
+    <div id="gameOver" class="overlay" style="display: none">
+      <!-- Game over UI -->
+    </div>
 
-  <!-- Shared arcade shell -->
-  <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
-  <script>
-    // ⚠️ MUST be in regular <script>, NOT <script type="module">
-    // Module scripts are deferred — ArcadeShell will be undefined
-    ArcadeShell.init({
-      slug: '{slug}',
-      title: '{Title}',
-      icon: '{emoji}',
-      accentColor: '#{hex}',
-      hideNavOnPlay: true,
-      showLoader: false, // Set to false if game has its own start/loading screen
-    });
-  </script>
-
-  <!-- Score bridge -->
-  <script src="../fuzzy-score.js"></script>
-
-  <!-- Game engine (AFTER arcade shell) -->
-  <script src="{game}.js"></script>
-
-  <!-- Score submission + service worker -->
-  <script>
-    // Read score from game engine or DOM
-    function getScore() {
-      try { return /* your score reading logic */ || 0; }
-      catch(e) { return 0; }
-    }
-
-    // Auto-save on tab blur + page exit
-    ArcadeShell.autoSave(getScore);
-
-    // Periodic save every 15 seconds
-    setInterval(function() { ArcadeShell.submit(getScore()); }, 15000);
-
-    // Reset dedup on game restart
-    // if (score === 0 && lastScore > 0) ArcadeShell.resetScore();
-
-    // Register service worker for offline caching
-    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+    <!-- Shared arcade shell -->
+    <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
+    <script>
+      // ⚠️ MUST be in regular <script>, NOT <script type="module">
+      // Module scripts are deferred — ArcadeShell will be undefined
+      ArcadeShell.init({
+        slug: "{slug}",
+        title: "{Title}",
+        icon: "{emoji}",
+        accentColor: "#{hex}",
+        hideNavOnPlay: true,
+        showLoader: false, // Set to false if game has its own start/loading screen
       });
-    }
-  </script>
-</body>
+    </script>
+
+    <!-- Score bridge -->
+    <script src="../fuzzy-score.js"></script>
+
+    <!-- Game engine (AFTER arcade shell) -->
+    <script src="{game}.js"></script>
+
+    <!-- Score submission + service worker -->
+    <script>
+      // Read score from game engine or DOM
+      function getScore() {
+        try { return /* your score reading logic */ || 0; }
+        catch(e) { return 0; }
+      }
+
+      // Auto-save on tab blur + page exit
+      ArcadeShell.autoSave(getScore);
+
+      // Periodic save every 15 seconds
+      setInterval(function() { ArcadeShell.submit(getScore()); }, 15000);
+
+      // Reset dedup on game restart
+      // if (score === 0 && lastScore > 0) ArcadeShell.resetScore();
+
+      // Register service worker for offline caching
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('./service-worker.js').catch(function() {});
+        });
+      }
+    </script>
+  </body>
 </html>
 ```
 
 ### Critical rules
 
-| Rule | Why |
-|------|-----|
-| `ArcadeShell.init()` in regular `<script>`, NOT `<script type="module">` | Module scripts are deferred. ArcadeShell will be undefined. Shell nav/score completely broken. |
-| `showLoader: false` if game has own start screen | Otherwise "Booting cabinet..." stays visible forever |
-| `showLoader: false` if game has own loading screen (like minigolf's `#loadingScreen`) | Otherwise you get double loaders |
-| `?v=mobile-fix` on arcade-shell.css and arcade-shell.js | Mobile browsers aggressively cache. Without this, users see old version for hours. |
-| Overlay elements get class `overlay` | arcade-shell.css applies `touch-action: pan-y` so they scroll on mobile |
-| Nav ID is `arcadeNav` | Any game-specific auto-hide code must use `getElementById('arcadeNav')`, NOT `fuzzyNav` |
+| Rule                                                                                  | Why                                                                                            |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `ArcadeShell.init()` in regular `<script>`, NOT `<script type="module">`              | Module scripts are deferred. ArcadeShell will be undefined. Shell nav/score completely broken. |
+| `showLoader: false` if game has own start screen                                      | Otherwise "Booting cabinet..." stays visible forever                                           |
+| `showLoader: false` if game has own loading screen (like minigolf's `#loadingScreen`) | Otherwise you get double loaders                                                               |
+| `?v=mobile-fix` on arcade-shell.css and arcade-shell.js                               | Mobile browsers aggressively cache. Without this, users see old version for hours.             |
+| Overlay elements get class `overlay`                                                  | arcade-shell.css applies `touch-action: pan-y` so they scroll on mobile                        |
+| Nav ID is `arcadeNav`                                                                 | Any game-specific auto-hide code must use `getElementById('arcadeNav')`, NOT `fuzzyNav`        |
 
 ### Canvas scaling (for fixed-dimension games)
 
@@ -180,7 +189,9 @@ If your game has a fixed pixel canvas (e.g., 1265×464), add CSS transform scali
 
 ```css
 @media (max-width: 1300px) {
-  body { overflow: hidden !important; }
+  body {
+    overflow: hidden !important;
+  }
   #gameContainer {
     width: 100vw;
     height: 100dvh;
@@ -191,7 +202,7 @@ If your game has a fixed pixel canvas (e.g., 1265×464), add CSS transform scali
     justify-content: center;
   }
   #gameContainer .game-engine-wrapper {
-    transform-origin: center center;  /* NOT top center */
+    transform-origin: center center; /* NOT top center */
     transform: scale(min(calc(100vw / CANVAS_WIDTH), calc(100dvh / CANVAS_HEIGHT)));
     margin: 0;
   }
@@ -200,59 +211,64 @@ If your game has a fixed pixel canvas (e.g., 1265×464), add CSS transform scali
 
 ### Touch control patterns
 
-| Game Type | Touch Approach |
-|-----------|---------------|
-| Canvas 2D with custom engine | Engine's built-in touch API |
-| Vanilla JS Canvas | Virtual joystick + tap buttons (Fuzzy Survivors pattern) |
-| WASM/Emscripten | Touch-to-mouse event proxy (touchstart→mousedown, etc.) |
-| Pseudo-3D Canvas | D-pad buttons with `@media (pointer: coarse)` visibility |
+| Game Type                    | Touch Approach                                           |
+| ---------------------------- | -------------------------------------------------------- |
+| Canvas 2D with custom engine | Engine's built-in touch API                              |
+| Vanilla JS Canvas            | Virtual joystick + tap buttons (Fuzzy Survivors pattern) |
+| WASM/Emscripten              | Touch-to-mouse event proxy (touchstart→mousedown, etc.)  |
+| Pseudo-3D Canvas             | D-pad buttons with `@media (pointer: coarse)` visibility |
 
 ### Service worker template
 
 ```js
 // service-worker.js
-const CACHE = '{slug}-v1.0.0';
+const CACHE = "{slug}-v1.0.0";
 const ASSETS = [
-    './',
-    './index.html',
-    './{game}.css',
-    './{game}.js',
-    // ... list ALL static assets (images, sounds, WASM, fonts, etc.)
+  "./",
+  "./index.html",
+  "./{game}.css",
+  "./{game}.js",
+  // ... list ALL static assets (images, sounds, WASM, fonts, etc.)
 ];
 
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE)
-            .then((cache) => cache.addAll(ASSETS))
-            .then(() => self.skipWaiting())
-    );
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting()),
+  );
 });
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-        ).then(() => self.clients.claim())
-    );
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
+  );
 });
 
-self.addEventListener('fetch', (event) => {
-    const req = event.request;
-    if (req.method !== 'GET') return;
-    const url = new URL(req.url);
-    if (url.origin !== self.location.origin) return;
-    event.respondWith(
-        caches.match(req).then((hit) =>
-            hit ||
-            fetch(req).then((res) => {
-                if (res && res.status === 200) {
-                    const copy = res.clone();
-                    caches.open(CACHE).then((c) => c.put(req, copy));
-                }
-                return res;
-            }).catch(() => caches.match('./index.html'))
-        )
-    );
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  event.respondWith(
+    caches.match(req).then(
+      (hit) =>
+        hit ||
+        fetch(req)
+          .then((res) => {
+            if (res && res.status === 200) {
+              const copy = res.clone();
+              caches.open(CACHE).then((c) => c.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => caches.match("./index.html")),
+    ),
+  );
 });
 ```
 
@@ -265,6 +281,7 @@ self.addEventListener('fetch', (event) => {
 **File:** `src/lib/gameRegistry.ts`
 
 Add an entry to the `GAME_LIST` array. This automatically handles:
+
 - Front page game card (GamesShowcase reads GAME_LIST)
 - GameModal config (title, icon, color, sandbox)
 - Leaderboard filtering
@@ -320,7 +337,7 @@ Add an entry to the `GAME_LIST` array. This automatically handles:
 ```js
 var SCORE_CAPS = {
   // ... existing games ...
-  '{slug}': XXXXX,  // ← ADD THIS
+  "{slug}": XXXXX, // ← ADD THIS
 };
 ```
 
@@ -329,11 +346,12 @@ var SCORE_CAPS = {
 ```ts
 export const SCORE_CAPS: Record<string, number> = {
   // ... existing games ...
-  '{slug}': XXXXX,  // ← ADD THIS
+  "{slug}": XXXXX, // ← ADD THIS
 };
 ```
 
 **How to choose a score cap:**
+
 - Play the game at maximum skill for 30 minutes
 - Multiply the highest achievable score by 1.5×
 - Round to a clean number
@@ -358,17 +376,17 @@ Expected: new game route appears in build output, zero errors.
 npm run dev
 ```
 
-| Test | Action | Expected |
-|------|--------|----------|
-| Route exists | Visit `http://localhost:3000/games/{slug}/` | Page loads, no 404 |
-| Arcade shell nav | Visit game page directly (not in modal) | Nav bar visible with back button |
-| GameModal | Click game card on homepage | Modal opens with game iframe |
-| Nav suppressed in iframe | Observe game inside modal | No duplicate nav (arcade shell nav hidden) |
-| Score submission | Play → game over | Score submits, leaderboard updates |
-| Mobile layout | Resize to <640px | Touch controls visible, overlays scrollable |
-| Service worker | DevTools → Application → Service Workers | Registered, assets cached |
-| Homepage card | Navigate to `/` | New game card appears in arcade section |
-| Loader | Open game | No stuck "Booting cabinet..." screen |
+| Test                     | Action                                      | Expected                                    |
+| ------------------------ | ------------------------------------------- | ------------------------------------------- |
+| Route exists             | Visit `http://localhost:3000/games/{slug}/` | Page loads, no 404                          |
+| Arcade shell nav         | Visit game page directly (not in modal)     | Nav bar visible with back button            |
+| GameModal                | Click game card on homepage                 | Modal opens with game iframe                |
+| Nav suppressed in iframe | Observe game inside modal                   | No duplicate nav (arcade shell nav hidden)  |
+| Score submission         | Play → game over                            | Score submits, leaderboard updates          |
+| Mobile layout            | Resize to <640px                            | Touch controls visible, overlays scrollable |
+| Service worker           | DevTools → Application → Service Workers    | Registered, assets cached                   |
+| Homepage card            | Navigate to `/`                             | New game card appears in arcade section     |
+| Loader                   | Open game                                   | No stuck "Booting cabinet..." screen        |
 
 ### Deploy
 
@@ -394,18 +412,19 @@ curl -s -o /dev/null -w "%{http_code}" https://fuzzynuts.xyz/games/{slug}/
 
 Every new game touches exactly these files:
 
-| File | Change |
-|------|--------|
-| `public/games/{slug}/index.html` | New — game page with arcade shell |
-| `public/games/{slug}/{game}.js` | New — game engine |
-| `public/games/{slug}/{game}.css` | New — game styles |
-| `public/games/{slug}/service-worker.js` | New — cache-first offline |
-| `src/lib/gameRegistry.ts` | Add entry to `GAME_LIST` |
-| `public/games/fuzzy-score.js` | Add slug to `SCORE_CAPS` |
-| `src/features/arcade/constants/index.ts` | Add slug to `SCORE_CAPS` |
-| `public/icons/icon-{slug}-pop.webp` | New — game icon |
+| File                                     | Change                            |
+| ---------------------------------------- | --------------------------------- |
+| `public/games/{slug}/index.html`         | New — game page with arcade shell |
+| `public/games/{slug}/{game}.js`          | New — game engine                 |
+| `public/games/{slug}/{game}.css`         | New — game styles                 |
+| `public/games/{slug}/service-worker.js`  | New — cache-first offline         |
+| `src/lib/gameRegistry.ts`                | Add entry to `GAME_LIST`          |
+| `public/games/fuzzy-score.js`            | Add slug to `SCORE_CAPS`          |
+| `src/features/arcade/constants/index.ts` | Add slug to `SCORE_CAPS`          |
+| `public/icons/icon-{slug}-pop.webp`      | New — game icon                   |
 
 **Files that do NOT change:**
+
 - `arcade-shell.js` / `arcade-shell.css` — generic, handles any game
 - `GameModal.tsx` — reads from gameRegistry automatically
 - `GamesShowcase` — reads from gameRegistry automatically
@@ -419,6 +438,7 @@ Every new game touches exactly these files:
 ### "Game page returns 404"
 
 Slug missing from `gameRegistry.ts`. Check:
+
 ```bash
 grep -n "{slug}" src/lib/gameRegistry.ts
 ```

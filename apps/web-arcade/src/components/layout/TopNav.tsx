@@ -2,14 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LogOut,
-  User,
-  Trophy,
-  Menu,
-  LogIn,
-  Search,
-} from "lucide-react";
+import { LogOut, User, Trophy, Menu, LogIn, Search } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { useSession, signOut } from "next-auth/react";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -130,13 +123,21 @@ export function TopNav({ searchQuery, onSearchChange, onMenuToggle }: TopNavProp
                         )}
 
                         {session && (
-                          <Link href="/profile/" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors">
+                          <Link
+                            href="/profile/"
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
+                          >
                             <User size={14} />
                             Profile
                           </Link>
                         )}
 
-                        <Link href="/leaderboard/" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors">
+                        <Link
+                          href="/leaderboard/"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-cream-dim)] hover:text-cream hover:bg-white/5 rounded-lg transition-colors"
+                        >
                           <Trophy size={14} />
                           Leaderboard
                         </Link>

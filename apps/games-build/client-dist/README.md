@@ -32,6 +32,7 @@ sha256sum Open_RSC_Client.jar > Open_RSC_Client.jar.sha256
 ## Web Download Flow
 
 Players will:
+
 1. Connect their XRP wallet on `/play/rsc`
 2. Receive a game session token
 3. Download `Open_RSC_Client.jar`

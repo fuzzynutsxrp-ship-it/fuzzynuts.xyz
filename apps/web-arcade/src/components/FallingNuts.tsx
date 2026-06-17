@@ -223,10 +223,18 @@ export function FallingNuts() {
 
     const drawNutByType = (n: Nut) => {
       switch (n.type) {
-        case 0: drawAcorn(n); break;
-        case 1: drawNut(n); break;
-        case 2: drawLeaf(n); break;
-        case 3: drawGoldenAcorn(n); break;
+        case 0:
+          drawAcorn(n);
+          break;
+        case 1:
+          drawNut(n);
+          break;
+        case 2:
+          drawLeaf(n);
+          break;
+        case 3:
+          drawGoldenAcorn(n);
+          break;
       }
     };
 
@@ -267,9 +275,7 @@ export function FallingNuts() {
     };
     const stopLoop = () => cancelAnimationFrame(animFrameRef.current);
 
-    const reducedMotionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    );
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     // Start animating, or freeze to a static frame, based on the user's
     // OS-level motion preference — and react if they toggle it live.

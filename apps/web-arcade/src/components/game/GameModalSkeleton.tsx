@@ -13,12 +13,7 @@
 
 export function GameModalSkeleton() {
   return (
-    <dialog
-      open
-      className="game-modal"
-      aria-label="Loading game"
-      aria-busy="true"
-    >
+    <dialog open className="game-modal" aria-label="Loading game" aria-busy="true">
       {/* Header skeleton */}
       <div className="game-modal__header">
         <div className="game-modal__header-left">
@@ -90,11 +85,7 @@ export function GameModalSkeleton() {
           </div>
           <div className="game-modal__sidebar-list">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="play-next-card"
-                style={{ opacity: 1 - i * 0.15 }}
-              >
+              <div key={i} className="play-next-card" style={{ opacity: 1 - i * 0.15 }}>
                 <div className="play-next-card__thumb">
                   <div
                     className="w-full h-full rounded animate-pulse"

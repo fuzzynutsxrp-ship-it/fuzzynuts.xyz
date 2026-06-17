@@ -19,11 +19,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { truncateAddress, formatNumber } from "@/lib/utils";
 import { useWalletStore } from "@/store/wallet";
 import { useSession } from "next-auth/react";
-import {
-  useLeaderboardSSE,
-  getCurrentWeekKey,
-  timeAgo,
-} from "@/features/arcade";
+import { useLeaderboardSSE, getCurrentWeekKey, timeAgo } from "@/features/arcade";
 import type { ScoreEntry } from "@/features/arcade";
 import { API_SCORES } from "@/features/arcade/constants";
 import { toBackendSlug } from "@/features/arcade/slugAliases";
@@ -131,13 +127,7 @@ function aggregateByPlayer(entries: ScoreEntry[]): PlayerRow[] {
    Podium Component — Top 3 players
    ═══════════════════════════════════════════════════════════════ */
 
-function Podium({
-  rows,
-  currentUserKey,
-}: {
-  rows: PlayerRow[];
-  currentUserKey?: string | null;
-}) {
+function Podium({ rows, currentUserKey }: { rows: PlayerRow[]; currentUserKey?: string | null }) {
   const top3 = rows.slice(0, 3);
   if (top3.length === 0) return null;
 
@@ -146,8 +136,7 @@ function Podium({
       rank: 1,
       medal: "🥇",
       borderClass: "border-[#e2e8f0]",
-      shadowStyle:
-        "0 1px 3px rgba(15,23,42,0.08)",
+      shadowStyle: "0 1px 3px rgba(15,23,42,0.08)",
       textClass: "text-[#6366f1]",
       label: "1st Place",
       order: "order-2",
@@ -202,9 +191,7 @@ function Podium({
                 </span>
               )}
             </p>
-            <p
-              className={`font-mono text-lg sm:text-xl font-black ${cfg.textClass} mt-1`}
-            >
+            <p className={`font-mono text-lg sm:text-xl font-black ${cfg.textClass} mt-1`}>
               {formatNumber(entry.totalScore)}
             </p>
             <p className="text-[10px] text-[#64748b] mt-1">
@@ -225,11 +212,7 @@ function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return <span className="text-lg">🥇</span>;
   if (rank === 2) return <span className="text-lg">🥈</span>;
   if (rank === 3) return <span className="text-lg">🥉</span>;
-  return (
-    <span className="text-xs font-mono text-[#64748b] w-8 text-center">
-      #{rank}
-    </span>
-  );
+  return <span className="text-xs font-mono text-[#64748b] w-8 text-center">#{rank}</span>;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -326,9 +309,7 @@ export function LeaderboardClient() {
         }
       } catch (err) {
         if (!cancelled) {
-          setAllError(
-            err instanceof Error ? err.message : "Failed to load scores",
-          );
+          setAllError(err instanceof Error ? err.message : "Failed to load scores");
         }
       } finally {
         if (!cancelled) setAllLoading(false);
@@ -344,41 +325,28 @@ export function LeaderboardClient() {
   }, [selectedGame, timeframe, weekKey]);
 
   // Resolve raw scores
-  const rawScores =
-    selectedGame === "all" ? allScores : singleGameHook.scores;
-  const loading =
-    selectedGame === "all" ? allLoading : singleGameHook.loading;
-  const error =
-    selectedGame === "all" ? allError : singleGameHook.error;
-  const isRefreshing =
-    selectedGame === "all" ? false : singleGameHook.isRefreshing;
-  const lastFetched =
-    selectedGame === "all" ? null : singleGameHook.lastFetched;
-  const manualRefresh =
-    selectedGame === "all" ? () => {} : singleGameHook.manualRefresh;
+  const rawScores = selectedGame === "all" ? allScores : singleGameHook.scores;
+  const loading = selectedGame === "all" ? allLoading : singleGameHook.loading;
+  const error = selectedGame === "all" ? allError : singleGameHook.error;
+  const isRefreshing = selectedGame === "all" ? false : singleGameHook.isRefreshing;
+  const lastFetched = selectedGame === "all" ? null : singleGameHook.lastFetched;
+  const manualRefresh = selectedGame === "all" ? () => {} : singleGameHook.manualRefresh;
 
   // ── Aggregate into player rows ──
-  const playerRows = useMemo(
-    () => aggregateByPlayer(rawScores),
-    [rawScores],
-  );
+  const playerRows = useMemo(() => aggregateByPlayer(rawScores), [rawScores]);
 
   // ── Find current user ──
   const currentUserKey = walletAddress || session?.user?.email || null;
   const userRowIndex = currentUserKey
     ? playerRows.findIndex(
         (r) =>
-          r.wallet?.toLowerCase() === currentUserKey.toLowerCase() ||
-          r.userId === currentUserKey,
+          r.wallet?.toLowerCase() === currentUserKey.toLowerCase() || r.userId === currentUserKey,
       )
     : -1;
   const userRank = userRowIndex >= 0 ? userRowIndex + 1 : null;
 
   // Game title for empty state
-  const selectedGameMeta =
-    selectedGame !== "all"
-      ? gameRegistry.getBySlug(selectedGame)
-      : null;
+  const selectedGameMeta = selectedGame !== "all" ? gameRegistry.getBySlug(selectedGame) : null;
   const selectedGameLabel = selectedGameMeta?.title || "All Games";
 
   return (
@@ -444,9 +412,7 @@ export function LeaderboardClient() {
                 onClick={() => setGameDropdownOpen(!gameDropdownOpen)}
                 className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-[#e2e8f0] text-[#0f172a] font-semibold text-sm"
               >
-                <span>
-                  {GAME_FILTERS.find((g) => g.slug === selectedGame)?.title}
-                </span>
+                <span>{GAME_FILTERS.find((g) => g.slug === selectedGame)?.title}</span>
                 <ChevronDown
                   size={16}
                   className={`transition-transform ${gameDropdownOpen ? "rotate-180" : ""}`}
@@ -515,10 +481,7 @@ export function LeaderboardClient() {
                 disabled={isRefreshing}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[#64748b] hover:text-[#0f172a] bg-white/[0.03] hover:bg-white/[0.06] border border-[#e2e8f0] transition-all disabled:opacity-40"
               >
-                <RefreshCw
-                  size={14}
-                  className={isRefreshing ? "animate-spin" : ""}
-                />
+                <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
             </div>
@@ -573,13 +536,8 @@ export function LeaderboardClient() {
                 <p className="font-display text-lg font-bold text-[#0f172a] mb-2">
                   Unable to load scores
                 </p>
-                <p className="text-sm text-[#64748b] max-w-sm mb-6">
-                  {error}
-                </p>
-                <button
-                  onClick={manualRefresh}
-                  className="btn-secondary text-sm"
-                >
+                <p className="text-sm text-[#64748b] max-w-sm mb-6">{error}</p>
+                <button onClick={manualRefresh} className="btn-secondary text-sm">
                   <RefreshCw size={14} />
                   Try Again
                 </button>
@@ -589,19 +547,12 @@ export function LeaderboardClient() {
             {/* Empty state */}
             {!loading && !error && playerRows.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-                <Gamepad2
-                  size={48}
-                  className="text-[#6366f1]/30 mb-4"
-                />
-                <p className="font-display text-xl font-bold text-[#0f172a] mb-2">
-                  No scores yet
-                </p>
+                <Gamepad2 size={48} className="text-[#6366f1]/30 mb-4" />
+                <p className="font-display text-xl font-bold text-[#0f172a] mb-2">No scores yet</p>
                 <p className="text-sm text-[#64748b] max-w-sm mb-6">
                   Be the first to play{" "}
-                  <span className="text-[#0f172a] font-semibold">
-                    {selectedGameLabel}
-                  </span>{" "}
-                  and claim the #1 spot!
+                  <span className="text-[#0f172a] font-semibold">{selectedGameLabel}</span> and
+                  claim the #1 spot!
                 </p>
                 <Link
                   href="/"
@@ -619,8 +570,7 @@ export function LeaderboardClient() {
                   const rank = index + 4; // offset by 3 for podium
                   const isCurrentUser =
                     currentUserKey &&
-                    (row.wallet?.toLowerCase() ===
-                      currentUserKey.toLowerCase() ||
+                    (row.wallet?.toLowerCase() === currentUserKey.toLowerCase() ||
                       row.userId === currentUserKey);
 
                   return (
@@ -643,9 +593,7 @@ export function LeaderboardClient() {
                         <div className="flex-1 min-w-0 flex items-center">
                           <span
                             className={`text-sm font-medium truncate ${
-                              isCurrentUser
-                                ? "text-[#6366f1] font-bold"
-                                : "text-[#0f172a]"
+                              isCurrentUser ? "text-[#6366f1] font-bold" : "text-[#0f172a]"
                             }`}
                           >
                             {row.displayName}
@@ -685,9 +633,7 @@ export function LeaderboardClient() {
                           <div className="flex items-center gap-1.5">
                             <span
                               className={`text-sm font-medium truncate ${
-                                isCurrentUser
-                                  ? "text-[#6366f1] font-bold"
-                                  : "text-[#0f172a]"
+                                isCurrentUser ? "text-[#6366f1] font-bold" : "text-[#0f172a]"
                               }`}
                             >
                               {row.displayName}
@@ -729,9 +675,7 @@ export function LeaderboardClient() {
           {lastFetched && (
             <p className="text-[11px] text-[#64748b]/60 text-center mt-4 font-mono">
               Updated {timeAgo(lastFetched)} · Top {LEADERBOARD_SIZE} ·{" "}
-              {timeframe === "weekly"
-                ? "Resets Monday 00:00 UTC"
-                : "All Time"}
+              {timeframe === "weekly" ? "Resets Monday 00:00 UTC" : "All Time"}
             </p>
           )}
 

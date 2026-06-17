@@ -171,8 +171,8 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
 
               {/* Footer note */}
               <p className="mt-5 text-center text-[10px] text-[var(--color-cream-dim)] opacity-40 leading-relaxed">
-                By signing in you agree to our Terms. Web3 wallet connection is
-                optional — unlock on-chain rewards later.
+                By signing in you agree to our Terms. Web3 wallet connection is optional — unlock
+                on-chain rewards later.
               </p>
             </div>
           </motion.div>

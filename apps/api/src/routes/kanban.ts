@@ -49,11 +49,7 @@ export function buildKanbanRouter(env: {
   router.get("/", requireAdmin, async (_req, res) => {
     try {
       const db = await getDb(MONGODB_URI);
-      const tasks = await db
-        .collection(COLLECTION)
-        .find({})
-        .sort({ created_at: -1 })
-        .toArray();
+      const tasks = await db.collection(COLLECTION).find({}).sort({ created_at: -1 }).toArray();
 
       const grouped = {
         todo: tasks.filter((t) => t.status === "todo"),
@@ -83,9 +79,7 @@ export function buildKanbanRouter(env: {
       }
 
       const validPriorities = ["low", "med", "high"];
-      const taskPriority = validPriorities.includes(priority ?? "")
-        ? priority
-        : "med";
+      const taskPriority = validPriorities.includes(priority ?? "") ? priority : "med";
 
       const now = new Date();
       const task = {
@@ -164,9 +158,7 @@ export function buildKanbanRouter(env: {
       }
 
       const db = await getDb(MONGODB_URI);
-      const result = await db
-        .collection(COLLECTION)
-        .deleteOne({ _id: new ObjectId(id) });
+      const result = await db.collection(COLLECTION).deleteOne({ _id: new ObjectId(id) });
 
       if (result.deletedCount === 0) {
         res.status(404).json({ error: "E_NOT_FOUND" });

@@ -75,7 +75,9 @@ function fill(tmpl: string, key: string, value: string): string {
 
 function rootVersion(): string {
   try {
-    return (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version as string) ?? "0.0.0";
+    return (
+      (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version as string) ?? "0.0.0"
+    );
   } catch {
     return "0.0.0";
   }
@@ -87,10 +89,12 @@ function recentCommits(n = 10): string {
   const raw = sh(`git log -n ${n} --pretty=format:'${formatStr}'`);
   if (!raw) return "";
   const lines = raw.split("\n").filter(Boolean);
-  return lines.map((l) => {
-    const [sha, subject, author, when] = l.split(SEP);
-    return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
-  }).join("\n");
+  return lines
+    .map((l) => {
+      const [sha, subject, author, when] = l.split(SEP);
+      return `- \`${sha}\` ${subject} — _${author}, ${when}_`;
+    })
+    .join("\n");
 }
 
 function main(): void {
@@ -116,7 +120,15 @@ function main(): void {
 
   if (CHECK) {
     const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-    if (cur !== out) {
+    // Only compare the structural content — strip the header (timestamp +
+    // HEAD SHA are always different between generation and check time) and
+    // the entire "Recent activity" section (commit list shifts on every run).
+    const stablePart = (s: string) => {
+      const noHeader = s.replace(/\n_Generated \*\*.*?\*\* from `[^`]*` on `[^`]*`\._\n/, "\n");
+      const idx = noHeader.indexOf("## Recent activity");
+      return idx >= 0 ? noHeader.slice(0, idx) : noHeader;
+    };
+    if (stablePart(cur) !== stablePart(out)) {
       console.error("docs/STATUS.md is stale — run `pnpm status` and commit.");
       process.exit(1);
     }

@@ -56,11 +56,22 @@ const CONFIG = {
 const ServerScoreSchema = z.object({
   game: z.enum(VALID_GAMES),
   score: z.number().int().positive().max(99_999_999),
-  wallet: z.string().regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/).optional().nullable(),
+  wallet: z
+    .string()
+    .regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/)
+    .optional()
+    .nullable(),
   timestamp: z.number().int().positive(),
   duration: z.number().min(CONFIG.MIN_DURATION_SECONDS).optional(),
-  nonce: z.string().regex(/^[a-zA-Z0-9_-]{16,64}$/).optional(),
-  hash: z.string().length(64).regex(/^[a-f0-9]{64}$/).optional(),
+  nonce: z
+    .string()
+    .regex(/^[a-zA-Z0-9_-]{16,64}$/)
+    .optional(),
+  hash: z
+    .string()
+    .length(64)
+    .regex(/^[a-f0-9]{64}$/)
+    .optional(),
   signature: z.string().min(1).max(512).optional(),
 });
 
@@ -143,12 +154,10 @@ async function verifyHMAC(payload: ServerScorePayload): Promise<boolean> {
     encoder.encode(CONFIG.HMAC_SECRET),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["verify"]
+    ["verify"],
   );
 
-  const hashBuffer = new Uint8Array(
-    payload.hash.match(/.{2}/g)!.map((byte) => parseInt(byte, 16))
-  );
+  const hashBuffer = new Uint8Array(payload.hash.match(/.{2}/g)!.map((byte) => parseInt(byte, 16)));
 
   return crypto.subtle.verify("HMAC", key, hashBuffer, encoder.encode(message));
 }
@@ -189,7 +198,7 @@ export interface ValidationResult {
  */
 export async function validateScoreSubmission(
   body: unknown,
-  clientIP: string
+  clientIP: string,
 ): Promise<ValidationResult> {
   /* ── Step 1: Schema validation ── */
   const parsed = ServerScoreSchema.safeParse(body);

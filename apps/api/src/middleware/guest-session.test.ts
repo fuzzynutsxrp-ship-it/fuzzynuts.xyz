@@ -39,9 +39,7 @@ describe("guestSessionMiddleware", () => {
     // Cookie should be set
     const cookies = res.headers["set-cookie"] as unknown as string[] | undefined;
     expect(cookies).toBeDefined();
-    const guestCookie = cookies!.find((c: string) =>
-      c.startsWith("fuzzy_guest="),
-    );
+    const guestCookie = cookies!.find((c: string) => c.startsWith("fuzzy_guest="));
     expect(guestCookie).toBeDefined();
     expect(guestCookie).toContain("HttpOnly");
     expect(guestCookie).toContain("SameSite=Strict");
@@ -55,14 +53,10 @@ describe("guestSessionMiddleware", () => {
 
     // Extract cookie
     const cookies = res1.headers["set-cookie"] as unknown as string[];
-    const guestCookie = cookies
-      .find((c: string) => c.startsWith("fuzzy_guest="))!
-      .split(";")[0];
+    const guestCookie = cookies.find((c: string) => c.startsWith("fuzzy_guest="))!.split(";")[0];
 
     // Second request — send the cookie back
-    const res2 = await request(app)
-      .get("/test")
-      .set("Cookie", guestCookie!);
+    const res2 = await request(app).get("/test").set("Cookie", guestCookie!);
 
     expect(res2.status).toBe(200);
     expect(res2.body.guest.type).toBe("guest");
@@ -70,9 +64,7 @@ describe("guestSessionMiddleware", () => {
   });
 
   it("mints a new guest when cookie is tampered", async () => {
-    const res = await request(app)
-      .get("/test")
-      .set("Cookie", "fuzzy_guest=tampered.token.value");
+    const res = await request(app).get("/test").set("Cookie", "fuzzy_guest=tampered.token.value");
 
     expect(res.status).toBe(200);
     expect(res.body.guest.type).toBe("guest");

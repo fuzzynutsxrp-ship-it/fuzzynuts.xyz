@@ -39,12 +39,12 @@ Rules of the road (full version in `HERMES.md`):
 
 ## 1. What is live and verified
 
-| Component | Status | Evidence (re-runnable) |
-|---|---|---|
-| Frontend (Vercel) | ✅ LIVE | `curl -sI https://www.fuzzynuts.xyz/` → 200, `server: Vercel` |
-| API (Railway) | ✅ LIVE v2.1 | `curl .../healthz` → `{"ok":true,"version":"2.1",...}` all 6 env vars present |
-| Games served | ✅ 38 game dirs under `apps/web-arcade/public/games/` | `ls` that dir |
-| Security headers | ✅ | `frame-ancestors 'none'`, HSTS, `nosniff`, `no-store` on live responses |
+| Component         | Status                                                | Evidence (re-runnable)                                                        |
+| ----------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Frontend (Vercel) | ✅ LIVE                                               | `curl -sI https://www.fuzzynuts.xyz/` → 200, `server: Vercel`                 |
+| API (Railway)     | ✅ LIVE v2.1                                          | `curl .../healthz` → `{"ok":true,"version":"2.1",...}` all 6 env vars present |
+| Games served      | ✅ 38 game dirs under `apps/web-arcade/public/games/` | `ls` that dir                                                                 |
+| Security headers  | ✅                                                    | `frame-ancestors 'none'`, HSTS, `nosniff`, `no-store` on live responses       |
 
 **Cannot be verified from a sandbox** (human must check the dashboards): Vercel
 project settings, Railway dashboard/secrets, VPS `67.205.132.6` (RSC TeaVM client),
@@ -56,15 +56,15 @@ on-chain XRPL distributor state, Porkbun DNS, Xaman/Joey key tier.
 
 Status legend: 🔴 open · 🟡 in progress · ✅ done · 🔒 needs ADR + CODEOWNERS review (HERMES.md §1.3/§4)
 
-| # | Blocker | Status | Notes |
-|---|---|---|---|
-| ~~P0-1~~ | ~~`games.json` shows third-party MMOs on the live site~~ | ✅ N/A | **MISDIAGNOSED — verified 2026-06-13 against the live site.** The homepage renders the 38 real games from `apps/web-arcade/src/lib/gameRegistry.ts` and has **zero** third-party MMOs. The third-party `public/data/games.json` + `public/index.html` are dead legacy files Next.js never serves (`/index.html` returns the Next page, not the static file). Demoted to cleanup — see §3. |
-| P0-2 | `SCORE_CAPS` diverge across 3+ sources (10M ceiling vs 99M in `arcade-core` vs ~1B in `scores.ts`) | 🔴 🔒 | Touches `packages/arcade-core/src/constants/` → needs ADR. |
-| P0-3 | Server `VALID_GAMES` accepts only 6 slugs (`scores.ts`); a 2nd validator uses a different source | 🔴 🔒 | Unify on one source (SCORE_CAPS keys). |
-| P0-4 | Score submissions not HMAC-verified — leaderboard trivially spoofable | 🔴 🔒 | `shared-anticheat/hmac.ts` exists but isn't enforced in `scores.ts`. |
-| P0-5 | Wallet auth is mocked (`MOCK_SIGNATURE_`, hardcoded address) | 🔴 🔒 | Touches `auth` route (HERMES.md §4). |
-| P0-6 | No XRPL signature verification wired into auth/score flows | 🔴 🔒 | `xrpl-token-utils/src/verify.ts` exists, unused. |
-| P1-7 | `apps/mobile-capacitor` typecheck fails (`TS6059: rootDir`) | 🔴 | Blocks `pnpm typecheck` green. Scaffold only, not launch-critical but blocks CI. |
+| #        | Blocker                                                                                            | Status | Notes                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~P0-1~~ | ~~`games.json` shows third-party MMOs on the live site~~                                           | ✅ N/A | **MISDIAGNOSED — verified 2026-06-13 against the live site.** The homepage renders the 38 real games from `apps/web-arcade/src/lib/gameRegistry.ts` and has **zero** third-party MMOs. The third-party `public/data/games.json` + `public/index.html` are dead legacy files Next.js never serves (`/index.html` returns the Next page, not the static file). Demoted to cleanup — see §3. |
+| P0-2     | `SCORE_CAPS` diverge across 3+ sources (10M ceiling vs 99M in `arcade-core` vs ~1B in `scores.ts`) | 🔴 🔒  | Touches `packages/arcade-core/src/constants/` → needs ADR.                                                                                                                                                                                                                                                                                                                                |
+| P0-3     | Server `VALID_GAMES` accepts only 6 slugs (`scores.ts`); a 2nd validator uses a different source   | 🔴 🔒  | Unify on one source (SCORE_CAPS keys).                                                                                                                                                                                                                                                                                                                                                    |
+| P0-4     | Score submissions not HMAC-verified — leaderboard trivially spoofable                              | 🔴 🔒  | `shared-anticheat/hmac.ts` exists but isn't enforced in `scores.ts`.                                                                                                                                                                                                                                                                                                                      |
+| P0-5     | Wallet auth is mocked (`MOCK_SIGNATURE_`, hardcoded address)                                       | 🔴 🔒  | Touches `auth` route (HERMES.md §4).                                                                                                                                                                                                                                                                                                                                                      |
+| P0-6     | No XRPL signature verification wired into auth/score flows                                         | 🔴 🔒  | `xrpl-token-utils/src/verify.ts` exists, unused.                                                                                                                                                                                                                                                                                                                                          |
+| P1-7     | `apps/mobile-capacitor` typecheck fails (`TS6059: rootDir`)                                        | 🔴     | Blocks `pnpm typecheck` green. Scaffold only, not launch-critical but blocks CI.                                                                                                                                                                                                                                                                                                          |
 
 ## 3. Not launch-blocking (track, don't gate on)
 
@@ -86,13 +86,13 @@ Next.js + Root = `apps/web-arcade`; confirm Porkbun DNS; confirm VPS RSC client 
 
 ## 5. Where the bodies are buried (key file map)
 
-| Concern | File |
-|---|---|
-| Game catalog (homepage carousels) | `apps/web-arcade/public/data/games.json` |
-| Server score validation + caps | `apps/api/src/routes/scores.ts`, `apps/api/src/features/arcade/validation/scoreMiddleware.ts` |
-| Canonical score caps | `packages/arcade-core/src/constants/score-caps.ts` |
-| Client-side caps | `apps/web-arcade/public/games/fuzzy-score.js` |
-| HMAC signing | `packages/shared-anticheat/src/hmac.ts` |
-| Wallet auth middleware | `apps/api/src/middleware/walletAuth.ts` |
-| XRPL signature verify | `packages/xrpl-token-utils/src/verify.ts` |
-| RSC auto-login (VPS) | `tools/fix-teavm-js-autologin.sh` |
+| Concern                           | File                                                                                          |
+| --------------------------------- | --------------------------------------------------------------------------------------------- |
+| Game catalog (homepage carousels) | `apps/web-arcade/public/data/games.json`                                                      |
+| Server score validation + caps    | `apps/api/src/routes/scores.ts`, `apps/api/src/features/arcade/validation/scoreMiddleware.ts` |
+| Canonical score caps              | `packages/arcade-core/src/constants/score-caps.ts`                                            |
+| Client-side caps                  | `apps/web-arcade/public/games/fuzzy-score.js`                                                 |
+| HMAC signing                      | `packages/shared-anticheat/src/hmac.ts`                                                       |
+| Wallet auth middleware            | `apps/api/src/middleware/walletAuth.ts`                                                       |
+| XRPL signature verify             | `packages/xrpl-token-utils/src/verify.ts`                                                     |
+| RSC auto-login (VPS)              | `tools/fix-teavm-js-autologin.sh`                                                             |

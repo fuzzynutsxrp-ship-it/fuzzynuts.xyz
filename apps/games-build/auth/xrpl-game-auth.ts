@@ -21,19 +21,10 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-import {
-  verifyMessageSignature,
-  formatGameChallenge,
-} from "@fuzzynuts/xrpl-token-utils/verify";
+import { verifyMessageSignature, formatGameChallenge } from "@fuzzynuts/xrpl-token-utils/verify";
 import { signPayload, mintNonce } from "@fuzzynuts/shared-anticheat";
-import type {
-  GameSessionToken,
-  GameSessionRequest,
-} from "@fuzzynuts/arcade-core";
-import {
-  DEFAULT_GAME_SERVER_ENDPOINT,
-  GAME_SESSION_TTL_MS,
-} from "@fuzzynuts/arcade-core";
+import type { GameSessionToken, GameSessionRequest } from "@fuzzynuts/arcade-core";
+import { DEFAULT_GAME_SERVER_ENDPOINT, GAME_SESSION_TTL_MS } from "@fuzzynuts/arcade-core";
 
 /**
  * Nonce replay-protection store. In production, replace with
@@ -124,8 +115,7 @@ export async function createGameSession(
     // 4. Build and sign the game session token
     const now = Date.now();
     const expiresAt = now + GAME_SESSION_TTL_MS;
-    const gameServerEndpoint =
-      opts.gameServerEndpoint ?? DEFAULT_GAME_SERVER_ENDPOINT;
+    const gameServerEndpoint = opts.gameServerEndpoint ?? DEFAULT_GAME_SERVER_ENDPOINT;
 
     const tokenNonce = mintNonce();
     const payload = JSON.stringify({

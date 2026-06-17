@@ -63,11 +63,25 @@ const HOW_IT_WORKS = [
 
 /* ── Past Winners (static showcase) ── */
 const PAST_WINNERS = [
-  { rank: 1, name: "rH7F…xP2a", game: "Fuzzynuts World", prize: "$250", week: "May 19", emoji: "🥇" },
+  {
+    rank: 1,
+    name: "rH7F…xP2a",
+    game: "Fuzzynuts World",
+    prize: "$250",
+    week: "May 19",
+    emoji: "🥇",
+  },
   { rank: 2, name: "rN4k…jQ8m", game: "Survivors", prize: "$150", week: "May 19", emoji: "🥈" },
   { rank: 3, name: "rP9x…wD3r", game: "Nut Racer", prize: "$100", week: "May 19", emoji: "🥉" },
   { rank: 1, name: "rT2b…kL7y", game: "Nut Golf", prize: "$250", week: "May 12", emoji: "🥇" },
-  { rank: 2, name: "rW5c…mN1z", game: "Fuzzynuts World", prize: "$150", week: "May 12", emoji: "🥈" },
+  {
+    rank: 2,
+    name: "rW5c…mN1z",
+    game: "Fuzzynuts World",
+    prize: "$150",
+    week: "May 12",
+    emoji: "🥈",
+  },
   { rank: 3, name: "rJ8d…pR4s", game: "Survivors", prize: "$100", week: "May 12", emoji: "🥉" },
 ];
 
@@ -97,9 +111,15 @@ export function PrizesPageContent() {
     let cancelled = false;
     fetch(`${API_REWARDS}/tiers`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled) setWeekTiers(d); })
-      .catch(() => { if (!cancelled) setWeekTiers(null); });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) setWeekTiers(d);
+      })
+      .catch(() => {
+        if (!cancelled) setWeekTiers(null);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const tierUsd = (rank: number) => weekTiers?.tiers?.[rank - 1]?.usd_value ?? null;
@@ -107,8 +127,14 @@ export function PrizesPageContent() {
     const n = weekTiers?.tiers?.[rank - 1]?.nut_amount;
     return n != null ? Number(n) : null;
   };
-  const tierUsdLabel = (rank: number) => { const u = tierUsd(rank); return u != null ? formatUsd(u) : "—"; };
-  const tierNutLabel = (rank: number) => { const n = tierNut(rank); return n != null ? `${formatNumber(n)} NUT` : "TBA"; };
+  const tierUsdLabel = (rank: number) => {
+    const u = tierUsd(rank);
+    return u != null ? formatUsd(u) : "—";
+  };
+  const tierNutLabel = (rank: number) => {
+    const n = tierNut(rank);
+    return n != null ? `${formatNumber(n)} NUT` : "TBA";
+  };
 
   const tiers = weekTiers?.tiers ?? null;
   const totalUsdLabel = tiers ? formatUsd(tiers.reduce((s, t) => s + (t.usd_value || 0), 0)) : "—";
@@ -121,7 +147,6 @@ export function PrizesPageContent() {
   return (
     <section id="prizes" className="py-24 relative">
       <div className="container-main">
-
         {/* ═══════════════════════════════════════════════════════
            SECTION HEADER — matches Leaderboard exactly
            ═══════════════════════════════════════════════════════ */}
@@ -132,9 +157,24 @@ export function PrizesPageContent() {
           className="text-center mb-12 md:mb-16 relative"
         >
           {/* Floating nut particles around header */}
-          <span className="absolute -top-4 left-1/4 text-2xl float-nut-1 opacity-60 pointer-events-none" style={{ animationDelay: "0s" }}>🥜</span>
-          <span className="absolute top-2 right-1/4 text-xl float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "0.7s" }}>🥜</span>
-          <span className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none" style={{ animationDelay: "1.4s" }}>🥜</span>
+          <span
+            className="absolute -top-4 left-1/4 text-2xl float-nut-1 opacity-60 pointer-events-none"
+            style={{ animationDelay: "0s" }}
+          >
+            🥜
+          </span>
+          <span
+            className="absolute top-2 right-1/4 text-xl float-nut-2 opacity-50 pointer-events-none"
+            style={{ animationDelay: "0.7s" }}
+          >
+            🥜
+          </span>
+          <span
+            className="absolute -bottom-2 left-1/3 text-lg float-nut-3 opacity-40 pointer-events-none"
+            style={{ animationDelay: "1.4s" }}
+          >
+            🥜
+          </span>
 
           <span className="inline-block px-3 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] text-xs font-semibold tracking-wide mb-4">
             🥜 Weekly Leaderboard Tournaments
@@ -143,15 +183,19 @@ export function PrizesPageContent() {
             Prizes &amp; Payouts
           </h2>
           <p className="text-[#64748b] text-lg max-w-2xl mx-auto leading-relaxed">
-            {totalUsdLabel} hoard split every single week. Free to play, real
-            payouts, no cap. Skill in, $NUT out. 🐿️
+            {totalUsdLabel} hoard split every single week. Free to play, real payouts, no cap. Skill
+            in, $NUT out. 🐿️
           </p>
-          <p className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-[#f59e0b]" : "text-[#64748b]"}`}>
+          <p
+            className={`text-base sm:text-lg font-mono font-bold mt-3 animate-pulse ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-[#f59e0b]" : "text-[#64748b]"}`}
+          >
             ⏱ Resets in{" "}
-            <span className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-[#f59e0b]" : "text-[#16a34a]"}`}>
+            <span
+              className={`font-black ${countdown.isCritical ? "text-red-400" : countdown.isUrgent ? "text-[#f59e0b]" : "text-[#16a34a]"}`}
+            >
               {countdown.display}
-            </span>
-            {" "}· Monday 00:00 UTC
+            </span>{" "}
+            · Monday 00:00 UTC
           </p>
         </motion.div>
 
@@ -165,41 +209,80 @@ export function PrizesPageContent() {
           className="mb-4 grid grid-cols-3 gap-3 sm:gap-5"
         >
           {/* 1st Place Pedestal */}
-          <div
-            className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
-          >
-            <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">🥜</span>
-            <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">🥜</span>
-            <span className="absolute -bottom-2 left-1/3 text-sm float-nut-3 opacity-60 pointer-events-none" style={{ animationDelay: "0.5s" }}>🥜</span>
+          <div className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
+            <span className="absolute -top-3 -left-1 text-lg float-nut-1 opacity-70 pointer-events-none">
+              🥜
+            </span>
+            <span className="absolute top-1/2 -right-2 text-base float-nut-2 opacity-50 pointer-events-none">
+              🥜
+            </span>
+            <span
+              className="absolute -bottom-2 left-1/3 text-sm float-nut-3 opacity-60 pointer-events-none"
+              style={{ animationDelay: "0.5s" }}
+            >
+              🥜
+            </span>
             <div className="text-4xl sm:text-5xl mb-2">🥇</div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6366f1]/70 mb-1">1st Place</p>
-            <p className="font-display text-2xl sm:text-3xl font-black text-[#6366f1]">{tierUsdLabel(1)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6366f1]/70 mb-1">
+              1st Place
+            </p>
+            <p className="font-display text-2xl sm:text-3xl font-black text-[#6366f1]">
+              {tierUsdLabel(1)}
+            </p>
             <p className="text-xs font-mono text-[#64748b]/60 mt-1">{tierNutLabel(1)}</p>
           </div>
 
           {/* 2nd Place Pedestal */}
-          <div
-            className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
-          >
-            <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">🥜</span>
-            <span className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none" style={{ animationDelay: "0.3s" }}>🥜</span>
-            <span className="absolute -bottom-1 right-1/4 text-sm float-nut-1 opacity-55 pointer-events-none" style={{ animationDelay: "0.8s" }}>🥜</span>
+          <div className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
+            <span className="absolute -top-3 -right-1 text-lg float-nut-2 opacity-60 pointer-events-none">
+              🥜
+            </span>
+            <span
+              className="absolute bottom-1/3 -left-2 text-base float-nut-3 opacity-45 pointer-events-none"
+              style={{ animationDelay: "0.3s" }}
+            >
+              🥜
+            </span>
+            <span
+              className="absolute -bottom-1 right-1/4 text-sm float-nut-1 opacity-55 pointer-events-none"
+              style={{ animationDelay: "0.8s" }}
+            >
+              🥜
+            </span>
             <div className="text-4xl sm:text-5xl mb-2">🥈</div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#64748b]/70 mb-1">2nd Place</p>
-            <p className="font-display text-2xl sm:text-3xl font-black text-[#64748b]">{tierUsdLabel(2)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#64748b]/70 mb-1">
+              2nd Place
+            </p>
+            <p className="font-display text-2xl sm:text-3xl font-black text-[#64748b]">
+              {tierUsdLabel(2)}
+            </p>
             <p className="text-xs font-mono text-[#64748b]/60 mt-1">{tierNutLabel(2)}</p>
           </div>
 
           {/* 3rd Place Pedestal */}
-          <div
-            className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]"
-          >
-            <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">🥜</span>
-            <span className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none" style={{ animationDelay: "0.6s" }}>🥜</span>
-            <span className="absolute -bottom-2 left-1/2 text-sm float-nut-2 opacity-50 pointer-events-none" style={{ animationDelay: "1.1s" }}>🥜</span>
+          <div className="relative rounded-2xl border border-[#e2e8f0] bg-white py-6 sm:py-8 px-3 text-center shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
+            <span className="absolute -top-3 left-1/4 text-lg float-nut-3 opacity-55 pointer-events-none">
+              🥜
+            </span>
+            <span
+              className="absolute top-1/3 -right-2 text-base float-nut-1 opacity-40 pointer-events-none"
+              style={{ animationDelay: "0.6s" }}
+            >
+              🥜
+            </span>
+            <span
+              className="absolute -bottom-2 left-1/2 text-sm float-nut-2 opacity-50 pointer-events-none"
+              style={{ animationDelay: "1.1s" }}
+            >
+              🥜
+            </span>
             <div className="text-4xl sm:text-5xl mb-2">🥉</div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b]/70 mb-1">3rd Place</p>
-            <p className="font-display text-2xl sm:text-3xl font-black text-[#f59e0b]">{tierUsdLabel(3)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b]/70 mb-1">
+              3rd Place
+            </p>
+            <p className="font-display text-2xl sm:text-3xl font-black text-[#f59e0b]">
+              {tierUsdLabel(3)}
+            </p>
             <p className="text-xs font-mono text-[#64748b]/60 mt-1">{tierNutLabel(3)}</p>
           </div>
         </motion.div>
@@ -209,7 +292,8 @@ export function PrizesPageContent() {
           <span className="opacity-60">Total weekly pool: </span>
           <span className="font-bold text-[#6366f1]">{totalUsdLabel}</span>
           <span className="opacity-60">
-            {" "}(≈ {totalNutLabel} this week @ {fmtSnapshotPrice(weekTiers?.snapshot_price)})
+            {" "}
+            (≈ {totalNutLabel} this week @ {fmtSnapshotPrice(weekTiers?.snapshot_price)})
           </span>
         </p>
 
@@ -226,8 +310,15 @@ export function PrizesPageContent() {
           <div className="overflow-hidden bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             <div className="p-6 sm:p-8 relative">
               {/* Floating nuts */}
-              <span className="absolute top-4 right-6 text-xl float-nut-1 opacity-40 pointer-events-none">🥜</span>
-              <span className="absolute bottom-4 left-8 text-lg float-nut-2 opacity-30 pointer-events-none" style={{ animationDelay: "0.9s" }}>🥜</span>
+              <span className="absolute top-4 right-6 text-xl float-nut-1 opacity-40 pointer-events-none">
+                🥜
+              </span>
+              <span
+                className="absolute bottom-4 left-8 text-lg float-nut-2 opacity-30 pointer-events-none"
+                style={{ animationDelay: "0.9s" }}
+              >
+                🥜
+              </span>
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#f1f5f9] border border-[#e2e8f0]">
@@ -238,15 +329,16 @@ export function PrizesPageContent() {
                 </h3>
               </div>
               <p className="text-[#64748b] text-sm sm:text-base leading-relaxed mb-4">
-                Every week, a fresh pool of <span className="text-[#6366f1] font-bold">{totalUsdLabel}</span> in $NUT
-                is up for grabs. The top 3 scorers across all arcade games split the hoard —
-                1st takes the lion&apos;s share, 2nd and 3rd get their cut. The pool resets
-                every Monday at 00:00 UTC, so every week is a clean slate.
+                Every week, a fresh pool of{" "}
+                <span className="text-[#6366f1] font-bold">{totalUsdLabel}</span> in $NUT is up for
+                grabs. The top 3 scorers across all arcade games split the hoard — 1st takes the
+                lion&apos;s share, 2nd and 3rd get their cut. The pool resets every Monday at 00:00
+                UTC, so every week is a clean slate.
               </p>
               <p className="text-[#64748b] text-sm sm:text-base leading-relaxed">
-                No buy-in. No catch. No cap. Just play your best, and if your score
-                sits in the top 3 when the clock hits zero, the $NUT is yours. Connect
-                your XRP wallet (Xaman or Joey) to claim. Skill in, $NUT out. 🥜
+                No buy-in. No catch. No cap. Just play your best, and if your score sits in the top
+                3 when the clock hits zero, the $NUT is yours. Connect your XRP wallet (Xaman or
+                Joey) to claim. Skill in, $NUT out. 🥜
               </p>
             </div>
           </div>
@@ -280,11 +372,16 @@ export function PrizesPageContent() {
                 <div className="h-full bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
                   <div className="p-5 sm:p-6 text-center relative">
                     {/* Step number watermark */}
-                    <span className="absolute top-3 right-4 font-display text-5xl font-black opacity-[0.06] pointer-events-none" style={{ color: step.color }}>
+                    <span
+                      className="absolute top-3 right-4 font-display text-5xl font-black opacity-[0.06] pointer-events-none"
+                      style={{ color: step.color }}
+                    >
                       {step.step}
                     </span>
 
-                    <span className="text-3xl mb-3 block" aria-hidden="true">{step.emoji}</span>
+                    <span className="text-3xl mb-3 block" aria-hidden="true">
+                      {step.emoji}
+                    </span>
 
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
@@ -293,12 +390,13 @@ export function PrizesPageContent() {
                       <step.icon size={20} style={{ color: step.color }} strokeWidth={2.5} />
                     </div>
 
-                    <p className="font-display text-base font-bold mb-1" style={{ color: step.color }}>
+                    <p
+                      className="font-display text-base font-bold mb-1"
+                      style={{ color: step.color }}
+                    >
                       {step.title}
                     </p>
-                    <p className="text-xs text-[#64748b] leading-relaxed">
-                      {step.desc}
-                    </p>
+                    <p className="text-xs text-[#64748b] leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               </motion.div>
@@ -337,9 +435,11 @@ export function PrizesPageContent() {
 
             {PAST_WINNERS.map((winner, i) => {
               const rankBorderGlow =
-                winner.rank === 1 ? "border-l-2 border-l-[#6366f1]" :
-                winner.rank === 2 ? "border-l-2 border-l-[#64748b]" :
-                "border-l-2 border-l-[#f59e0b]";
+                winner.rank === 1
+                  ? "border-l-2 border-l-[#6366f1]"
+                  : winner.rank === 2
+                    ? "border-l-2 border-l-[#64748b]"
+                    : "border-l-2 border-l-[#f59e0b]";
 
               return (
                 <motion.div
@@ -359,7 +459,9 @@ export function PrizesPageContent() {
 
                   {/* Name */}
                   <div className="flex-1 min-w-0">
-                    <span className={`text-sm font-medium truncate block ${winner.rank === 1 ? "text-[#6366f1] font-bold" : "text-[#0f172a]"}`}>
+                    <span
+                      className={`text-sm font-medium truncate block ${winner.rank === 1 ? "text-[#6366f1] font-bold" : "text-[#0f172a]"}`}
+                    >
                       {winner.name}
                     </span>
                   </div>
@@ -371,12 +473,16 @@ export function PrizesPageContent() {
 
                   {/* Week */}
                   <div className="w-16 text-right shrink-0">
-                    <span className="text-[11px] font-mono text-[#64748b] opacity-60">{winner.week}</span>
+                    <span className="text-[11px] font-mono text-[#64748b] opacity-60">
+                      {winner.week}
+                    </span>
                   </div>
 
                   {/* Prize */}
                   <div className="w-16 text-right shrink-0">
-                    <span className={`text-sm font-mono font-bold ${winner.rank === 1 ? "text-[#6366f1]" : winner.rank === 2 ? "text-[#64748b]" : "text-[#f59e0b]"}`}>
+                    <span
+                      className={`text-sm font-mono font-bold ${winner.rank === 1 ? "text-[#6366f1]" : winner.rank === 2 ? "text-[#64748b]" : "text-[#f59e0b]"}`}
+                    >
                       {winner.prize}
                     </span>
                   </div>
@@ -399,8 +505,15 @@ export function PrizesPageContent() {
           <div className="overflow-hidden bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
             <div className="p-6 sm:p-8 relative">
               {/* Floating nuts */}
-              <span className="absolute top-4 left-6 text-lg float-nut-2 opacity-30 pointer-events-none">🥜</span>
-              <span className="absolute bottom-6 right-8 text-xl float-nut-3 opacity-25 pointer-events-none" style={{ animationDelay: "1.2s" }}>🥜</span>
+              <span className="absolute top-4 left-6 text-lg float-nut-2 opacity-30 pointer-events-none">
+                🥜
+              </span>
+              <span
+                className="absolute bottom-6 right-8 text-xl float-nut-3 opacity-25 pointer-events-none"
+                style={{ animationDelay: "1.2s" }}
+              >
+                🥜
+              </span>
 
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#f1f5f9] border border-[#e2e8f0]">
@@ -477,27 +590,20 @@ export function PrizesPageContent() {
                 className="relative inline-flex items-center gap-3 px-8 py-4 sm:px-12 sm:py-5 rounded-xl bg-[#6366f1] text-white font-display font-black text-base sm:text-lg tracking-wide transition-all hover:bg-[#4f46e5] disabled:opacity-50 cursor-pointer"
               >
                 <Wallet size={22} strokeWidth={2.5} />
-                <span>
-                  {isConnecting ? "Connecting…" : "Bag the Bag — Am I Top 3? 🥜"}
-                </span>
+                <span>{isConnecting ? "Connecting…" : "Bag the Bag — Am I Top 3? 🥜"}</span>
                 <ArrowRight size={18} strokeWidth={2.5} />
               </motion.button>
 
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4">
                 <div className="flex items-center gap-1.5 text-[#64748b]">
                   <ShieldCheck size={13} className="text-[#16a34a]" />
-                  <span className="text-xs">
-                    Free · read-only · no transactions
-                  </span>
+                  <span className="text-xs">Free · read-only · no transactions</span>
                 </div>
-                <span className="text-xs text-[#64748b] opacity-50">
-                  Xaman · Joey
-                </span>
+                <span className="text-xs text-[#64748b] opacity-50">Xaman · Joey</span>
               </div>
             </>
           )}
         </motion.div>
-
       </div>
     </section>
   );

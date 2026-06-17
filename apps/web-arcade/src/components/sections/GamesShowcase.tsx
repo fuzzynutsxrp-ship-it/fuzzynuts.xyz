@@ -7,8 +7,8 @@ import { useState } from "react";
 import { GAMES } from "@/lib/utils";
 import { GameModalSkeleton } from "@/components/game/GameModalSkeleton";
 
-const GameModal = dynamic(() =>
-  import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
+const GameModal = dynamic(
+  () => import("@/components/game/GameModal").then((m) => ({ default: m.GameModal })),
   { loading: () => <GameModalSkeleton />, ssr: false },
 );
 
@@ -23,8 +23,7 @@ const GameModal = dynamic(() =>
 // Card = clickable button, no navigation
 // DEGEN FLUID SCALING START — Production-reviewed architecture
 const CARD_CLASSES =
-  "arcade-card group relative cursor-pointer " +
-  "transition-all duration-300 ease-out";
+  "arcade-card group relative cursor-pointer " + "transition-all duration-300 ease-out";
 // DEGEN FLUID SCALING END
 
 function ArcadeCabinet({
@@ -60,9 +59,7 @@ function ArcadeCabinet({
       style={{ "--accent": game.color } as React.CSSProperties}
       className={CARD_CLASSES}
       role="button"
-      aria-label={
-        isComingSoon ? `${game.title} — Coming Soon` : `Play ${game.title}`
-      }
+      aria-label={isComingSoon ? `${game.title} — Coming Soon` : `Play ${game.title}`}
       aria-disabled={isComingSoon}
       tabIndex={isComingSoon ? -1 : 0}
       onKeyDown={(e) => {
@@ -107,17 +104,13 @@ function ArcadeCabinet({
               {tag}
             </span>
           ))}
-          <span
-            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-accent-purple/30 text-accent-purple/80 bg-accent-purple/5"
-          >
+          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-accent-purple/30 text-accent-purple/80 bg-accent-purple/5">
             {game.type}
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="font-display text-base font-black text-cream truncate mb-1">
-          {game.title}
-        </h3>
+        <h3 className="font-display text-base font-black text-cream truncate mb-1">{game.title}</h3>
 
         {/* Description */}
         <p className="text-xs text-cream-dim/70 line-clamp-2 leading-relaxed mb-3 flex-1">
@@ -164,10 +157,7 @@ export function GamesShowcase() {
   return (
     <section id="games" className="relative overflow-hidden">
       {/* Background layers */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none z-0 bg-degen-mesh"
-      />
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none z-0 bg-degen-mesh" />
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none z-[1]"
@@ -205,14 +195,9 @@ export function GamesShowcase() {
 
         {/* DEGEN FLUID SCALING START */}
         <div className="arcade-grid">
-        {/* DEGEN FLUID SCALING END */}
+          {/* DEGEN FLUID SCALING END */}
           {GAMES.map((game, i) => (
-            <ArcadeCabinet
-              key={game.id}
-              game={game}
-              index={i}
-              onPlay={setActiveGameId}
-            />
+            <ArcadeCabinet key={game.id} game={game} index={i} onPlay={setActiveGameId} />
           ))}
         </div>
       </div>

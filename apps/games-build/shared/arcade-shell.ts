@@ -49,7 +49,12 @@ export function installArcadeShell(opts: ArcadeShellOptions = {}): void {
     // ── Origin validation: only accept config from trusted parent ──
     const origin = event.origin;
     const allowed = ["https://fuzzynuts.xyz", "https://www.fuzzynuts.xyz"];
-    if (typeof window !== "undefined" && origin !== window.location.origin && !allowed.includes(origin)) return;
+    if (
+      typeof window !== "undefined" &&
+      origin !== window.location.origin &&
+      !allowed.includes(origin)
+    )
+      return;
     // Store parent origin for outbound messages
     if (data.parentOrigin) _parentOrigin = data.parentOrigin;
     if (data.hideNav) {
@@ -64,11 +69,7 @@ export function installArcadeShell(opts: ArcadeShellOptions = {}): void {
 let _parentOrigin: string = "*";
 
 /** Notify the parent that the game just emitted a score event. */
-export function emitScoreEvent(payload: {
-  game: string;
-  score: number;
-  duration: number;
-}): void {
+export function emitScoreEvent(payload: { game: string; score: number; duration: number }): void {
   if (typeof window === "undefined" || window.parent === window) return;
   window.parent.postMessage({ type: "FUZZY_SCORE_SUBMITTED", ...payload }, _parentOrigin);
 }

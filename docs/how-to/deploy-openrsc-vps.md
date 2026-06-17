@@ -2,14 +2,14 @@
 
 ## Prerequisites
 
-| Requirement | Minimum | Recommended |
-|-------------|---------|-------------|
-| OS | Ubuntu 22.04 LTS | Ubuntu 24.04 LTS |
-| CPU | 1 vCPU | 2 vCPU |
-| RAM | 1 GB | 2 GB |
-| Disk | 10 GB SSD | 20 GB SSD |
-| Network | Public IPv4 | Static IPv4 |
-| Budget | $5/mo (Hetzner CX22) | $12/mo (DO 2vCPU/2GB) |
+| Requirement | Minimum              | Recommended           |
+| ----------- | -------------------- | --------------------- |
+| OS          | Ubuntu 22.04 LTS     | Ubuntu 24.04 LTS      |
+| CPU         | 1 vCPU               | 2 vCPU                |
+| RAM         | 1 GB                 | 2 GB                  |
+| Disk        | 10 GB SSD            | 20 GB SSD             |
+| Network     | Public IPv4          | Static IPv4           |
+| Budget      | $5/mo (Hetzner CX22) | $12/mo (DO 2vCPU/2GB) |
 
 ## Step-by-Step Installation
 
@@ -81,6 +81,7 @@ nano /opt/openrsc/.env
 ```
 
 Set:
+
 ```
 MARIADB_ROOT_USER=root
 MARIADB_ROOT_PASSWORD=<your_root_password>

@@ -69,7 +69,10 @@ function applySecurityHeaders(response: NextResponse, pathname: string): NextRes
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("Referrer-Policy", "no-referrer");
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+  );
 
   // Frame headers: game pages need SAME-ORIGIN so the React shell at
   // Static game assets at /games/*/index.html need SAME-ORIGIN so the
@@ -96,15 +99,16 @@ export function proxy(request: NextRequest) {
   }
 
   // ── Rate limit check ──
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || request.headers.get("x-real-ip")
-    || "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
 
   if (isRateLimited(ip)) {
-    const response = new NextResponse(
-      "Too many failed attempts. Try again later.",
-      { status: 429, headers: { "Content-Type": "text/plain", "Retry-After": "60" } }
-    );
+    const response = new NextResponse("Too many failed attempts. Try again later.", {
+      status: 429,
+      headers: { "Content-Type": "text/plain", "Retry-After": "60" },
+    });
     return applySecurityHeaders(response, pathname);
   }
 
@@ -142,7 +146,8 @@ export function proxy(request: NextRequest) {
   const response = new NextResponse("Authentication required", {
     status: 401,
     headers: {
-      "WWW-Authenticate": 'Basic realm="Fuzzynuts Staging - Authorized Access Only", charset="UTF-8"',
+      "WWW-Authenticate":
+        'Basic realm="Fuzzynuts Staging - Authorized Access Only", charset="UTF-8"',
       "Content-Type": "text/plain",
     },
   });

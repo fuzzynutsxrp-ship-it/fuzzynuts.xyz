@@ -128,15 +128,11 @@ function buildSessionCookies(
 
 export function buildAuthRouter(env: {
   WALLET_JWT_SECRET: string;
-  challengeStore?: Map<
-    string,
-    { address: string; challenge: string; exp: number }
-  >;
+  challengeStore?: Map<string, { address: string; challenge: string; exp: number }>;
 }): Router {
   const router = Router();
   const store =
-    env.challengeStore ??
-    new Map<string, { address: string; challenge: string; exp: number }>();
+    env.challengeStore ?? new Map<string, { address: string; challenge: string; exp: number }>();
   const secret = new TextEncoder().encode(env.WALLET_JWT_SECRET);
 
   // ── CSRF protection middleware (audit fix: HIGH) ──────────────
@@ -148,8 +144,7 @@ export function buildAuthRouter(env: {
     res: import("express").Response,
     next: import("express").NextFunction,
   ) {
-    const header =
-      req.headers["x-requested-with"] || req.headers["x-fn-request"];
+    const header = req.headers["x-requested-with"] || req.headers["x-fn-request"];
     if (!header || header !== "XMLHttpRequest") {
       res.status(403).json({ error: "E_CSRF" });
       return;
@@ -179,8 +174,7 @@ export function buildAuthRouter(env: {
     if (!parsed.success) return res.status(400).json({ error: "E_SCHEMA" });
 
     const record = store.get(parsed.data.challengeId);
-    if (!record)
-      return res.status(404).json({ error: "E_CHALLENGE_NOT_FOUND" });
+    if (!record) return res.status(404).json({ error: "E_CHALLENGE_NOT_FOUND" });
     if (record.exp < Date.now()) {
       store.delete(parsed.data.challengeId);
       return res.status(410).json({ error: "E_CHALLENGE_EXPIRED" });
@@ -202,11 +196,7 @@ export function buildAuthRouter(env: {
 
     store.delete(parsed.data.challengeId);
 
-    const { cookieExp, cookies } = await buildSessionCookies(
-      parsed.data.address,
-      "xaman",
-      secret,
-    );
+    const { cookieExp, cookies } = await buildSessionCookies(parsed.data.address, "xaman", secret);
 
     res.setHeader("Set-Cookie", cookies);
     return res.json({
@@ -227,10 +217,7 @@ export function buildAuthRouter(env: {
 
     // CRITICAL: Validate the Xaman OAuth token server-side.
     // Do NOT trust the client-claimed address alone.
-    const validation = await validateXamanToken(
-      parsed.data.token,
-      parsed.data.address,
-    );
+    const validation = await validateXamanToken(parsed.data.token, parsed.data.address);
 
     if (!validation.valid) {
       return res.status(401).json({

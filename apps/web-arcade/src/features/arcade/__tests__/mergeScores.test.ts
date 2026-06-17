@@ -59,9 +59,7 @@ describe("mergeScores", () => {
     const local = [makeScore({ wallet: "rDupeWallet", score: 800 })];
     const result = mergeScores(api, local);
     // Should only have 1 entry for this wallet — API is authoritative
-    const dupeEntries = result.filter(
-      (s) => s.wallet.toLowerCase() === "rdupewallet"
-    );
+    const dupeEntries = result.filter((s) => s.wallet.toLowerCase() === "rdupewallet");
     expect(dupeEntries).toHaveLength(1);
   });
 
@@ -69,9 +67,7 @@ describe("mergeScores", () => {
     const api = [makeScore({ wallet: "rAbCdEfG12345678901234567890", score: 100 })];
     const local = [makeScore({ wallet: "rABCDEFG12345678901234567890", score: 200 })];
     const result = mergeScores(api, local);
-    const entries = result.filter(
-      (s) => s.wallet.toLowerCase() === "rabcdefg12345678901234567890"
-    );
+    const entries = result.filter((s) => s.wallet.toLowerCase() === "rabcdefg12345678901234567890");
     expect(entries).toHaveLength(1);
   });
 
@@ -149,7 +145,7 @@ describe("mergeScores", () => {
 
   it("caps output to MAX_ENTRIES (50)", () => {
     const api = Array.from({ length: 60 }, (_, i) =>
-      makeScore({ wallet: `rWallet${i}`, score: 60 - i })
+      makeScore({ wallet: `rWallet${i}`, score: 60 - i }),
     );
     const result = mergeScores(api, []);
     expect(result.length).toBeLessThanOrEqual(50);
@@ -157,10 +153,10 @@ describe("mergeScores", () => {
 
   it("drops lowest scores when merging pushes count over MAX_ENTRIES", () => {
     const api = Array.from({ length: 48 }, (_, i) =>
-      makeScore({ wallet: `rAPI${i}`, score: 1000 - i })
+      makeScore({ wallet: `rAPI${i}`, score: 1000 - i }),
     );
     const local = Array.from({ length: 5 }, (_, i) =>
-      makeScore({ wallet: `rLocal${i}`, score: 500 + i })
+      makeScore({ wallet: `rLocal${i}`, score: 500 + i }),
     );
     const result = mergeScores(api, local);
     expect(result.length).toBeLessThanOrEqual(50);
@@ -182,10 +178,7 @@ describe("mergeScores", () => {
   });
 
   it("handles scores with identical values correctly", () => {
-    const api = [
-      makeScore({ wallet: "rA", score: 500 }),
-      makeScore({ wallet: "rB", score: 500 }),
-    ];
+    const api = [makeScore({ wallet: "rA", score: 500 }), makeScore({ wallet: "rB", score: 500 })];
     const local = [makeScore({ wallet: "rC", score: 500 })];
     const result = mergeScores(api, local);
     expect(result).toHaveLength(3);
@@ -234,9 +227,7 @@ describe("mergeScores", () => {
     ];
     const result = mergeScores(api, local);
     // Only 1 entry per wallet — API authoritative
-    const spammerEntries = result.filter(
-      (s) => s.wallet.toLowerCase() === "rspammer"
-    );
+    const spammerEntries = result.filter((s) => s.wallet.toLowerCase() === "rspammer");
     expect(spammerEntries).toHaveLength(1);
   });
 });

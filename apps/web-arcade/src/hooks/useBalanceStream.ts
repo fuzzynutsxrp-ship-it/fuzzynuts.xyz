@@ -42,9 +42,7 @@ const DEBOUNCE_MS = 500; // Debounce rapid balance updates
 
 /* ── HTTP Fallback ── */
 
-async function fetchBalancesHTTP(
-  address: string,
-): Promise<{ xrp: string; nut: string }> {
+async function fetchBalancesHTTP(address: string): Promise<{ xrp: string; nut: string }> {
   const wsUrl = new URL(WS_URL);
   const httpUrl = `${wsUrl.protocol === "wss:" ? "https:" : "http:"}//${wsUrl.host}`;
 
@@ -136,9 +134,7 @@ export function useBalanceStream(): BalanceStreamState {
       updateBalances(xrp, nut);
     } catch (err) {
       if (mountedRef.current) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch balances",
-        );
+        setError(err instanceof Error ? err.message : "Failed to fetch balances");
       }
     } finally {
       if (mountedRef.current) setIsPolling(false);
@@ -236,8 +232,7 @@ export function useBalanceStream(): BalanceStreamState {
           // Trust lines response
           if (data.result?.lines) {
             const nutLine = data.result.lines.find(
-              (l: { currency: string }) =>
-                l.currency === XRPL_CONFIG.currencyCode,
+              (l: { currency: string }) => l.currency === XRPL_CONFIG.currencyCode,
             );
             if (nutLine) {
               setNutBalance(nutLine.balance);
@@ -277,8 +272,7 @@ export function useBalanceStream(): BalanceStreamState {
 
         // Reconnect with backoff
         const attempt = reconnectRef.current;
-        const delay =
-          RECONNECT_DELAYS[Math.min(attempt, RECONNECT_DELAYS.length - 1)];
+        const delay = RECONNECT_DELAYS[Math.min(attempt, RECONNECT_DELAYS.length - 1)];
         reconnectRef.current = attempt + 1;
 
         reconnectTimerRef.current = setTimeout(() => {
@@ -327,18 +321,13 @@ export function useBalanceStream(): BalanceStreamState {
   /* ── Reconnect on visibility ── */
   useEffect(() => {
     const handleVisibility = () => {
-      if (
-        document.visibilityState === "visible" &&
-        address &&
-        !wsRef.current
-      ) {
+      if (document.visibilityState === "visible" && address && !wsRef.current) {
         reconnectRef.current = 0;
         connectWS();
       }
     };
     document.addEventListener("visibilitychange", handleVisibility);
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [address, connectWS]);
 
   return {
@@ -353,10 +342,7 @@ export function useBalanceStream(): BalanceStreamState {
 
 /* ── Helpers: Extract balances from transaction metadata ── */
 
-function extractXRPBalance(
-  meta: Record<string, unknown>,
-  address: string,
-): number | null {
+function extractXRPBalance(meta: Record<string, unknown>, address: string): number | null {
   const nodes = (meta.AffectedNodes as Array<Record<string, unknown>>) || [];
   for (const node of nodes) {
     const modified = node.ModifiedNode as Record<string, unknown> | undefined;
@@ -365,18 +351,14 @@ function extractXRPBalance(
       modified.LedgerEntryType === "AccountRoot" &&
       (modified.FinalFields as Record<string, unknown>)?.Account === address
     ) {
-      const balance = (modified.FinalFields as Record<string, unknown>)
-        ?.Balance;
+      const balance = (modified.FinalFields as Record<string, unknown>)?.Balance;
       if (typeof balance === "string") return parseInt(balance, 10);
     }
   }
   return null;
 }
 
-function extractNUTBalance(
-  meta: Record<string, unknown>,
-  address: string,
-): string | null {
+function extractNUTBalance(meta: Record<string, unknown>, address: string): string | null {
   const nodes = (meta.AffectedNodes as Array<Record<string, unknown>>) || [];
   for (const node of nodes) {
     const modified = node.ModifiedNode as Record<string, unknown> | undefined;
@@ -386,13 +368,9 @@ function extractNUTBalance(
 
       const low = fields.LowLimit as { issuer?: string } | undefined;
       const high = fields.HighLimit as { issuer?: string } | undefined;
-      const isRelevant =
-        low?.issuer === address || high?.issuer === address;
+      const isRelevant = low?.issuer === address || high?.issuer === address;
 
-      if (
-        isRelevant &&
-        (fields as Record<string, unknown>).Balance !== undefined
-      ) {
+      if (isRelevant && (fields as Record<string, unknown>).Balance !== undefined) {
         const bal = fields.Balance as { value?: string } | string;
         if (typeof bal === "string") return bal;
         if (typeof bal === "object" && bal.value) return bal.value;

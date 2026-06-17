@@ -20,19 +20,19 @@ export interface UserDocument {
 
   // Auth
   provider: AuthProvider;
-  email?: string;           // Web2 — unique, sparse
-  googleId?: string;        // Web2 — Google sub
-  walletAddress?: string;   // Web3 — XRPL address (r...)
-  name?: string;            // Display name (Google profile or custom)
-  image?: string;           // Avatar URL (Google profile picture)
+  email?: string; // Web2 — unique, sparse
+  googleId?: string; // Web2 — Google sub
+  walletAddress?: string; // Web3 — XRPL address (r...)
+  name?: string; // Display name (Google profile or custom)
+  image?: string; // Avatar URL (Google profile picture)
 
   // Referral
-  referralCode?: string;    // unique per user
-  referredBy?: string;      // referralCode of the referrer
+  referralCode?: string; // unique per user
+  referredBy?: string; // referralCode of the referrer
 
   // Game data
-  rscUsername?: string;     // Open-RSC username mapping
-  nutBalance?: number;      // $NUT balance (cached)
+  rscUsername?: string; // Open-RSC username mapping
+  nutBalance?: number; // $NUT balance (cached)
 
   // Timestamps
   createdAt: Date;
@@ -89,7 +89,14 @@ export async function upsertGoogleUser(
   if (user) {
     await col.updateOne(
       { _id: user._id },
-      { $set: { lastLoginAt: now, updatedAt: now, name: opts.name ?? user.name, image: opts.image ?? user.image } },
+      {
+        $set: {
+          lastLoginAt: now,
+          updatedAt: now,
+          name: opts.name ?? user.name,
+          image: opts.image ?? user.image,
+        },
+      },
     );
     return { ...user, lastLoginAt: now, updatedAt: now };
   }
@@ -111,7 +118,13 @@ export async function upsertGoogleUser(
         },
       },
     );
-    return { ...existingEmail, provider: "both", googleId: opts.googleId, lastLoginAt: now, updatedAt: now };
+    return {
+      ...existingEmail,
+      provider: "both",
+      googleId: opts.googleId,
+      lastLoginAt: now,
+      updatedAt: now,
+    };
   }
 
   // Create new Google user
@@ -142,10 +155,7 @@ export async function upsertWalletUser(
 
   let user = await col.findOne({ walletAddress: opts.walletAddress });
   if (user) {
-    await col.updateOne(
-      { _id: user._id },
-      { $set: { lastLoginAt: now, updatedAt: now } },
-    );
+    await col.updateOne({ _id: user._id }, { $set: { lastLoginAt: now, updatedAt: now } });
     return { ...user, lastLoginAt: now, updatedAt: now };
   }
 

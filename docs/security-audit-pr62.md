@@ -47,10 +47,7 @@ won't.
 **Recommendation:** Apply CORP selectively to game asset routes only:
 
 ```typescript
-app.use(
-  "/games",
-  helmet.crossOriginResourcePolicy({ policy: "cross-origin" }),
-);
+app.use("/games", helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 ```
 
 Or use helmet's `crossOriginResourcePolicy: { policy: "same-site" }` as the global default
@@ -72,7 +69,10 @@ The new catch-all rule:
   "headers": [
     { "key": "Access-Control-Allow-Origin", "value": "https://www.fuzzynuts.xyz" },
     { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS" },
-    { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Requested-With" },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Authorization, X-Requested-With"
+    },
     { "key": "Access-Control-Allow-Credentials", "value": "true" },
     { "key": "Access-Control-Max-Age", "value": "86400" }
   ]
@@ -132,6 +132,7 @@ Express evaluates middleware in registration order. The current order is:
 2. `/games` CORS (origin: `*`, no credentials)
 
 For requests to `/games/*`:
+
 - **Same-origin requests:** Hit global CORS first (origin passes check, headers set), then
   hit `/games` CORS (wildcard adds another set of CORS headers). Result: duplicate CORS
   headers. Browsers handle this, but it's untidy.
@@ -194,14 +195,14 @@ future.
 
 ## Changes from main
 
-| Area | Before (main) | After (PR #62) |
-|------|---------------|-----------------|
-| CSP frame-ancestors | `self`, `www.fuzzynuts.xyz`, `localhost:3000` | + `fuzzynuts.xyz`, `game.fuzzynuts.xyz` |
-| CORP header | Not set | `cross-origin` (global) |
-| API CORS (Express) | Origin-check callback, credentials | + methods, allowedHeaders, exposedHeaders, maxAge |
-| `/games` CORS | Not present | `origin: *`, GET/HEAD/OPTIONS only |
-| Vercel CORS | SSE stream only | + game assets, videos, icons, catch-all `/api/(.*)` |
-| Vercel SSE origin | `https://fuzzynuts.xyz` | `https://www.fuzzynuts.xyz` |
+| Area                | Before (main)                                 | After (PR #62)                                      |
+| ------------------- | --------------------------------------------- | --------------------------------------------------- |
+| CSP frame-ancestors | `self`, `www.fuzzynuts.xyz`, `localhost:3000` | + `fuzzynuts.xyz`, `game.fuzzynuts.xyz`             |
+| CORP header         | Not set                                       | `cross-origin` (global)                             |
+| API CORS (Express)  | Origin-check callback, credentials            | + methods, allowedHeaders, exposedHeaders, maxAge   |
+| `/games` CORS       | Not present                                   | `origin: *`, GET/HEAD/OPTIONS only                  |
+| Vercel CORS         | SSE stream only                               | + game assets, videos, icons, catch-all `/api/(.*)` |
+| Vercel SSE origin   | `https://fuzzynuts.xyz`                       | `https://www.fuzzynuts.xyz`                         |
 
 ---
 

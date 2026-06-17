@@ -24,8 +24,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:game-auth": "tsx tools/test-game-auth.ts",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json,yaml,yml}\" --ignore-path .gitignore",
-    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,yaml,yml}\" --ignore-path .gitignore",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,yaml,yml}\"",
     "changeset": "changeset",
     "version": "changeset version && pnpm install --lockfile-only",
     "release": "turbo run build --filter=...[origin/main] && changeset publish",
@@ -48,7 +48,10 @@
       "esbuild": ">=0.28.1",
       "postcss": ">=8.5.10",
       "vite": ">=6.4.2",
-      "ws": ">=8.20.1",
+      "ws": ">=8.21.0",
+      "form-data": ">=4.0.6",
+      "tar": ">=7.5.16",
+      "js-yaml": ">=4.2.0",
       "uuid": ">=11.1.1"
     }
   }

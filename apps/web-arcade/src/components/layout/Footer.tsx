@@ -14,10 +14,7 @@ const FOOTER_LINKS = [
 
 export function Footer() {
   return (
-    <footer
-      className="relative border-t border-white/5 bg-[#0a0613]"
-      role="contentinfo"
-    >
+    <footer className="relative border-t border-white/5 bg-[#0a0613]" role="contentinfo">
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Brand */}
@@ -30,9 +27,7 @@ export function Footer() {
               className="rounded"
               loading="lazy"
             />
-            <span className="text-sm font-display font-bold text-cream">
-              FuzzyNuts
-            </span>
+            <span className="text-sm font-display font-bold text-cream">FuzzyNuts</span>
           </div>
 
           {/* Links */}

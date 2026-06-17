@@ -24,12 +24,12 @@ Full walkthrough: [docs/tutorials/01-run-the-arcade-locally.md](./docs/tutorials
 
 ## Architecture
 
-| Component | URL / Location | Stack |
-|-----------|----------------|-------|
-| **fuzzynuts.xyz** (Vercel) | <https://fuzzynuts.xyz> | Next.js 15 static arcade frontend |
-| **world.fuzzynuts.xyz** (Railway `efficient-tenderness`) | <https://world.fuzzynuts.xyz> | Kaetram MMORPG game server (from [`fuzzynuts-world`](https://github.com/fuzzynutsxrp-ship-it/fuzzynuts-world) repo) |
-| **Railway `fuzzynuts.xyz` service** | `fuzzynutsxyz-production.up.railway.app` | Express API backend (from monorepo, no custom domain) |
-| **VPS 67.205.132.6** | `game.fuzzynuts.xyz` :43594 / :43494 | Open-RSC RuneScape Classic game server (Java 8, systemd) |
+| Component                                                | URL / Location                           | Stack                                                                                                               |
+| -------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **fuzzynuts.xyz** (Vercel)                               | <https://fuzzynuts.xyz>                  | Next.js 15 static arcade frontend                                                                                   |
+| **world.fuzzynuts.xyz** (Railway `efficient-tenderness`) | <https://world.fuzzynuts.xyz>            | Kaetram MMORPG game server (from [`fuzzynuts-world`](https://github.com/fuzzynutsxrp-ship-it/fuzzynuts-world) repo) |
+| **Railway `fuzzynuts.xyz` service**                      | `fuzzynutsxyz-production.up.railway.app` | Express API backend (from monorepo, no custom domain)                                                               |
+| **VPS 67.205.132.6**                                     | `game.fuzzynuts.xyz` :43594 / :43494     | Open-RSC RuneScape Classic game server (Java 8, systemd)                                                            |
 
 ### Mermaid diagram
 
@@ -61,18 +61,18 @@ flowchart LR
 
 ## Repo layout
 
-| Path | What |
-|---|---|
-| `apps/web-arcade` | Next.js 15 static export |
-| `apps/api` | Express + Mongo, deployed to Railway |
-| `apps/games-build` | One Vite pipeline for every iframe game |
-| `apps/desktop-tauri` | Tauri 2.x shell |
-| `apps/mobile-capacitor` | Capacitor 7 iOS + Android |
-| `packages/arcade-core` | Single source of truth: SCORE_CAPS, slugs, schema |
-| `packages/xrpl-token-utils` | XRPL client, verify, AMM price, payout |
-| `packages/wallet-client` | Xaman + Joey adapters |
-| `packages/shared-anticheat` | HMAC + nonce + session-token, shared web/api |
-| `docs/` | Diátaxis: tutorials, how-to, reference, explanation, ADRs, runbooks |
+| Path                        | What                                                                |
+| --------------------------- | ------------------------------------------------------------------- |
+| `apps/web-arcade`           | Next.js 15 static export                                            |
+| `apps/api`                  | Express + Mongo, deployed to Railway                                |
+| `apps/games-build`          | One Vite pipeline for every iframe game                             |
+| `apps/desktop-tauri`        | Tauri 2.x shell                                                     |
+| `apps/mobile-capacitor`     | Capacitor 7 iOS + Android                                           |
+| `packages/arcade-core`      | Single source of truth: SCORE_CAPS, slugs, schema                   |
+| `packages/xrpl-token-utils` | XRPL client, verify, AMM price, payout                              |
+| `packages/wallet-client`    | Xaman + Joey adapters                                               |
+| `packages/shared-anticheat` | HMAC + nonce + session-token, shared web/api                        |
+| `docs/`                     | Diátaxis: tutorials, how-to, reference, explanation, ADRs, runbooks |
 
 ## Contributing
 
@@ -92,13 +92,13 @@ RuneScape Classic integration via [Open-RSC](https://gitlab.com/openrsc/openrsc)
 
 ### Quick status
 
-| Component | Status |
-|-----------|--------|
-| Challenge format | `FuzzyNuts-Auth-{nonce}-{timestamp}` (UTF-8) |
-| XRPL verify | `verifyKeypairSignature` (xrpl.js v4) with hex encoding |
-| Game session HMAC | `shared-anticheat` signGameSession / verifyGameSession |
-| VPS script | `tools/deploy-openrsc-vps.sh` (Ubuntu 22.04+, idempotent) |
-| API env toggle | `GAME_SERVER_READY=true` in Railway dashboard |
+| Component         | Status                                                    |
+| ----------------- | --------------------------------------------------------- |
+| Challenge format  | `FuzzyNuts-Auth-{nonce}-{timestamp}` (UTF-8)              |
+| XRPL verify       | `verifyKeypairSignature` (xrpl.js v4) with hex encoding   |
+| Game session HMAC | `shared-anticheat` signGameSession / verifyGameSession    |
+| VPS script        | `tools/deploy-openrsc-vps.sh` (Ubuntu 22.04+, idempotent) |
+| API env toggle    | `GAME_SERVER_READY=true` in Railway dashboard             |
 
 ## License
 

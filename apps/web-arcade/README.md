@@ -20,16 +20,16 @@
 
 ## 🛠 Tech Stack
 
-| Technology | Version | Purpose |
-|---|---|---|
-| [Next.js](https://nextjs.org) | 15.5 | App Router, static export |
-| [React](https://react.dev) | 19.1 | UI framework |
-| [TypeScript](https://typescriptlang.org) | 5.x | Type safety |
-| [Tailwind CSS](https://tailwindcss.com) | 3.4 | Utility-first styling |
-| [Framer Motion](https://www.framer.com/motion/) | 12.x | Animations |
-| [Zustand](https://zustand-demo.pmnd.rs/) | 5.x | State management |
-| [Lucide React](https://lucide.dev) | Latest | Icon library |
-| [Xumm SDK](https://www.npmjs.com/package/xumm) | 1.8 | Xaman wallet integration |
+| Technology                                      | Version | Purpose                   |
+| ----------------------------------------------- | ------- | ------------------------- |
+| [Next.js](https://nextjs.org)                   | 15.5    | App Router, static export |
+| [React](https://react.dev)                      | 19.1    | UI framework              |
+| [TypeScript](https://typescriptlang.org)        | 5.x     | Type safety               |
+| [Tailwind CSS](https://tailwindcss.com)         | 3.4     | Utility-first styling     |
+| [Framer Motion](https://www.framer.com/motion/) | 12.x    | Animations                |
+| [Zustand](https://zustand-demo.pmnd.rs/)        | 5.x     | State management          |
+| [Lucide React](https://lucide.dev)              | Latest  | Icon library              |
+| [Xumm SDK](https://www.npmjs.com/package/xumm)  | 1.8     | Xaman wallet integration  |
 
 ## 🚀 Quick Start
 
@@ -153,29 +153,29 @@ fuzzynuts-optimized/
 
 ### Supported Wallets
 
-| Wallet | Type | Support |
-|---|---|---|
-| [Xaman (Xumm)](https://xaman.app) | Mobile + Desktop | ✅ Full |
+| Wallet                             | Type              | Support |
+| ---------------------------------- | ----------------- | ------- |
+| [Xaman (Xumm)](https://xaman.app)  | Mobile + Desktop  | ✅ Full |
 | [GemWallet](https://gemwallet.app) | Browser Extension | ✅ Full |
-| [Crossmark](https://crossmark.io) | Browser Extension | ✅ Full |
+| [Crossmark](https://crossmark.io)  | Browser Extension | ✅ Full |
 
 ### On-Chain Addresses
 
-| Purpose | Address |
-|---|---|
+| Purpose             | Address                              |
+| ------------------- | ------------------------------------ |
 | Issuer (Blackholed) | `rpL6HfoV578CAkZoNbm3UEK5BgVY9DxMP7` |
-| Distributor | `rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh` |
-| AMM Pool | `r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg` |
+| Distributor         | `rEAg6fmrKyCFahqY4KNfbFx4BN2KjR4BZh` |
+| AMM Pool            | `r3UzuHQQQGZRPhxzFFGbzgJYCb76ESJxtg` |
 
 ## 🎮 Games
 
-| Game | Type | Status |
-|---|---|---|
-| Fuzzynuts World | MMORPG | 🟢 Live |
-| Super Fuzzynuts | Platformer | 🟢 Live |
-| Fuzzy Survivors | Horde Survival | 🟢 Live |
-| Fuzzy Putt | Mini Golf | 🟢 Live |
-| Nut Racer | Racing | 🟡 Coming Soon |
+| Game            | Type           | Status         |
+| --------------- | -------------- | -------------- |
+| Fuzzynuts World | MMORPG         | 🟢 Live        |
+| Super Fuzzynuts | Platformer     | 🟢 Live        |
+| Fuzzy Survivors | Horde Survival | 🟢 Live        |
+| Fuzzy Putt      | Mini Golf      | 🟢 Live        |
+| Nut Racer       | Racing         | 🟡 Coming Soon |
 
 ## 📜 Scripts
 
