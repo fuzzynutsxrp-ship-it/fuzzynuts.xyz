@@ -272,8 +272,8 @@
     canvas = document.getElementById('game-canvas');
     if (!canvas) return;
     ctx = canvas.getContext('2d');
-    overlayStart = document.getElementById('overlay-start');
-    overlayOver = document.getElementById('overlay-gameover');
+    overlayStart = document.getElementById('start-screen');
+    overlayOver = document.getElementById('game-over');
     best = parseInt((function(){try{return localStorage.getItem('tetris_best')}catch(e){return null}})()) || 0;
     document.addEventListener('keydown', onKeyDown);
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
