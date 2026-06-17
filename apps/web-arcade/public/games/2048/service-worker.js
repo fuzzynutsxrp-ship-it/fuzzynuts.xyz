@@ -1,4 +1,4 @@
-const CACHE = '2048-v1.0.0';
+const CACHE = '2048-v1.1.0';
 const ASSETS = ['./', './index.html', './2048.css', './2048.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

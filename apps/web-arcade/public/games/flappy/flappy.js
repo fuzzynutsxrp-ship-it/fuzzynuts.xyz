@@ -33,9 +33,9 @@
   best = parseInt((function(){try{return localStorage.getItem('flappy_best')}catch(e){return null}})() || '0', 10);
 
   function resize() {
-    const parent = canvas.parentElement || document.body;
-    W = canvas.width = parent.clientWidth || 480;
-    H = canvas.height = parent.clientHeight || 640;
+    
+    W = canvas.width = window.innerWidth || 480;
+    H = canvas.height = window.innerHeight || 640;
   }
 
   function initStars() {
@@ -287,7 +287,7 @@
     const duration = Math.round((Date.now() - startTime) / 1000);
     if (score > best) {
       best = score;
-      try { localStorage.setItem('flappy_best', String(best) } catch(e) {});
+      try { localStorage.setItem('flappy_best', String(best)); } catch(e) {}
     }
     window.__gameScore = score;
 
@@ -335,10 +335,12 @@
     flap();
   });
 
+  canvas.addEventListener('touchend', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchstart', function (e) {
     e.preventDefault();
     flap();
   }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   // ── Restart hook ──
   window.__restartFlappy = function () {

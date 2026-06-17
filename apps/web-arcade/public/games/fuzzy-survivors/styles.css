@@ -1,18 +1,18 @@
 /* Survivor — open-source roguelite styles */
 :root {
-    --bg: #0a0613;
-    --card: rgba(10, 6, 19, 0.95);
-    --accent: #d4a843;
-    --accent-strong: #b8922f;
+    --bg: #0a0a12;
+    --card: rgba(6, 8, 16, 0.92);
+    --accent: #ffd24d;
+    --accent-strong: #ffb400;
     /* iter-10 a11y: --primary darkened from #3388ff (3.43:1 vs white) to
        #1d6fe0 (~4.66:1) so primary buttons clear the WCAG AA 4.5:1 bar
        at the existing 15px weight 600 on white text. */
-    --primary: #ff2e88;
-    --primary-strong: #ff5fa8;
+    --primary: #1d6fe0;
+    --primary-strong: #4d92ff;
     --danger: #ff3355;
-    --muted: rgba(245, 240, 230, 0.45);
+    --muted: #8a8fa0;
     --text: #e8ebf3;
-    --border: rgba(255, 46, 136, 0.2);
+    --border: #2a2f44;
 }
 
 * {
@@ -28,10 +28,9 @@ body {
     height: 100vh;
     height: 100svh;
     height: 100dvh;
-    background: radial-gradient(ellipse at top, #1a0d2e 0%, #0a0613 70%);
+    background: radial-gradient(ellipse at top, #1b1330 0%, #0a0a12 70%);
     color: var(--text);
     font-family:
-        "Outfit",
         system-ui,
         -apple-system,
         'Segoe UI',
@@ -52,7 +51,7 @@ body {
 
 #gameContainer {
     position: relative;
-    box-shadow: 0 0 60px rgba(255, 46, 136, 0.2);
+    box-shadow: 0 0 60px rgba(120, 60, 220, 0.35);
     border-radius: 6px;
     overflow: hidden;
     /* Scale to fill the viewport while preserving the game's 3:2 aspect ratio.
@@ -75,12 +74,14 @@ body {
 @media (hover: none) and (pointer: coarse) {
     #gameContainer {
         position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%);
-        max-width: 100vw;
-        max-height: 100vh;
-        max-height: 100dvh;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
         border-radius: 0;
         box-shadow: none;
         z-index: 1;
@@ -122,8 +123,8 @@ body {
 
 canvas {
     display: block;
-    border: 1px solid rgba(255, 46, 136, 0.15);
-    background: #0d0a16;
+    border: 1px solid #222;
+    background: #1a1a2e;
     width: 100%;
     height: 100%;
     image-rendering: crisp-edges;
@@ -195,7 +196,7 @@ canvas {
 }
 .exp-fill {
     height: 100%;
-    background: linear-gradient(90deg, #d4a843, #ffd280);
+    background: linear-gradient(90deg, #3388ff, #66bbff);
     transition: width 0.2s;
 }
 
@@ -272,31 +273,23 @@ canvas {
     font-size: 16px;
 }
 .icon-btn:hover {
-    background: rgba(255, 46, 136, 0.1);
+    background: #1a1c30;
 }
 
 /* Overlays ------------------------------------------------------------- */
 .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(10, 6, 19, 0.75);
-    backdrop-filter: blur(8px);
+    background: rgba(5, 6, 14, 0.6);
+    backdrop-filter: blur(6px);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     pointer-events: auto;
     z-index: 10;
-    padding-top: 20px;
+    /* Account for the fixed nav bar at the top */
+    padding-top: 44px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    /* Override body touch-action:none so overlays can scroll */
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-    overflow-y: auto;
-}
-
-/* In iframe mode (GameModal), no nav bar */
-body.in-iframe .overlay {
-    padding-top: 12px;
 }
 
 .overlay-card {
@@ -330,7 +323,7 @@ body.in-iframe .overlay {
     font-size: 36px;
     letter-spacing: 2px;
     margin-bottom: 6px;
-    text-shadow: 0 0 20px rgba(255, 46, 136, 0.5);
+    text-shadow: 0 0 20px rgba(85, 160, 255, 0.5);
 }
 .overlay-card h2 {
     color: var(--accent);
@@ -377,10 +370,8 @@ body.in-iframe .overlay {
         background 0.2s;
     color: #fff;
 }
-@media (hover: hover) {
-    .btn:hover {
-        transform: translateY(-1px);
-    }
+.btn:hover {
+    transform: translateY(-1px);
 }
 .btn.primary {
     background: var(--primary);
@@ -558,7 +549,7 @@ body.in-iframe .overlay {
     text-align: right;
 }
 .settings-row select {
-    background: rgba(10, 6, 19, 0.9);
+    background: #101224;
     color: var(--text);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -712,11 +703,11 @@ body.in-iframe .overlay {
  */
 @media (prefers-contrast: more) {
     :root {
-        --accent: #ffd966;
-        --primary: #ff6faa;
+        --accent: #ffff44;
+        --primary: #66ddff;
         --danger: #ff6699;
         --muted: #c8cbd8;
-        --border: rgba(255, 111, 170, 0.5);
+        --border: #888ea5;
     }
     .overlay {
         background: rgba(0, 0, 0, 0.9);
@@ -759,7 +750,7 @@ body.in-iframe .overlay {
     width: min(380px, 92vw);
 }
 .ach-toast {
-    background: rgba(10, 6, 19, 0.95);
+    background: rgba(8, 12, 24, 0.92);
     border: 1px solid var(--accent);
     border-radius: 10px;
     padding: 10px 12px;
@@ -910,8 +901,8 @@ body.in-iframe .overlay {
 
 /* Colorblind / high-contrast mode ----------------------------------- */
 body.cb-mode {
-    --accent: #ffd966;
-    --primary: #ff6faa;
+    --accent: #ffff44;
+    --primary: #55ddff;
     --danger: #ff77aa;
 }
 body.cb-mode .chip {
@@ -921,7 +912,7 @@ body.cb-mode .hp-fill {
     background: #ff77aa;
 }
 body.cb-mode .exp-fill {
-    background: #ffd966;
+    background: #55ddff;
 }
 
 /* Phones ------------------------------------------------------------- */
@@ -1231,13 +1222,13 @@ body.cb-mode .exp-fill {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(10, 6, 19, 0.78);
+    background: rgba(8, 6, 18, 0.78);
     backdrop-filter: blur(2px);
     z-index: 60;
 }
 .tutorial-offer-card {
-    background: rgba(10, 6, 19, 0.95);
-    border: 1px solid rgba(255, 46, 136, 0.2);
+    background: #1a1432;
+    border: 1px solid #3a2f5a;
     border-radius: 14px;
     padding: 22px 26px;
     text-align: center;
@@ -1249,11 +1240,11 @@ body.cb-mode .exp-fill {
     top: 16px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(10, 6, 19, 0.95);
-    border: 1px solid rgba(212, 168, 67, 0.3);
+    background: rgba(20, 12, 38, 0.92);
+    border: 1px solid #4a3a8a;
     border-radius: 10px;
     padding: 10px 16px;
-    color: var(--text);
+    color: #f3edff;
     font-size: 13px;
     line-height: 1.4;
     max-width: min(560px, 90vw);
@@ -1263,7 +1254,7 @@ body.cb-mode .exp-fill {
 }
 .tutorial-banner strong {
     display: block;
-    color: var(--accent);
+    color: #ffd66b;
     margin-bottom: 4px;
 }
 .tutorial-banner .tutorial-body {

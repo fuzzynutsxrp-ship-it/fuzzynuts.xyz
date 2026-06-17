@@ -38,7 +38,7 @@ function init(){
   if(!canvas){ canvas = document.createElement('canvas'); canvas.id='game-canvas'; document.body.appendChild(canvas); }
   ctx = canvas.getContext('2d');
   resize();
-  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
   canvas.addEventListener('click', handleClick);
   canvas.addEventListener('touchstart', handleTouch, {passive:false});
   resetState();
@@ -372,7 +372,7 @@ function handleClick(e){
   if(state.gameOver){ restart(); return; }
   if(state.wave===0 && !state.waveActive){ startWave(); return; }
   const rect=canvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const sc=canvas.width/rect.width; const mx=(e.clientX-rect.left)*sc, my=(e.clientY-rect.top)*(canvas.height/rect.height);
   const gx=Math.floor(mx/GRID_SIZE), gy=Math.floor(my/GRID_SIZE);
   // check if clicked on existing tower
   for(const t of state.towers){
@@ -391,7 +391,7 @@ function handleClick(e){
 function handleTouch(e){
   e.preventDefault();
   const t=e.touches[0];
-  handleClick({clientX:t.clientX, clientY:t.clientY});
+  const r=canvas.getBoundingClientRect(), sc=canvas.width/r.width; handleClick({clientX:(t.clientX-r.left)*sc+r.left, clientY:(t.clientY-r.top)*(canvas.height/r.height)+r.top});
 }
 
 function towerAt(gx,gy){
@@ -440,7 +440,7 @@ function upgradeTower(tower){
 function gameOver(){
   state.gameOver=true;
   const best=parseInt((function(){try{return localStorage.getItem('tower-defense_best')}catch(e){return null}})()||'0');
-  if(state.score>best) try{localStorage.setItem('tower-defense_best',state.score)}catch(e){};
+  try { if(state.score>best) localStorage.setItem('tower-defense_best',state.score); } catch(e) {}
   const duration=Math.floor((Date.now()-startTime)/1000);
   window.__gameScore=state.score;
   if(typeof FuzzyScoreSubmit==='function') FuzzyScoreSubmit('tower-defense',state.score,duration);
@@ -452,7 +452,7 @@ function victory(){
   state.score+=500;
   window.__gameScore=state.score;
   const best=parseInt((function(){try{return localStorage.getItem('tower-defense_best')}catch(e){return null}})()||'0');
-  if(state.score>best) try{localStorage.setItem('tower-defense_best',state.score)}catch(e){};
+  try { if(state.score>best) localStorage.setItem('tower-defense_best',state.score); } catch(e) {}
   const duration=Math.floor((Date.now()-startTime)/1000);
   if(typeof FuzzyScoreSubmit==='function') FuzzyScoreSubmit('tower-defense',state.score,duration);
   updateHUD();

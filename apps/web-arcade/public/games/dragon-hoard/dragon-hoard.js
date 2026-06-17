@@ -167,7 +167,7 @@
     // Update best score
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('dragon-hoard-best', bestScore.toString() } catch(e) {});
+      try { localStorage.setItem('dragon-hoard-best', bestScore.toString()); } catch(e) {}
     }
 
     // Show game over screen
@@ -781,6 +781,7 @@
       e.preventDefault();
       touchTarget = null;
     }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   // ─── Bootstrap ─────────────────────────────────────────────────

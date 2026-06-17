@@ -5,7 +5,7 @@
  */
 /* eslint-env serviceworker */
 
-const CACHE = 'fuzzy-putt-v1.0.0';
+const CACHE = 'fuzzy-putt-v1.1.0';
 const ASSETS = [
     './',
     './index.html',

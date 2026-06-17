@@ -84,9 +84,7 @@
   function resize() {
     const container = canvas.parentElement || document.body;
     const maxW = container.clientWidth || 800;
-    if (const maxW =  < 100) const maxW =  = (window.innerWidth || 800) - 16;
     const maxH = container.clientHeight || 600;
-    if (const maxH =  < 100) const maxH =  = (window.innerHeight || 600) - 16;
     tileW = Math.floor(maxW / COLS);
     tileH = Math.floor(maxH / ROWS);
     const t = Math.min(tileW, tileH);
@@ -353,7 +351,7 @@
 
     // Best score
     const prev = parseInt((function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0', 10);
-    if (score > prev) try { localStorage.setItem('bomberman_best', score.toString() } catch(e) {});
+    try { if (score > prev) localStorage.setItem('bomberman_best', score.toString()); } catch(e) {}
     bestScore = Math.max(score, prev);
 
     const duration = Math.floor((Date.now() - startTime) / 1000);
@@ -413,15 +411,19 @@
   function onTouchStart(e) {
     if (!gameRunning) return;
     const t = e.touches[0];
-    touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+    const rect = canvas.getBoundingClientRect();
+    touchStart = { x: (t.clientX - rect.left) * (canvas.width / rect.width), y: (t.clientY - rect.top) * (canvas.height / rect.height), time: Date.now() };
     touchMoved = false;
   }
 
   function onTouchMove(e) {
     if (!touchStart || !gameRunning) return;
     const t = e.touches[0];
-    const dx = t.clientX - touchStart.x;
-    const dy = t.clientY - touchStart.y;
+    const rect = canvas.getBoundingClientRect();
+    const cx = (t.clientX - rect.left) * (canvas.width / rect.width);
+    const cy = (t.clientY - rect.top) * (canvas.height / rect.height);
+    const dx = cx - touchStart.x;
+    const dy = cy - touchStart.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist > 30) {
       touchMoved = true;
@@ -430,7 +432,7 @@
       } else {
         movePlayer(0, dy > 0 ? 1 : -1);
       }
-      touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+      touchStart = { x: cx, y: cy, time: Date.now() };
       e.preventDefault();
     }
   }
@@ -562,7 +564,7 @@
     ctx.fillText('Space / Tap to place bomb', canvas.width / 2, canvas.height * 0.58);
     ctx.fillText('Destroy all enemies to advance!', canvas.width / 2, canvas.height * 0.66);
 
-    const bs = (function(){try{return localStorage.getItem('bomberman_best') || '0'}catch(e){return '0'}})();
+    const bs = (function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0';
     ctx.fillStyle = '#888';
     ctx.font = Math.floor(tileH * 0.4) + 'px monospace';
     ctx.fillText('Best: ' + bs, canvas.width / 2, canvas.height * 0.78);
@@ -718,6 +720,7 @@
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: true });
 
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     // Start screen wait
     drawStartScreen();
 

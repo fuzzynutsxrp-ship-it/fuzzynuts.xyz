@@ -130,10 +130,12 @@
     canvas.addEventListener('touchstart', function(e) { e.preventDefault(); handleTouch(e); }, { passive: false });
     canvas.addEventListener('touchmove', function(e) { e.preventDefault(); handleTouch(e); }, { passive: false });
     canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
       if (waitingForServe) { serveBall(); hideOverlay('start-overlay'); }
       if (gameOver) { hideOverlay('gameover-overlay'); resetGame(); }
-    });
-    window.addEventListener('resize', resize);
+    }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
   }
 
   function handleTouch(e) {
@@ -347,7 +349,7 @@
     const duration = Math.floor((Date.now() - gameStartTime) / 1000);
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('breakout_best', bestScore) } catch(e) {};
+      try { localStorage.setItem('breakout_best', bestScore); } catch(e) {}
     }
     window.__gameScore = score;
     updateHUD();

@@ -26,7 +26,7 @@ function resize(){
   canvas.width  = wrap.clientWidth  || window.innerWidth;
   canvas.height = wrap.clientHeight || window.innerHeight;
 }
-window.addEventListener('resize', resize);
+if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 resize();
 
 /* ── HUD helper ─────────────────────────────────────────────────── */
@@ -114,6 +114,7 @@ canvas.addEventListener('touchend', e=>{
   state.touchY = null;
   state.touchStartY = null;
 },{passive:false});
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
 /* ── game control ───────────────────────────────────────────────── */
 function startGame(){
@@ -134,7 +135,7 @@ function gameOver(){
   const finalScore = Math.floor(state.score);
   if (finalScore > state.best){
     state.best = finalScore;
-    try{localStorage.setItem('surf-up_best', String(finalScore)}catch(e){});
+    try { localStorage.setItem('surf-up_best', String(finalScore)); } catch(e) {}
   }
   window.__gameScore = finalScore;
   updateHUD();

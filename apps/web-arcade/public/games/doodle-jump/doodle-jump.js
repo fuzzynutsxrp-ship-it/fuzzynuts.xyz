@@ -39,10 +39,10 @@
     canvas = document.getElementById('game-canvas');
     if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; document.body.appendChild(canvas); }
     ctx = canvas.getContext('2d');
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
     resize();
 
-    bestScore = (function() { try { return parseInt((function(){try{return localStorage.getItem('doodle-jump_best')}catch(e){return null}})() || '0') } catch(e) { return 0 } })();
+    bestScore = parseInt((function(){try{return localStorage.getItem('doodle-jump_best')}catch(e){return null}})() || '0');
     keys = {};
     window.addEventListener('keydown', e => { keys[e.key] = true; if (['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key)) e.preventDefault(); });
     window.addEventListener('keyup', e => { keys[e.key] = false; });
@@ -52,6 +52,7 @@
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
     canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     showStart();
     loop();
@@ -115,7 +116,7 @@
     const elapsed = (Date.now() - startTime) / 1000;
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('doodle-jump_best', bestScore) } catch(e) {};
+      try { localStorage.setItem('doodle-jump_best', bestScore); } catch(e) {}
     }
     window.__gameScore = score;
     updateHUD(score);

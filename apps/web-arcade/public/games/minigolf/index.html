@@ -9,12 +9,8 @@
     <meta property="og:title" content="Nut Golf — Fuzzynuts Arcade">
     <meta property="og:description" content="3D mini-golf in your browser. Part of the Fuzzynuts Arcade on XRPL.">
     <meta property="og:image" content="https://fuzzynuts.xyz/logo.png">
-    <link rel="icon" type="image/png" href="../../images/branding/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet"></noscript>
-    <!-- Shared arcade shell -->
-    <link rel="stylesheet" href="../../css/design-tokens.css">
-    <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
+    <link rel="icon" type="image/png" href="../../logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         /* ── Global reset ── */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,7 +30,90 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
+        /* ══════ FUZZYNUTS ARCADE NAV BAR ══════ */
+        .fuzzy-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.35rem 1rem;
+            background: rgba(10, 10, 20, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(245, 166, 35, 0.15);
+            font-family: 'Outfit', sans-serif;
+            transition: transform 0.3s ease;
+        }
+        .fuzzy-nav.hidden {
+            transform: translateY(-100%);
+            pointer-events: none;
+        }
+        .fuzzy-nav-left, .fuzzy-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .fuzzy-nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.3rem 0.7rem;
+            background: linear-gradient(135deg, rgba(245,166,35,0.15), rgba(245,166,35,0.05));
+            border: 1px solid rgba(245,166,35,0.25);
+            border-radius: 6px;
+            color: #f5a623;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .fuzzy-nav-back:hover {
+            background: rgba(245,166,35,0.25);
+            border-color: rgba(245,166,35,0.5);
+        }
+        .fuzzy-nav-back svg {
+            width: 14px;
+            height: 14px;
+            fill: #f5a623;
+        }
+        .brand-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(245,166,35,0.4);
+        }
+        .fuzzy-nav-game-title {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .fuzzy-nav-right a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: color 0.2s;
+        }
+        .fuzzy-nav-right a:hover { color: #f5a623; }
+        .fuzzy-nav-brand {
+            padding: 0.25rem 0.6rem;
+            background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.04));
+            border: 1px solid rgba(245,166,35,0.2);
+            border-radius: 5px;
+            color: #f5a623 !important;
+            font-weight: 700;
+            font-size: 0.7rem !important;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 500px) {
+            .fuzzy-nav-game-title, .brand-dot, .fuzzy-nav-link { display: none; }
+            .fuzzy-nav { padding: 0.3rem 0.5rem; }
+        }
 
+        /* ══════ LOADING SCREEN ══════ */
         #loadingScreen {
             position: fixed;
             inset: 0;
@@ -265,7 +344,23 @@
     </style>
 </head>
 <body>
-    <!-- Nav injected by arcade-shell.js -->
+    <!-- ═══ FUZZYNUTS ARCADE NAV BAR ═══ -->
+    <nav class="fuzzy-nav" id="fuzzyNav">
+        <div class="fuzzy-nav-left">
+            <a href="../../arcade/" class="fuzzy-nav-back" title="Back to Arcade">
+                <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                Arcade
+            </a>
+            <span class="brand-dot"></span>
+            <span class="fuzzy-nav-game-title">⛳ Nut Golf</span>
+        </div>
+        <div class="fuzzy-nav-right">
+            <a href="../../" class="fuzzy-nav-link">fuzzynuts.xyz</a>
+            <a href="../../arcade/" class="fuzzy-nav-brand" title="Fuzzynuts Arcade">
+                🕹️ ARCADE
+            </a>
+        </div>
+    </nav>
 
     <!-- ═══ ARCADE SCORE HUD ═══ -->
     <div id="scoreHud">
@@ -307,29 +402,11 @@
         <button class="toast-close" id="orientClose">✕</button>
     </div>
 
-    <!-- ═══ SHARED ARCADE SHELL ═══ -->
-    <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
-    <script>
-        ArcadeShell.init({
-            slug: 'minigolf',
-            title: 'Fuzzy Putt',
-            icon: '⛳',
-            accentColor: '#22d3ee',
-            hideNavOnPlay: true,
-            showLoader: false, // Game has its own loadingScreen
-        });
-    </script>
-
     <!-- ═══ FUZZY SCORE BRIDGE ═══ -->
     <script src="../fuzzy-score.js"></script>
 
     <!-- ═══ EMSCRIPTEN BOOTSTRAP ═══ -->
     <script type='text/javascript'>
-        // Register service worker for offline caching (before WASM loads)
-        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-            navigator.serviceWorker.register('./service-worker.js').catch(function() {});
-        }
-
         // Loading progress tracking
         const loadingBar = document.getElementById('loadingBar');
         const loadingStatus = document.getElementById('loadingStatus');
@@ -397,8 +474,8 @@
                 }
             }
         };
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.log("onerror: " + message + " at " + source + ":" + lineno);
+        window.onerror = function() {
+            console.log("onerror: " + event.message);
         };
     </script>
     <script async type="text/javascript" src="golf.js"></script>
@@ -601,7 +678,7 @@
         // The nav bar stays visible for the first 5 seconds then auto-hides
         // It re-appears on mouse hover near the top edge
         (function() {
-            const nav = document.getElementById('arcadeNav');
+            const nav = document.getElementById('fuzzyNav');
             if (!nav) return;
 
             let hideTimer;

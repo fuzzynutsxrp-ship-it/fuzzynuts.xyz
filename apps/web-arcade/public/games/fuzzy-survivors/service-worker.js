@@ -11,7 +11,7 @@
 /* eslint-env serviceworker */
 /* global self, caches, fetch */
 
-const CACHE = 'fuzzy-survivors-v3.3.0';
+const CACHE = 'fuzzy-survivors-v3.4.0';
 const ASSETS = [
     './',
     './index.html',

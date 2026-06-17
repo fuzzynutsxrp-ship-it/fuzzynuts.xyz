@@ -171,7 +171,7 @@
     window.__gameScore = score;
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('2048_best', bestScore.toString()) } catch(e) {});
+      try { localStorage.setItem('2048_best', bestScore.toString()); } catch(e) {}
     }
     updateHUD();
 
@@ -231,9 +231,8 @@
 
   // ── Draw ────────────────────────────────────────────────────────────
   function resize() {
-    var container = canvas.parentElement;
-    var w = container ? container.clientWidth : 480;
-    var h = container ? container.clientHeight : 480;
+    var w = window.innerWidth || 480;
+    var h = window.innerHeight || 480;
     size = Math.min(w, h);
     canvas.width = size;
     canvas.height = size;
@@ -321,9 +320,9 @@
     ctx.font = 'bold ' + Math.floor(size * 0.035) + 'px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('SCORE: ' + score, pad, size + 4);
+    ctx.fillText('SCORE: ' + score, pad, size - 10);
     ctx.textAlign = 'right';
-    ctx.fillText('BEST: ' + bestScore, size - pad, size + 4);
+    ctx.fillText('BEST: ' + bestScore, size - pad, size - 10);
 
     // Overlays
     if (gameOver) showGameOverOverlay();
@@ -399,16 +398,21 @@
       }
     });
 
-    // Touch swipe
-    var tx = 0, ty = 0;
+    // Touch swipe — iOS fix: track position in touchmove, prevent rubber-banding
+    var tx = 0, ty = 0, cx = 0, cy = 0;
     canvas.addEventListener('touchstart', function (e) {
-      tx = e.touches[0].clientX;
-      ty = e.touches[0].clientY;
+      tx = cx = e.touches[0].clientX;
+      ty = cy = e.touches[0].clientY;
     }, { passive: true });
 
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchmove', function (e) {
+      cx = e.touches[0].clientX;
+      cy = e.touches[0].clientY;
+      e.preventDefault(); // Prevent iOS rubber-banding during swipe
+    }, { passive: false }); // MUST be false to allow preventDefault
 
     canvas.addEventListener('touchend', function (e) {
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
       if (gameWon && !continueMode) {
         continueMode = true;
         draw();
@@ -418,9 +422,9 @@
         init();
         return;
       }
-      var dx = e.changedTouches[0].clientX - tx;
-      var dy = e.changedTouches[0].clientY - ty;
-      if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
+      var dx = cx - tx;
+      var dy = cy - ty;
+      if (Math.abs(dx) < 15 && Math.abs(dy) < 15) return;
       if (Math.abs(dx) > Math.abs(dy)) {
         move(dx > 0 ? 'right' : 'left');
       } else {
@@ -441,7 +445,11 @@
       }
     });
 
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) {
+      new ResizeObserver(resize).observe(document.body);
+    } else {
+      window.addEventListener('resize', resize);
+    }
   }
 
   // ── Start ───────────────────────────────────────────────────────────

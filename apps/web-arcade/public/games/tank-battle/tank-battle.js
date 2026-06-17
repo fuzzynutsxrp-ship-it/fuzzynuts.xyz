@@ -878,7 +878,7 @@
     // Update best score
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('tank-battle_best', bestScore.toString()}catch(e){});
+      try { localStorage.setItem('tank-battle_best', bestScore.toString()); } catch(e) {}
     }
 
     window.__gameScore = score;
@@ -1124,6 +1124,7 @@
         rows = Math.floor(gameHeight / TILE_SIZE);
       }
     });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     // Draw start screen
     drawStartScreen();

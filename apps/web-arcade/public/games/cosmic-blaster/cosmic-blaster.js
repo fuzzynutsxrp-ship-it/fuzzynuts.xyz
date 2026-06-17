@@ -15,7 +15,7 @@
 
   /* ── State ─────────────────────────────────────────────────── */
   let canvas, ctx, score, lives, wave, isPlaying, animFrame;
-  let bestScore = (function() { try { return parseInt((function(){try{return localStorage.getItem(GAME_SLUG + '-best')}catch(e){return null}})() || '0') } catch(e) { return 0 } })();
+  let bestScore = parseInt(localStorage.getItem(GAME_SLUG + '-best') || '0');
   let lastShot = 0;
   let touchActive = false;
   let touchX = 0, touchY = 0;
@@ -136,6 +136,7 @@
       e.preventDefault();
       touchActive = false;
     }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   /* ── Update ────────────────────────────────────────────────── */
@@ -613,11 +614,9 @@
 
   /* ── Resize ────────────────────────────────────────────────── */
   function resize() {
-    const container = canvas.parentElement;
+    
     const cw = container.clientWidth;
-    if (const cw =  < 100) const cw =  = (window.innerWidth || 800) - 16;
     const ch = container.clientHeight;
-    if (const ch =  < 100) const ch =  = (window.innerHeight || 600) - 16;
     const ratio = CANVAS_W / CANVAS_H;
     let w, h;
     if (cw / ch > ratio) { h = ch; w = h * ratio; }
@@ -633,7 +632,7 @@
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
     generateStars();
     setupInput();
 

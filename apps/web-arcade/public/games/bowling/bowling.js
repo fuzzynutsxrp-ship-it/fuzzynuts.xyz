@@ -221,7 +221,7 @@
   function saveBest() {
     const key = "bowling_best";
     const prev = parseInt((function(){try{return localStorage.getItem(key)}catch(e){return null}})() || "0", 10);
-    if (score > prev) try { localStorage.setItem(key, score) } catch(e) {};
+    try { if (score > prev) localStorage.setItem(key, score); } catch(e) {}
   }
 
   function getBest() {
@@ -588,7 +588,7 @@
     const rect = canvas.getBoundingClientRect();
     const cx = e.touches ? e.touches[0].clientX : e.clientX;
     const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: cx - rect.left, y: cy - rect.top };
+    return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
   }
 
   function onPointerDown(e) {
@@ -637,6 +637,7 @@
     canvas.addEventListener("touchmove", onPointerMove, { passive: false });
     window.addEventListener("touchend", onPointerUp, { passive: false });
   }
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   function unbindInput() {
     canvas.removeEventListener("mousedown", onPointerDown);
@@ -1238,7 +1239,7 @@
     scoreEl = document.getElementById("score-display");
 
     resize();
-    window.addEventListener("resize", resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
 
     /* initial draw */
     ctx.fillStyle = BG;

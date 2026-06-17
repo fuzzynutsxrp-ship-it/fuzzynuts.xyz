@@ -1,4 +1,4 @@
-const CACHE = 'snake-v1.0.0';
+const CACHE = 'snake-v1.1.0';
 const ASSETS = [
     './', './index.html', './snake.css', './snake.js',
 ];

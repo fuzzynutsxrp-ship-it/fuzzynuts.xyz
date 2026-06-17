@@ -230,16 +230,17 @@
     }
     ctx = canvas.getContext('2d');
 
-    bestScore = parseInt((function(){try{return (function(){try{return localStorage.getItem('wordle_best')}catch(e){return null}})()}catch(e){return null}})() || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('wordle_best')}catch(e){return null}})() || '0', 10);
     window.__gameScore = 0;
 
     resize();
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
     document.addEventListener('keydown', handleKeyDown);
 
     // Touch support
     canvas.addEventListener('click', handleClick);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     showStartScreen();
     requestAnimationFrame(gameLoop);
@@ -448,7 +449,7 @@
 
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('wordle_best', bestScore.toString()}catch(e){});
+      try { localStorage.setItem('wordle_best', bestScore.toString()); } catch(e) {}
     }
 
     if (typeof FuzzyScoreSubmit === 'function') {
@@ -897,7 +898,7 @@
 
   function handleClick(e) {
     const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
     const my = e.clientY - rect.top;
     handleInteraction(mx, my);
   }
@@ -906,7 +907,7 @@
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const mx = touch.clientX - rect.left;
+    const mx = (touch.clientX - rect.left) * (canvas.width / rect.width);
     const my = touch.clientY - rect.top;
     handleInteraction(mx, my);
   }

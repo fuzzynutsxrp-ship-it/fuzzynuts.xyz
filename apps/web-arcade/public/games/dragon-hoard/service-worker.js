@@ -6,7 +6,7 @@
  *  Update CACHE version when deploying new builds.
  * ═══════════════════════════════════════════════════════════════
  */
-const CACHE = 'dragon-hoard-v1.0.0';
+const CACHE = 'dragon-hoard-v1.1.0';
 const ASSETS = [
   './',
   './index.html',

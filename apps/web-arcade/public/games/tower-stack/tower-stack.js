@@ -19,7 +19,7 @@
   let speed = BASE_SPEED;
   let score = 0;
   let combo = 0;
-  let bestScore = parseInt((function(){try{return (function(){try{return localStorage.getItem('tower-stack_best')}catch(e){return null}})()}catch(e){return null}})() || '0');
+  let bestScore = parseInt((function(){try{return localStorage.getItem('tower-stack_best')}catch(e){return null}})() || '0');
   let cameraY = 0;
   let targetCameraY = 0;
   let startTime = 0;
@@ -181,7 +181,7 @@
     state = 'over';
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('tower-stack_best', bestScore.toString()}catch(e){});
+      try { localStorage.setItem('tower-stack_best', bestScore.toString()); } catch(e) {}
     }
     const duration = Math.floor((Date.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') {

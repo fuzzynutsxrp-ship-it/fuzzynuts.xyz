@@ -101,7 +101,7 @@
     ctx = canvas.getContext('2d');
     resize();
     bestScore = parseInt((function(){try{return localStorage.getItem('helicopter_best')}catch(e){return null}})() || '0', 10);
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
     bindInputs();
     showStart();
   }
@@ -159,6 +159,7 @@
     canvas.addEventListener('touchstart', function (e) { e.preventDefault(); holding = true; if (state !== 'playing') reset(); }, { passive: false });
     canvas.addEventListener('touchend', function () { holding = false; });
   }
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   /* ── game loop ── */
   function loop() {
@@ -275,7 +276,7 @@
     if (frameId) cancelAnimationFrame(frameId);
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('helicopter_best', bestScore) } catch(e) {};
+      try { localStorage.setItem('helicopter_best', bestScore); } catch(e) {}
     }
     window.__gameScore = score;
     var dur = Math.floor(elapsed);

@@ -1,4 +1,4 @@
-const CACHE = 'subway-runner-v1.0.0';
+const CACHE = 'subway-runner-v1.1.0';
 const ASSETS = ['./', './index.html', './subway-runner.css', './subway-runner.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

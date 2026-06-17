@@ -86,7 +86,7 @@
   function saveBest(s) {
     const prev = loadBest();
     if (s > prev) {
-      try { localStorage.setItem('memory_best', String(s) } catch(e) {});
+      try { localStorage.setItem('memory_best', String(s)); } catch(e) {}
       return true;
     }
     return false;
@@ -119,8 +119,8 @@
   function resize() {
     if (!canvas) return;
     const container = canvas.parentElement || document.getElementById('game-container');
-    canvas.width  = container.clientWidth;
-    canvas.height = container.clientHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     calculateGrid();
   }
 
@@ -535,7 +535,10 @@
 
   if (canvas) {
     canvas.addEventListener('click', handleClick, { passive: true });
-    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchend', function(e) { e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   // ── Wire buttons ───────────────────────────────────────────
