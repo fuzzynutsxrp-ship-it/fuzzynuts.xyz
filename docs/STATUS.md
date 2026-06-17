@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T16:02:52.254Z** from `5842c8f` on `main`._
+_Generated **2026-06-17T17:34:19.579Z** from `4708bd7` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `5842c8f` fix(tetris): cherry-pick iOS fixes — button selectors + ResizeObserver + visualViewport (#99) — _fuzzynutsxrp-ship-it, 36 seconds ago_
+- `4708bd7` fix(tetris): correct I-piece rotation, game-over display, HUD labels, remove dead code — _shafic-bit, 30 seconds ago_
