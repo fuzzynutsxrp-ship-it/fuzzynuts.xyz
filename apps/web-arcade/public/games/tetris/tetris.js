@@ -10,7 +10,7 @@
 
   // Tetromino shapes (row,col offsets) in 4 rotations
   const SHAPES = {
-    I: [[ [0,0],[0,1],[0,2],[0,3] ], [ [0,0],[1,0],[2,0],[3,0] ], [ [0,0],[0,1],[0,2],[0,3] ], [ [0,0],[1,0],[2,0],[3,0] ]],
+    I: [[ [0,0],[0,1],[0,2],[0,3] ], [ [0,0],[1,0],[2,0],[3,0] ], [ [1,0],[1,1],[1,2],[1,3] ], [ [0,1],[1,1],[2,1],[3,1] ]],
     O: [[ [0,0],[0,1],[1,0],[1,1] ], [ [0,0],[0,1],[1,0],[1,1] ], [ [0,0],[0,1],[1,0],[1,1] ], [ [0,0],[0,1],[1,0],[1,1] ]],
     T: [[ [0,0],[0,1],[0,2],[1,1] ], [ [0,0],[1,0],[2,0],[1,1] ], [ [1,0],[1,1],[1,2],[0,1] ], [ [0,0],[1,0],[2,0],[1,-1] ]],
     S: [[ [0,1],[0,2],[1,0],[1,1] ], [ [0,0],[1,0],[1,1],[2,1] ], [ [0,1],[0,2],[1,0],[1,1] ], [ [0,0],[1,0],[1,1],[2,1] ]],
@@ -54,12 +54,6 @@
     nextBag = makeBag();
     const idx = bag.pop();
     return { type: idx, rot: 0, cells: SHAPES[Object.keys(SHAPES)[idx]][0], color: COLORS[idx], row: 0, col: 3 };
-  }
-
-  function rotate(cells, rot) {
-    // rotate 90° CW around center
-    const n = (rot + 1) % 4;
-    return SHAPES[Object.keys(SHAPES)[current.type]][n].map(c => [c[0], c[1]]);
   }
 
   function getCells(type, rot) { return SHAPES[Object.keys(SHAPES)[type]][rot % 4]; }
@@ -118,9 +112,15 @@
 
   function endGame() {
     const dur = ((Date.now() - startTime) / 1000) | 0;
+    const isNewBest = score > best;
     best = Math.max(best, score);
     try { localStorage.setItem('tetris_best', best); } catch(e) {}
     window.__gameScore = score;
+    // Update game-over overlay
+    const finalEl = document.getElementById('final-score');
+    if (finalEl) finalEl.textContent = score;
+    const bestEl = document.getElementById('new-best');
+    if (bestEl) { bestEl.classList.toggle('hidden', !isNewBest); }
     if (overlayOver) { overlayOver.style.display = 'flex'; }
     try { FuzzyScoreSubmit('tetris', score, dur); } catch(e) {}
   }
@@ -128,8 +128,8 @@
   function updateHUD() {
     const se = document.getElementById('score-display');
     const le = document.getElementById('level-display');
-    if (se) se.textContent = score;
-    if (le) le.textContent = level;
+    if (se) se.textContent = 'Score: ' + score;
+    if (le) le.textContent = 'Level: ' + level;
   }
 
   function dropSpeed() { return Math.max(50, 800 - (level - 1) * 70); }
@@ -256,13 +256,19 @@
 
   // ── Resize ─────────────────────────────────────────────────────────────
   function resize() {
-    const maxH = (window.visualViewport?.height || window.innerHeight) || 600;
-    const maxW = window.innerWidth || 800;
+    const vv = window.visualViewport;
+    const maxW = (vv ? vv.width : window.innerWidth) || 800;
+    const maxH = (vv ? vv.height : window.innerHeight) || 600;
     const sidebar = 90;
     cellSize = Math.min(Math.floor((maxW - sidebar) / COLS), Math.floor(maxH / ROWS), 32);
     cellSize = Math.max(cellSize, 14);
-    canvas.width = COLS * cellSize + sidebar;
-    canvas.height = ROWS * cellSize;
+    const drawW = COLS * cellSize + sidebar;
+    const drawH = ROWS * cellSize;
+    canvas.width = drawW;
+    canvas.height = drawH;
+    // Override CSS width:100%/height:100% to prevent stretch/clip
+    canvas.style.width = drawW + 'px';
+    canvas.style.height = drawH + 'px';
   }
 
   // ── Init / Start / Reset ───────────────────────────────────────────────
