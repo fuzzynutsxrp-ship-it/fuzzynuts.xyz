@@ -63,7 +63,7 @@
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
 
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     resetGame();
     showStartScreen();
   }

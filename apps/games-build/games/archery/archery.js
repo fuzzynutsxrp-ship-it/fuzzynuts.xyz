@@ -46,7 +46,7 @@
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); if (state === 'aiming') state = 'idle'; }, { passive: false });
+  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); if (state === 'aiming') state = 'idle'; }, { passive: false });
     startGame();
   }
 
