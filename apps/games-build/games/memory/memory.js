@@ -538,7 +538,7 @@
     canvas.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchend', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchstart', handleTouch, { passive: false });
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   // ── Wire buttons ───────────────────────────────────────────

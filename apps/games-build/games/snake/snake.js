@@ -175,9 +175,9 @@
     touchStartY = t.clientY;
     touchStartTime = Date.now();
   }, { passive: false });
+  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   canvas.addEventListener('touchend', function (e) {
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     e.preventDefault();
     if (!touchStartTime) return;
     const dt = Date.now() - touchStartTime;

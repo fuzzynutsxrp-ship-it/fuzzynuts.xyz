@@ -58,8 +58,8 @@
   canvas.addEventListener('touchstart', e => {
     const t = e.touches[0]; touchStartX = t.clientX; touchStartY = t.clientY; touching = true;
   }, { passive: true });
+  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchend', e => {
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     if (!touching) return; touching = false;
     const t = e.changedTouches[0];
     const dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;

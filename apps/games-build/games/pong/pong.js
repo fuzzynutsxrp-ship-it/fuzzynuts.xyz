@@ -111,7 +111,7 @@
     const t = e.touches[0];
     const rect = canvas.getBoundingClientRect();
     const ty = t.clientY - rect.top;
-    const tx = t.clientX - rect.left) * (canvas.width / rect.width;
+    const tx = (t.clientX - rect.left) * (canvas.width / rect.width);
     if(tx < W / 2) touchY = ty; // only left half controls player
   }, {passive:false});
   canvas.addEventListener('touchend', function(){ touchY = null; });

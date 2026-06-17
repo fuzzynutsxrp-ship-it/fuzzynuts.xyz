@@ -458,9 +458,9 @@
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     if (e.touches && e.touches.length) {
-      return { x: e.touches[0].clientX - rect.left) * (canvas.width / rect.width, y: e.touches[0].clientY - rect.top) * (canvas.height / rect.height };
+      return { x: (e.touches[0].clientX - rect.left) * (canvas.width / rect.width), y: (e.touches[0].clientY - rect.top) * (canvas.height / rect.height) };
     }
-    return { x: e.clientX - rect.left) * (canvas.width / rect.width, y: e.clientY - rect.top) * (canvas.height / rect.height };
+    return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
   }
 
   function onPointerDown(e) {
