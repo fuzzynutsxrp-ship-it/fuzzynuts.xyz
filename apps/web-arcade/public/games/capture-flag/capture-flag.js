@@ -24,7 +24,7 @@
   let startTime = 0;
   let gameTime = 0;
   let p1Captures = 0, p2Captures = 0;
-  let bestScore = parseInt((function(){try{return localStorage.getItem('capture-flag_best')}catch(e){return null}})() || '0', 10);
+  let bestScore = parseInt(localStorage.getItem('capture-flag_best') || '0', 10);
   let animFrame;
   let lastPowerupSpawn = 0;
 
@@ -332,7 +332,7 @@
     window.__gameScore = finalScore;
     if (finalScore > bestScore) {
       bestScore = finalScore;
-      try { localStorage.setItem('capture-flag_best', bestScore.toString()) } catch(e) {}
+      localStorage.setItem('capture-flag_best', bestScore.toString());
     }
     gameState = 'gameover';
     if (typeof FuzzyScoreSubmit === 'function') {
@@ -616,8 +616,8 @@
   function getTouchPos(touch) {
     const rect = canvas.getBoundingClientRect();
     return {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top
+      x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+      y: (touch.clientY - rect.top) * (canvas.height / rect.height)
     };
   }
 

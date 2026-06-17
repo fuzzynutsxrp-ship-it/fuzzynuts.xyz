@@ -19,7 +19,7 @@
   let canvas, ctx, W, H;
   let state = 'idle'; // idle, aiming, flying, stuck, roundover, gameover
   let score = 0, totalScore = 0, arrowsLeft = ARROWS_PER_ROUND, round = 0;
-  let bestScore = parseInt((function(){try{return localStorage.getItem('archery_best')}catch(e){return null}})()) || 0;
+  let bestScore = parseInt(localStorage.getItem('archery_best')) || 0;
   let startTime = 0;
   let mouse = { x: 0, y: 0 };
   let aimStart = 0, power = 0;
@@ -35,20 +35,24 @@
     if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; document.body.appendChild(canvas); }
     ctx = canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) {
+      new ResizeObserver(resize).observe(document.body);
+    } else {
+      window.addEventListener('resize', resize);
+    }
     canvas.addEventListener('mousedown', onDown);
     canvas.addEventListener('mousemove', onMove);
     canvas.addEventListener('mouseup', onUp);
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); if (state === 'aiming') state = 'idle'; }, { passive: false });
     startGame();
   }
 
   function resize() {
-    const r = canvas.parentElement || document.body;
-    W = canvas.width = r.clientWidth || 800;
-    H = canvas.height = r.clientHeight || 600;
+    W = canvas.width = window.innerWidth || 800;
+    H = canvas.height = window.innerHeight || 600;
     targetX = W / 2;
     targetY = H * 0.35;
     targetRadius = Math.min(W, H) * 0.18 * distance.scale;
@@ -81,24 +85,23 @@
 
   function onDown(e) {
     if (state !== 'idle') return;
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top;
+    mouse.x = e.clientX; mouse.y = e.clientY;
     state = 'aiming'; aimStart = Date.now(); power = 0;
   }
 
   function onMove(e) {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top;
+    mouse.x = e.clientX; mouse.y = e.clientY;
   }
 
   function onUp(e) {
+    if (state === 'gameover') { startGame(); return; }
     if (state !== 'aiming') return;
     shoot();
   }
 
-  function onTouchStart(e) { e.preventDefault(); const t = e.touches[0]; const rect = canvas.getBoundingClientRect(); mouse.x = t.clientX - rect.left; mouse.y = t.clientY - rect.top; if (state === 'idle') { state = 'aiming'; aimStart = Date.now(); power = 0; } }
-  function onTouchMove(e) { e.preventDefault(); const t = e.touches[0]; const rect = canvas.getBoundingClientRect(); mouse.x = t.clientX - rect.left; mouse.y = t.clientY - rect.top; }
-  function onTouchEnd(e) { e.preventDefault(); if (state === 'aiming') shoot(); }
+  function onTouchStart(e) { e.preventDefault(); const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY; if (state === 'idle') { state = 'aiming'; aimStart = Date.now(); power = 0; } }
+  function onTouchMove(e) { e.preventDefault(); const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY; }
+  function onTouchEnd(e) { e.preventDefault(); if (state === 'gameover') { startGame(); return; } if (state === 'aiming') shoot(); }
 
   function shoot() {
     const maxPower = 25;
@@ -167,7 +170,7 @@
 
   function endGame() {
     state = 'gameover';
-    if (totalScore > bestScore) { bestScore = totalScore; try { localStorage.setItem('archery_best', bestScore) } catch(e) {}; }
+    if (totalScore > bestScore) { bestScore = totalScore; localStorage.setItem('archery_best', bestScore); }
     window.__gameScore = totalScore;
     const duration = Math.round((Date.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') FuzzyScoreSubmit('archery', totalScore, duration);
@@ -373,7 +376,7 @@
       ctx.fillStyle = '#ffffff88';
       ctx.font = '16px monospace';
       ctx.fillText('Click to play again', W / 2, H / 2 + 80);
-      canvas.onclick = () => { canvas.onclick = null; startGame(); };
+      canvas.onclick = null;
     }
   }
 

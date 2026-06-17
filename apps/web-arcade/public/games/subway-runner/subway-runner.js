@@ -36,7 +36,7 @@
   let state = 'start'; // start | playing | over
   let score = 0;
   let coins = 0;
-  let bestScore = parseInt((function(){try{return (function(){try{return localStorage.getItem('subway-runner_best')}catch(e){return null}})()}catch(e){return null}})() || '0', 10);
+  let bestScore = parseInt(localStorage.getItem('subway-runner_best') || '0', 10);
   let speed = 4;
   let elapsed = 0;
   let startTime = 0;
@@ -731,7 +731,7 @@
     window.__gameScore = finalScore;
     if (finalScore > bestScore) {
       bestScore = finalScore;
-      try{localStorage.setItem('subway-runner_best', String(bestScore))}catch(e){}
+      localStorage.setItem('subway-runner_best', String(bestScore));
     }
     const duration = Math.floor((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') {
@@ -778,6 +778,7 @@
   });
 
   // Touch / swipe
+  canvas.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
     const t = e.touches[0];
@@ -787,6 +788,7 @@
   }, { passive: false });
 
   canvas.addEventListener('touchend', function(e) {
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     e.preventDefault();
     if (state !== 'playing') {
       handleAction('start');
@@ -818,7 +820,7 @@
 
   // ── Init ──────────────────────────────────────────────────────────
   resize();
-  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
   requestAnimationFrame(loop);
 
 })();

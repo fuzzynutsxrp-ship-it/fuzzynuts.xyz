@@ -20,11 +20,11 @@
   const ctx    = canvas.getContext("2d");
 
   function resize() {
-    const parent = canvas.parentElement || document.body;
+    
     canvas.width  = Math.min(parent.clientWidth  || 800, 960);
     canvas.height = Math.min(parent.clientHeight || 600, 720);
   }
-  window.addEventListener("resize", resize);
+  if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
   resize();
 
   /* ── helpers ── */
@@ -60,7 +60,7 @@
   let alienDir, alienDropNext, alienSpeed, alienAnimFrame, alienMoveTimer;
   let mysteryTimer, shootCooldown, invincibleTimer, gameOverTimer;
 
-  best = parseInt((function(){try{return localStorage.getItem("space-invaders_best")}catch(e){return null}})() || "0", 10);
+  best = parseInt(localStorage.getItem("space-invaders_best") || "0", 10);
 
   function resetAliens() {
     aliens = [];
@@ -168,11 +168,13 @@
     e.preventDefault();
     const t = e.touches[0];
     const r = canvas.getBoundingClientRect();
-    touchX = t.clientX - r.left;
-    touchY = t.clientY - r.top;
+    const scX = canvas.width / r.width, scY = canvas.height / r.height;
+    touchX = (t.clientX - r.left) * scX;
+    touchY = (t.clientY - r.top) * scY;
   }, { passive: false });
   canvas.addEventListener("touchend", e => { e.preventDefault(); touchActive = false; }, { passive: false });
 
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   /* ── collision ── */
   function overlap(a, b) {
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
@@ -355,7 +357,7 @@
     gameOverTimer = 0;
     if (score > best) {
       best = score;
-      try { localStorage.setItem("space-invaders_best", String(best)) } catch(e) {}
+      localStorage.setItem("space-invaders_best", String(best));
     }
     const duration = Math.round((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === "function") {

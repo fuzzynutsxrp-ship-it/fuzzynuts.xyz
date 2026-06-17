@@ -119,7 +119,7 @@
   function endGame() {
     const dur = ((Date.now() - startTime) / 1000) | 0;
     best = Math.max(best, score);
-    try{localStorage.setItem('tetris_best', best)}catch(e){};
+    localStorage.setItem('tetris_best', best);
     window.__gameScore = score;
     if (overlayOver) { overlayOver.style.display = 'flex'; }
     try { FuzzyScoreSubmit('tetris', score, dur); } catch(e) {}
@@ -274,11 +274,12 @@
     ctx = canvas.getContext('2d');
     overlayStart = document.getElementById('overlay-start');
     overlayOver = document.getElementById('overlay-gameover');
-    best = parseInt((function(){try{return localStorage.getItem('tetris_best')}catch(e){return null}})()) || 0;
+    best = parseInt(localStorage.getItem('tetris_best')) || 0;
     document.addEventListener('keydown', onKeyDown);
-    canvas.addEventListener('touchstart', onTouchStart, { passive: true });
-    canvas.addEventListener('touchend', onTouchEnd, { passive: true });
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
     window.addEventListener('resize', () => { resize(); if (!running) draw(); });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     resize();
     if (overlayStart) overlayStart.style.display = 'flex';
     if (overlayOver) overlayOver.style.display = 'none';

@@ -44,7 +44,7 @@
   let gameStartTime;
   let lastFireballTime = 0;
   let difficulty = 1;
-  let bestScore = parseInt((function(){try{return localStorage.getItem('dragon-hoard-best')}catch(e){return null}})() || '0', 10);
+  let bestScore = parseInt(localStorage.getItem('dragon-hoard-best') || '0', 10);
 
   // ─── Player ────────────────────────────────────────────────────
   const player = {
@@ -167,7 +167,7 @@
     // Update best score
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('dragon-hoard-best', bestScore.toString()) } catch(e) {}
+      localStorage.setItem('dragon-hoard-best', bestScore.toString());
     }
 
     // Show game over screen
@@ -781,6 +781,7 @@
       e.preventDefault();
       touchTarget = null;
     }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   // ─── Bootstrap ─────────────────────────────────────────────────

@@ -42,27 +42,149 @@
         />
         <meta name="twitter:image" content="./docs/og-card.svg" />
 
-        <link rel="stylesheet" href="./styles.css?v=2" />
+        <link rel="stylesheet" href="./styles.css" />
         <script src="../fuzzy-score.js" type="text/javascript"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
             href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap"
             rel="stylesheet"
-            media="print"
-            onload="this.media='all'"
         />
-        <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet"></noscript>
-        <!-- Shared arcade shell -->
-        <link rel="stylesheet" href="../../css/design-tokens.css">
-        <link rel="stylesheet" href="../../css/arcade-shell.css?v=mobile-fix">
         <style>
+            /* ═══ FUZZYNUTS ARCADE NAV BAR ═══ */
+            .fuzzy-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.4rem 1rem;
+                background: rgba(10, 10, 6, 0.85);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(245, 166, 35, 0.15);
+                font-family: 'Outfit', sans-serif;
+                transition: transform 0.35s ease, opacity 0.35s ease;
+            }
+            .fuzzy-nav.hidden {
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+            }
+            .fuzzy-nav-left {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+            .fuzzy-nav-back {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.35rem 0.8rem;
+                background: rgba(245, 166, 35, 0.12);
+                border: 1px solid rgba(245, 166, 35, 0.25);
+                border-radius: 8px;
+                color: #f5a623;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.2s;
+                cursor: pointer;
+                font-family: inherit;
+            }
+            .fuzzy-nav-back:hover {
+                background: rgba(245, 166, 35, 0.22);
+                border-color: rgba(245, 166, 35, 0.4);
+                color: #ffd280;
+                transform: translateX(-2px);
+            }
+            .fuzzy-nav-back svg {
+                width: 14px;
+                height: 14px;
+                fill: currentColor;
+            }
+            .fuzzy-nav-brand {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                text-decoration: none;
+                color: #f5a623;
+                font-weight: 800;
+                font-size: 0.85rem;
+                letter-spacing: 0.5px;
+            }
+            .fuzzy-nav-brand:hover {
+                color: #ffd280;
+            }
+            .fuzzy-nav-brand .brand-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: rgba(245, 166, 35, 0.4);
+            }
+            .fuzzy-nav-right {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+            }
+            .fuzzy-nav-link {
+                color: rgba(255, 255, 255, 0.55);
+                text-decoration: none;
+                font-size: 0.78rem;
+                font-weight: 600;
+                transition: color 0.2s;
+            }
+            .fuzzy-nav-link:hover {
+                color: #f5a623;
+            }
+            .fuzzy-nav-game-title {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.78rem;
+                font-weight: 600;
+                display: none;
+            }
+            @media (min-width: 600px) {
+                .fuzzy-nav-game-title {
+                    display: block;
+                }
+            }
             /* Let the game container fill the screen — nav auto-hides during play */
-            #gameContainer { padding-top: 0; }
+            #gameContainer {
+                padding-top: 0;
+            }
+            /* On very small screens, shrink nav */
+            @media (max-width: 400px) {
+                .fuzzy-nav {
+                    padding: 0.3rem 0.5rem;
+                }
+                .fuzzy-nav-back {
+                    font-size: 0.7rem;
+                    padding: 0.3rem 0.6rem;
+                }
+            }
         </style>
     </head>
     <body>
-        <!-- Nav injected by arcade-shell.js -->
+        <!-- ═══ FUZZYNUTS ARCADE NAV BAR ═══ -->
+        <nav class="fuzzy-nav" id="fuzzyNav">
+            <div class="fuzzy-nav-left">
+                <a href="../../arcade/" class="fuzzy-nav-back" title="Back to Arcade">
+                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                    Arcade
+                </a>
+                <span class="brand-dot"></span>
+                <span class="fuzzy-nav-game-title">🐿️ Fuzzy Survivors</span>
+            </div>
+            <div class="fuzzy-nav-right">
+                <a href="../../" class="fuzzy-nav-link">fuzzynuts.xyz</a>
+                <a href="../../arcade/" class="fuzzy-nav-brand" title="Fuzzynuts Arcade">
+                    🕹️ ARCADE
+                </a>
+            </div>
+        </nav>
 
         <div id="gameContainer" aria-label="Fuzzy Survivors game">
             <canvas
@@ -319,7 +441,7 @@
                         <button id="btnMenu" class="btn ghost" data-i18n="mainMenu">
                             Main Menu
                         </button>
-                        <a href="../../" class="btn ghost" style="color:#f5a623;border-color:rgba(245,166,35,0.3);">← Arcade</a>
+                        <a href="../../arcade/" class="btn ghost" style="color:#f5a623;border-color:rgba(245,166,35,0.3);">← Arcade</a>
                     </div>
                 </div>
             </div>
@@ -336,6 +458,30 @@
                 .getElementById('btnPause')
                 ?.addEventListener('click', () => game.togglePause());
 
+            // ── Nav bar auto-hide during gameplay ──
+            // Hide the nav when the game is actively running (no overlays visible).
+            // Show it on start screen, pause, game over, level-up, etc.
+            (function() {
+                const nav = document.getElementById('fuzzyNav');
+                if (!nav) return;
+                const overlays = [
+                    'startScreen', 'pauseMenu', 'gameOver', 'levelUpMenu',
+                    'settingsMenu', 'achievementsScreen', 'leaderboardScreen',
+                    'stagePickerScreen', 'streakScreen', 'helpScreen',
+                    'howToPlayScreen'
+                ];
+                function checkNav() {
+                    const anyVisible = overlays.some(id => {
+                        const el = document.getElementById(id);
+                        return el && el.style.display !== 'none';
+                    });
+                    nav.classList.toggle('hidden', !anyVisible);
+                }
+                // Poll at 500ms — lightweight and catches all state transitions
+                setInterval(checkNav, 500);
+                checkNav();
+            })();
+
             // ── Intercept FuzzyScoreSubmit to populate the arcade score display ──
             // The cached main.js may not have the DOM update code yet, so we
             // wrap the global function here (inline script, not cached by SW).
@@ -351,32 +497,27 @@
             }
         </script>
 
-        <!-- Shared arcade shell -->
-        <script src="../../js/arcade-shell.js?v=mobile-fix"></script>
-        <script>
-            // Initialize arcade shell (must run AFTER arcade-shell.js loads)
-            ArcadeShell.init({
-                slug: 'fuzzy-survivors',
-                title: 'Fuzzy Survivors',
-                icon: '⚔️',
-                accentColor: '#a855f7',
-                hideNavOnPlay: true,
-                showLoader: false, // Game has its own start screen
-            });
-        </script>
+        <!-- Service worker DISABLED — was causing stale-asset bugs after deploys.
+             The cache version (fuzzy-survivors-vX.X.X in service-worker.js) was
+             hardcoded and never bumped, so the SW kept serving old main.js even
+             after new code shipped, requiring users to hard-refresh. PWA offline
+             capability isn't useful in an iframe anyway.
 
-        <!-- Service worker with forced update for development -->
+             This script actively unregisters any pre-existing SW and clears its
+             caches so users who installed it before see a clean slate on next
+             visit. Safe to remove entirely once the cleanup window has passed. -->
         <script>
             if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-                window.addEventListener('load', async () => {
-                    try {
-                        const reg = await navigator.serviceWorker.register('./service-worker.js');
-                        // Force update check on every load
-                        reg.update();
-                    } catch (err) {
-                        console.warn('[sw] registration failed', err);
-                    }
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    regs.forEach(function (reg) { reg.unregister(); });
                 });
+                if (typeof caches !== 'undefined' && caches.keys) {
+                    caches.keys().then(function (keys) {
+                        keys.forEach(function (k) {
+                            if (k.indexOf('fuzzy-survivors') === 0) caches.delete(k);
+                        });
+                    });
+                }
             }
         </script>
     </body>

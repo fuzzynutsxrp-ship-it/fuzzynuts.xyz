@@ -1,22 +1,52 @@
+/* Nut-Racer — FuzzyNuts Arcade */
+html, body { overscroll-behavior: none; -webkit-overflow-scrolling: auto; }
 /* ═══════════════════════════════════════════════════════════════
-   NUT RACER — Game-specific styles
-
-   Nav bar, loading screen, and mobile base styles are provided
-   by arcade-shell.css (loaded before this file).
+   NUT RACER — Fuzzynuts Arcade Theme
    ═══════════════════════════════════════════════════════════════ */
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
+  background: #0a0a0a;
   font-family: 'Press Start 2P', 'Courier New', monospace;
+  overflow: hidden;
   touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-/* Game container — fullbleed (nav auto-hides during play) */
+/* Header */
+.fuzzy-header {
+  background: #0d0b06;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 2px solid #d4a017;
+  height: 44px;
+  z-index: 10;
+  position: relative;
+}
+.fuzzy-brand {
+  color: #d4a017;
+  font-size: 14px;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+.fuzzy-nav { display: flex; gap: 14px; }
+.fuzzy-nav a {
+  color: #8b7355;
+  text-decoration: none;
+  font-size: 10px;
+}
+.fuzzy-nav a:hover { color: #d4a017; }
+
+/* Game container */
 #racer {
   position: relative;
   width: 100%;
-  height: 100vh;
-  height: 100svh;
-  height: 100dvh;
+  height: calc(100vh - 44px);
   background: #0a0a0a;
 }
 
@@ -49,7 +79,7 @@ body {
   white-space: nowrap;
 }
 .hud .value {
-  color: var(--arcade-accent, #d4a017);
+  color: #d4a017;
   font-weight: bold;
 }
 
@@ -83,17 +113,17 @@ body {
 
 .race-complete-inner {
   background: rgba(26, 26, 36, 0.95);
-  border: 2px solid var(--arcade-accent, #d4a017);
+  border: 2px solid #d4a017;
   border-radius: 16px;
   padding: 32px;
   text-align: center;
   max-width: 380px;
   width: 90%;
-  box-shadow: 0 0 40px var(--arcade-accent-glow, rgba(218,165,32,0.3));
+  box-shadow: 0 0 40px rgba(218,165,32,0.3);
 }
 
 .race-complete-inner h2 {
-  color: var(--arcade-accent, #d4a017);
+  color: #d4a017;
   font-size: 18px;
   margin-bottom: 20px;
   letter-spacing: 2px;
@@ -110,7 +140,7 @@ body {
   font-size: 11px;
   color: #b8b4ac;
 }
-.stat-row span:last-child { color: var(--arcade-accent, #d4a017); }
+.stat-row span:last-child { color: #d4a017; }
 .stat-row.highlight span:last-child {
   color: #4ade80;
   font-size: 14px;
@@ -119,7 +149,7 @@ body {
 #race-again-btn {
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;
-  background: linear-gradient(135deg, var(--arcade-accent, #d4a017), var(--arcade-accent-hover, #b8860b));
+  background: linear-gradient(135deg, #d4a017, #b8860b);
   color: #0a0a0a;
   border: none;
   padding: 12px 24px;
@@ -131,7 +161,7 @@ body {
 }
 #race-again-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 20px var(--arcade-accent-glow, rgba(218,165,32,0.4));
+  box-shadow: 0 0 20px rgba(218,165,32,0.4);
 }
 
 .back-link {
@@ -141,14 +171,14 @@ body {
   text-decoration: none;
   margin-top: 8px;
 }
-.back-link:hover { color: var(--arcade-accent, #d4a017); }
+.back-link:hover { color: #d4a017; }
 
 /* Mobile touch controls */
 #touch-controls {
   display: none;
   position: fixed;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: 16px;
+  right: 16px;
   z-index: 20;
   opacity: 0.6;
 }
@@ -166,7 +196,7 @@ body {
   border-radius: 10px;
   border: 2px solid rgba(218,165,32,0.5);
   background: rgba(10,10,10,0.7);
-  color: var(--arcade-accent, #d4a017);
+  color: #d4a017;
   font-size: 18px;
   display: flex;
   align-items: center;
@@ -176,7 +206,7 @@ body {
 }
 .touch-btn:active, .touch-btn.active {
   background: rgba(218,165,32,0.3);
-  border-color: var(--arcade-accent, #d4a017);
+  border-color: #d4a017;
 }
 
 /* Show touch controls on mobile */
@@ -185,6 +215,10 @@ body {
 }
 @media (max-width: 768px) {
   #touch-controls { display: block; }
+  .fuzzy-header { height: 38px; padding: 0 10px; }
+  .fuzzy-brand { font-size: 11px; }
+  .fuzzy-nav a { font-size: 9px; }
+  #racer { height: calc(100vh - 38px); }
   .hud { font-size: 8px; }
   #hud { padding: 6px 8px; gap: 6px; }
 }

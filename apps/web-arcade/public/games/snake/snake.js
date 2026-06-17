@@ -45,16 +45,16 @@
   function randInt(max) { return Math.floor(Math.random() * max); }
 
   function saveBest(s) {
-    const prev = parseInt((function(){try{return localStorage.getItem('snake_best')}catch(e){return null}})() || '0', 10);
+    const prev = parseInt(localStorage.getItem('snake_best') || '0', 10);
     if (s > prev) {
-      try { localStorage.setItem('snake_best', String(s)) } catch(e) {}
+      localStorage.setItem('snake_best', String(s));
       return true;
     }
     return false;
   }
 
   function loadBest() {
-    return parseInt((function(){try{return localStorage.getItem('snake_best')}catch(e){return null}})() || '0', 10);
+    return parseInt(localStorage.getItem('snake_best') || '0', 10);
   }
 
   function showBest() {
@@ -169,13 +169,16 @@
 
   // ── Touch / Swipe ──────────────────────────────────────────
   canvas.addEventListener('touchstart', function (e) {
+    e.preventDefault();
     const t = e.touches[0];
     touchStartX = t.clientX;
     touchStartY = t.clientY;
     touchStartTime = Date.now();
-  }, { passive: true });
+  }, { passive: false });
 
   canvas.addEventListener('touchend', function (e) {
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    e.preventDefault();
     if (!touchStartTime) return;
     const dt = Date.now() - touchStartTime;
     if (dt > 300) return; // too slow
@@ -194,7 +197,7 @@
     } else {
       setDirection(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
     }
-  }, { passive: true });
+  }, { passive: false });
 
   // ── Game Over ──────────────────────────────────────────────
   function gameOver() {

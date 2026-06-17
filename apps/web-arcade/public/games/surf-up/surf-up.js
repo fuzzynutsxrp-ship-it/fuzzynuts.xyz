@@ -26,7 +26,7 @@ function resize(){
   canvas.width  = wrap.clientWidth  || window.innerWidth;
   canvas.height = wrap.clientHeight || window.innerHeight;
 }
-window.addEventListener('resize', resize);
+if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 resize();
 
 /* ── HUD helper ─────────────────────────────────────────────────── */
@@ -47,7 +47,7 @@ function freshState(){
     score: 0,                // distance + tricks
     trickPts: 0,
     distance: 0,
-    best: +((function(){try{return localStorage.getItem('surf-up_best')}catch(e){return null}})()||0),
+    best: +(localStorage.getItem('surf-up_best')||0),
 
     /* player */
     px: 0, py: 0,            // screen position (set each frame)
@@ -114,6 +114,7 @@ canvas.addEventListener('touchend', e=>{
   state.touchY = null;
   state.touchStartY = null;
 },{passive:false});
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
 /* ── game control ───────────────────────────────────────────────── */
 function startGame(){
@@ -134,7 +135,7 @@ function gameOver(){
   const finalScore = Math.floor(state.score);
   if (finalScore > state.best){
     state.best = finalScore;
-    try{localStorage.setItem('surf-up_best', String(finalScore))}catch(e){}
+    localStorage.setItem('surf-up_best', String(finalScore));
   }
   window.__gameScore = finalScore;
   updateHUD();

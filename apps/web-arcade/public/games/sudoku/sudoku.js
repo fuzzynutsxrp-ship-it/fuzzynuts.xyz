@@ -278,8 +278,8 @@ function gameWon(){
 
   /* best time */
   const key='sudoku_best_'+difficulty;
-  const prev=parseInt((function(){try{return localStorage.getItem(key)}catch(e){return null}})())||99999;
-  if(timer<prev) try{localStorage.setItem(key,timer)}catch(e){};
+  const prev=parseInt(localStorage.getItem(key))||99999;
+  if(timer<prev) localStorage.setItem(key,timer);
 
   if(typeof FuzzyScoreSubmit==='function') FuzzyScoreSubmit('sudoku',score,timer);
   /* signal game over */
@@ -309,12 +309,12 @@ function init(canvasEl){
 
   canvas.addEventListener('click',e=>{
     const r=canvas.getBoundingClientRect();
-    handleClick(e.clientX-r.left, e.clientY-r.top);
+    handleClick((e.clientX-r.left)*(canvas.width/r.width), (e.clientY-r.top)*(canvas.height/r.height));
   });
   canvas.addEventListener('touchstart',e=>{
     e.preventDefault();
     const t=e.touches[0], r=canvas.getBoundingClientRect();
-    handleClick(t.clientX-r.left, t.clientY-r.top);
+    handleClick((t.clientX-r.left)*(canvas.width/r.width), (t.clientY-r.top)*(canvas.height/r.height));
   },{passive:false});
   window.addEventListener('keydown',handleKey);
   window.addEventListener('resize',resize);

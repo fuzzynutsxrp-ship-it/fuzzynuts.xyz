@@ -44,7 +44,7 @@
   let score = 0;
   let lives = 3;
   let wave = 1;
-  let bestScore = parseInt((function(){try{return localStorage.getItem('tank-battle_best')}catch(e){return null}})()) || 0;
+  let bestScore = parseInt(localStorage.getItem('tank-battle_best')) || 0;
   let startTime = 0;
   let lastComboTime = 0;
   let comboCount = 0;
@@ -878,7 +878,7 @@
     // Update best score
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('tank-battle_best', bestScore.toString())}catch(e){}
+      localStorage.setItem('tank-battle_best', bestScore.toString());
     }
 
     window.__gameScore = score;
@@ -1124,6 +1124,7 @@
         rows = Math.floor(gameHeight / TILE_SIZE);
       }
     });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     // Draw start screen
     drawStartScreen();

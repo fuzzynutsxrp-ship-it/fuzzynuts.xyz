@@ -433,8 +433,8 @@
 
     // Save best score
     const bestKey = 'maze-escape_best';
-    const prev = parseInt((function(){try{return localStorage.getItem(bestKey)}catch(e){return null}})()) || 0;
-    if (score > prev) try { localStorage.setItem(bestKey, score) } catch(e) {};
+    const prev = parseInt(localStorage.getItem(bestKey)) || 0;
+    if (score > prev) localStorage.setItem(bestKey, score);
 
     window.__gameScore = score;
     if (typeof FuzzyScoreSubmit === 'function') {
@@ -467,7 +467,7 @@
     if (gameState === 'start') { startGame(); return; }
     if (gameState === 'gameover') { startGame(); return; }
     const t = e.touches[0];
-    _touchSwipeStart = { x: t.clientX, y: t.clientY };
+    const rect = canvas.getBoundingClientRect(); _touchSwipeStart = { x: (t.clientX - rect.left) * (canvas.width / rect.width), y: (t.clientY - rect.top) * (canvas.height / rect.height) };
   }
 
   function _onTouchEnd(e) {
@@ -492,6 +492,7 @@
     canvas.addEventListener('touchstart', _onTouchStart, { passive: true });
     canvas.addEventListener('touchend', _onTouchEnd, { passive: true });
   }
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   // Cleanup
   window.addEventListener('game-cleanup', function () {
@@ -508,7 +509,7 @@
     if (gameState === 'playing') {
       draw();
     } else if (gameState === 'start') {
-      drawOverlay('MAZE ESCAPE', 'Find the exit!', ['Arrow keys or swipe to move', 'Collect gems for bonus points', 'Press any key to start', '', `Best: ${(function(){try{return localStorage.getItem('maze-escape_best')}catch(e){return null}})() || 0}`]);
+      drawOverlay('MAZE ESCAPE', 'Find the exit!', ['Arrow keys or swipe to move', 'Collect gems for bonus points', 'Press any key to start', '', `Best: ${localStorage.getItem('maze-escape_best') || 0}`]);
     } else if (gameState === 'levelComplete') {
       drawOverlay('LEVEL COMPLETE!', `Score: ${score}`, ['Generating next maze...']);
     } else if (gameState === 'gameover') {

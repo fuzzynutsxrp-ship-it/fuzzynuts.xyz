@@ -34,8 +34,9 @@
   let keys = {};
   let touchJoy = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
   let touchFire = false;
+  let fireTouchIds = new Set();
   let animFrame;
-  let bestScore = parseInt((function(){try{return localStorage.getItem('asteroids_best')}catch(e){return null}})()) || 0;
+  let bestScore = parseInt(localStorage.getItem('asteroids_best')) || 0;
 
   // ── Helpers ──
   function rand(min, max) { return Math.random() * (max - min) + min; }
@@ -367,7 +368,7 @@
     let duration = Math.floor((Date.now() - startTime) / 1000);
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('asteroids_best', bestScore) } catch(e) {};
+      localStorage.setItem('asteroids_best', bestScore);
     }
     window.__gameScore = score;
     if (typeof window.FuzzyScoreSubmit === 'function') {
@@ -501,9 +502,8 @@
   function resize() {
     canvas = document.getElementById('game-canvas');
     if (!canvas) return;
-    let parent = canvas.parentElement || document.body;
-    W = parent.clientWidth || window.innerWidth;
-    H = parent.clientHeight || window.innerHeight;
+    W = window.innerWidth || 800;
+    H = window.innerHeight || 600;
     canvas.width = W;
     canvas.height = H;
   }
@@ -523,16 +523,29 @@
       keys[e.code] = false;
     });
 
-    // Touch: left half = joystick, right half = fire
+    // Touch: left half = joystick, right half = fire (iOS-safe with multi-touch tracking)
+    function getTouchPos(t) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (t.clientX - rect.left) * (canvas.width / rect.width),
+        y: (t.clientY - rect.top) * (canvas.height / rect.height),
+        isLeft: (t.clientX - rect.left) < (rect.width / 2)
+      };
+    }
+
     canvas.addEventListener('touchstart', function(e) {
       e.preventDefault();
       for (let t of e.changedTouches) {
-        if (t.clientX < W / 2) {
-          touchJoy.active = true;
-          touchJoy.startX = t.clientX;
-          touchJoy.startY = t.clientY;
-          touchJoy.id = t.identifier;
+        const pos = getTouchPos(t);
+        if (pos.isLeft) {
+          if (!touchJoy.active) {
+            touchJoy.active = true;
+            touchJoy.id = t.identifier;
+            touchJoy.startX = pos.x;
+            touchJoy.startY = pos.y;
+          }
         } else {
+          fireTouchIds.add(t.identifier);
           touchFire = true;
         }
       }
@@ -542,8 +555,9 @@
       e.preventDefault();
       for (let t of e.changedTouches) {
         if (touchJoy.active && t.identifier === touchJoy.id) {
-          touchJoy.dx = t.clientX - touchJoy.startX;
-          touchJoy.dy = t.clientY - touchJoy.startY;
+          const pos = getTouchPos(t);
+          touchJoy.dx = pos.x - touchJoy.startX;
+          touchJoy.dy = pos.y - touchJoy.startY;
         }
       }
     }, { passive: false });
@@ -556,13 +570,24 @@
           touchJoy.dx = 0;
           touchJoy.dy = 0;
         }
-        if (t.clientX >= W / 2) {
-          touchFire = false;
-        }
+        fireTouchIds.delete(t.identifier);
+        touchFire = fireTouchIds.size > 0;
       }
     }, { passive: false });
 
-    window.addEventListener('resize', resize);
+    canvas.addEventListener('touchcancel', function(e) {
+      e.preventDefault();
+      touchJoy.active = false;
+      touchJoy.dx = 0;
+      touchJoy.dy = 0;
+      touchFire = false;
+    }, { passive: false });
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(resize).observe(document.body);
+    } else {
+      window.addEventListener('resize', resize);
+    }
   }
 
   // ── Init ──

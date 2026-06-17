@@ -20,7 +20,7 @@ function resize(){
   H = canvas.height = r.height || 600;
 }
 resize();
-window.addEventListener('resize', resize);
+if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
 
 /* ── colours / constants ── */
 const BG        = '#0a0614';
@@ -106,7 +106,7 @@ function updateHUD(){
 function initGame(){
   score = 0; combo = 0; comboMult = 1; maxCombo = 0;
   round = 1;
-  bestScore = parseInt((function(){try{return localStorage.getItem(BEST_KEY)}catch(e){return null}})()||'0',10);
+  bestScore = parseInt(localStorage.getItem(BEST_KEY)||'0',10);
   particles = [];
   screenShake = 0;
   aiTimer = 1000 + Math.random()*1500;
@@ -296,7 +296,7 @@ function endGame(playerWon){
   // best score
   if(score > bestScore){
     bestScore = score;
-    try{ try { localStorage.setItem(BEST_KEY, ''+bestScore) } catch(e) {}; }catch(e){}
+    try{ localStorage.setItem(BEST_KEY, ''+bestScore); }catch(e){}
   }
   // global score
   window.__gameScore = score;
@@ -329,13 +329,18 @@ canvas.addEventListener('touchstart', e=>{
   e.preventDefault();
   if(state==='start'){ state='playing'; initGame(); return; }
   if(state!=='playing') return;
-  touchStart = { x:e.touches[0].clientX, y:e.touches[0].clientY, t:performance.now() };
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches[0];
+  touchStart = { x:(t.clientX-rect.left)*(canvas.width/rect.width), y:(t.clientY-rect.top)*(canvas.height/rect.height), t:performance.now() };
 });
 canvas.addEventListener('touchend', e=>{
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   e.preventDefault();
   if(state!=='playing' || !touchStart) return;
-  const ex = e.changedTouches[0].clientX;
-  const ey = e.changedTouches[0].clientY;
+  const rect = canvas.getBoundingClientRect();
+  const t = e.changedTouches[0];
+  const ex = (t.clientX-rect.left)*(canvas.width/rect.width);
+  const ey = (t.clientY-rect.top)*(canvas.height/rect.height);
   const dx = ex - touchStart.x;
   const dy = ey - touchStart.y;
   const elapsed = performance.now() - touchStart.t;
@@ -349,7 +354,7 @@ canvas.addEventListener('touchend', e=>{
   } else {
     // tap position determines punch
     const third = W/3;
-    const tx = ex - canvas.getBoundingClientRect().left;
+    const tx = ex; // Already in canvas coords from scaling above
     if(tx < third) startPunch(player,'jab');
     else if(tx < third*2) startPunch(player,'hook');
     else startPunch(player,'uppercut');
@@ -720,7 +725,7 @@ canvas.addEventListener('click', ()=>{
 });
 
 /* ── boot ── */
-bestScore = parseInt((function(){try{return localStorage.getItem(BEST_KEY)}catch(e){return null}})()||'0',10);
+bestScore = parseInt(localStorage.getItem(BEST_KEY)||'0',10);
 state = 'start';
 animFrame = requestAnimationFrame(update);
 
