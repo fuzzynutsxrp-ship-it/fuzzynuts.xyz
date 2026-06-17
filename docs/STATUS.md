@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T02:28:33.464Z** from `62fc849` on `main`._
+_Generated **2026-06-17T02:30:49.728Z** from `da06514` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `62fc849` chore(deps-dev): bump eslint 9->10 with @eslint/compat shim (closes #85) (#93) — _fuzzynutsxrp-ship-it, 27 seconds ago_
+- `da06514` fix(ios): game-by-game iOS touch audit — 37 games reviewed with Qwen — _Shafster, 66 seconds ago_
