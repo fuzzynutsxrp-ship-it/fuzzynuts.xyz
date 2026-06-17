@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T03:23:56.126Z** from `157f01c` on `main`._
+_Generated **2026-06-17T03:32:29.968Z** from `f2c7a4e` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `157f01c` fix(ios): restore orphaned container/parent variables in 3 games — _Shafster, 28 seconds ago_
+- `f2c7a4e` fix: move touchcancel listener outside touchend to prevent listener leak (#96) — _fuzzynutsxrp-ship-it, 25 seconds ago_
