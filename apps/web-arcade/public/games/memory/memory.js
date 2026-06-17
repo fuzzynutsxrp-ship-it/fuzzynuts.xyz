@@ -80,13 +80,13 @@
   }
 
   function loadBest() {
-    return parseInt(localStorage.getItem('memory_best') || '0', 10);
+    return parseInt((function(){try{return localStorage.getItem('memory_best')}catch(e){return null}})() || '0', 10);
   }
 
   function saveBest(s) {
     const prev = loadBest();
     if (s > prev) {
-      localStorage.setItem('memory_best', String(s));
+      try { localStorage.setItem('memory_best', String(s)); } catch(e) {}
       return true;
     }
     return false;

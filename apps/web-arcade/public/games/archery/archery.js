@@ -19,7 +19,7 @@
   let canvas, ctx, W, H;
   let state = 'idle'; // idle, aiming, flying, stuck, roundover, gameover
   let score = 0, totalScore = 0, arrowsLeft = ARROWS_PER_ROUND, round = 0;
-  let bestScore = parseInt(localStorage.getItem('archery_best')) || 0;
+  let bestScore = parseInt((function(){try{return localStorage.getItem('archery_best')}catch(e){return null}})()) || 0;
   let startTime = 0;
   let mouse = { x: 0, y: 0 };
   let aimStart = 0, power = 0;
@@ -170,7 +170,7 @@
 
   function endGame() {
     state = 'gameover';
-    if (totalScore > bestScore) { bestScore = totalScore; localStorage.setItem('archery_best', bestScore); }
+    try { if (totalScore > bestScore) { bestScore = totalScore; localStorage.setItem('archery_best', bestScore); }; } catch(e) {}
     window.__gameScore = totalScore;
     const duration = Math.round((Date.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') FuzzyScoreSubmit('archery', totalScore, duration);

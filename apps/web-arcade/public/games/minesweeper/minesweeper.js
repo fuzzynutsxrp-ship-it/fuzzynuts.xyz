@@ -77,6 +77,7 @@
   }
 
   function resize() {
+    const container = canvas.parentElement || document.body;
     
     const maxW = Math.min(container.clientWidth || 800, 1200);
     const maxH = Math.min(container.clientHeight || 600, 800) - 60;
@@ -183,8 +184,8 @@
     updateScoreDisplay();
 
     const bestKey = 'minesweeper_best';
-    const best = parseInt(localStorage.getItem(bestKey) || '0');
-    if (score > best) localStorage.setItem(bestKey, score.toString());
+    const best = parseInt((function(){try{return localStorage.getItem(bestKey)}catch(e){return null}})() || '0');
+    try { if (score > best) localStorage.setItem(bestKey, score.toString()); } catch(e) {}
 
     draw();
 
@@ -444,7 +445,7 @@
   }
 
   function showGameOverScreen(won) {
-    const best = parseInt(localStorage.getItem('minesweeper_best') || '0');
+    const best = parseInt((function(){try{return localStorage.getItem('minesweeper_best')}catch(e){return null}})() || '0');
 
     ctx.fillStyle = 'rgba(10,6,20,0.85)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);

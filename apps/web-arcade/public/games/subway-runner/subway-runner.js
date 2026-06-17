@@ -36,7 +36,7 @@
   let state = 'start'; // start | playing | over
   let score = 0;
   let coins = 0;
-  let bestScore = parseInt(localStorage.getItem('subway-runner_best') || '0', 10);
+  let bestScore = parseInt((function(){try{return localStorage.getItem('subway-runner_best')}catch(e){return null}})() || '0', 10);
   let speed = 4;
   let elapsed = 0;
   let startTime = 0;
@@ -731,7 +731,7 @@
     window.__gameScore = finalScore;
     if (finalScore > bestScore) {
       bestScore = finalScore;
-      localStorage.setItem('subway-runner_best', String(bestScore));
+      try { localStorage.setItem('subway-runner_best', String(bestScore)); } catch(e) {}
     }
     const duration = Math.floor((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') {

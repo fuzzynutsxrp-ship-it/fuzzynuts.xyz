@@ -46,7 +46,7 @@ body {
 #racer {
   position: relative;
   width: 100%;
-  height: calc(100vh - 44px);
+  height: calc(100dvh - 44px);
   background: #0a0a0a;
 }
 
@@ -218,7 +218,7 @@ body {
   .fuzzy-header { height: 38px; padding: 0 10px; }
   .fuzzy-brand { font-size: 11px; }
   .fuzzy-nav a { font-size: 9px; }
-  #racer { height: calc(100vh - 38px); }
+  #racer { height: calc(100dvh - 38px); }
   .hud { font-size: 8px; }
   #hud { padding: 6px 8px; gap: 6px; }
 }

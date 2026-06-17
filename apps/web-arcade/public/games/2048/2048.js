@@ -34,7 +34,7 @@
     canvas = document.getElementById('game-canvas');
     if (!canvas) return;
     ctx = canvas.getContext('2d');
-    bestScore = parseInt(localStorage.getItem('2048_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('2048_best')}catch(e){return null}})() || '0', 10);
     score = 0;
     window.__gameScore = 0;
     gameOver = false;
@@ -171,7 +171,7 @@
     window.__gameScore = score;
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('2048_best', bestScore.toString());
+      try { localStorage.setItem('2048_best', bestScore.toString()); } catch(e) {}
     }
     updateHUD();
 

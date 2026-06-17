@@ -30,7 +30,7 @@
   const PIPE_INTERVAL = 95; // frames between pipe spawns
   const GROUND_H = 50;
 
-  best = parseInt(localStorage.getItem('flappy_best') || '0', 10);
+  best = parseInt((function(){try{return localStorage.getItem('flappy_best')}catch(e){return null}})() || '0', 10);
 
   function resize() {
     
@@ -287,7 +287,7 @@
     const duration = Math.round((Date.now() - startTime) / 1000);
     if (score > best) {
       best = score;
-      localStorage.setItem('flappy_best', String(best));
+      try { localStorage.setItem('flappy_best', String(best)); } catch(e) {}
     }
     window.__gameScore = score;
 
