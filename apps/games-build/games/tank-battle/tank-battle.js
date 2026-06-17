@@ -1124,6 +1124,7 @@
         rows = Math.floor(gameHeight / TILE_SIZE);
       }
     });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     // Draw start screen
     drawStartScreen();

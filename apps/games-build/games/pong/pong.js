@@ -33,9 +33,9 @@
 
   /* ── resize ── */
   function resize(){
-    const parent = canvas.parentElement;
-    W = canvas.width  = parent.clientWidth;
-    H = canvas.height = parent.clientHeight || 600;
+    
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight || 600;
     // reposition paddles on resize
     if(player){
       player.x = 20;
@@ -44,7 +44,7 @@
       ai.h = player.h;
     }
   }
-  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 
   /* ── helpers ── */
   function clamp(v, lo, hi){ return v < lo ? lo : v > hi ? hi : v; }
@@ -111,11 +111,12 @@
     const t = e.touches[0];
     const rect = canvas.getBoundingClientRect();
     const ty = t.clientY - rect.top;
-    const tx = t.clientX - rect.left;
+    const tx = t.clientX - rect.left) * (canvas.width / rect.width;
     if(tx < W / 2) touchY = ty; // only left half controls player
   }, {passive:false});
   canvas.addEventListener('touchend', function(){ touchY = null; });
 
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   /* ── paddle movement ── */
   function movePlayer(){
     const speed = 8 * (H / 600);

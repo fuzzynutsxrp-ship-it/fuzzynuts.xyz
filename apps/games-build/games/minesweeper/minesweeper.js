@@ -49,7 +49,8 @@
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
 
-    window.addEventListener('resize', resize);
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 
     resetGame();
     resize();
@@ -76,7 +77,7 @@
   }
 
   function resize() {
-    const container = canvas.parentElement || document.body;
+    
     const maxW = Math.min(container.clientWidth || 800, 1200);
     const maxH = Math.min(container.clientHeight || 600, 800) - 60;
 
@@ -204,7 +205,7 @@
 
   function getCell(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) - offsetX;
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width) - offsetX;
     const y = (e.clientY - rect.top) - offsetY;
     const c = Math.floor(x / cellSize);
     const r = Math.floor(y / cellSize);
@@ -424,7 +425,7 @@
     // Override click for start screen
     canvas.onclick = function (e) {
       const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
+      const mx = e.clientX - rect.left) * (canvas.width / rect.width;
       const my = e.clientY - rect.top;
       for (const btn of btns) {
         if (mx >= btn._x && mx <= btn._x + btn._w && my >= btn._y && my <= btn._y + btn._h) {
@@ -471,7 +472,7 @@
 
     canvas.onclick = function (e) {
       const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
+      const mx = e.clientX - rect.left) * (canvas.width / rect.width;
       const my = e.clientY - rect.top;
       if (mx >= bx && mx <= bx + bw && my >= by && my <= by + bh) {
         canvas.onclick = null;

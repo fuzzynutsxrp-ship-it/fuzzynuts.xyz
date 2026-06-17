@@ -1,3 +1,5 @@
+/* Flappy — FuzzyNuts Arcade */
+html, body { overscroll-behavior: none; -webkit-overflow-scrolling: auto; }
 /* Flappy Nut — FuzzyNuts Arcade */
 #game-container {
   width: 100%;
@@ -15,7 +17,7 @@ body.in-iframe #game-container { height: 100dvh; }
 .overlay {
   position: absolute; inset: 0; z-index: 10;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(10, 6, 20, 0.95); touch-action: pan-y;
+  background: rgba(10, 6, 20, 0.95); touch-action: none;
 }
 .overlay.hidden { display: none; }
 .overlay-content { text-align: center; padding: 2rem; max-width: 400px; }

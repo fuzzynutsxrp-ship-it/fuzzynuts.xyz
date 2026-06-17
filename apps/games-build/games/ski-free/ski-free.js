@@ -38,7 +38,7 @@
     canvas.height = canvas.parentElement.clientHeight;
   }
   resize();
-  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 
   /* ── state ── */
   let running = false, gameOver = false, started = false;
@@ -59,6 +59,7 @@
     const t = e.touches[0]; touchStartX = t.clientX; touchStartY = t.clientY; touching = true;
   }, { passive: true });
   canvas.addEventListener('touchend', e => {
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     if (!touching) return; touching = false;
     const t = e.changedTouches[0];
     const dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;

@@ -39,7 +39,7 @@
     canvas = document.getElementById('game-canvas');
     if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; document.body.appendChild(canvas); }
     ctx = canvas.getContext('2d');
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
     resize();
 
     bestScore = parseInt(localStorage.getItem('doodle-jump_best') || '0');
@@ -52,6 +52,7 @@
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
     canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     showStart();
     loop();

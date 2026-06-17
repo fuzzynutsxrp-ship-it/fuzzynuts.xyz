@@ -781,6 +781,7 @@
       e.preventDefault();
       touchTarget = null;
     }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   // ─── Bootstrap ─────────────────────────────────────────────────

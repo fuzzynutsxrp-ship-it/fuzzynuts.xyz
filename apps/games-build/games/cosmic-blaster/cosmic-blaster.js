@@ -136,6 +136,7 @@
       e.preventDefault();
       touchActive = false;
     }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   }
 
   /* ── Update ────────────────────────────────────────────────── */
@@ -613,7 +614,7 @@
 
   /* ── Resize ────────────────────────────────────────────────── */
   function resize() {
-    const container = canvas.parentElement;
+    
     const cw = container.clientWidth;
     const ch = container.clientHeight;
     const ratio = CANVAS_W / CANVAS_H;
@@ -631,7 +632,7 @@
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
     generateStars();
     setupInput();
 

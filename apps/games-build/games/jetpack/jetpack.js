@@ -47,7 +47,7 @@
     }
     ctx = canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
   }
 
   function resize() {
@@ -518,6 +518,7 @@
     canvas.addEventListener('touchstart', function(e) { e.preventDefault(); handleDown(); }, { passive: false });
     canvas.addEventListener('touchend', function(e) { e.preventDefault(); handleUp(); }, { passive: false });
 
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     // Start/restart on click when in menu/gameover
     canvas.addEventListener('click', function() {
       if (gameState === 'menu') startGame();

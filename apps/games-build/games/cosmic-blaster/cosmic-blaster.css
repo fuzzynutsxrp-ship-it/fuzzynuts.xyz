@@ -1,3 +1,5 @@
+/* Cosmic-Blaster — FuzzyNuts Arcade */
+html, body { overscroll-behavior: none; -webkit-overflow-scrolling: auto; }
 /* Cosmic Blaster — Space theme with cyan accent */
 #game-container {
   position: relative;

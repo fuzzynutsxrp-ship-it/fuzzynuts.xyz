@@ -458,9 +458,9 @@
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     if (e.touches && e.touches.length) {
-      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+      return { x: e.touches[0].clientX - rect.left) * (canvas.width / rect.width, y: e.touches[0].clientY - rect.top) * (canvas.height / rect.height };
     }
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    return { x: e.clientX - rect.left) * (canvas.width / rect.width, y: e.clientY - rect.top) * (canvas.height / rect.height };
   }
 
   function onPointerDown(e) {
@@ -495,6 +495,7 @@
     canvas.addEventListener("touchmove", onPointerMove, { passive: false });
     window.addEventListener("touchend", onPointerUp);
   }
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   function unbindInput() {
     canvas.removeEventListener("mousedown", onPointerDown);
@@ -581,7 +582,7 @@
     livesEl = document.getElementById("lives-display");
 
     resize();
-    window.addEventListener("resize", resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
 
     /* initial draw */
     ctx.fillStyle = BG;

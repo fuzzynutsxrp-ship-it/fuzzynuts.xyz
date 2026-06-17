@@ -778,6 +778,7 @@
   });
 
   // Touch / swipe
+  canvas.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
     const t = e.touches[0];
@@ -787,6 +788,7 @@
   }, { passive: false });
 
   canvas.addEventListener('touchend', function(e) {
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     e.preventDefault();
     if (state !== 'playing') {
       handleAction('start');
@@ -818,7 +820,7 @@
 
   // ── Init ──────────────────────────────────────────────────────────
   resize();
-  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
   requestAnimationFrame(loop);
 
 })();

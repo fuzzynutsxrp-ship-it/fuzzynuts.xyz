@@ -1,3 +1,5 @@
+/* Dragon-Hoard — FuzzyNuts Arcade */
+html, body { overscroll-behavior: none; -webkit-overflow-scrolling: auto; }
 /**
  * ═══════════════════════════════════════════════════════════════
  *  Dragon's Hoard — Styles

@@ -467,7 +467,7 @@
     if (gameState === 'start') { startGame(); return; }
     if (gameState === 'gameover') { startGame(); return; }
     const t = e.touches[0];
-    _touchSwipeStart = { x: t.clientX, y: t.clientY };
+    const rect = canvas.getBoundingClientRect(); _touchSwipeStart = { x: (t.clientX - rect.left) * (canvas.width / rect.width), y: (t.clientY - rect.top) * (canvas.height / rect.height) };
   }
 
   function _onTouchEnd(e) {
@@ -492,6 +492,7 @@
     canvas.addEventListener('touchstart', _onTouchStart, { passive: true });
     canvas.addEventListener('touchend', _onTouchEnd, { passive: true });
   }
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   // Cleanup
   window.addEventListener('game-cleanup', function () {

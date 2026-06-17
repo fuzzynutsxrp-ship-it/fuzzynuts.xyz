@@ -57,20 +57,21 @@
     if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; document.body.appendChild(canvas); }
     ctx = canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 
     document.addEventListener('keydown', handleKey);
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
 
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     resetGame();
     showStartScreen();
   }
 
   function resize() {
-    const parent = canvas.parentElement || document.body;
-    const maxW = parent.clientWidth || 800;
-    const maxH = parent.clientHeight || 600;
+    
+    const maxW = window.innerWidth || 800;
+    const maxH = window.innerHeight || 600;
     const scale = Math.min(maxW / W, maxH / H, 2);
     canvas.width = W;
     canvas.height = H;

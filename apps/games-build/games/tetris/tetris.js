@@ -276,9 +276,10 @@
     overlayOver = document.getElementById('overlay-gameover');
     best = parseInt(localStorage.getItem('tetris_best')) || 0;
     document.addEventListener('keydown', onKeyDown);
-    canvas.addEventListener('touchstart', onTouchStart, { passive: true });
-    canvas.addEventListener('touchend', onTouchEnd, { passive: true });
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
     window.addEventListener('resize', () => { resize(); if (!running) draw(); });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     resize();
     if (overlayStart) overlayStart.style.display = 'flex';
     if (overlayOver) overlayOver.style.display = 'none';

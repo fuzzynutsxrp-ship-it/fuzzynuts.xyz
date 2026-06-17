@@ -309,12 +309,12 @@ function init(canvasEl){
 
   canvas.addEventListener('click',e=>{
     const r=canvas.getBoundingClientRect();
-    handleClick(e.clientX-r.left, e.clientY-r.top);
+    handleClick((e.clientX-r.left)*(canvas.width/r.width), (e.clientY-r.top)*(canvas.height/r.height));
   });
   canvas.addEventListener('touchstart',e=>{
     e.preventDefault();
     const t=e.touches[0], r=canvas.getBoundingClientRect();
-    handleClick(t.clientX-r.left, t.clientY-r.top);
+    handleClick((t.clientX-r.left)*(canvas.width/r.width), (t.clientY-r.top)*(canvas.height/r.height));
   },{passive:false});
   window.addEventListener('keydown',handleKey);
   window.addEventListener('resize',resize);

@@ -33,9 +33,9 @@
   best = parseInt(localStorage.getItem('flappy_best') || '0', 10);
 
   function resize() {
-    const parent = canvas.parentElement || document.body;
-    W = canvas.width = parent.clientWidth || 480;
-    H = canvas.height = parent.clientHeight || 640;
+    
+    W = canvas.width = window.innerWidth || 480;
+    H = canvas.height = window.innerHeight || 640;
   }
 
   function initStars() {
@@ -335,10 +335,12 @@
     flap();
   });
 
+  canvas.addEventListener('touchend', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchstart', function (e) {
     e.preventDefault();
     flap();
   }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
   // ── Restart hook ──
   window.__restartFlappy = function () {

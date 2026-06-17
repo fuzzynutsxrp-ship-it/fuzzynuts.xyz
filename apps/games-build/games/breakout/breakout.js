@@ -130,10 +130,12 @@
     canvas.addEventListener('touchstart', function(e) { e.preventDefault(); handleTouch(e); }, { passive: false });
     canvas.addEventListener('touchmove', function(e) { e.preventDefault(); handleTouch(e); }, { passive: false });
     canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
       if (waitingForServe) { serveBall(); hideOverlay('start-overlay'); }
       if (gameOver) { hideOverlay('gameover-overlay'); resetGame(); }
-    });
-    window.addEventListener('resize', resize);
+    }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
   }
 
   function handleTouch(e) {

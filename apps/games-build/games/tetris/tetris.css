@@ -1,4 +1,5 @@
 /* Tetris — FuzzyNuts Arcade */
+html, body { overscroll-behavior: none; -webkit-overflow-scrolling: auto; }
 #game-container {
   width: 100%;
   height: calc(100dvh - var(--arcade-nav-height, 44px));
@@ -29,7 +30,7 @@ body.in-iframe #game-container {
   align-items: center;
   justify-content: center;
   background: rgba(10, 6, 20, 0.95);
-  touch-action: pan-y;
+  touch-action: none;
 }
 .overlay.hidden {
   display: none;

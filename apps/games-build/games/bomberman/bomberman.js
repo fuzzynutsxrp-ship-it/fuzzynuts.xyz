@@ -411,15 +411,19 @@
   function onTouchStart(e) {
     if (!gameRunning) return;
     const t = e.touches[0];
-    touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+    const rect = canvas.getBoundingClientRect();
+    touchStart = { x: (t.clientX - rect.left) * (canvas.width / rect.width), y: (t.clientY - rect.top) * (canvas.height / rect.height), time: Date.now() };
     touchMoved = false;
   }
 
   function onTouchMove(e) {
     if (!touchStart || !gameRunning) return;
     const t = e.touches[0];
-    const dx = t.clientX - touchStart.x;
-    const dy = t.clientY - touchStart.y;
+    const rect = canvas.getBoundingClientRect();
+    const cx = (t.clientX - rect.left) * (canvas.width / rect.width);
+    const cy = (t.clientY - rect.top) * (canvas.height / rect.height);
+    const dx = cx - touchStart.x;
+    const dy = cy - touchStart.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist > 30) {
       touchMoved = true;
@@ -428,7 +432,7 @@
       } else {
         movePlayer(0, dy > 0 ? 1 : -1);
       }
-      touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+      touchStart = { x: cx, y: cy, time: Date.now() };
       e.preventDefault();
     }
   }
@@ -716,6 +720,7 @@
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: true });
 
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     // Start screen wait
     drawStartScreen();
 
