@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T12:08:42.874Z** from `4f30de9` on `main`._
+_Generated **2026-06-17T12:34:04.587Z** from `12a10ac` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `4f30de9` fix(tetris): overlay ID mismatch — start-screen was overlay-start, game-over was overlay-gameover — _Shafster, 28 seconds ago_
+- `12a10ac` fix(tetris): sync overlay ID fix from games-build to web-arcade (#98) — _fuzzynutsxrp-ship-it, 26 seconds ago_
