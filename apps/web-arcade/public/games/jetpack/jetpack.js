@@ -485,7 +485,7 @@
 
     if (totalScore > bestScore) {
       bestScore = totalScore;
-      try { localStorage.setItem('jetpack_best', String(bestScore) } catch(e) {});
+      try { localStorage.setItem('jetpack_best', String(bestScore)) } catch(e) {}
     }
 
     FuzzyScoreSubmit('jetpack', totalScore, duration);

@@ -171,7 +171,7 @@
     window.__gameScore = score;
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('2048_best', bestScore.toString() } catch(e) {});
+      try { localStorage.setItem('2048_best', bestScore.toString()) } catch(e) {}
     }
     updateHUD();
 

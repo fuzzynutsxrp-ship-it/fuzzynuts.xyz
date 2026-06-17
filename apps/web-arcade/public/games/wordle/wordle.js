@@ -448,7 +448,7 @@
 
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('wordle_best', bestScore.toString()}catch(e){});
+      try{localStorage.setItem('wordle_best', bestScore.toString())}catch(e){}
     }
 
     if (typeof FuzzyScoreSubmit === 'function') {

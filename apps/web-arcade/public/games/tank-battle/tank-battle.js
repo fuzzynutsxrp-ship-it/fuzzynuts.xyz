@@ -878,7 +878,7 @@
     // Update best score
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('tank-battle_best', bestScore.toString()}catch(e){});
+      try{localStorage.setItem('tank-battle_best', bestScore.toString())}catch(e){}
     }
 
     window.__gameScore = score;

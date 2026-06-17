@@ -167,7 +167,7 @@
     // Update best score
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('dragon-hoard-best', bestScore.toString() } catch(e) {});
+      try { localStorage.setItem('dragon-hoard-best', bestScore.toString()) } catch(e) {}
     }
 
     // Show game over screen

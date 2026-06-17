@@ -355,7 +355,7 @@
     gameOverTimer = 0;
     if (score > best) {
       best = score;
-      try { localStorage.setItem("space-invaders_best", String(best) } catch(e) {});
+      try { localStorage.setItem("space-invaders_best", String(best)) } catch(e) {}
     }
     const duration = Math.round((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === "function") {

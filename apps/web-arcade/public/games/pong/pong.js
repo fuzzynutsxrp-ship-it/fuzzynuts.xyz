@@ -294,7 +294,7 @@
     // best score
     if(finalScore > bestScore){
       bestScore = finalScore;
-      try{ try { localStorage.setItem('pong_best', String(bestScore) } catch(e) {}); }catch(e){}
+      try{ try { localStorage.setItem('pong_best', String(bestScore)) } catch(e) {} }catch(e){}
     }
 
     // show game over overlay via custom event / class

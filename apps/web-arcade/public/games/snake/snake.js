@@ -47,7 +47,7 @@
   function saveBest(s) {
     const prev = parseInt((function(){try{return localStorage.getItem('snake_best')}catch(e){return null}})() || '0', 10);
     if (s > prev) {
-      try { localStorage.setItem('snake_best', String(s) } catch(e) {});
+      try { localStorage.setItem('snake_best', String(s)) } catch(e) {}
       return true;
     }
     return false;

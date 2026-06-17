@@ -287,7 +287,7 @@
     const duration = Math.round((Date.now() - startTime) / 1000);
     if (score > best) {
       best = score;
-      try { localStorage.setItem('flappy_best', String(best) } catch(e) {});
+      try { localStorage.setItem('flappy_best', String(best)) } catch(e) {}
     }
     window.__gameScore = score;
 

@@ -134,7 +134,7 @@ function gameOver(){
   const finalScore = Math.floor(state.score);
   if (finalScore > state.best){
     state.best = finalScore;
-    try{localStorage.setItem('surf-up_best', String(finalScore)}catch(e){});
+    try{localStorage.setItem('surf-up_best', String(finalScore))}catch(e){}
   }
   window.__gameScore = finalScore;
   updateHUD();

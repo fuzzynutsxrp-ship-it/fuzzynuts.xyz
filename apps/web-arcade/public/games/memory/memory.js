@@ -86,7 +86,7 @@
   function saveBest(s) {
     const prev = loadBest();
     if (s > prev) {
-      try { localStorage.setItem('memory_best', String(s) } catch(e) {});
+      try { localStorage.setItem('memory_best', String(s)) } catch(e) {}
       return true;
     }
     return false;

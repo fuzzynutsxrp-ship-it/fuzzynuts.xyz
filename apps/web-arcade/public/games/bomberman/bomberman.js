@@ -83,10 +83,10 @@
   // ── Resize ─────────────────────────────────────────────────────────────────
   function resize() {
     const container = canvas.parentElement || document.body;
-    const maxW = container.clientWidth || 800;
-    if (const maxW =  < 100) const maxW =  = (window.innerWidth || 800) - 16;
-    const maxH = container.clientHeight || 600;
-    if (const maxH =  < 100) const maxH =  = (window.innerHeight || 600) - 16;
+    let maxW = container.clientWidth || 800;
+    if (maxW < 100) maxW = (window.innerWidth || 800) - 16;
+    let maxH = container.clientHeight || 600;
+    if (maxH < 100) maxH = (window.innerHeight || 600) - 16;
     tileW = Math.floor(maxW / COLS);
     tileH = Math.floor(maxH / ROWS);
     const t = Math.min(tileW, tileH);
@@ -353,7 +353,7 @@
 
     // Best score
     const prev = parseInt((function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0', 10);
-    if (score > prev) try { localStorage.setItem('bomberman_best', score.toString() } catch(e) {});
+    if (score > prev) try { localStorage.setItem('bomberman_best', score.toString()) } catch(e) {}
     bestScore = Math.max(score, prev);
 
     const duration = Math.floor((Date.now() - startTime) / 1000);

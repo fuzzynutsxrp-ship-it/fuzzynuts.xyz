@@ -332,7 +332,7 @@
     window.__gameScore = finalScore;
     if (finalScore > bestScore) {
       bestScore = finalScore;
-      try { localStorage.setItem('capture-flag_best', bestScore.toString() } catch(e) {});
+      try { localStorage.setItem('capture-flag_best', bestScore.toString()) } catch(e) {}
     }
     gameState = 'gameover';
     if (typeof FuzzyScoreSubmit === 'function') {

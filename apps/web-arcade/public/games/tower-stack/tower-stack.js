@@ -181,7 +181,7 @@
     state = 'over';
     if (score > bestScore) {
       bestScore = score;
-      try{localStorage.setItem('tower-stack_best', bestScore.toString()}catch(e){});
+      try{localStorage.setItem('tower-stack_best', bestScore.toString())}catch(e){}
     }
     const duration = Math.floor((Date.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') {

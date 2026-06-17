@@ -731,7 +731,7 @@
     window.__gameScore = finalScore;
     if (finalScore > bestScore) {
       bestScore = finalScore;
-      try{localStorage.setItem('subway-runner_best', String(bestScore)}catch(e){});
+      try{localStorage.setItem('subway-runner_best', String(bestScore))}catch(e){}
     }
     const duration = Math.floor((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === 'function') {
