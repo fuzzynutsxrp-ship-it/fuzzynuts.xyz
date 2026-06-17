@@ -411,8 +411,9 @@
       e.preventDefault(); // Prevent iOS rubber-banding during swipe
     }, { passive: false }); // MUST be false to allow preventDefault
 
-    canvas.addEventListener('touchend', function (e) {
     canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+
+    canvas.addEventListener('touchend', function (e) {
       if (gameWon && !continueMode) {
         continueMode = true;
         draw();
