@@ -554,8 +554,26 @@ export class Game {
 
         if (isMobile) {
             // MOBILE: CSS position:fixed;inset:0 handles fullscreen sizing.
-            // Do NOT set inline width/height — it would conflict with the CSS.
-            // Just clear any stale inline styles from previous desktop-path runs.
+            // Dynamically set canvas resolution to match screen aspect ratio
+            // so the game fills the screen without stretching or letterboxing.
+            const vp = window.visualViewport;
+            const vpW = vp ? vp.width : window.innerWidth;
+            const vpH = vp ? vp.height : window.innerHeight;
+
+            // Scale canvas to fill the viewport while staying within arena bounds
+            // Use a base scale so we don't create an absurdly large canvas
+            const baseScale = Math.min(vpW, vpH) < 500 ? 1 : 1;
+            const newW = Math.round(vpW * baseScale);
+            const newH = Math.round(vpH * baseScale);
+
+            // Only update if dimensions actually changed
+            if (this.canvas && (this.canvas.width !== newW || this.canvas.height !== newH)) {
+                this.canvas.width = newW;
+                this.canvas.height = newH;
+                CONFIG.CANVAS_WIDTH = newW;
+                CONFIG.CANVAS_HEIGHT = newH;
+            }
+
             container.style.width = '';
             container.style.height = '';
             return;
@@ -1228,10 +1246,20 @@ export class Game {
         const ah = CONFIG.ARENA_HEIGHT ?? vh;
         let wx = this.player.x - vw / 2;
         let wy = this.player.y - vh / 2;
-        if (wx < 0) wx = 0;
-        if (wy < 0) wy = 0;
-        if (wx > aw - vw) wx = aw - vw;
-        if (wy > ah - vh) wy = ah - vh;
+        // Clamp camera so it never shows beyond arena bounds.
+        // If viewport is larger than arena, center the arena.
+        if (aw > vw) {
+            if (wx < 0) wx = 0;
+            if (wx > aw - vw) wx = aw - vw;
+        } else {
+            wx = (aw - vw) / 2;
+        }
+        if (ah > vh) {
+            if (wy < 0) wy = 0;
+            if (wy > ah - vh) wy = ah - vh;
+        } else {
+            wy = (ah - vh) / 2;
+        }
         this.camera.worldX = wx;
         this.camera.worldY = wy;
     }
