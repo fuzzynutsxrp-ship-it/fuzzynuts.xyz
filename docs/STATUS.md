@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T03:06:03.307Z** from `0c0b60a` on `main`._
+_Generated **2026-06-17T03:23:56.126Z** from `157f01c` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `0c0b60a` fix(ios): syntax errors and misplaced touchcancel handlers — _Shafster, 35 seconds ago_
+- `157f01c` fix(ios): restore orphaned container/parent variables in 3 games — _Shafster, 28 seconds ago_
