@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-16T13:17:23.785Z** from `206cb81` on `eslint-10-compat-fix`._
+_Generated **2026-06-17T02:28:33.464Z** from `62fc849` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -64,15 +64,6 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 ## Recent activity
 
-Last 10 commits on `eslint-10-compat-fix`:
+Last 10 commits on `main`:
 
-- `206cb81` fix: add js-yaml pnpm override (>=4.2.0) for security audit — _Hermes Dev Worker, 73 seconds ago_
-- `9eae62d` fix(ci): apply security overrides (ws/form-data/tar), format merged files, regenerate STATUS.md — _Hermes Dev Worker, 7 minutes ago_
-- `7d28647` merge: resolve dialog→div conflict with main (take iOS Safari fix) — _Hermes Dev Worker, 16 minutes ago_
-- `ed26a0e` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 44 minutes ago_
-- `8e4f34a` fix(ci): compare only structural content in status:check — _Hermes Dev Worker, 45 minutes ago_
-- `e7cdc7e` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 46 minutes ago_
-- `80689d3` fix(ci): also normalize commit SHAs and relative times in status:check — _Hermes Dev Worker, 46 minutes ago_
-- `fd3f2dc` fix(ci): normalize timestamp in status:check comparison — _Hermes Dev Worker, 49 minutes ago_
-- `140fb71` style: prettier format all files to fix CI lint check — _Hermes Dev Worker, 50 minutes ago_
-- `b52cd3c` chore: regenerate docs/STATUS.md — _Hermes Dev Worker, 52 minutes ago_
+- `62fc849` chore(deps-dev): bump eslint 9->10 with @eslint/compat shim (closes #85) (#93) — _fuzzynutsxrp-ship-it, 27 seconds ago_
