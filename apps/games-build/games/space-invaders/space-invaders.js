@@ -20,9 +20,8 @@
   const ctx    = canvas.getContext("2d");
 
   function resize() {
-    
-    canvas.width  = Math.min(parent.clientWidth  || 800, 960);
-    canvas.height = Math.min(parent.clientHeight || 600, 720);
+    canvas.width  = Math.min(window.innerWidth  || 800, 960);
+    canvas.height = Math.min(window.innerHeight || 600, 720);
   }
   if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
   resize();

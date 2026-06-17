@@ -614,9 +614,8 @@
 
   /* ── Resize ────────────────────────────────────────────────── */
   function resize() {
-    
-    const cw = container.clientWidth;
-    const ch = container.clientHeight;
+    const cw = window.innerWidth;
+    const ch = window.innerHeight;
     const ratio = CANVAS_W / CANVAS_H;
     let w, h;
     if (cw / ch > ratio) { h = ch; w = h * ratio; }

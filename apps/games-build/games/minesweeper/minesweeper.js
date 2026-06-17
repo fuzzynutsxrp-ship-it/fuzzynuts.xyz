@@ -77,9 +77,8 @@
   }
 
   function resize() {
-    
-    const maxW = Math.min(container.clientWidth || 800, 1200);
-    const maxH = Math.min(container.clientHeight || 600, 800) - 60;
+    const maxW = Math.min(window.innerWidth || 800, 1200);
+    const maxH = Math.min(window.innerHeight || 600, 800) - 60;
 
     cellSize = Math.floor(Math.min(maxW / cols, maxH / rows, 40));
     cellSize = Math.max(cellSize, 16);
