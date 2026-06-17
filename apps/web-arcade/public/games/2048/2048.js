@@ -171,7 +171,7 @@
     window.__gameScore = score;
     if (score > bestScore) {
       bestScore = score;
-      try { localStorage.setItem('2048_best', bestScore.toString() } catch(e) {});
+      try { localStorage.setItem('2048_best', bestScore.toString()) } catch(e) {});
     }
     updateHUD();
 
@@ -405,6 +405,8 @@
       tx = e.touches[0].clientX;
       ty = e.touches[0].clientY;
     }, { passive: true });
+
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     canvas.addEventListener('touchend', function (e) {
       if (gameWon && !continueMode) {
