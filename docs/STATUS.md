@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T15:23:04.320Z** from `64536c4` on `main`._
+_Generated **2026-06-17T16:02:52.254Z** from `5842c8f` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `64536c4` fix(tetris): sync iOS fixes to deployed web-arcade copy — _Shafster, 47 seconds ago_
+- `5842c8f` fix(tetris): cherry-pick iOS fixes — button selectors + ResizeObserver + visualViewport (#99) — _fuzzynutsxrp-ship-it, 36 seconds ago_
