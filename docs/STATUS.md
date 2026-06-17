@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T12:34:04.587Z** from `12a10ac` on `main`._
+_Generated **2026-06-17T14:46:47.430Z** from `bd48af8` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `12a10ac` fix(tetris): sync overlay ID fix from games-build to web-arcade (#98) — _fuzzynutsxrp-ship-it, 26 seconds ago_
+- `bd48af8` fix(tetris): Qwen-verified — button selectors, resize, ResizeObserver — _Shafster, 44 seconds ago_
