@@ -256,7 +256,7 @@
 
   // ── Resize ─────────────────────────────────────────────────────────────
   function resize() {
-    const maxH = window.innerHeight || 600;
+    const maxH = (window.visualViewport?.height || window.innerHeight) || 600;
     const maxW = window.innerWidth || 800;
     const sidebar = 90;
     cellSize = Math.min(Math.floor((maxW - sidebar) / COLS), Math.floor(maxH / ROWS), 32);
