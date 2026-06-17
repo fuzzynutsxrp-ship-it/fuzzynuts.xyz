@@ -3,7 +3,7 @@
 
 # Fuzzynuts — Project Status
 
-_Generated **2026-06-17T02:56:56.030Z** from `e77dd94` on `main`._
+_Generated **2026-06-17T03:06:03.307Z** from `0c0b60a` on `main`._
 
 `migration_phase: in-progress`  ·  `version: 0.2.0`
 
@@ -66,4 +66,4 @@ Legend: ✅ fixed · 🟡 partial · 🔴 open · ⏸️ blocked
 
 Last 10 commits on `main`:
 
-- `e77dd94` fix(fuzzy-survivors): adaptive canvas resolution for mobile portrait/landscape — _Shafster, 41 seconds ago_
+- `0c0b60a` fix(ios): syntax errors and misplaced touchcancel handlers — _Shafster, 35 seconds ago_
