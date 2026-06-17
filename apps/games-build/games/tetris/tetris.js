@@ -256,10 +256,8 @@
 
   // ── Resize ─────────────────────────────────────────────────────────────
   function resize() {
-    const container = canvas.parentElement;
-    if (!container) return;
-    const maxH = container.clientHeight || window.innerHeight;
-    const maxW = container.clientWidth || window.innerWidth;
+    const maxH = window.innerHeight || 600;
+    const maxW = window.innerWidth || 800;
     const sidebar = 90;
     cellSize = Math.min(Math.floor((maxW - sidebar) / COLS), Math.floor(maxH / ROWS), 32);
     cellSize = Math.max(cellSize, 14);
@@ -278,14 +276,18 @@
     document.addEventListener('keydown', onKeyDown);
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
-    window.addEventListener('resize', () => { resize(); if (!running) draw(); });
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => { resize(); if (!running) draw(); }).observe(document.body);
+    } else {
+      window.addEventListener('resize', () => { resize(); if (!running) draw(); });
+    }
     canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     resize();
     if (overlayStart) overlayStart.style.display = 'flex';
     if (overlayOver) overlayOver.style.display = 'none';
     // Bind start buttons
-    document.querySelectorAll('[data-action="start"]').forEach(b => b.addEventListener('click', startGame));
-    document.querySelectorAll('[data-action="restart"]').forEach(b => b.addEventListener('click', startGame));
+    document.getElementById('start-btn')?.addEventListener('click', startGame);
+    document.getElementById('restart-btn')?.addEventListener('click', startGame);
   }
 
   function startGame() {
