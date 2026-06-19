@@ -1,4 +1,4 @@
-const CACHE = 'memory-v1.0.0';
+const CACHE = 'memory-v1.1.0';
 const ASSETS = ['./', './index.html', './memory.css', './memory.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

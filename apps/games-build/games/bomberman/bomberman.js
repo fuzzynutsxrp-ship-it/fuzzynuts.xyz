@@ -350,8 +350,8 @@
     animFrame = null;
 
     // Best score
-    const prev = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
-    if (score > prev) localStorage.setItem('bomberman_best', score.toString());
+    const prev = parseInt((function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0', 10);
+    try { if (score > prev) localStorage.setItem('bomberman_best', score.toString()); } catch(e) {}
     bestScore = Math.max(score, prev);
 
     const duration = Math.floor((Date.now() - startTime) / 1000);
@@ -564,7 +564,7 @@
     ctx.fillText('Space / Tap to place bomb', canvas.width / 2, canvas.height * 0.58);
     ctx.fillText('Destroy all enemies to advance!', canvas.width / 2, canvas.height * 0.66);
 
-    const bs = localStorage.getItem('bomberman_best') || '0';
+    const bs = (function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0';
     ctx.fillStyle = '#888';
     ctx.font = Math.floor(tileH * 0.4) + 'px monospace';
     ctx.fillText('Best: ' + bs, canvas.width / 2, canvas.height * 0.78);
@@ -590,7 +590,7 @@
     ctx.fillText('Score: ' + score, canvas.width / 2, canvas.height * 0.5);
     ctx.fillText('Level: ' + level, canvas.width / 2, canvas.height * 0.58);
 
-    const bs = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+    const bs = parseInt((function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0', 10);
     ctx.fillStyle = '#888';
     ctx.font = Math.floor(tileH * 0.4) + 'px monospace';
     ctx.fillText('Best: ' + bs, canvas.width / 2, canvas.height * 0.68);
@@ -665,7 +665,7 @@
     gameRunning = true;
     gamePaused = false;
     startTime = Date.now();
-    bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0', 10);
 
     // Hide start screen and game-over overlays
     const startScreen = document.getElementById('start-screen');
@@ -712,7 +712,7 @@
     }
     ctx = canvas.getContext('2d');
 
-    bestScore = parseInt(localStorage.getItem('bomberman_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('bomberman_best')}catch(e){return null}})() || '0', 10);
     resize();
     window.addEventListener('resize', _onResize);
     document.addEventListener('keydown', onKeyDown);
@@ -720,7 +720,7 @@
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: true });
 
-  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     // Start screen wait
     drawStartScreen();
 

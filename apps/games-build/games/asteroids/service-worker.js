@@ -1,4 +1,4 @@
-const CACHE = 'asteroids-v1.0.0';
+const CACHE = 'asteroids-v1.1.0';
 const ASSETS = [
     './', './index.html', './asteroids.css', './asteroids.js',
 ];

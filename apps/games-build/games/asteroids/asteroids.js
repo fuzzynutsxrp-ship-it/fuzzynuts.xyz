@@ -36,7 +36,7 @@
   let touchFire = false;
   let fireTouchIds = new Set();
   let animFrame;
-  let bestScore = parseInt(localStorage.getItem('asteroids_best')) || 0;
+  let bestScore = parseInt((function(){try{return localStorage.getItem('asteroids_best')}catch(e){return null}})()) || 0;
 
   // ── Helpers ──
   function rand(min, max) { return Math.random() * (max - min) + min; }
@@ -368,7 +368,7 @@
     let duration = Math.floor((Date.now() - startTime) / 1000);
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('asteroids_best', bestScore);
+      try { localStorage.setItem('asteroids_best', bestScore); } catch(e) {}
     }
     window.__gameScore = score;
     if (typeof window.FuzzyScoreSubmit === 'function') {

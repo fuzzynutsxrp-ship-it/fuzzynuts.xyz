@@ -1,4 +1,4 @@
-const CACHE = 'doodle-jump-v1.0.0';
+const CACHE = 'doodle-jump-v1.1.0';
 const ASSETS = ['./', './index.html', './doodle-jump.css', './doodle-jump.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

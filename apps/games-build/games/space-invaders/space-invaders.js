@@ -20,8 +20,10 @@
   const ctx    = canvas.getContext("2d");
 
   function resize() {
-    canvas.width  = Math.min(window.innerWidth  || 800, 960);
-    canvas.height = Math.min(window.innerHeight || 600, 720);
+    const parent = canvas.parentElement || document.body;
+    
+    canvas.width  = Math.min(parent.clientWidth  || 800, 960);
+    canvas.height = Math.min(parent.clientHeight || 600, 720);
   }
   if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
   resize();
@@ -59,7 +61,7 @@
   let alienDir, alienDropNext, alienSpeed, alienAnimFrame, alienMoveTimer;
   let mysteryTimer, shootCooldown, invincibleTimer, gameOverTimer;
 
-  best = parseInt(localStorage.getItem("space-invaders_best") || "0", 10);
+  best = parseInt((function(){try{return localStorage.getItem("space-invaders_best")}catch(e){return null}})() || "0", 10);
 
   function resetAliens() {
     aliens = [];
@@ -356,7 +358,7 @@
     gameOverTimer = 0;
     if (score > best) {
       best = score;
-      localStorage.setItem("space-invaders_best", String(best));
+      try { localStorage.setItem("space-invaders_best", String(best)); } catch(e) {}
     }
     const duration = Math.round((performance.now() - startTime) / 1000);
     if (typeof FuzzyScoreSubmit === "function") {

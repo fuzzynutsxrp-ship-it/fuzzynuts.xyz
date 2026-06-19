@@ -1,4 +1,4 @@
-const CACHE = 'ski-free-v1.0.0';
+const CACHE = 'ski-free-v1.1.0';
 const ASSETS = ['./', './index.html', './ski-free.css', './ski-free.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

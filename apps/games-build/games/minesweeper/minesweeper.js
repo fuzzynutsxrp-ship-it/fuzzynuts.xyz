@@ -49,7 +49,7 @@
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
 
-  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
 
     resetGame();
@@ -77,8 +77,10 @@
   }
 
   function resize() {
-    const maxW = Math.min(window.innerWidth || 800, 1200);
-    const maxH = Math.min(window.innerHeight || 600, 800) - 60;
+    const container = canvas.parentElement || document.body;
+    
+    const maxW = Math.min(container.clientWidth || 800, 1200);
+    const maxH = Math.min(container.clientHeight || 600, 800) - 60;
 
     cellSize = Math.floor(Math.min(maxW / cols, maxH / rows, 40));
     cellSize = Math.max(cellSize, 16);
@@ -182,8 +184,8 @@
     updateScoreDisplay();
 
     const bestKey = 'minesweeper_best';
-    const best = parseInt(localStorage.getItem(bestKey) || '0');
-    if (score > best) localStorage.setItem(bestKey, score.toString());
+    const best = parseInt((function(){try{return localStorage.getItem(bestKey)}catch(e){return null}})() || '0');
+    try { if (score > best) localStorage.setItem(bestKey, score.toString()); } catch(e) {}
 
     draw();
 
@@ -443,7 +445,7 @@
   }
 
   function showGameOverScreen(won) {
-    const best = parseInt(localStorage.getItem('minesweeper_best') || '0');
+    const best = parseInt((function(){try{return localStorage.getItem('minesweeper_best')}catch(e){return null}})() || '0');
 
     ctx.fillStyle = 'rgba(10,6,20,0.85)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);

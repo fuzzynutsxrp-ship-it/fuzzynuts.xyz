@@ -1,4 +1,4 @@
-const CACHE = 'breakout-v1.0.0';
+const CACHE = 'breakout-v1.1.0';
 const ASSETS = [
     './', './index.html', './breakout.css', './breakout.js',
 ];

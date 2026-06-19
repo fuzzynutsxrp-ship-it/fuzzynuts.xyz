@@ -106,7 +106,7 @@ function updateHUD(){
 function initGame(){
   score = 0; combo = 0; comboMult = 1; maxCombo = 0;
   round = 1;
-  bestScore = parseInt(localStorage.getItem(BEST_KEY)||'0',10);
+  bestScore = parseInt((function(){try{return localStorage.getItem(BEST_KEY)}catch(e){return null}})()||'0',10);
   particles = [];
   screenShake = 0;
   aiTimer = 1000 + Math.random()*1500;
@@ -333,8 +333,8 @@ canvas.addEventListener('touchstart', e=>{
   const t = e.touches[0];
   touchStart = { x:(t.clientX-rect.left)*(canvas.width/rect.width), y:(t.clientY-rect.top)*(canvas.height/rect.height), t:performance.now() };
 });
+canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 canvas.addEventListener('touchend', e=>{
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   e.preventDefault();
   if(state!=='playing' || !touchStart) return;
   const rect = canvas.getBoundingClientRect();
@@ -725,7 +725,7 @@ canvas.addEventListener('click', ()=>{
 });
 
 /* ── boot ── */
-bestScore = parseInt(localStorage.getItem(BEST_KEY)||'0',10);
+bestScore = parseInt((function(){try{return localStorage.getItem(BEST_KEY)}catch(e){return null}})()||'0',10);
 state = 'start';
 animFrame = requestAnimationFrame(update);
 

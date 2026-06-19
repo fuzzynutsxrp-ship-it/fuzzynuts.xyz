@@ -45,7 +45,7 @@
   let skierX, skierY, speed, score, braking, airborne, airTimer, trickDone;
   let obstacles, snowParticles, trailMarks, mogulBumps;
   let yeti, yetiActive, startTime;
-  let bestScore = parseInt(localStorage.getItem('ski-free_best') || '0', 10);
+  let bestScore = parseInt((function(){try{return localStorage.getItem('ski-free_best')}catch(e){return null}})() || '0', 10);
   let lastTs = 0;
 
   /* ── input ── */
@@ -145,7 +145,7 @@
     window.__gameScore = score;
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('ski-free_best', bestScore);
+      try { localStorage.setItem('ski-free_best', bestScore); } catch(e) {}
     }
     if (typeof FuzzyScoreSubmit === 'function') {
       FuzzyScoreSubmit('ski-free', score, duration);
