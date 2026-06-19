@@ -28,7 +28,7 @@
   let startTime, gameOver, paused, started;
   let keys = {};
   let touchY = null;
-  let bestScore = parseInt(localStorage.getItem('pong_best') || '0', 10);
+  let bestScore = parseInt((function(){try{return localStorage.getItem('pong_best')}catch(e){return null}})() || '0', 10);
   let animId = null;
 
   /* ── resize ── */

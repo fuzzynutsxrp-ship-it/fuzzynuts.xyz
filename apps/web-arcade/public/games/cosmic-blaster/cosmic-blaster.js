@@ -15,7 +15,7 @@
 
   /* ── State ─────────────────────────────────────────────────── */
   let canvas, ctx, score, lives, wave, isPlaying, animFrame;
-  let bestScore = parseInt(localStorage.getItem(GAME_SLUG + '-best') || '0');
+  let bestScore = parseInt((function(){try{return localStorage.getItem(GAME_SLUG + '-best')}catch(e){return null}})() || '0');
   let lastShot = 0;
   let touchActive = false;
   let touchX = 0, touchY = 0;

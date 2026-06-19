@@ -333,8 +333,8 @@ canvas.addEventListener('touchstart', e=>{
   const t = e.touches[0];
   touchStart = { x:(t.clientX-rect.left)*(canvas.width/rect.width), y:(t.clientY-rect.top)*(canvas.height/rect.height), t:performance.now() };
 });
+canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 canvas.addEventListener('touchend', e=>{
-    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   e.preventDefault();
   if(state!=='playing' || !touchStart) return;
   const rect = canvas.getBoundingClientRect();
