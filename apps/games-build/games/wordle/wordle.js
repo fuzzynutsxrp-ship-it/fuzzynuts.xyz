@@ -230,7 +230,7 @@
     }
     ctx = canvas.getContext('2d');
 
-    bestScore = parseInt(localStorage.getItem('wordle_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('wordle_best')}catch(e){return null}})() || '0', 10);
     window.__gameScore = 0;
 
     resize();
@@ -240,6 +240,7 @@
     // Touch support
     canvas.addEventListener('click', handleClick);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
     showStartScreen();
     requestAnimationFrame(gameLoop);
@@ -448,7 +449,7 @@
 
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('wordle_best', bestScore.toString());
+      try { localStorage.setItem('wordle_best', bestScore.toString()); } catch(e) {}
     }
 
     if (typeof FuzzyScoreSubmit === 'function') {

@@ -1,4 +1,4 @@
-const CACHE = 'pong-v1.0.0';
+const CACHE = 'pong-v1.1.0';
 const ASSETS = [
     './', './index.html', './pong.css', './pong.js',
 ];

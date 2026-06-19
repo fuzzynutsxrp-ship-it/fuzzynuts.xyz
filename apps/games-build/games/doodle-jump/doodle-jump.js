@@ -42,7 +42,7 @@
     if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); };
     resize();
 
-    bestScore = parseInt(localStorage.getItem('doodle-jump_best') || '0');
+    bestScore = parseInt((function(){try{return localStorage.getItem('doodle-jump_best')}catch(e){return null}})() || '0');
     keys = {};
     window.addEventListener('keydown', e => { keys[e.key] = true; if (['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key)) e.preventDefault(); });
     window.addEventListener('keyup', e => { keys[e.key] = false; });
@@ -116,7 +116,7 @@
     const elapsed = (Date.now() - startTime) / 1000;
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('doodle-jump_best', bestScore);
+      try { localStorage.setItem('doodle-jump_best', bestScore); } catch(e) {}
     }
     window.__gameScore = score;
     updateHUD(score);

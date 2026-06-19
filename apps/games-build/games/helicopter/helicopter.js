@@ -100,7 +100,7 @@
     if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; document.body.appendChild(canvas); }
     ctx = canvas.getContext('2d');
     resize();
-    bestScore = parseInt(localStorage.getItem('helicopter_best') || '0', 10);
+    bestScore = parseInt((function(){try{return localStorage.getItem('helicopter_best')}catch(e){return null}})() || '0', 10);
     if (window.ResizeObserver) { new ResizeObserver(resize).observe(document.body); } else { window.addEventListener('resize', resize); }
     bindInputs();
     showStart();
@@ -276,7 +276,7 @@
     if (frameId) cancelAnimationFrame(frameId);
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('helicopter_best', bestScore);
+      try { localStorage.setItem('helicopter_best', bestScore); } catch(e) {}
     }
     window.__gameScore = score;
     var dur = Math.floor(elapsed);

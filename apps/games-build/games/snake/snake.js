@@ -45,16 +45,16 @@
   function randInt(max) { return Math.floor(Math.random() * max); }
 
   function saveBest(s) {
-    const prev = parseInt(localStorage.getItem('snake_best') || '0', 10);
+    const prev = parseInt((function(){try{return localStorage.getItem('snake_best')}catch(e){return null}})() || '0', 10);
     if (s > prev) {
-      localStorage.setItem('snake_best', String(s));
+      try { localStorage.setItem('snake_best', String(s)); } catch(e) {}
       return true;
     }
     return false;
   }
 
   function loadBest() {
-    return parseInt(localStorage.getItem('snake_best') || '0', 10);
+    return parseInt((function(){try{return localStorage.getItem('snake_best')}catch(e){return null}})() || '0', 10);
   }
 
   function showBest() {
@@ -175,8 +175,8 @@
     touchStartY = t.clientY;
     touchStartTime = Date.now();
   }, { passive: false });
-  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
 
+  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchend', function (e) {
     e.preventDefault();
     if (!touchStartTime) return;

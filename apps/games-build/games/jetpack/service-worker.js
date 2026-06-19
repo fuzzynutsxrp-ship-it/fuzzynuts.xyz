@@ -1,4 +1,4 @@
-const CACHE = 'jetpack-v1.0.0';
+const CACHE = 'jetpack-v1.1.0';
 const ASSETS = ['./', './index.html', './jetpack.css', './jetpack.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

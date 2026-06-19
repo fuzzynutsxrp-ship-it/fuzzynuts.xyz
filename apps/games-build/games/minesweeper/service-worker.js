@@ -1,4 +1,4 @@
-const CACHE = 'minesweeper-v1.0.0';
+const CACHE = 'minesweeper-v1.1.0';
 const ASSETS = ['./', './index.html', './minesweeper.css', './minesweeper.js'];
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

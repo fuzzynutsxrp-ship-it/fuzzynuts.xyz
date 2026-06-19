@@ -63,7 +63,7 @@
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
 
-  canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchcancel', function(e) { e.preventDefault(); }, { passive: false });
     resetGame();
     showStartScreen();
   }
@@ -145,8 +145,8 @@
     gameActive = false;
     cancelAnimationFrame(animFrame);
 
-    const best = parseInt(localStorage.getItem('frogger_best') || '0', 10);
-    if (score > best) localStorage.setItem('frogger_best', score);
+    const best = parseInt((function(){try{return localStorage.getItem('frogger_best')}catch(e){return null}})() || '0', 10);
+    try { if (score > best) localStorage.setItem('frogger_best', score); } catch(e) {}
 
     if (typeof FuzzyScoreSubmit === 'function') {
       try { FuzzyScoreSubmit('frogger', score, gameDuration); } catch (e) { /* */ }
