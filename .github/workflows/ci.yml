@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with:
@@ -33,7 +33,7 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -46,7 +46,7 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -60,7 +60,7 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -73,7 +73,7 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -86,7 +86,7 @@ jobs:
     needs: build-games
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -103,7 +103,7 @@ jobs:
       GAME_SESSION_SECRET: ci-only-test-session-secret-do-not-use
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -135,7 +135,7 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
@@ -148,7 +148,7 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.15.0 }
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
