@@ -154,8 +154,8 @@ importers:
   apps/mobile-capacitor:
     dependencies:
       '@capacitor/android':
-        specifier: ^7.0.0
-        version: 7.6.5(@capacitor/core@7.6.5)
+        specifier: ^8.4.1
+        version: 8.4.1(@capacitor/core@7.6.5)
       '@capacitor/core':
         specifier: ^7.0.0
         version: 7.6.5
@@ -479,10 +479,10 @@ packages:
   '@base-org/account@2.4.0':
     resolution: {integrity: sha512-A4Umpi8B9/pqR78D1Yoze4xHyQaujioVRqqO3d6xuDFw9VRtjg6tK3bPlwE0aW+nVH/ntllCpPa2PbI8Rnjcug==}
 
-  '@capacitor/android@7.6.5':
-    resolution: {integrity: sha512-FCNSo5bWkqCIuNt2OgG6IUsJJaYlghzbzlFf4IiHkFtir18FCyqHVGHszvtXB+npT7HQ9JQOZ4MQRDsgczKEGQ==}
+  '@capacitor/android@8.4.1':
+    resolution: {integrity: sha512-igtDCJ7QQn0P2qHFD9p4KXaa6V1b2PRNt+MxjVwtjTm/BJvqmiazOJq6rPjwFSZnfHm6iFoZk8TfzHd44pyBGw==}
     peerDependencies:
-      '@capacitor/core': ^7.6.0
+      '@capacitor/core': ^8.4.0
 
   '@capacitor/cli@7.6.5':
     resolution: {integrity: sha512-nlhNoWZIL7YcV1JgNP8+p7WAVIG+zwsY20ZQJ0zd+2lLeCx9MijfELLhLzMCq33c2pILwOvLww8HUqZ5uYCvHg==}
@@ -5717,7 +5717,7 @@ snapshots:
       - zod
     optional: true
 
-  '@capacitor/android@7.6.5(@capacitor/core@7.6.5)':
+  '@capacitor/android@8.4.1(@capacitor/core@7.6.5)':
     dependencies:
       '@capacitor/core': 7.6.5
 
@@ -9475,7 +9475,7 @@ snapshots:
       eslint: 10.5.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.10
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@10.5.0(jiti@1.21.7))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@10.5.0(jiti@1.21.7))
       eslint-plugin-react: 7.37.5(eslint@10.5.0(jiti@1.21.7))
       eslint-plugin-react-hooks: 7.1.1(eslint@10.5.0(jiti@1.21.7))
@@ -9508,7 +9508,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.12.2
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@10.5.0(jiti@1.21.7))
     transitivePeerDependencies:
       - supports-color
 
@@ -9523,7 +9523,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@10.5.0(jiti@1.21.7)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9

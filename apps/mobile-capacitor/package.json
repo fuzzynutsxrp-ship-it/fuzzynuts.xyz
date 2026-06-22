@@ -14,7 +14,7 @@
     "clean": "rm -rf android ios .turbo"
   },
   "dependencies": {
-    "@capacitor/android": "^7.0.0",
+    "@capacitor/android": "^8.4.1",
     "@capacitor/core": "^7.0.0",
     "@capacitor/ios": "^7.0.0"
   },
